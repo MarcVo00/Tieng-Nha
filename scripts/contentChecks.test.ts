@@ -58,3 +58,31 @@ test("strict mode requires 10 lessons, 10 dialogues and exam quotas", () => {
   expect(errors).toMatch(/10 lessons/);
   expect(errors).toMatch(/10 dialogues/);
 });
+
+const lines = (errs: string[]) => errs.join(String.fromCharCode(10));
+
+test("detects duplicate vocab id inside one lesson", () => {
+  const bad = structuredClone(ok);
+  bad.lessons[0]!.vocab[1]!.id = bad.lessons[0]!.vocab[0]!.id;
+  expect(lines(checkContent(bad, { strict: false }))).toMatch(/duplicate/i);
+});
+
+test("detects duplicate exam question id", () => {
+  const bad = structuredClone(ok);
+  bad.exam.questions[1]!.id = bad.exam.questions[0]!.id;
+  expect(lines(checkContent(bad, { strict: false }))).toMatch(/duplicate/i);
+});
+
+test("detects duplicate turn id in a dialogue", () => {
+  const bad = structuredClone(ok);
+  bad.dialogues[0]!.turns[2]!.id = "t1";
+  expect(lines(checkContent(bad, { strict: false }))).toMatch(/duplicate turn id t1/);
+});
+
+test("strict mode flags an exam section below its quota", () => {
+  const bad = structuredClone(ok);
+  bad.exam.questions = bad.exam.questions.filter((q) => q.section !== "tones");
+  const errors = lines(checkContent(bad, { strict: true }));
+  expect(errors).toMatch(/section tones needs >= 12, found 0/);
+  expect(errors).toMatch(/expected >= 60 questions/);
+});

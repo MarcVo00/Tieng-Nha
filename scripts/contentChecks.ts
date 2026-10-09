@@ -32,7 +32,7 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   const seen = new Map<string, string>();
   const claim = (id: string, where: string) => {
     const prev = seen.get(id);
-    if (prev && prev !== where) errors.push(`duplicate id "${id}" in ${where} (already in ${prev})`);
+    if (prev !== undefined) errors.push(`duplicate id "${id}" in ${where} (already in ${prev})`);
     else seen.set(id, where);
   };
   for (const l of lessons) {
@@ -41,6 +41,12 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
     l.exercises.forEach((e) => claim(e.id, `${l.id}.exercises`));
   }
   dialogues.forEach((d) => claim(d.id, d.id));
+  if (exam.success) {
+    for (const q of exam.data.questions) {
+      claim(q.id, "exam.questions");
+      claim(q.exercise.id, `exam.${q.id}.exercise`);
+    }
+  }
 
   const vocabIds = new Set(lessons.flatMap((l) => l.vocab.map((v) => v.id)));
   const checkExercise = (e: Exercise, where: string) => {
@@ -80,7 +86,18 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
 
   // Dialogue graph: every next exists, starts with npc, at least one terminal, no cycles
   for (const d of dialogues) {
-    const ids = new Set(d.turns.map((t) => t.id));
+    const ids = new Set<string>();
+    for (const t of d.turns) {
+      if (ids.has(t.id)) errors.push(`${d.id}: duplicate turn id ${t.id}`);
+      ids.add(t.id);
+      if (t.speaker === "user") {
+        const optIds = new Set<string>();
+        for (const o of t.options) {
+          if (optIds.has(o.id)) errors.push(`${d.id}/${t.id}: duplicate option id ${o.id}`);
+          optIds.add(o.id);
+        }
+      }
+    }
     const edges = new Map<string, string[]>();
     for (const t of d.turns) {
       const nexts = t.speaker === "npc" ? [t.next] : t.options.map((o) => o.next);

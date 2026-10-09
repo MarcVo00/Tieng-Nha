@@ -75,12 +75,17 @@ export function createSyncService(deps: {
 
   async function run(): Promise<{ sent: number }> {
     let sent = 0;
-    do {
+    for (;;) {
       dirty = false;
       sent += await pass();
-    } while (dirty);
-    await notify();
-    return { sent };
+      await notify();
+      if (!dirty) {
+        // Last check happens after the last await; clearing inflight is synchronous with it,
+        // so any later flush() starts a fresh run instead of being lost.
+        inflight = null;
+        return { sent };
+      }
+    }
   }
 
   function flush(): Promise<{ sent: number }> {
@@ -88,9 +93,7 @@ export function createSyncService(deps: {
       dirty = true; // a run is in progress: make it go around once more
       return inflight;
     }
-    inflight = run().finally(() => {
-      inflight = null;
-    });
+    inflight = run();
     return inflight;
   }
 

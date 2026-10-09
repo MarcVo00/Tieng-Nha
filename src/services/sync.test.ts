@@ -152,3 +152,25 @@ test("stop cancels the pending retry", async () => {
   await vi.advanceTimersByTimeAsync(600000);
   expect(spy).toHaveBeenCalledTimes(1);
 });
+
+test("an event enqueued while the final size notification is pending is still sent", async () => {
+  const outbox = new InMemoryOutbox(); const sink = new FakeEventSink();
+  await seed(outbox, 1);
+  const gate = deferred();
+  const realSize = outbox.size.bind(outbox);
+  let first = true;
+  outbox.size = async () => {
+    if (first) { first = false; await gate.promise; }
+    return realSize();
+  };
+  const sync = createSyncService({ outbox, sink, addOnlineListener: () => () => {} });
+  const p = sync.flush();
+  await vi.advanceTimersByTimeAsync(0); // pass finished, run is parked on the gated size()
+  await seed(outbox, 1);
+  sync.notifyEnqueued();
+  gate.resolve();
+  await p;
+  await vi.advanceTimersByTimeAsync(0);
+  expect(sink.received).toHaveLength(2);
+  expect(await outbox.size()).toBe(0);
+});

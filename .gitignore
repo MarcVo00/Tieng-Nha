@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dev-dist/
+coverage/
+.env
+.env*.local
+!.env.example
+playwright-report/
+test-results/
+.lighthouseci/
+supabase/.temp/
+*.log
+.DS_Store
+vietlearn-design-workspace/

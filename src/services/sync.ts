@@ -37,9 +37,14 @@ export function createSyncService(deps: {
   let running = false;
 
   const notify = async () => {
-    const n = await deps.outbox.size();
-    listeners.forEach((l) => l(n));
+    try {
+      const n = await deps.outbox.size();
+      listeners.forEach((l) => l(n));
+    } catch {
+      // size reporting is best-effort; never let it break a flush
+    }
   };
+  let dirty = false;
   const scheduleRetry = () => {
     if (!running || retryHandle !== null) return;
     const delay = BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)] ?? 300000;
@@ -50,31 +55,42 @@ export function createSyncService(deps: {
     }, delay);
   };
 
-  async function run(): Promise<{ sent: number }> {
+  async function pass(): Promise<number> {
     let sent = 0;
     try {
       for (;;) {
         const events = await deps.outbox.peek(batch);
         if (events.length === 0) break;
         const { accepted } = await deps.sink.push(events);
+        if (accepted.length === 0) throw new Error("batch rejected");
         await deps.outbox.ack(accepted);
         sent += accepted.length;
-        if (accepted.length === 0) break; // avoid infinite loop if the server rejects everything
       }
       attempt = 0;
     } catch {
       scheduleRetry();
     }
+    return sent;
+  }
+
+  async function run(): Promise<{ sent: number }> {
+    let sent = 0;
+    do {
+      dirty = false;
+      sent += await pass();
+    } while (dirty);
     await notify();
     return { sent };
   }
 
   function flush(): Promise<{ sent: number }> {
-    if (!inflight) {
-      inflight = run().finally(() => {
-        inflight = null;
-      });
+    if (inflight) {
+      dirty = true; // a run is in progress: make it go around once more
+      return inflight;
     }
+    inflight = run().finally(() => {
+      inflight = null;
+    });
     return inflight;
   }
 

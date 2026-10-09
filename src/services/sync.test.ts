@@ -63,3 +63,92 @@ test("concurrent flushes share one run", async () => {
   expect(a).toBe(b);
   expect(sink.received).toHaveLength(5);
 });
+
+function deferred() {
+  let resolve: () => void = () => {};
+  const promise = new Promise<void>((r) => { resolve = r; });
+  return { promise, resolve };
+}
+
+test("an event enqueued while a flush is in flight is still sent", async () => {
+  const outbox = new InMemoryOutbox(); const sink = new FakeEventSink();
+  await seed(outbox, 1);
+  const gate = deferred();
+  const realPush = sink.push.bind(sink);
+  let first = true;
+  sink.push = async (events) => {
+    if (first) { first = false; await gate.promise; }
+    return realPush(events);
+  };
+  const sync = createSyncService({ outbox, sink, addOnlineListener: () => () => {} });
+  const p = sync.flush();
+  await vi.advanceTimersByTimeAsync(0);
+  await seed(outbox, 1);
+  sync.notifyEnqueued();
+  gate.resolve();
+  await p;
+  await vi.advanceTimersByTimeAsync(0);
+  expect(await outbox.size()).toBe(0);
+  expect(sink.received).toHaveLength(2);
+});
+
+test("a fully rejected batch is retried with backoff", async () => {
+  const outbox = new InMemoryOutbox(); const sink = new FakeEventSink();
+  await seed(outbox, 2);
+  const realPush = sink.push.bind(sink);
+  let first = true;
+  sink.push = async (events) => {
+    if (first) { first = false; return { accepted: [] }; }
+    return realPush(events);
+  };
+  const sync = createSyncService({ outbox, sink, addOnlineListener: () => () => {} });
+  sync.start();
+  await vi.advanceTimersByTimeAsync(0);
+  expect(await outbox.size()).toBe(2);
+  await vi.advanceTimersByTimeAsync(2000);
+  expect(await outbox.size()).toBe(0);
+  sync.stop();
+});
+
+test("a failing outbox.size does not reject flush", async () => {
+  const outbox = new InMemoryOutbox(); const sink = new FakeEventSink();
+  await seed(outbox, 1);
+  outbox.size = async () => { throw new Error("boom"); };
+  const sync = createSyncService({ outbox, sink, addOnlineListener: () => () => {} });
+  await expect(sync.flush()).resolves.toEqual({ sent: 1 });
+  expect(() => sync.notifyEnqueued()).not.toThrow();
+  await vi.advanceTimersByTimeAsync(0);
+});
+
+test("backoff grows 2s then 4s while the sink keeps failing", async () => {
+  const outbox = new InMemoryOutbox(); const sink = new FakeEventSink();
+  sink.online = false;
+  await seed(outbox, 1);
+  const spy = vi.spyOn(sink, "push");
+  const sync = createSyncService({ outbox, sink, addOnlineListener: () => () => {} });
+  sync.start();
+  await vi.advanceTimersByTimeAsync(0);
+  expect(spy).toHaveBeenCalledTimes(1);
+  await vi.advanceTimersByTimeAsync(1999);
+  expect(spy).toHaveBeenCalledTimes(1);
+  await vi.advanceTimersByTimeAsync(1);
+  expect(spy).toHaveBeenCalledTimes(2);
+  await vi.advanceTimersByTimeAsync(3999);
+  expect(spy).toHaveBeenCalledTimes(2);
+  await vi.advanceTimersByTimeAsync(1);
+  expect(spy).toHaveBeenCalledTimes(3);
+  sync.stop();
+});
+
+test("stop cancels the pending retry", async () => {
+  const outbox = new InMemoryOutbox(); const sink = new FakeEventSink();
+  sink.online = false;
+  await seed(outbox, 1);
+  const spy = vi.spyOn(sink, "push");
+  const sync = createSyncService({ outbox, sink, addOnlineListener: () => () => {} });
+  sync.start();
+  await vi.advanceTimersByTimeAsync(0);
+  sync.stop();
+  await vi.advanceTimersByTimeAsync(600000);
+  expect(spy).toHaveBeenCalledTimes(1);
+});

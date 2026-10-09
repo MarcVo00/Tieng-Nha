@@ -16,6 +16,10 @@
 | services | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ | ✓ (schema/types) | ✗ |
 | adapters | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | même adaptateur | ✓ | ✗ |
 
+Deux éléments partagés complètent la matrice (configuration exacte dans le plan, tâche T01) :
+- **`di`** = `src/app/ServicesProvider.tsx`, `src/app/services.ts`, `src/app/appState.ts` : seule partie de `app/` importable par `features/`, `exercises/` et `adapters/` (accès aux services et à l'état global).
+- **`exercise-registry`** = `src/exercises/registry.ts`, `types.ts`, `ExerciseHost.tsx` : moteur d'exercices commun à la leçon, à la révision et à l'examen.
+
 ## Conséquences
 + Les sous-agents ne peuvent pas créer de dépendance cachée ; le lint échoue.
 − Parfois un peu de duplication de présentation entre features (acceptable).

@@ -6,10 +6,10 @@
 Cinq types d'exercices en V1, d'autres probables (association par paires, dictée…). Ils sont utilisés par trois moteurs : leçon, révision, examen. Les sous-agents doivent pouvoir les développer en parallèle.
 
 ## Décision
-- Chaque type vit dans `src/exercises/<type>/` avec : `schema.ts` (Zod), `Component.tsx`, `grade.ts` (pur), `index.ts` (exporte le plugin), tests.
+- Chaque type vit dans `src/exercises/<type>/` avec : `Component.tsx`, `grade.ts` (pur), `index.ts` (exporte le plugin), tests. Le schéma Zod du type est défini **une seule fois** dans `src/content/schema.ts` (pour éviter une dépendance circulaire contenu ↔ plugins) ; le plugin le référence via son champ `schema`.
 - `src/exercises/registry.ts` exporte `getPlugin(type)` et la liste des plugins enregistrés. Les moteurs ne connaissent **aucun** type concret : ils appellent `getPlugin(ex.type)`.
-- Le schéma `Exercise` global (`content/schema.ts`) est l'union discriminée des schémas de plugins.
-- Contrat : voir spec §6.4 (`ExercisePlugin`, `ExerciseProps`, `GradeResult`).
+- Le schéma `Exercise` global (`content/schema.ts`) est l'union discriminée des 5 schémas de type. Ajouter un type = ajouter son schéma à l'union + créer son dossier plugin.
+- Contrat définitif : plan, tâche T03, fichier `src/exercises/types.ts` (`ExercisePlugin`, `ExerciseProps`, `GradeResult`). L'extrait ci-dessous est indicatif.
 
 ```ts
 export interface ExerciseProps<E> {

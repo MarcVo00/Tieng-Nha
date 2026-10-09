@@ -38,9 +38,10 @@ IA conversationnelle, enregistrements humains, notifications push, gel de streak
 | Stockage local | `dexie` | `^4` |
 | Backend | `@supabase/supabase-js` | `^2.45` |
 | Validation | `zod` | `^3.23` |
-| Tests unitaires | `vitest`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`, `fake-indexeddb` | `^2.1` / dernières compatibles |
+| Tests unitaires | `vitest`, `@vitest/coverage-v8`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`, `jsdom`, `fake-indexeddb` | `^2.1` / dernières compatibles |
+| Scripts TS | `tsx` | `^4` |
 | E2E | `@playwright/test` | `^1.48` |
-| Lint | `eslint` (flat config), `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-boundaries` | `^9` |
+| Lint | `eslint` (flat config), `@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-boundaries`, `eslint-plugin-i18next`, `globals` | `^9` (eslint) / dernières compatibles |
 | Format | `prettier` | `^3` |
 | Police | `@fontsource/be-vietnam-pro` | latest (auto-hébergée) |
 
@@ -103,7 +104,9 @@ e2e/*.spec.ts
 scripts/validate-content.ts
 ```
 
-### 2.3 Ports (contrats exacts)
+### 2.3 Ports (contrats)
+
+> Les signatures **définitives** (méthodes ajoutées pendant la planification : `getVocabIndex`, `countDueVocab`, cache du classement, `getMyProfile`, `onCapabilityLost`…) font foi dans le plan, tâche **T03** (`docs/superpowers/plans/v1/phase-0-foundation.md`). Ce bloc donne la vue d'ensemble.
 ```ts
 // ports/ContentSource.ts
 export interface ContentSource {
@@ -189,7 +192,7 @@ Lesson      = { id: "l01".."l10", contentVersion: number, title, description, em
 Dialogue    = { id: "d01".."d10", contentVersion, title, scene, turns: Turn[] }
   Turn      = { id, speaker: "npc", vi, fr, next: TurnId | null }
             | { id, speaker: "user", options: { id, vi, fr, next: TurnId | null }[2..3] }
-ExamQuestion = Exercise & { section: "listening" | "translation" | "tones" | "speaking" }   // pool ≥ 60
+ExamQuestion = { id: `exam_q${number}`, section: "listening" | "translation" | "tones" | "speaking", exercise: Exercise }   // pool ≥ 60
 BadgeDef    = { id, title, description, icon /* emoji */, rule: BadgeRule }
   BadgeRule = { kind: "lessons_done", gte } | { kind: "streak", gte } | { kind: "perfect_lesson" }
             | { kind: "vocab_reviewed", gte } | { kind: "dialogues_done", gte } | { kind: "exam_score", gte }
@@ -462,7 +465,7 @@ Référence obligatoire : **`docs/design-system.md`** (thème de couleurs, typog
 
 ## 10. Tests et qualité (ADR 0009)
 
-- `npm run typecheck` (tsc --noEmit), `npm run lint`, `npm test` (vitest run + validate-content), `npm run test:e2e` (Playwright, Supabase local + fakes speech), `npm run build`.
+- `npm run typecheck` (tsc --noEmit), `npm run lint`, `npm test` (vitest run + validate-content), `npm run test:e2e` (Playwright sur le build avec `VITE_USE_FAKES=true` et `VITE_FAKE_SPEECH=true` : pas de Docker requis), `npm run build`, `npx supabase test db` (pgTAP, Docker requis, aussi en CI).
 - Couverture `services/` ≥ 90 % lignes.
 - Chaque plugin d'exercice : test de rendu + test `grade`.
 - E2E minimum : (1) onboarding avec fakes → leçon 1 → XP visible au classement ; (2) hors ligne : terminer une leçon, repasser en ligne, l'outbox se vide.
@@ -486,7 +489,8 @@ Référence obligatoire : **`docs/design-system.md`** (thème de couleurs, typog
 VITE_SUPABASE_URL=            # obligatoire
 VITE_SUPABASE_ANON_KEY=       # obligatoire
 VITE_WELCOME_MESSAGE=         # optionnel, message d'anniversaire
-VITE_USE_FAKES=false          # true → adaptateurs fakes (dev sans backend, E2E)
+VITE_USE_FAKES=false          # true → fakes pour auth, sync, classement, examen, signalements (dev sans backend, E2E)
+VITE_FAKE_SPEECH=false        # true → fakes TTS/STT/enregistreur (E2E, navigateurs sans voix)
 ```
 Validées dans `src/app/env.ts` (Zod) ; erreur claire au démarrage si manquantes et `VITE_USE_FAKES !== "true"`.
 

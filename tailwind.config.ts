@@ -1,0 +1,40 @@
+import type { Config } from "tailwindcss";
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  theme: {
+    colors: {
+      transparent: "transparent",
+      current: "currentColor",
+      bg: "var(--color-bg)",
+      surface: "var(--color-surface)",
+      "surface-2": "var(--color-surface-2)",
+      line: "var(--color-line)",
+      ink: { DEFAULT: "var(--color-ink)", muted: "var(--color-ink-muted)" },
+      primary: { DEFAULT: "var(--color-primary)", hover: "var(--color-primary-hover)", on: "var(--color-on-primary)" },
+      gold: { DEFAULT: "var(--color-gold)", ink: "var(--color-gold-ink)" },
+      success: { DEFAULT: "var(--color-success)", soft: "var(--color-success-soft)" },
+      error: { DEFAULT: "var(--color-error)", soft: "var(--color-error-soft)" },
+      info: "var(--color-info)",
+      streak: "var(--color-streak)",
+      tone: {
+        ngang: "var(--tone-ngang)", huyen: "var(--tone-huyen)", sac: "var(--tone-sac)",
+        hoi: "var(--tone-hoi)", nga: "var(--tone-nga)", nang: "var(--tone-nang)",
+      },
+    },
+    fontFamily: { sans: ['"Be Vietnam Pro"', "system-ui", "sans-serif"] },
+    fontSize: {
+      display: ["2.5rem", { lineHeight: "3rem", fontWeight: "800", letterSpacing: "-0.02em" }],
+      title: ["1.75rem", { lineHeight: "2.25rem", fontWeight: "800" }],
+      heading: ["1.25rem", { lineHeight: "1.75rem", fontWeight: "700" }],
+      body: ["1rem", { lineHeight: "1.5rem", fontWeight: "400" }],
+      "body-strong": ["1rem", { lineHeight: "1.5rem", fontWeight: "600" }],
+      caption: ["0.8125rem", { lineHeight: "1.125rem", fontWeight: "500" }],
+    },
+    borderRadius: { none: "0", sm: "var(--radius-sm)", md: "var(--radius-md)", lg: "var(--radius-lg)", full: "9999px" },
+    boxShadow: { none: "none", card: "var(--shadow-card)", raised: "var(--shadow-raised)" },
+    extend: {},
+  },
+  plugins: [],
+} satisfies Config;

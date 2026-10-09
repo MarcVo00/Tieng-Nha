@@ -1,0 +1,5 @@
+dist
+coverage
+node_modules
+src/content/**/*.json
+src/adapters/supabase/types.gen.ts

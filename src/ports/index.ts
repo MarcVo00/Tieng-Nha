@@ -1,0 +1,12 @@
+export type { ContentSource } from "@/ports/ContentSource";
+export { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
+export type { ProgressRepository } from "@/ports/ProgressRepository";
+export type { EventSink } from "@/ports/EventSink";
+export type { Outbox } from "@/ports/Outbox";
+export type { LeaderboardRepository } from "@/ports/LeaderboardRepository";
+export type { AuthService } from "@/ports/AuthService";
+export type { ExamGateway } from "@/ports/ExamGateway";
+export { RecognitionError } from "@/ports/Speech";
+export type { SpeakOptions, SpeechSynthesizer, SpeechRecognizer, VoiceRecorder, RecognitionErrorCode } from "@/ports/Speech";
+export type { ConversationEngine, ConversationInput } from "@/ports/ConversationEngine";
+export type { ContentReporter } from "@/ports/ContentReporter";

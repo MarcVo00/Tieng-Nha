@@ -25,6 +25,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
   const content =
     overrides.content ??
     new InMemoryContentSource([lessonFixture], [dialogueFixture], examPoolFixture, BadgesFileSchema.parse(badgesFile).badges);
+  const sync = createSyncService({ outbox, sink });
   const base: Services = {
     env: { VITE_WELCOME_MESSAGE: "", VITE_USE_FAKES: true, VITE_FAKE_SPEECH: true },
     flags: { aiConversation: false, streakFreeze: false, humanAudio: false },
@@ -47,8 +48,8 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
       answer: async (state) => state,
     },
     reporter: new FakeContentReporter(),
-    activity: createActivityService({ progress, outbox, content, clock }),
-    sync: createSyncService(),
+    activity: createActivityService({ progress, outbox, content, clock, onEventAppended: () => sync.notifyEnqueued() }),
+    sync,
   };
   return { ...base, ...overrides };
 }

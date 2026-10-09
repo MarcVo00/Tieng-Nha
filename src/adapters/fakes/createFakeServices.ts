@@ -47,7 +47,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
       answer: async (state) => state,
     },
     reporter: new FakeContentReporter(),
-    activity: createActivityService(),
+    activity: createActivityService({ progress, outbox, content, clock }),
     sync: createSyncService(),
   };
   return { ...base, ...overrides };

@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, PresenceContext } from "motion/react";
 import type { Capabilities, Exercise, VocabId, VocabItem } from "@/domain/types";
 import { getPlugin } from "@/exercises/registry";
 import type { ExerciseServices, GradeResult } from "@/exercises/types";
@@ -50,17 +50,20 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
           exit={{ x: -24, opacity: 0, transition: { duration: duration.fast * EXIT_RATIO, ease: ease.in } }}
         >
           <motion.div animate={wrong ? SHAKE : { x: 0 }} transition={wrong ? SHAKE_TRANSITION : { duration: 0 }}>
-            <plugin.Component
-              exercise={exercise}
-              disabled={result !== null}
-              onAnswer={handleAnswer}
-              services={services}
-              capabilities={capabilities}
-              vocabIndex={vocabIndex}
-              voiceRate={voiceRate}
-              seed={seed}
-              {...(onCapabilityLost ? { onCapabilityLost } : {})}
-            />
+            {/* Layout-animated children (word_order tiles) must not take part in this exit: they never release it. */}
+            <PresenceContext.Provider value={null}>
+              <plugin.Component
+                exercise={exercise}
+                disabled={result !== null}
+                onAnswer={handleAnswer}
+                services={services}
+                capabilities={capabilities}
+                vocabIndex={vocabIndex}
+                voiceRate={voiceRate}
+                seed={seed}
+                {...(onCapabilityLost ? { onCapabilityLost } : {})}
+              />
+            </PresenceContext.Provider>
           </motion.div>
         </motion.div>
       </AnimatePresence>

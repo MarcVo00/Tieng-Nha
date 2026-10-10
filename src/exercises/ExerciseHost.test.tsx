@@ -1,8 +1,10 @@
-import { screen } from "@testing-library/react";
+import { useState } from "react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithServices } from "@/test/renderWithServices";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { getPlugin } from "@/exercises/registry";
+import type { Exercise } from "@/domain/types";
 import { lessonFixture } from "@/test/fixtures/lessonFixture";
 import { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
 
@@ -97,4 +99,21 @@ test("the same exercise can be answered again with a new attempt", async () => {
   expect(screen.getByRole("button", { name: /vérifier/i })).toBeDisabled();
   await userEvent.keyboard("2{Enter}");
   expect(onResult).toHaveBeenCalledTimes(2);
+});
+
+test("a word_order exercise (layout-animated tiles) leaves so the next exercise can enter", async () => {
+  const wordOrder = lessonFixture.exercises.find((e) => e.type === "word_order");
+  if (wordOrder?.type !== "word_order") throw new Error("fixture has no word_order exercise");
+  // Like the lesson player: the parent swaps the exercise as soon as the result is reported.
+  function Sequence() {
+    const [current, setCurrent] = useState<Exercise>(wordOrder as Exercise);
+    return <ExerciseHost {...base} exercise={current} mode="practice" onResult={() => setCurrent(translate)} />;
+  }
+  renderWithServices(<Sequence />);
+  const bank = () => within(screen.getByRole("group", { name: /mots disponibles/i }));
+  for (const token of wordOrder.tokensVi) await userEvent.click(bank().getByRole("button", { name: token }));
+  await userEvent.click(screen.getByRole("button", { name: /vérifier/i }));
+  await userEvent.click(await screen.findByRole("button", { name: /continuer/i }));
+  expect(await screen.findByRole("button", { name: /^cho tui một ly cà phê đen\.$/i })).toBeInTheDocument();
+  expect(screen.queryByRole("group", { name: /mots disponibles/i })).not.toBeInTheDocument();
 });

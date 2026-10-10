@@ -44,7 +44,7 @@ test("onboarded user sees the tab bar", async () => {
 test("focus routes hide the tab bar", async () => {
   const { router } = renderAt("/lesson/l05", await onboardedServices());
   await waitFor(() => expect(router.state.location.pathname).toBe("/lesson/l05"));
-  await screen.findByRole("heading", { name: /bientôt prêt/i });
+  await screen.findByRole("button", { name: /quitter la leçon/i }); // the lesson player is a focus route
   expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
 });
 

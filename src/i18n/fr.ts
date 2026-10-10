@@ -226,6 +226,50 @@ export const fr = {
       aria: (locked: boolean) => `Bài kiểm tra, test final${locked ? ", verrouillé" : ""}`,
     },
   },
+  // --- lessons ---
+  lessons: {
+    loadError: { title: "La leçon n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
+    quit: {
+      aria: "Quitter la leçon",
+      title: "Quitter la leçon ?",
+      body: "Ta progression dans cette leçon sera perdue.",
+      confirm: "Quitter",
+      cancel: "Rester",
+    },
+    deck: {
+      label: "Vocabulaire de la leçon",
+      counter: (n: number, total: number) => `Mot ${n} sur ${total}`,
+      next: "Suivant",
+      start: "C'est parti !",
+      noAudio: "Pas de voix vietnamienne sur cet appareil.",
+    },
+    failed: {
+      title: "Plus de vies !",
+      body: "Les mots ont été ajoutés à tes révisions.",
+      retry: "Réessayer",
+      back: "Retour",
+    },
+    saving: { title: "On enregistre ta leçon…" },
+    saveError: { title: "Ta leçon n'a pas pu être enregistrée", body: "Tes réponses sont gardées. Réessaie dans un instant." },
+    report: {
+      title: "Signaler un problème",
+      hint: "Une faute, une traduction étrange ? Dis-nous ce qui cloche.",
+      field: "Ton message",
+      placeholder: "Qu'est-ce qui ne va pas ?",
+      count: (n: number, max: number) => `${n} / ${max}`,
+      send: "Envoyer",
+      sent: "Merci, c'est noté !",
+      error: "Impossible d'envoyer pour le moment. Réessaie.",
+    },
+    done: {
+      perfect: "Giỏi quá !",
+      good: "Bien joué !",
+      accuracy: (pct: number) => `${pct} % de réussite`,
+      badges: "Nouveaux badges",
+      dialogue: (title: string) => `Dialogue : ${title}`,
+      continue: "Continuer",
+    },
+  },
 } as const;
 
 export type Fr = typeof fr;

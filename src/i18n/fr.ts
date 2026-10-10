@@ -205,6 +205,27 @@ export const fr = {
       open: "Ouvrir VietLearn",
     },
   },
+  // --- home ---
+  home: {
+    pathLabel: "Ton parcours",
+    loadError: { title: "Le parcours n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
+    review: { title: "Révision du jour", count: (n: number) => `${n} ${n > 1 ? "mots" : "mot"}` },
+    start: "Commencer",
+    lesson: {
+      aria: (n: number, title: string, state: "done" | "available" | "locked", perfect: boolean) =>
+        `Leçon ${n} : ${title}, ${state === "done" ? (perfect ? "terminée sans faute" : "terminée") : state === "available" ? "disponible" : "verrouillée"}`,
+      lockedToast: "Termine d'abord la leçon précédente",
+    },
+    dialogue: { kicker: "Dialogue", aria: (title: string) => `Dialogue : ${title}`, done: "Fait" },
+    exam: {
+      vi: "Bài kiểm tra",
+      fr: "Test final",
+      lockedToast: "Termine d'abord les 10 leçons",
+      lockedHint: "Après les 10 leçons",
+      best: (n: number) => `Meilleur score : ${n} %`,
+      aria: (locked: boolean) => `Bài kiểm tra, test final${locked ? ", verrouillé" : ""}`,
+    },
+  },
 } as const;
 
 export type Fr = typeof fr;

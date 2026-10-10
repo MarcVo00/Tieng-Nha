@@ -1,6 +1,139 @@
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
-import { EmptyState } from "@/ui";
+import { useAppState, useRefreshProgress } from "@/app/appState";
+import { useServices } from "@/app/ServicesProvider";
+import type { LessonSummary } from "@/domain/types";
+import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
+import { PathStop } from "@/features/home/PathStop";
+import { buildPathLayout, PATH_WIDTH } from "@/features/home/pathLayout";
+
+// Hero: the winding path with the next stop pulsing. One primary action: the next stop.
+// Secondary: the review card on top. Loading: skeleton stops. Error: retry.
+
+function ReviewCard({ count }: { count: number }) {
+  return (
+    <motion.div whileTap={tap}>
+      <Card raised>
+        <Link to="/review" className="flex min-h-11 items-center gap-3 p-4">
+          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-2 text-primary">
+            <Icon name="review" size={24} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-body-strong text-ink">{fr.home.review.title}</span>
+            <span className="block text-caption tabular-nums text-ink-muted">{fr.home.review.count(count)}</span>
+          </span>
+          <Icon name="chevron-right" size={20} className="text-ink-muted" />
+        </Link>
+      </Card>
+    </motion.div>
+  );
+}
+
+function SkeletonStops() {
+  return (
+    <div className="mx-auto flex flex-col gap-10 py-6" style={{ width: PATH_WIDTH }} aria-hidden="true">
+      {[-40, 0, 40].map((offset) => (
+        <div key={offset} className="flex items-center gap-4" style={{ transform: `translateX(${offset}px)` }}>
+          <div className="h-16 w-16 shrink-0 rounded-full bg-surface-2" />
+          <div className="w-24"><Skeleton lines={2} /></div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function HomeScreen() {
-  return <EmptyState title={fr.app.soon.title} body={fr.app.soon.body} illustration="lantern" />;
+  const { content } = useServices();
+  const refresh = useRefreshProgress();
+  const snapshot = useAppState((s) => s.snapshot);
+  const dueCount = useAppState((s) => s.dueCount);
+  const reduced = useReducedMotion();
+  const maskId = useId();
+  const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const nextEl = useRef<HTMLElement | null>(null);
+  const scrolled = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setFailed(false);
+    Promise.all([content.listLessons(), refresh()]).then(
+      ([list]) => {
+        if (!cancelled) setLessons(list);
+      },
+      () => {
+        if (!cancelled) setFailed(true);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [content, refresh, attempt]);
+
+  const ready = lessons !== null && snapshot !== null;
+  useEffect(() => {
+    if (!ready || scrolled.current) return;
+    scrolled.current = true;
+    nextEl.current?.scrollIntoView?.({ block: "center", behavior: reduced ? "auto" : "smooth" });
+  }, [ready, reduced]);
+
+  const nextRef = useCallback((el: HTMLElement | null) => {
+    nextEl.current = el;
+  }, []);
+
+  if (failed) {
+    return (
+      <EmptyState
+        title={fr.home.loadError.title}
+        body={fr.home.loadError.body}
+        illustration="boat"
+        action={<Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>{fr.app.error.retry}</Button>}
+      />
+    );
+  }
+
+  const layout = ready ? buildPathLayout(lessons, snapshot) : null;
+
+  return (
+    <div className="relative px-5 pb-8 pt-4">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 text-primary [mask-image:linear-gradient(to_bottom,black,transparent)]">
+        <Motif kind="waves" />
+      </div>
+      <h1 className="sr-only">{fr.home.pathLabel}</h1>
+      <div className="relative">
+        {dueCount > 0 ? <ReviewCard count={dueCount} /> : null}
+        {layout === null ? (
+          <SkeletonStops />
+        ) : (
+          <div className="relative mx-auto" style={{ width: PATH_WIDTH, height: layout.height }}>
+            <svg className="absolute inset-0 text-line" width={PATH_WIDTH} height={layout.height} viewBox={`0 0 ${PATH_WIDTH} ${layout.height}`} fill="none" aria-hidden="true" focusable="false">
+              <defs>
+                <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width={PATH_WIDTH} height={layout.height}>
+                  <motion.path
+                    d={layout.d}
+                    stroke="white"
+                    strokeWidth={10}
+                    strokeLinecap="round"
+                    fill="none"
+                    initial={{ pathLength: reduced ? 1 : 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: reduced ? 0 : 0.6, ease: ease.inOut }}
+                  />
+                </mask>
+              </defs>
+              <path d={layout.d} stroke="currentColor" strokeWidth={4} strokeLinecap="round" strokeDasharray="2 12" mask={`url(#${maskId})`} />
+            </svg>
+            <ol className="absolute inset-0 list-none">
+              {layout.nodes.map((node) => (
+                <PathStop key={node.key} node={node} nextRef={nextRef} />
+              ))}
+            </ol>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

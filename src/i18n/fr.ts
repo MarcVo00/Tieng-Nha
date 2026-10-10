@@ -490,6 +490,12 @@ export const fr = {
     account: {
       title: "Compte",
       signOut: { open: "Se déconnecter", title: "Se déconnecter ?", body: "Ta progression sur cet appareil sera effacée. Elle reste enregistrée si tu l'as synchronisée.", confirm: "Me déconnecter", cancel: "Annuler" },
+      unsynced: {
+        title: "Progrès non synchronisés",
+        body: "Tu as des progrès pas encore synchronisés, ils seront perdus. Continuer ?",
+        confirm: "Me déconnecter quand même",
+        cancel: "Rester connecté",
+      },
       delete: {
         open: "Supprimer mon compte",
         title: "Supprimer mon compte ?",

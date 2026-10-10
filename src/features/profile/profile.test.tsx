@@ -238,3 +238,24 @@ test("sign-out flushes pending sync before signing out", async () => {
   await user.click(await screen.findByRole("button", { name: fr.profile.account.signOut.confirm }));
   await waitFor(() => expect(order).toEqual(["flush", "signOut"]));
 });
+
+test("sign-out warns about unsynced progress and only proceeds when confirmed", async () => {
+  const { services, router, user } = await setup();
+  await services.outbox.enqueue({
+    clientId: "c1", schemaVersion: 1, type: "lesson_completed", refId: "l01", xp: 10, payload: {}, createdAt: NOW,
+  });
+  vi.spyOn(services.sync, "flush").mockResolvedValue({ sent: 0 });
+  const signOut = vi.spyOn(services.auth, "signOut");
+  await user.click(screen.getByRole("button", { name: fr.profile.account.signOut.open }));
+  await user.click(await screen.findByRole("button", { name: fr.profile.account.signOut.confirm }));
+  expect(await screen.findByText(fr.profile.account.unsynced.body)).toBeInTheDocument();
+  expect(signOut).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: fr.profile.account.unsynced.cancel }));
+  await waitFor(() => expect(screen.queryByText(fr.profile.account.unsynced.body)).not.toBeInTheDocument());
+  expect(router.state.location.pathname).toBe("/me");
+  await user.click(screen.getByRole("button", { name: fr.profile.account.signOut.open }));
+  await user.click(await screen.findByRole("button", { name: fr.profile.account.signOut.confirm }));
+  await user.click(await screen.findByRole("button", { name: fr.profile.account.unsynced.confirm }));
+  await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
+  expect(signOut).toHaveBeenCalledTimes(1);
+});

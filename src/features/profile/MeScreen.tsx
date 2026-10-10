@@ -92,7 +92,7 @@ function BadgeSheet({ badge, unlocked, onClose }: { badge: BadgeDef | null; unlo
 }
 
 export function MeScreen() {
-  const { auth, progress, content, sync } = useServices();
+  const { auth, progress, content, sync, outbox } = useServices();
   const navigate = useNavigate();
   const toast = useToast();
   const profile = useAppState((s) => s.profile);
@@ -104,7 +104,7 @@ export function MeScreen() {
   const [reportOpen, setReportOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
   const [badge, setBadge] = useState<BadgeDef | null>(null);
-  const [confirm, setConfirm] = useState<"signout" | "delete" | null>(null);
+  const [confirm, setConfirm] = useState<"signout" | "unsynced" | "delete" | null>(null);
   const [pending, setPending] = useState(false);
   const leaving = useRef(false);
 
@@ -152,14 +152,23 @@ export function MeScreen() {
   const unlockedIds = new Set(snapshot?.badges ?? []);
   const sortedBadges = badges ? [...badges].sort((a, b) => Number(unlockedIds.has(b.id)) - Number(unlockedIds.has(a.id))) : [];
 
-  async function leave(kind: "signout" | "delete"): Promise<void> {
+  async function leave(kind: "signout" | "delete", skipUnsyncedCheck = false): Promise<void> {
     if (leaving.current) return;
     leaving.current = true;
     setPending(true);
     // Only the remote call can abort: once it succeeded the user is gone, so local cleanup never blocks.
     try {
       // Flush while the session is still valid; a slow network must not keep the dialog busy.
-      if (kind === "signout") await flushBeforeSignOut(sync.flush());
+      if (kind === "signout" && !skipUnsyncedCheck) {
+        await flushBeforeSignOut(sync.flush());
+        // Signing out wipes local data: warn first when some progress never reached the server.
+        if ((await outbox.size().catch(() => 0)) > 0) {
+          leaving.current = false;
+          setPending(false);
+          setConfirm("unsynced");
+          return;
+        }
+      }
       if (kind === "signout") await auth.signOut();
       else await auth.deleteAccount();
     } catch (e) {
@@ -270,6 +279,17 @@ export function MeScreen() {
         confirmLabel={a.signOut.confirm}
         cancelLabel={a.signOut.cancel}
         onConfirm={() => void leave("signout")}
+        onCancel={() => setConfirm(null)}
+      />
+      <ConfirmDialog
+        open={confirm === "unsynced"}
+        title={a.unsynced.title}
+        body={a.unsynced.body}
+        busy={pending}
+        confirmLabel={a.unsynced.confirm}
+        cancelLabel={a.unsynced.cancel}
+        danger
+        onConfirm={() => void leave("signout", true)}
         onCancel={() => setConfirm(null)}
       />
       <ConfirmDialog

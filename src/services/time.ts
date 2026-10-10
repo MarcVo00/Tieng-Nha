@@ -8,7 +8,10 @@ const fmt = new Intl.DateTimeFormat("en-CA", {
 });
 
 export function parisDay(iso: string): string {
-  return fmt.format(new Date(iso)); // en-CA formats as YYYY-MM-DD
+  // Assemble from parts: the order and separators of a formatted string vary by engine and ICU version.
+  const parts = fmt.formatToParts(new Date(iso));
+  const part = (type: "year" | "month" | "day") => parts.find((p) => p.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
 }
 // Noon UTC avoids any DST edge when doing pure calendar arithmetic.
 const noon = (day: string) => Date.parse(`${day}T12:00:00.000Z`);

@@ -26,3 +26,4 @@ export { Confetti } from "@/ui/Confetti";
 export { Motif } from "@/ui/Motif";
 export { ChoiceGrid, type ChoiceOption } from "@/ui/ChoiceGrid";
 export { useChoiceKeys } from "@/ui/useChoiceKeys";
+export { DeviceCheck, type DeviceCheckProps } from "@/ui/DeviceCheck";

@@ -11,6 +11,8 @@ export function pickVietnameseVoice(voices: readonly SpeechSynthesisVoice[]): Sp
 export class WebSpeechSynthesizer implements SpeechSynthesizer {
   private voice: SpeechSynthesisVoice | null = null;
   private readyPromise: Promise<void> | null = null;
+  // iOS can garbage-collect an utterance mid-speech and never fire `end`; keeping a reference helps.
+  private current: SpeechSynthesisUtterance | null = null;
 
   constructor(private readonly win: SpeechWindow = window as unknown as SpeechWindow) {}
 
@@ -79,9 +81,22 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
     u.lang = "vi-VN";
     u.voice = this.voice;
     u.rate = opts.rate ?? 1;
+    this.current = u;
+    const rate = u.rate > 0 ? u.rate : 1;
+    const safetyMs = Math.max(3000, (text.length * 150) / rate + 2000);
     await new Promise<void>((resolve) => {
-      u.onend = () => resolve();
-      u.onerror = () => resolve();
+      // A dropped utterance must never leave the caller waiting forever.
+      const timer = setTimeout(() => {
+        synth.cancel();
+        done();
+      }, safetyMs);
+      const done = () => {
+        clearTimeout(timer);
+        if (this.current === u) this.current = null;
+        resolve();
+      };
+      u.onend = done;
+      u.onerror = done;
       synth.speak(u);
     });
   }

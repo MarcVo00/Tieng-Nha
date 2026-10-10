@@ -69,6 +69,50 @@ test("speak uses the Vietnamese voice and resolves on end", async () => {
   expect(win.speechSynthesis.speak.mock.calls[0]?.[0]).toMatchObject({ text: "xin chào", lang: "vi-VN", rate: 0.7 });
 });
 
+test("speak gives up after a safety timeout when the utterance is dropped", async () => {
+  vi.useFakeTimers();
+  try {
+    const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []); // speak() never fires end
+    const tts = new WebSpeechSynthesizer(win as never);
+    let settled = false;
+    const p = tts.speak("xin chào", { rate: 1 }).then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(3199);
+    expect(settled).toBe(false);
+    const cancels = win.speechSynthesis.cancel.mock.calls.length;
+    await vi.advanceTimersByTimeAsync(1);
+    await p;
+    expect(settled).toBe(true);
+    expect(win.speechSynthesis.cancel.mock.calls.length).toBe(cancels + 1);
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+test("the safety timeout scales with text length and slow rate, and is cleared on a normal end", async () => {
+  vi.useFakeTimers();
+  try {
+    const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
+    win.speechSynthesis.speak.mockImplementation((u: { onend: (() => void) | null }) => u.onend?.());
+    await new WebSpeechSynthesizer(win as never).speak("xin chào");
+    expect(vi.getTimerCount()).toBe(0);
+    const slow = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
+    const text = "a".repeat(40);
+    let settled = false;
+    void new WebSpeechSynthesizer(slow as never).speak(text, { rate: 0.5 }).then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(40 * 150 / 0.5 + 1999);
+    expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(settled).toBe(true);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
 type FakeRec = {
   onresult: ((e: unknown) => void) | null;
   onerror: ((e: { error: string }) => void) | null;

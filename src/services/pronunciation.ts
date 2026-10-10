@@ -14,8 +14,14 @@ export function normalizeVi(s: string): string {
     .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .split(/\s+/)
     .filter(Boolean)
-    .map((w) => (/^\d+$/.test(w) && Number(w) <= 10 ? (DIGITS[Number(w)] ?? w) : w))
+    .flatMap(spellDigits)
     .join(" ");
+}
+
+function spellDigits(w: string): string[] {
+  if (!/^\d+$/.test(w)) return [w];
+  if (w.length > 2) return [...w].map((c) => DIGITS[Number(c)] ?? c);
+  return [Number(w) <= 10 ? (DIGITS[Number(w)] ?? w) : w];
 }
 
 export function stripTones(s: string): string {

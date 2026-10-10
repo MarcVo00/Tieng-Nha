@@ -34,3 +34,12 @@ test("garbage scores low and is clamped at 0", () => {
   expect(r.score).toBeLessThan(PASS_THRESHOLD);
 });
 test("no alternatives → score 0", () => expect(scorePronunciation("xin chào", []).score).toBe(0));
+
+test("normalizeVi spells out long digit runs digit by digit", () => {
+  expect(normalizeVi("889362")).toBe("tám tám chín ba sáu hai");
+  expect(normalizeVi("889 362")).toBe("tám tám chín ba sáu hai");
+  expect(normalizeVi("Số của tui là 973256.")).toBe("số của tui là chín bảy ba hai năm sáu");
+});
+test("scorePronunciation matches a recognised digit run", () => {
+  expect(scorePronunciation("Số của tui là tám tám chín ba sáu hai.", ["số của tui là 889362"]).score).toBe(1);
+});

@@ -1,6 +1,6 @@
 {
   "id": "d10",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Se présenter à la famille",
   "scene": "Bữa cơm gia đình — un repas de famille",
   "turns": [
@@ -18,7 +18,7 @@
         {
           "id": "o1",
           "vi": "Dạ, rất vui được gặp bạn.",
-          "fr": "Oui, ravi(e) de te rencontrer.",
+          "fr": "Merci, ravi(e) de te rencontrer.",
           "next": "t3"
         },
         {
@@ -57,7 +57,7 @@
     {
       "id": "t5",
       "speaker": "npc",
-      "vi": "Vậy à! Mời bạn ăn cơm. Bạn đói không?",
+      "vi": "Vậy hả! Mời bạn ăn cơm. Bạn đói không?",
       "fr": "Ah bon ! À table. Tu as faim ?",
       "next": "t6"
     },
@@ -73,8 +73,8 @@
         },
         {
           "id": "o2",
-          "vi": "Dạ, tui no rồi.",
-          "fr": "Merci, je n'ai plus faim.",
+          "vi": "Dạ, cảm ơn bạn!",
+          "fr": "Merci !",
           "next": "t7"
         }
       ]
@@ -82,8 +82,8 @@
     {
       "id": "t7",
       "speaker": "npc",
-      "vi": "Bạn ăn nhiều nha. Cơm má tui ngon lắm.",
-      "fr": "Mange bien, hein. La cuisine de ma mère est très bonne.",
+      "vi": "Bạn ăn nhiều nha. Cơm má tui nấu ngon lắm.",
+      "fr": "Mange bien. La cuisine de ma mère est très bonne.",
       "next": null
     }
   ]

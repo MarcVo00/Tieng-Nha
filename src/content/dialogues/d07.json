@@ -1,6 +1,6 @@
 {
   "id": "d07",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Marchander des fruits",
   "scene": "Chợ Bến Thành — le marché Bến Thành à Sài Gòn",
   "turns": [
@@ -17,14 +17,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Xoài bao nhiêu tiền?",
-          "fr": "La mangue, combien ça coûte ?",
+          "vi": "Chuối rẻ không?",
+          "fr": "Les bananes sont bon marché ?",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Thơm rẻ không?",
-          "fr": "L'ananas est bon marché ?",
+          "vi": "Tui mua xoài. Bao nhiêu tiền?",
+          "fr": "Je prends des mangues. C'est combien ?",
           "next": "t3"
         }
       ]
@@ -43,7 +43,7 @@
         {
           "id": "o1",
           "vi": "Mắc quá! Bớt cho tui nha.",
-          "fr": "Trop cher ! Fais-moi un rabais, hein.",
+          "fr": "Trop cher ! Fais-moi un prix, hein.",
           "next": "t5"
         },
         {
@@ -58,7 +58,7 @@
       "id": "t5",
       "speaker": "npc",
       "vi": "Dạ, bớt cho bạn. Ba mươi lăm ngàn một ký nha.",
-      "fr": "D'accord, je te fais un rabais. Trente-cinq mille le kilo, hein.",
+      "fr": "D'accord, je te fais un rabais. Trente-cinq mille le kilo.",
       "next": "t7"
     },
     {
@@ -81,7 +81,7 @@
         {
           "id": "o2",
           "vi": "Tính tiền nha!",
-          "fr": "Je te paie, hein !",
+          "fr": "Je vais payer, hein !",
           "next": "t8"
         }
       ]

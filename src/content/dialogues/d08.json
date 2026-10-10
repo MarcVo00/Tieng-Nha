@@ -1,6 +1,6 @@
 {
   "id": "d08",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Prendre un xe ôm",
   "scene": "Ngã tư — au carrefour",
   "turns": [
@@ -17,14 +17,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Tui đi chợ.",
-          "fr": "Je vais au marché.",
+          "vi": "Tui đi gần đây.",
+          "fr": "Je vais tout près d'ici.",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Tui đi gần đây.",
-          "fr": "Je vais tout près d'ici.",
+          "vi": "Đi chợ. Có xa không?",
+          "fr": "Au marché. C'est loin ?",
           "next": "t3"
         }
       ]
@@ -32,8 +32,8 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Dạ, bạn lên xe đi.",
-      "fr": "D'accord, monte.",
+      "vi": "Dạ, không xa đâu. Bạn lên xe đi.",
+      "fr": "Non, ce n'est pas loin. Monte.",
       "next": "t4"
     },
     {
@@ -89,7 +89,7 @@
       "id": "t7",
       "speaker": "npc",
       "vi": "Dạ, tới rồi. Mười lăm ngàn nha.",
-      "fr": "Voilà, on est arrivés. Quinze mille, hein.",
+      "fr": "Voilà, on est arrivés. Quinze mille.",
       "next": null
     }
   ]

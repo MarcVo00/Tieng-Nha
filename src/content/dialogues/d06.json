@@ -1,6 +1,6 @@
 {
   "id": "d06",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Au restaurant",
   "scene": "Quán cơm tấm — un restaurant de riz brisé à Sài Gòn",
   "turns": [
@@ -23,14 +23,8 @@
         },
         {
           "id": "o2",
-          "vi": "Cho tui hủ tiếu.",
-          "fr": "Un hủ tiếu pour moi.",
-          "next": "t3"
-        },
-        {
-          "id": "o3",
-          "vi": "Cho tui phở.",
-          "fr": "Un phở pour moi.",
+          "vi": "Cho tui hai dĩa cơm tấm.",
+          "fr": "Deux assiettes de riz brisé pour moi.",
           "next": "t3"
         }
       ]

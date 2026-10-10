@@ -1,14 +1,14 @@
 {
   "id": "d03",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Donner son numéro",
-  "scene": "Au téléphone — Gọi điện thoại",
+  "scene": "Trên đường — on échange nos numéros",
   "turns": [
     {
       "id": "t1",
       "speaker": "npc",
-      "vi": "Alô? Chào bạn! Số điện thoại của bạn là số mấy?",
-      "fr": "Allô ? Bonjour ! Quel est ton numéro de téléphone ?",
+      "vi": "Chào bạn! Số điện thoại của bạn là số mấy?",
+      "fr": "Salut ! C'est quoi ton numéro de téléphone ?",
       "next": "t2"
     },
     {
@@ -57,15 +57,15 @@
     {
       "id": "t5",
       "speaker": "npc",
-      "vi": "Số của tui là tám tám chín ba sáu hai. Tạm biệt bạn!",
-      "fr": "Mon numéro est 8 8 9 3 6 2. Au revoir !",
+      "vi": "Số của tui là tám tám chín ba sáu hai.",
+      "fr": "Mon numéro est 8 8 9 3 6 2.",
       "next": null
     },
     {
       "id": "t6",
       "speaker": "npc",
       "vi": "Tốt quá! Tạm biệt bạn nha.",
-      "fr": "Parfait ! Au revoir, hein.",
+      "fr": "Parfait ! Au revoir.",
       "next": null
     }
   ]

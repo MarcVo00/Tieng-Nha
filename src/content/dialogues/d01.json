@@ -1,14 +1,14 @@
 {
   "id": "d01",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Première rencontre",
   "scene": "Dans la rue — Trên đường",
   "turns": [
     {
       "id": "t1",
       "speaker": "npc",
-      "vi": "Xin chào bạn! Bạn có vui không?",
-      "fr": "Bonjour ! Tu es content(e) ?",
+      "vi": "Xin chào bạn! Rất vui được gặp bạn.",
+      "fr": "Bonjour ! Ravi(e) de te rencontrer.",
       "next": "t2"
     },
     {
@@ -17,14 +17,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Dạ, vui lắm.",
-          "fr": "Oui, très content(e).",
+          "vi": "Dạ, cảm ơn bạn.",
+          "fr": "Merci.",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Dạ, không vui.",
-          "fr": "Oui, pas content(e).",
+          "vi": "Dạ, vui lắm!",
+          "fr": "Moi aussi, très content(e) !",
           "next": "t3"
         }
       ]
@@ -32,8 +32,8 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Vậy à! Tui phải đi rồi nha.",
-      "fr": "Ah bon ! Je dois y aller, hein.",
+      "vi": "Tui phải đi rồi. Tạm biệt bạn nha!",
+      "fr": "Je dois y aller. Au revoir !",
       "next": "t4"
     },
     {

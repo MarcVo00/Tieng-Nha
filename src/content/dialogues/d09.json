@@ -1,6 +1,6 @@
 {
   "id": "d09",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Fixer un rendez-vous",
   "scene": "Au téléphone — Gọi điện thoại",
   "turns": [
@@ -17,14 +17,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Gặp hôm nay nha.",
-          "fr": "On se voit aujourd'hui, hein.",
+          "vi": "Hôm nay nha.",
+          "fr": "Aujourd'hui, alors.",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Ngày mai, tui gặp bạn nha.",
-          "fr": "Demain, je te vois, hein.",
+          "vi": "Ngày mai nha.",
+          "fr": "Demain, alors.",
           "next": "t3"
         }
       ]
@@ -63,8 +63,8 @@
     {
       "id": "t5",
       "speaker": "npc",
-      "vi": "Dạ, được. Vậy gặp bạn nha!",
-      "fr": "D'accord. Alors à tout à l'heure, hein !",
+      "vi": "Dạ, được. Vậy hẹn gặp bạn nha!",
+      "fr": "D'accord. Alors à plus tard !",
       "next": "t6"
     },
     {

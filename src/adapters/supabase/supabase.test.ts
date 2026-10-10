@@ -104,6 +104,16 @@ describe("SupabaseAuthService offline session fallback", () => {
     expect(localStorage.getItem("vl-session")).not.toBeNull();
   });
 
+  test("a thrown fetch failure uses the same cached fallback", async () => {
+    localStorage.setItem("vl-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
+    const throwing = make(async () => {
+      throw new TypeError("Failed to fetch");
+    });
+    await expect(throwing.getSession()).resolves.toEqual({ userId: "u1", email: "a@b.c" });
+    localStorage.clear();
+    await expect(throwing.getSession()).rejects.toBeInstanceOf(OfflineError);
+  });
+
   test("throws OfflineError when offline and nothing is cached", async () => {
     await expect(make(async () => ({ data: { session: null }, error: retryable })).getSession()).rejects.toBeInstanceOf(OfflineError);
   });

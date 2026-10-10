@@ -87,7 +87,7 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
     await new Promise<void>((resolve) => {
       // A dropped utterance must never leave the caller waiting forever.
       const timer = setTimeout(() => {
-        synth.cancel();
+        if (this.current === u) synth.cancel();
         done();
       }, safetyMs);
       const done = () => {

@@ -113,6 +113,23 @@ test("the safety timeout scales with text length and slow rate, and is cleared o
   }
 });
 
+test("a stale safety timer never cancels a newer utterance", async () => {
+  vi.useFakeTimers();
+  try {
+    const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
+    const tts = new WebSpeechSynthesizer(win as never);
+    void tts.speak("a");
+    await vi.advanceTimersByTimeAsync(1000);
+    void tts.speak("b");
+    await vi.advanceTimersByTimeAsync(0);
+    const before = win.speechSynthesis.cancel.mock.calls.length;
+    await vi.advanceTimersByTimeAsync(2000); // A's timer fires at 3000 ms
+    expect(win.speechSynthesis.cancel.mock.calls.length).toBe(before);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
 type FakeRec = {
   onresult: ((e: unknown) => void) | null;
   onerror: ((e: { error: string }) => void) | null;

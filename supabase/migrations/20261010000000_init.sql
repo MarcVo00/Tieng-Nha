@@ -15,6 +15,7 @@ create table public.groups (
   invite_code text unique not null,
   created_at timestamptz not null default now()
 );
+create unique index groups_invite_code_norm_key on public.groups (upper(trim(invite_code)));
 
 create table public.profiles (
   id uuid primary key references auth.users on delete cascade,

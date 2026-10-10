@@ -93,5 +93,14 @@ test("any other recorder failure shows the retry message and stays in recorder m
   expect(await screen.findByText(/je n'ai rien entendu/i)).toBeInTheDocument();
   expect(onCapabilityLost).not.toHaveBeenCalled();
   expect(screen.getByRole("button", { name: /parler/i })).toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: /passer/i })).not.toBeInTheDocument();
+});
+
+test("a recorder that keeps failing for a non-permission reason still offers skip", async () => {
+  const recorder = new FakeVoiceRecorder();
+  vi.spyOn(recorder, "record").mockRejectedValue(new DOMException("busy", "NotReadableError"));
+  const { onResult, onCapabilityLost } = setup({ stt: false }, recorder);
+  await userEvent.click(screen.getByRole("button", { name: /parler/i }));
+  await userEvent.click(await screen.findByRole("button", { name: /passer/i }));
+  expect(onCapabilityLost).not.toHaveBeenCalled();
+  expect(onResult).toHaveBeenCalledWith(expect.objectContaining({ skipped: true, correct: false }));
 });

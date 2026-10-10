@@ -28,6 +28,7 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
   const [phase, setPhase] = useState<"idle" | "listening" | "processing" | "recorded">("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [failures, setFailures] = useState(0);
+  const [recorderFailures, setRecorderFailures] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [voiceUrl, setVoiceUrl] = useState<string | null>(null);
   const recordCtl = useRef<AbortController | null>(null);
@@ -115,6 +116,7 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
         return;
       }
       setMessage(fr.exercises.speak.notHeard);
+      setRecorderFailures((n) => n + 1);
     }
   };
 
@@ -156,6 +158,7 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
           disabled={disabled}
           onPress={() => void record()}
         />
+        {recorderFailures > 0 && phase !== "recorded" ? skipButton : null}
         {phase === "recorded" && voiceUrl ? (
           <>
             <div className="flex w-full flex-col gap-3">

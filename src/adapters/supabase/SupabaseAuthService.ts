@@ -14,7 +14,13 @@ export class SupabaseAuthService implements AuthService {
   constructor(private readonly db: Db) {}
 
   async getSession(): Promise<Session | null> {
-    const { data, error } = await this.db.auth.getSession();
+    let result: Awaited<ReturnType<Db["auth"]["getSession"]>>;
+    try {
+      result = await this.db.auth.getSession();
+    } catch (e) {
+      result = { data: { session: null }, error: e as never };
+    }
+    const { data, error } = result;
     if (error) {
       const mapped = mapError(error);
       // An expired token that cannot refresh offline is not a sign-out: keep the last known identity.

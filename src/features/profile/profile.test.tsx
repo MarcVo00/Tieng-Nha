@@ -221,3 +221,20 @@ test("offline sign-out shows an error toast and wipes nothing", async () => {
   expect(localStorage.getItem("vl-profile")).not.toBeNull();
   expect(useAppState.getState().profile).not.toBeNull();
 });
+
+test("sign-out flushes pending sync before signing out", async () => {
+  const { services, user } = await setup();
+  const order: string[] = [];
+  vi.spyOn(services.sync, "flush").mockImplementation(async () => {
+    order.push("flush");
+    return { sent: 0 };
+  });
+  const original = services.auth.signOut.bind(services.auth);
+  vi.spyOn(services.auth, "signOut").mockImplementation(async () => {
+    order.push("signOut");
+    await original();
+  });
+  await user.click(screen.getByRole("button", { name: fr.profile.account.signOut.open }));
+  await user.click(await screen.findByRole("button", { name: fr.profile.account.signOut.confirm }));
+  await waitFor(() => expect(order).toEqual(["flush", "signOut"]));
+});

@@ -29,6 +29,22 @@ function removeKey(key: string): void {
 
 // Hero: the pseudo and XP. Secondary: badges and settings. The account actions sit quietly at the bottom.
 
+const FLUSH_TIMEOUT_MS = 3000;
+
+async function flushBeforeSignOut(flush: Promise<unknown>): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<void>((resolve) => {
+    timer = setTimeout(resolve, FLUSH_TIMEOUT_MS);
+  });
+  try {
+    await Promise.race([flush.then(() => undefined), timeout]);
+  } catch {
+    // Best effort: a failed flush never blocks signing out.
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function CertificateSheet({ open, onClose, data }: { open: boolean; onClose(): void; data: CertificateProps | null }) {
   const [failed, setFailed] = useState(false);
   const download = async () => {
@@ -142,6 +158,8 @@ export function MeScreen() {
     setPending(true);
     // Only the remote call can abort: once it succeeded the user is gone, so local cleanup never blocks.
     try {
+      // Flush while the session is still valid; a slow network must not keep the dialog busy.
+      if (kind === "signout") await flushBeforeSignOut(sync.flush());
       if (kind === "signout") await auth.signOut();
       else await auth.deleteAccount();
     } catch (e) {
@@ -152,7 +170,6 @@ export function MeScreen() {
       return;
     }
     try {
-      if (kind === "signout") await sync.flush().catch(() => undefined);
       await progress.clearAll();
     } catch (e) {
       console.warn("Local cleanup failed", e);

@@ -1,0 +1,38 @@
+{
+  "id": "l03",
+  "contentVersion": 1,
+  "title": "Les chiffres",
+  "description": "Compte de un à dix, puis découvre « cent » (trăm) et « mille » (ngàn), très utiles pour les prix et les numéros de téléphone.",
+  "emoji": "🔢",
+  "dialogueId": "d03",
+  "vocab": [
+    { "id": "v_mot", "vi": "một", "fr": "un", "dialect": "south" },
+    { "id": "v_hai", "vi": "hai", "fr": "deux", "dialect": "south" },
+    { "id": "v_ba_trois", "vi": "ba", "fr": "trois", "dialect": "south" },
+    { "id": "v_bon", "vi": "bốn", "fr": "quatre", "dialect": "south", "note": "Au Sud on entend aussi « tư » dans certains nombres (24 = hai mươi tư)." },
+    { "id": "v_nam", "vi": "năm", "fr": "cinq", "dialect": "south", "note": "« Năm » veut aussi dire « année »." },
+    { "id": "v_sau", "vi": "sáu", "fr": "six", "dialect": "south" },
+    { "id": "v_bay", "vi": "bảy", "fr": "sept", "dialect": "south" },
+    { "id": "v_tam", "vi": "tám", "fr": "huit", "dialect": "south" },
+    { "id": "v_chin", "vi": "chín", "fr": "neuf", "dialect": "south" },
+    { "id": "v_muoi", "vi": "mười", "fr": "dix", "dialect": "south" },
+    { "id": "v_tram", "vi": "trăm", "fr": "cent", "dialect": "south", "note": "« Một trăm » = 100." },
+    { "id": "v_ngan", "vi": "ngàn", "fr": "mille", "dialect": "south", "note": "Au Nord on dit « nghìn ». « Mười ngàn » = 10 000 (dongs)." },
+    { "id": "v_may", "vi": "mấy", "fr": "combien (petit nombre)", "dialect": "south", "note": "S'utilise pour les petites quantités : « mấy người ? » = combien de personnes ?" },
+    { "id": "v_so", "vi": "số", "fr": "numéro, nombre", "dialect": "south" }
+  ],
+  "exercises": [
+    { "id": "l03_e01", "type": "listen_choose", "vocabId": "v_hai", "choices": ["v_mot", "v_hai", "v_ba_trois", "v_bon"] },
+    { "id": "l03_e02", "type": "listen_choose", "vocabId": "v_sau", "choices": ["v_sau", "v_bay", "v_chin", "v_muoi"] },
+    { "id": "l03_e03", "type": "listen_choose", "vocabId": "v_nam", "choices": ["v_nam", "v_tam", "v_bon", "v_hai"] },
+    { "id": "l03_e04", "type": "tone_pick", "syllable": "sáu", "answerTone": "sac" },
+    { "id": "l03_e05", "type": "tone_pick", "syllable": "bảy", "answerTone": "hoi" },
+    { "id": "l03_e06", "type": "tone_pick", "syllable": "một", "answerTone": "nang" },
+    { "id": "l03_e07", "type": "translate_choose", "promptFr": "Huit.", "answerVi": "Tám.", "distractorsVi": ["Sáu.", "Chín.", "Bảy."] },
+    { "id": "l03_e08", "type": "translate_choose", "promptFr": "Mon numéro.", "answerVi": "Số của tui.", "distractorsVi": ["Số của bạn.", "Mười ngàn.", "Một trăm."] },
+    { "id": "l03_e09", "type": "translate_choose", "promptFr": "Dix.", "answerVi": "Mười.", "distractorsVi": ["Chín.", "Năm.", "Hai."] },
+    { "id": "l03_e10", "type": "word_order", "fr": "Mon numéro est sept.", "tokensVi": ["Số", "của", "tui", "là", "bảy"], "extraTokens": ["tám"] },
+    { "id": "l03_e11", "type": "speak", "vi": "Một, hai, ba.", "fr": "Un, deux, trois.", "vocabIds": ["v_mot", "v_hai", "v_ba_trois"] },
+    { "id": "l03_e12", "type": "speak", "vi": "Mười ngàn.", "fr": "Dix mille.", "vocabIds": ["v_muoi", "v_ngan"] }
+  ]
+}

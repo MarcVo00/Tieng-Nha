@@ -1,0 +1,37 @@
+{
+  "id": "l01",
+  "contentVersion": 1,
+  "title": "Les 6 tons & bonjour",
+  "description": "Le vietnamien a 6 tons : ngang (plat), huyền (descend doucement), sắc (monte), hỏi (descend puis remonte), ngã (monte avec une cassure) et nặng (bref, qui tombe). Le même son « ma » change de sens selon le ton. Apprends aussi à dire bonjour, merci et au revoir.",
+  "emoji": "🎵",
+  "dialogueId": "d01",
+  "vocab": [
+    { "id": "v_xin_chao", "vi": "xin chào", "fr": "bonjour", "dialect": "south" },
+    { "id": "v_chao_ban", "vi": "chào bạn", "fr": "salut (à toi)", "dialect": "south", "note": "Forme amicale et neutre. Dans la vie courante, on remplace « bạn » par « anh » (homme) ou « chị » (femme) selon la personne." },
+    { "id": "v_tam_biet", "vi": "tạm biệt", "fr": "au revoir", "dialect": "south" },
+    { "id": "v_cam_on", "vi": "cảm ơn", "fr": "merci", "dialect": "south" },
+    { "id": "v_da_oui", "vi": "dạ", "fr": "oui (poli) / à vos ordres", "dialect": "south", "note": "Mot de politesse très courant au Sud, pour répondre « oui » ou montrer qu'on écoute. Au Nord on dit plutôt « vâng »." },
+    { "id": "v_khong", "vi": "không", "fr": "non / ne… pas", "dialect": "south" },
+    { "id": "v_vui", "vi": "vui", "fr": "joyeux, content", "dialect": "south", "note": "Au Sud, le « v » se prononce comme un « y » : « vui » sonne presque « yui »." },
+    { "id": "v_ma_fantome", "vi": "ma", "fr": "fantôme", "dialect": "south", "note": "Ton ngang (plat), sans signe." },
+    { "id": "v_ma_mais", "vi": "mà", "fr": "mais", "dialect": "south", "note": "Ton huyền (accent grave) : la voix descend doucement." },
+    { "id": "v_ma_maman", "vi": "má", "fr": "maman", "dialect": "south", "note": "Ton sắc (accent aigu) : la voix monte. Au Sud on dit « má » pour maman (Nord : « mẹ »)." },
+    { "id": "v_ma_tombe", "vi": "mả", "fr": "tombe", "dialect": "south", "note": "Ton hỏi. Au Sud, « hỏi » et « ngã » se prononcent presque pareil : on les distingue surtout à l'écrit." },
+    { "id": "v_ma_cheval", "vi": "mã", "fr": "cheval", "dialect": "south", "note": "Ton ngã (tilde). Au Sud il sonne comme « hỏi » : retiens bien l'orthographe." },
+    { "id": "v_ma_riz", "vi": "mạ", "fr": "jeune plant de riz", "dialect": "south", "note": "Ton nặng (point en dessous) : court, la voix tombe et s'arrête." }
+  ],
+  "exercises": [
+    { "id": "l01_e01", "type": "listen_choose", "vocabId": "v_xin_chao", "choices": ["v_xin_chao", "v_tam_biet", "v_cam_on", "v_da_oui"] },
+    { "id": "l01_e02", "type": "listen_choose", "vocabId": "v_ma_maman", "choices": ["v_ma_fantome", "v_ma_mais", "v_ma_maman", "v_ma_riz"] },
+    { "id": "l01_e03", "type": "listen_choose", "vocabId": "v_ma_cheval", "choices": ["v_ma_cheval", "v_ma_fantome", "v_ma_mais", "v_ma_riz"] },
+    { "id": "l01_e04", "type": "tone_pick", "syllable": "mà", "answerTone": "huyen" },
+    { "id": "l01_e05", "type": "tone_pick", "syllable": "má", "answerTone": "sac" },
+    { "id": "l01_e06", "type": "tone_pick", "syllable": "mả", "answerTone": "hoi" },
+    { "id": "l01_e07", "type": "tone_pick", "syllable": "mã", "answerTone": "nga" },
+    { "id": "l01_e08", "type": "translate_choose", "promptFr": "Merci.", "answerVi": "Cảm ơn.", "distractorsVi": ["Tạm biệt.", "Xin chào.", "Không."] },
+    { "id": "l01_e09", "type": "translate_choose", "promptFr": "Au revoir.", "answerVi": "Tạm biệt.", "distractorsVi": ["Cảm ơn.", "Dạ.", "Không."] },
+    { "id": "l01_e10", "type": "word_order", "fr": "Oui, merci.", "tokensVi": ["Dạ", "cảm ơn"], "extraTokens": ["không", "tạm biệt"] },
+    { "id": "l01_e11", "type": "speak", "vi": "Xin chào!", "fr": "Bonjour !", "vocabIds": ["v_xin_chao"] },
+    { "id": "l01_e12", "type": "speak", "vi": "Cảm ơn, tạm biệt!", "fr": "Merci, au revoir !", "vocabIds": ["v_cam_on", "v_tam_biet"] }
+  ]
+}

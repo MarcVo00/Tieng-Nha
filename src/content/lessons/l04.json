@@ -1,0 +1,39 @@
+{
+  "id": "l04",
+  "contentVersion": 1,
+  "title": "La famille",
+  "description": "Présente ta famille : papa, maman, frères et sœurs, enfants. Au Sud, l'aîné de la fratrie s'appelle « hai » (deux).",
+  "emoji": "👨‍👩‍👧",
+  "dialogueId": "d04",
+  "vocab": [
+    { "id": "v_ba_papa", "vi": "ba", "fr": "papa", "dialect": "south", "note": "Même mot que « trois », le ton est identique : le contexte décide. Au Nord on dit « bố »." },
+    { "id": "v_anh_hai", "vi": "anh hai", "fr": "grand frère (l'aîné)", "dialect": "south", "note": "Au Sud, l'aîné est « hai » (deux) : anh hai, chị hai. Au Nord on dit « anh cả », « chị cả »." },
+    { "id": "v_chi_hai", "vi": "chị hai", "fr": "grande sœur (l'aînée)", "dialect": "south" },
+    { "id": "v_em_trai", "vi": "em trai", "fr": "petit frère", "dialect": "south" },
+    { "id": "v_em_gai", "vi": "em gái", "fr": "petite sœur", "dialect": "south" },
+    { "id": "v_ong_ba", "vi": "ông bà", "fr": "grands-parents", "dialect": "south" },
+    { "id": "v_con", "vi": "con", "fr": "enfant", "dialect": "south", "note": "Un parent dit aussi « con » à son enfant." },
+    { "id": "v_con_trai", "vi": "con trai", "fr": "fils", "dialect": "south" },
+    { "id": "v_con_gai", "vi": "con gái", "fr": "fille", "dialect": "south" },
+    { "id": "v_vo", "vi": "vợ", "fr": "épouse, femme", "dialect": "south" },
+    { "id": "v_chong", "vi": "chồng", "fr": "mari", "dialect": "south" },
+    { "id": "v_gia_dinh", "vi": "gia đình", "fr": "famille", "dialect": "south" },
+    { "id": "v_co_avoir", "vi": "có", "fr": "avoir / il y a", "dialect": "south", "note": "« Bạn có con không? » = As-tu des enfants ?" },
+    { "id": "v_nguoi", "vi": "người", "fr": "personne", "dialect": "south" },
+    { "id": "v_may_nguoi", "vi": "mấy người", "fr": "combien de personnes", "dialect": "south" }
+  ],
+  "exercises": [
+    { "id": "l04_e01", "type": "listen_choose", "vocabId": "v_gia_dinh", "choices": ["v_gia_dinh", "v_con", "v_nguoi", "v_ong_ba"] },
+    { "id": "l04_e02", "type": "listen_choose", "vocabId": "v_ma_maman", "choices": ["v_ma_maman", "v_ba_papa", "v_con", "v_chi_hai"] },
+    { "id": "l04_e03", "type": "listen_choose", "vocabId": "v_anh_hai", "choices": ["v_anh_hai", "v_chi_hai", "v_em_gai", "v_em_trai"] },
+    { "id": "l04_e04", "type": "tone_pick", "syllable": "có", "answerTone": "sac" },
+    { "id": "l04_e05", "type": "tone_pick", "syllable": "vợ", "answerTone": "nang" },
+    { "id": "l04_e06", "type": "tone_pick", "syllable": "người", "answerTone": "huyen" },
+    { "id": "l04_e07", "type": "translate_choose", "promptFr": "Voici ma famille.", "answerVi": "Đây là gia đình của tui.", "distractorsVi": ["Đây là ba của tui.", "Đây là con của tui.", "Đây là chị hai của tui."] },
+    { "id": "l04_e08", "type": "translate_choose", "promptFr": "As-tu des enfants ?", "answerVi": "Bạn có con không?", "distractorsVi": ["Bạn khỏe không?", "Bạn có vợ không?", "Bạn có em trai không?"] },
+    { "id": "l04_e09", "type": "translate_choose", "promptFr": "Mon père.", "answerVi": "Ba của tui.", "distractorsVi": ["Má của tui.", "Ông bà của tui.", "Con của tui."] },
+    { "id": "l04_e10", "type": "word_order", "fr": "Ma famille a quatre personnes.", "tokensVi": ["Gia đình", "tui", "có", "bốn", "người"], "extraTokens": ["năm"] },
+    { "id": "l04_e11", "type": "speak", "vi": "Đây là gia đình của tui.", "fr": "Voici ma famille.", "vocabIds": ["v_gia_dinh"] },
+    { "id": "l04_e12", "type": "speak", "vi": "Đây là ba má của tui.", "fr": "Voici mon papa et ma maman.", "vocabIds": ["v_ba_papa", "v_ma_maman"] }
+  ]
+}

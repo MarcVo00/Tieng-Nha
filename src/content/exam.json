@@ -1,0 +1,1029 @@
+{
+  "contentVersion": 1,
+  "questions": [
+    {
+      "id": "exam_q001",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e001",
+        "type": "listen_choose",
+        "vocabId": "v_cam_on",
+        "choices": [
+          "v_cam_on",
+          "v_tam_biet",
+          "v_xin_chao",
+          "v_khong"
+        ]
+      }
+    },
+    {
+      "id": "exam_q002",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e002",
+        "type": "listen_choose",
+        "vocabId": "v_ma_mais",
+        "choices": [
+          "v_ma_fantome",
+          "v_ma_mais",
+          "v_ma_maman",
+          "v_ma_riz"
+        ]
+      }
+    },
+    {
+      "id": "exam_q003",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e003",
+        "type": "listen_choose",
+        "vocabId": "v_chao_ban",
+        "choices": [
+          "v_xin_chao",
+          "v_chao_ban",
+          "v_cam_on",
+          "v_vui"
+        ]
+      }
+    },
+    {
+      "id": "exam_q004",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e004",
+        "type": "listen_choose",
+        "vocabId": "v_khong_sao",
+        "choices": [
+          "v_khong_sao",
+          "v_xin_loi",
+          "v_co_tante",
+          "v_em"
+        ]
+      }
+    },
+    {
+      "id": "exam_q005",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e005",
+        "type": "listen_choose",
+        "vocabId": "v_chu",
+        "choices": [
+          "v_chu",
+          "v_ong",
+          "v_co_tante",
+          "v_chi"
+        ]
+      }
+    },
+    {
+      "id": "exam_q006",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e006",
+        "type": "listen_choose",
+        "vocabId": "v_bay",
+        "choices": [
+          "v_bay",
+          "v_bon",
+          "v_tam",
+          "v_sau"
+        ]
+      }
+    },
+    {
+      "id": "exam_q007",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e007",
+        "type": "listen_choose",
+        "vocabId": "v_ngan",
+        "choices": [
+          "v_ngan",
+          "v_tram",
+          "v_muoi",
+          "v_nam"
+        ]
+      }
+    },
+    {
+      "id": "exam_q008",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e008",
+        "type": "listen_choose",
+        "vocabId": "v_gia_dinh",
+        "choices": [
+          "v_gia_dinh",
+          "v_ong_ba",
+          "v_chong",
+          "v_nguoi"
+        ]
+      }
+    },
+    {
+      "id": "exam_q009",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e009",
+        "type": "listen_choose",
+        "vocabId": "v_em_gai",
+        "choices": [
+          "v_em_gai",
+          "v_em_trai",
+          "v_con_gai",
+          "v_anh_hai"
+        ]
+      }
+    },
+    {
+      "id": "exam_q010",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e010",
+        "type": "listen_choose",
+        "vocabId": "v_tra_da",
+        "choices": [
+          "v_tra_da",
+          "v_ca_phe",
+          "v_ca_phe_den",
+          "v_ly"
+        ]
+      }
+    },
+    {
+      "id": "exam_q011",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e011",
+        "type": "listen_choose",
+        "vocabId": "v_duong",
+        "choices": [
+          "v_duong",
+          "v_sua",
+          "v_nuoc",
+          "v_da"
+        ]
+      }
+    },
+    {
+      "id": "exam_q012",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e012",
+        "type": "listen_choose",
+        "vocabId": "v_tinh_tien",
+        "choices": [
+          "v_tinh_tien",
+          "v_ngon",
+          "v_em_oi",
+          "v_cho_tui"
+        ]
+      }
+    },
+    {
+      "id": "exam_q013",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e013",
+        "type": "listen_choose",
+        "vocabId": "v_com_tam",
+        "choices": [
+          "v_com_tam",
+          "v_pho",
+          "v_banh_mi",
+          "v_hu_tieu"
+        ]
+      }
+    },
+    {
+      "id": "exam_q014",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e014",
+        "type": "listen_choose",
+        "vocabId": "v_no",
+        "choices": [
+          "v_no",
+          "v_doi",
+          "v_an",
+          "v_chen"
+        ]
+      }
+    },
+    {
+      "id": "exam_q015",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e015",
+        "type": "listen_choose",
+        "vocabId": "v_muong",
+        "choices": [
+          "v_muong",
+          "v_dua",
+          "v_dia",
+          "v_chen"
+        ]
+      }
+    },
+    {
+      "id": "exam_q016",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e016",
+        "type": "listen_choose",
+        "vocabId": "v_re",
+        "choices": [
+          "v_re",
+          "v_mac_qua",
+          "v_bot",
+          "v_mua"
+        ]
+      }
+    },
+    {
+      "id": "exam_q017",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e017",
+        "type": "listen_choose",
+        "vocabId": "v_chuoi",
+        "choices": [
+          "v_chuoi",
+          "v_xoai",
+          "v_thom",
+          "v_trai_cay"
+        ]
+      }
+    },
+    {
+      "id": "exam_q018",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e018",
+        "type": "listen_choose",
+        "vocabId": "v_bao_nhieu_tien",
+        "choices": [
+          "v_bao_nhieu_tien",
+          "v_ky",
+          "v_bot",
+          "v_mua"
+        ]
+      }
+    },
+    {
+      "id": "exam_q019",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e019",
+        "type": "listen_choose",
+        "vocabId": "v_dung_lai",
+        "choices": [
+          "v_dung_lai",
+          "v_queo_trai",
+          "v_di",
+          "v_xe_om"
+        ]
+      }
+    },
+    {
+      "id": "exam_q020",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e020",
+        "type": "listen_choose",
+        "vocabId": "v_xa",
+        "choices": [
+          "v_xa",
+          "v_gan",
+          "v_o_dau",
+          "v_cho_marche"
+        ]
+      }
+    },
+    {
+      "id": "exam_q021",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e021",
+        "type": "listen_choose",
+        "vocabId": "v_hom_qua",
+        "choices": [
+          "v_hom_qua",
+          "v_hom_nay",
+          "v_ngay_mai",
+          "v_bay_gio"
+        ]
+      }
+    },
+    {
+      "id": "exam_q022",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e022",
+        "type": "listen_choose",
+        "vocabId": "v_trua",
+        "choices": [
+          "v_trua",
+          "v_sang",
+          "v_toi_soir",
+          "v_hom_nay"
+        ]
+      }
+    },
+    {
+      "id": "exam_q023",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e023",
+        "type": "listen_choose",
+        "vocabId": "v_tuoi",
+        "choices": [
+          "v_tuoi",
+          "v_ten",
+          "v_hoc",
+          "v_song_o"
+        ]
+      }
+    },
+    {
+      "id": "exam_q024",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e024",
+        "type": "listen_choose",
+        "vocabId": "v_viet_nam",
+        "choices": [
+          "v_viet_nam",
+          "v_phap",
+          "v_sai_gon",
+          "v_nguoi_viet"
+        ]
+      }
+    },
+    {
+      "id": "exam_q025",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e025",
+        "type": "translate_choose",
+        "promptFr": "Oui, merci.",
+        "answerVi": "Dạ, cảm ơn.",
+        "distractorsVi": [
+          "Dạ, tạm biệt.",
+          "Không, cảm ơn.",
+          "Xin chào bạn."
+        ]
+      }
+    },
+    {
+      "id": "exam_q026",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e026",
+        "type": "translate_choose",
+        "promptFr": "Ce n'est pas grave.",
+        "answerVi": "Không sao.",
+        "distractorsVi": [
+          "Xin lỗi bạn.",
+          "Bạn khỏe không?",
+          "Cảm ơn bà."
+        ]
+      }
+    },
+    {
+      "id": "exam_q027",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e027",
+        "type": "word_order",
+        "fr": "Je m'excuse, monsieur.",
+        "tokensVi": [
+          "Tui",
+          "xin lỗi",
+          "ông"
+        ],
+        "extraTokens": [
+          "bà"
+        ]
+      }
+    },
+    {
+      "id": "exam_q028",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e028",
+        "type": "translate_choose",
+        "promptFr": "Trois cents.",
+        "answerVi": "Ba trăm.",
+        "distractorsVi": [
+          "Bảy trăm.",
+          "Ba ngàn.",
+          "Sáu trăm."
+        ]
+      }
+    },
+    {
+      "id": "exam_q029",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e029",
+        "type": "translate_choose",
+        "promptFr": "Mille.",
+        "answerVi": "Một ngàn.",
+        "distractorsVi": [
+          "Một trăm.",
+          "Mười ngàn.",
+          "Chín ngàn."
+        ]
+      }
+    },
+    {
+      "id": "exam_q030",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e030",
+        "type": "translate_choose",
+        "promptFr": "J'ai une petite sœur.",
+        "answerVi": "Tui có một em gái.",
+        "distractorsVi": [
+          "Tui có một em trai.",
+          "Tui có một chị hai.",
+          "Tui không có em gái."
+        ]
+      }
+    },
+    {
+      "id": "exam_q031",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e031",
+        "type": "word_order",
+        "fr": "Mon père a deux fils.",
+        "tokensVi": [
+          "Ba",
+          "tui",
+          "có",
+          "hai",
+          "con trai"
+        ],
+        "extraTokens": [
+          "con gái"
+        ]
+      }
+    },
+    {
+      "id": "exam_q032",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e032",
+        "type": "translate_choose",
+        "promptFr": "Le café est très bon !",
+        "answerVi": "Cà phê ngon quá!",
+        "distractorsVi": [
+          "Trà đá ngon quá!",
+          "Cà phê mắc quá!",
+          "Sữa ngon quá!"
+        ]
+      }
+    },
+    {
+      "id": "exam_q033",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e033",
+        "type": "translate_choose",
+        "promptFr": "De l'eau, s'il te plaît.",
+        "answerVi": "Cho tui một ly nước.",
+        "distractorsVi": [
+          "Cho tui một ly sữa.",
+          "Cho tui một ly trà đá.",
+          "Cho tui một ly cà phê đen."
+        ]
+      }
+    },
+    {
+      "id": "exam_q034",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e034",
+        "type": "translate_choose",
+        "promptFr": "Je n'ai pas faim.",
+        "answerVi": "Tui không đói.",
+        "distractorsVi": [
+          "Tui đói quá.",
+          "Tui không ăn phở.",
+          "Tui uống trà."
+        ]
+      }
+    },
+    {
+      "id": "exam_q035",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e035",
+        "type": "word_order",
+        "fr": "Tu bois du thé glacé ?",
+        "tokensVi": [
+          "Bạn",
+          "uống",
+          "trà đá",
+          "không"
+        ],
+        "extraTokens": [
+          "ăn"
+        ]
+      }
+    },
+    {
+      "id": "exam_q036",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e036",
+        "type": "translate_choose",
+        "promptFr": "J'achète des mangues.",
+        "answerVi": "Tui mua xoài.",
+        "distractorsVi": [
+          "Tui bán xoài.",
+          "Tui mua chuối.",
+          "Tui mua thơm."
+        ]
+      }
+    },
+    {
+      "id": "exam_q037",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e037",
+        "type": "translate_choose",
+        "promptFr": "C'est vraiment pas cher !",
+        "answerVi": "Rẻ quá!",
+        "distractorsVi": [
+          "Mắc quá!",
+          "Ngon quá!",
+          "Bớt chút nha."
+        ]
+      }
+    },
+    {
+      "id": "exam_q038",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e038",
+        "type": "translate_choose",
+        "promptFr": "Le marché est près d'ici.",
+        "answerVi": "Chợ gần đây.",
+        "distractorsVi": [
+          "Chợ ở đâu?",
+          "Chợ xa lắm.",
+          "Đi thẳng."
+        ]
+      }
+    },
+    {
+      "id": "exam_q039",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e039",
+        "type": "word_order",
+        "fr": "Va tout droit, puis tourne à droite.",
+        "tokensVi": [
+          "Đi thẳng",
+          "rồi",
+          "quẹo phải"
+        ],
+        "extraTokens": [
+          "quẹo trái"
+        ]
+      }
+    },
+    {
+      "id": "exam_q040",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e040",
+        "type": "translate_choose",
+        "promptFr": "Hier matin.",
+        "answerVi": "Sáng hôm qua.",
+        "distractorsVi": [
+          "Chiều hôm qua.",
+          "Sáng hôm nay.",
+          "Tối hôm qua."
+        ]
+      }
+    },
+    {
+      "id": "exam_q041",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e041",
+        "type": "word_order",
+        "fr": "Il est une heure de l'après-midi.",
+        "tokensVi": [
+          "Bây giờ",
+          "là",
+          "một",
+          "giờ",
+          "trưa"
+        ],
+        "extraTokens": [
+          "chiều"
+        ]
+      }
+    },
+    {
+      "id": "exam_q042",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e042",
+        "type": "word_order",
+        "fr": "Comment tu t'appelles ?",
+        "tokensVi": [
+          "Bạn",
+          "tên là",
+          "gì"
+        ],
+        "extraTokens": [
+          "tuổi"
+        ]
+      }
+    },
+    {
+      "id": "exam_q043",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e043",
+        "type": "tone_pick",
+        "syllable": "chào",
+        "answerTone": "huyen"
+      }
+    },
+    {
+      "id": "exam_q044",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e044",
+        "type": "tone_pick",
+        "syllable": "tạm",
+        "answerTone": "nang"
+      }
+    },
+    {
+      "id": "exam_q045",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e045",
+        "type": "tone_pick",
+        "syllable": "cảm",
+        "answerTone": "hoi"
+      }
+    },
+    {
+      "id": "exam_q046",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e046",
+        "type": "tone_pick",
+        "syllable": "bạn",
+        "answerTone": "nang"
+      }
+    },
+    {
+      "id": "exam_q047",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e047",
+        "type": "tone_pick",
+        "syllable": "tám",
+        "answerTone": "sac"
+      }
+    },
+    {
+      "id": "exam_q048",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e048",
+        "type": "tone_pick",
+        "syllable": "hai",
+        "answerTone": "ngang"
+      }
+    },
+    {
+      "id": "exam_q049",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e049",
+        "type": "tone_pick",
+        "syllable": "gái",
+        "answerTone": "sac"
+      }
+    },
+    {
+      "id": "exam_q050",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e050",
+        "type": "tone_pick",
+        "syllable": "cà",
+        "answerTone": "huyen"
+      }
+    },
+    {
+      "id": "exam_q051",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e051",
+        "type": "tone_pick",
+        "syllable": "đũa",
+        "answerTone": "nga"
+      }
+    },
+    {
+      "id": "exam_q052",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e052",
+        "type": "tone_pick",
+        "syllable": "muỗng",
+        "answerTone": "nga"
+      }
+    },
+    {
+      "id": "exam_q053",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e053",
+        "type": "tone_pick",
+        "syllable": "bớt",
+        "answerTone": "sac"
+      }
+    },
+    {
+      "id": "exam_q054",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e054",
+        "type": "tone_pick",
+        "syllable": "thẳng",
+        "answerTone": "hoi"
+      }
+    },
+    {
+      "id": "exam_q055",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e055",
+        "type": "tone_pick",
+        "syllable": "hôm",
+        "answerTone": "ngang"
+      }
+    },
+    {
+      "id": "exam_q056",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e056",
+        "type": "tone_pick",
+        "syllable": "ngày",
+        "answerTone": "huyen"
+      }
+    },
+    {
+      "id": "exam_q057",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e057",
+        "type": "tone_pick",
+        "syllable": "tên",
+        "answerTone": "ngang"
+      }
+    },
+    {
+      "id": "exam_q058",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e058",
+        "type": "speak",
+        "vi": "Dạ, cảm ơn bạn.",
+        "fr": "Oui, merci à toi.",
+        "vocabIds": [
+          "v_da_oui",
+          "v_cam_on",
+          "v_ban"
+        ]
+      }
+    },
+    {
+      "id": "exam_q059",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e059",
+        "type": "speak",
+        "vi": "Tui khỏe, cảm ơn bạn.",
+        "fr": "Je vais bien, merci.",
+        "vocabIds": [
+          "v_tui",
+          "v_khoe_khong",
+          "v_cam_on"
+        ]
+      }
+    },
+    {
+      "id": "exam_q060",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e060",
+        "type": "speak",
+        "vi": "Xin chào ông.",
+        "fr": "Bonjour, monsieur.",
+        "vocabIds": [
+          "v_xin_chao",
+          "v_ong"
+        ]
+      }
+    },
+    {
+      "id": "exam_q061",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e061",
+        "type": "speak",
+        "vi": "Bảy, tám, chín.",
+        "fr": "Sept, huit, neuf.",
+        "vocabIds": [
+          "v_bay",
+          "v_tam",
+          "v_chin"
+        ]
+      }
+    },
+    {
+      "id": "exam_q062",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e062",
+        "type": "speak",
+        "vi": "Gia đình tui có năm người.",
+        "fr": "Il y a cinq personnes dans ma famille.",
+        "vocabIds": [
+          "v_gia_dinh",
+          "v_tui",
+          "v_co_avoir",
+          "v_nam",
+          "v_nguoi"
+        ]
+      }
+    },
+    {
+      "id": "exam_q063",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e063",
+        "type": "speak",
+        "vi": "Tui có một em gái.",
+        "fr": "J'ai une petite sœur.",
+        "vocabIds": [
+          "v_tui",
+          "v_co_avoir",
+          "v_mot",
+          "v_em_gai"
+        ]
+      }
+    },
+    {
+      "id": "exam_q064",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e064",
+        "type": "speak",
+        "vi": "Cà phê sữa đá ngon quá!",
+        "fr": "Le café au lait glacé est trop bon !",
+        "vocabIds": [
+          "v_ca_phe_sua_da",
+          "v_ngon_qua"
+        ]
+      }
+    },
+    {
+      "id": "exam_q065",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e065",
+        "type": "speak",
+        "vi": "Cho tui một ly sữa.",
+        "fr": "Un verre de lait pour moi.",
+        "vocabIds": [
+          "v_cho_tui",
+          "v_ly",
+          "v_sua"
+        ]
+      }
+    },
+    {
+      "id": "exam_q066",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e066",
+        "type": "speak",
+        "vi": "Tui ăn hủ tiếu.",
+        "fr": "Je mange du hủ tiếu.",
+        "vocabIds": [
+          "v_tui",
+          "v_an",
+          "v_hu_tieu"
+        ]
+      }
+    },
+    {
+      "id": "exam_q067",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e067",
+        "type": "speak",
+        "vi": "Chuối rẻ quá!",
+        "fr": "Les bananes sont vraiment pas chères !",
+        "vocabIds": [
+          "v_chuoi",
+          "v_re"
+        ]
+      }
+    },
+    {
+      "id": "exam_q068",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e068",
+        "type": "speak",
+        "vi": "Tui mua một ký thơm.",
+        "fr": "J'achète un kilo d'ananas.",
+        "vocabIds": [
+          "v_tui",
+          "v_mua",
+          "v_ky",
+          "v_thom"
+        ]
+      }
+    },
+    {
+      "id": "exam_q069",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e069",
+        "type": "speak",
+        "vi": "Quẹo phải, dừng lại đó.",
+        "fr": "Tourne à droite, arrête-toi là.",
+        "vocabIds": [
+          "v_queo_phai",
+          "v_dung_lai",
+          "v_do"
+        ]
+      }
+    },
+    {
+      "id": "exam_q070",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e070",
+        "type": "speak",
+        "vi": "Hôm qua tui ăn phở.",
+        "fr": "Hier, j'ai mangé du phở.",
+        "vocabIds": [
+          "v_hom_qua",
+          "v_tui",
+          "v_an",
+          "v_pho"
+        ]
+      }
+    },
+    {
+      "id": "exam_q071",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e071",
+        "type": "speak",
+        "vi": "Tui sống ở Sài Gòn.",
+        "fr": "J'habite à Sài Gòn.",
+        "vocabIds": [
+          "v_tui",
+          "v_song_o",
+          "v_sai_gon"
+        ]
+      }
+    },
+    {
+      "id": "exam_q072",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e072",
+        "type": "speak",
+        "vi": "Bạn sống ở Sài Gòn không?",
+        "fr": "Tu habites à Sài Gòn ?",
+        "vocabIds": [
+          "v_ban",
+          "v_song_o",
+          "v_sai_gon"
+        ]
+      }
+    }
+  ]
+}

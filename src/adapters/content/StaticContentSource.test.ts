@@ -26,13 +26,19 @@ test("exam pool and badges", async () => {
   expect(await src.getExamPool()).toHaveLength(60);
   expect((await src.getBadges()).length).toBe(12);
 });
-test("createStaticContentSource lists real lessons in order and copes with missing dialogues and exam files", async () => {
+test("createStaticContentSource lists real lessons in order and copes with missing dialogues files", async () => {
   const real = createStaticContentSource();
   const lessons = await real.listLessons();
   expect(lessons.length).toBeGreaterThan(0);
   expect(lessons.map((l) => l.order)).toEqual(lessons.map((_, i) => i + 1));
   expect(lessons.map((l) => l.id)).toEqual([...lessons.map((l) => l.id)].sort());
   for (const l of lessons) expect((await real.getLesson(l.id)).id).toBe(l.id);
-  expect(await real.getExamPool()).toEqual([]);
+  const pool = await real.getExamPool();
+  const count = (section: string) => pool.filter((q) => q.section === section).length;
+  expect(pool.length).toBeGreaterThanOrEqual(60);
+  expect(count("listening")).toBeGreaterThanOrEqual(20);
+  expect(count("translation")).toBeGreaterThanOrEqual(16);
+  expect(count("tones")).toBeGreaterThanOrEqual(12);
+  expect(count("speaking")).toBeGreaterThanOrEqual(12);
   expect((await real.getBadges()).length).toBe(12);
 });

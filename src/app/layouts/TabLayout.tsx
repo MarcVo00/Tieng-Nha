@@ -24,11 +24,13 @@ export function TabLayout() {
           <XpCounter value={snapshot?.xpTotal ?? 0} />
         </div>
       </header>
-      <AnimatePresence mode="wait">
+      <main>
+        <AnimatePresence mode="wait">
         <PageTransition key={pathname} variant="tab">
           {outlet}
         </PageTransition>
       </AnimatePresence>
+      </main>
       <TabBar
         items={[
           { to: "/", label: fr.app.tabs.learn, icon: "home" },

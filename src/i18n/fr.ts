@@ -9,8 +9,8 @@ export const fr = {
     sync: { pending: (n: number) => `${n} ${n > 1 ? "événements" : "événement"} en attente de synchronisation` },
     update: { available: "Nouvelle version disponible", action: "Mettre à jour" },
     error: { title: "Oups, quelque chose a coincé", body: "Ce n'est pas ta faute. Réessaie, ou reviens à l'accueil.", retry: "Réessayer", home: "Retour à l'accueil" },
-    notFound: { title: "Page introuvable", body: "Cette page n'existe pas (ou plus), bạn.", home: "Retour à l'accueil" },
-    soon: { title: "Bientôt prêt", body: "Cet écran arrive très vite, bạn !" },
+    notFound: { title: "Page introuvable", body: "Cette page n'existe pas (ou plus).", home: "Retour à l'accueil" },
+    soon: { title: "Bientôt prêt", body: "Cet écran arrive très vite !" },
   },
   // --- ui ---
   ui: {
@@ -35,7 +35,7 @@ export const fr = {
     report: { label: "Signaler", aria: "Signaler un problème avec cette réponse" },
     confirm: { typeToConfirm: (text: string) => `Tape « ${text} » pour confirmer`, inputLabel: "Confirmation" },
     tones: { ngang: "ngang", huyen: "huyền", sac: "sắc", hoi: "hỏi", nga: "ngã", nang: "nặng" },
-    nav: { label: "Navigation principale", due: (n: number) => `${n} à réviser` },
+    nav: { label: "Navigation principale", due: (n: number) => `${n} à réviser`, dueMany: "plus de 99 à réviser" },
     gallery: {
       title: "Galerie UI",
       light: "Clair",

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { z } from "zod";
+import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { OfflineError } from "@/domain/errors";
 import { useAppState, useRefreshProgress, type AppProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
@@ -56,7 +57,9 @@ export function Root() {
         writeCachedProfile(profile);
         return profile;
       } catch (e) {
-        return e instanceof OfflineError ? readCachedProfile() : null;
+        // With a valid session, any failure falls back to the cached profile so the app still opens.
+        if (!(e instanceof OfflineError)) console.warn("Could not load profile, using cache", e);
+        return readCachedProfile();
       }
     }
 
@@ -75,13 +78,19 @@ export function Root() {
     });
 
     void (async () => {
-      const [settings, session] = await Promise.all([progress.getSettings(), auth.getSession()]);
-      const profile = session ? await loadProfile() : null;
-      if (cancelled) return;
-      set({ settings, session, profile });
-      // A failing snapshot must not block the app: the header just shows zeros.
-      await refreshProgress().catch(() => undefined);
-      if (!cancelled) set({ ready: true });
+      try {
+        const [settings, session] = await Promise.all([progress.getSettings(), auth.getSession()]);
+        const profile = session ? await loadProfile() : null;
+        if (cancelled) return;
+        set({ settings, session, profile });
+        // A failing snapshot must not block the app: the header just shows zeros.
+        await refreshProgress().catch(() => undefined);
+      } catch (e) {
+        console.error("Bootstrap failed", e);
+        if (!cancelled) set({ settings: { ...DEFAULT_SETTINGS }, session: null, profile: null });
+      } finally {
+        if (!cancelled) set({ ready: true });
+      }
     })();
 
     return () => {
@@ -94,7 +103,7 @@ export function Root() {
 
   return (
     <>
-      <ThemeController />
+      {ready ? <ThemeController /> : null}
       <ToastViewport />
       <UpdatePrompt />
       {ready ? <Outlet /> : <Splash />}

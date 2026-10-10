@@ -22,7 +22,6 @@ const DialogueScreen = lazy(() => import("@/features/conversation").then((m) => 
 const ExamIntroScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamIntroScreen })));
 const ExamRunScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamRunScreen })));
 const ExamResultScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamResultScreen })));
-const Gallery = lazy(() => import("@/ui/Gallery").then((m) => ({ default: m.Gallery })));
 
 function screen(Screen: ComponentType): ReactNode {
   return (
@@ -56,14 +55,21 @@ const focusRoutes: RouteObject[] = [
 const publicRoutes: RouteObject[] = [
   { path: "welcome", element: screen(WelcomeScreen) },
   { path: "auth/callback", element: screen(AuthCallbackScreen) },
-  ...(import.meta.env.DEV ? [{ path: "__ui", element: screen(Gallery) }] : []),
-];
+  ];
+
+// Declared inside the DEV branch so the gallery chunk is dropped from production builds.
+const devRoutes: RouteObject[] = [];
+if (import.meta.env.DEV) {
+  const Gallery = lazy(() => import("@/ui/Gallery").then((m) => ({ default: m.Gallery })));
+  devRoutes.push({ path: "__ui", element: screen(Gallery) });
+}
 
 export const appRoutes: RouteObject[] = [
   {
     element: <Root />,
     children: [
       ...publicRoutes,
+      ...devRoutes,
       { element: <AuthGate><TabLayout /></AuthGate>, children: tabRoutes },
       { element: <AuthGate><FocusLayout /></AuthGate>, children: focusRoutes },
     ],

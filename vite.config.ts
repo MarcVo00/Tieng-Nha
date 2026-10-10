@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: ["icons/apple-touch-icon-180x180.png", "icons/icon.svg"],
+      includeAssets: ["favicon.ico", "icons/apple-touch-icon-180x180.png", "icons/icon.svg"],
       manifest: {
         name: "VietLearn",
         short_name: "VietLearn",

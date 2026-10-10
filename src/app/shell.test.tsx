@@ -4,6 +4,7 @@ import { ServicesProvider } from "@/app/ServicesProvider";
 import { createFakeServices } from "@/adapters/fakes";
 import { appRoutes } from "@/app/router";
 import { useAppState } from "@/app/appState";
+import "@/test/routerTestEnv";
 
 vi.mock("virtual:pwa-register/react", () => ({
   useRegisterSW: () => ({ needRefresh: [false, () => {}], updateServiceWorker: () => {} }),
@@ -45,4 +46,34 @@ test("focus routes hide the tab bar", async () => {
   await waitFor(() => expect(router.state.location.pathname).toBe("/lesson/l05"));
   await screen.findByRole("heading", { name: /bientôt prêt/i });
   expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+});
+
+test("saved dark theme never drops the dark class during bootstrap", async () => {
+  const services = await onboardedServices();
+  await services.progress.saveSettings({ theme: "dark", voiceRate: "normal", capabilities: null, onboardingDone: true });
+  localStorage.setItem("vl-theme", "dark");
+  document.documentElement.classList.add("dark"); // as the inline script in index.html does
+  let removed = false;
+  const observer = new MutationObserver(() => {
+    if (!document.documentElement.classList.contains("dark")) removed = true;
+  });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  renderAt("/", services);
+  await screen.findByRole("navigation");
+  await waitFor(() => expect(useAppState.getState().ready).toBe(true));
+  observer.disconnect();
+  expect(removed).toBe(false);
+  expect(document.documentElement.classList.contains("dark")).toBe(true);
+  expect(localStorage.getItem("vl-theme")).toBe("dark");
+  document.documentElement.classList.remove("dark");
+});
+
+test("a failing bootstrap still reaches a rendered app", async () => {
+  const services = createFakeServices();
+  vi.spyOn(services.progress, "getSettings").mockRejectedValue(new Error("boom"));
+  const errorLog = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  const { router } = renderAt("/", services);
+  await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
+  expect(errorLog).toHaveBeenCalled();
+  errorLog.mockRestore();
 });

@@ -24,9 +24,9 @@ export function TabBar({ items }: TabBarProps) {
                   {item.badge && item.badge > 0 ? (
                     <>
                       <span aria-hidden="true" className="tabular absolute right-[calc(50%-1.75rem)] top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-caption text-primary-on">
-                        {item.badge}
+                        {item.badge > 99 ? "99+" : item.badge}
                       </span>
-                      <span className="sr-only">{fr.ui.nav.due(item.badge)}</span>
+                      <span className="sr-only">{item.badge > 99 ? fr.ui.nav.dueMany : fr.ui.nav.due(item.badge)}</span>
                     </>
                   ) : null}
                   {isActive ? <motion.span layoutId="tab-dot" transition={spring.snappy} className="absolute top-0.5 h-1.5 w-1.5 rounded-full bg-primary" /> : null}

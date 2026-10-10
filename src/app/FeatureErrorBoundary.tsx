@@ -4,13 +4,14 @@ import { fr } from "@/i18n/fr";
 import { Button, EmptyState } from "@/ui";
 
 type Props = { children?: ReactNode };
-type State = { failed: boolean };
+type State = { failed: boolean; chunkError: boolean };
+const CHUNK_ERROR = /dynamically imported module|Loading chunk|Failed to fetch/i;
 
 export class FeatureErrorBoundary extends Component<Props, State> {
-  override state: State = { failed: false };
+  override state: State = { failed: false, chunkError: false };
 
-  static getDerivedStateFromError(): State {
-    return { failed: true };
+  static getDerivedStateFromError(error: unknown): State {
+    return { failed: true, chunkError: error instanceof Error && CHUNK_ERROR.test(error.message) };
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
@@ -19,7 +20,9 @@ export class FeatureErrorBoundary extends Component<Props, State> {
   }
 
   private reset = (): void => {
-    this.setState({ failed: false });
+    // A stale deploy leaves missing chunks: only a full reload can recover.
+    if (this.state.chunkError) window.location.reload();
+    else this.setState({ failed: false, chunkError: false });
   };
 
   override render(): ReactNode {

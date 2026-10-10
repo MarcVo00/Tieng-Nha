@@ -28,6 +28,7 @@ Dans chaque case : ✓ (OK), ✗ (problème, avec une note) ou n/a.
 | 10 | Nouveau déploiement → bannière « Nouvelle version disponible » → la mise à jour fonctionne | | | |
 | 11 | Examen verrouillé avant 10 leçons (tester l'examen complet sur un compte de test en finissant les leçons, ou passer) | | | |
 | 12 | Téléchargement du certificat PNG (si examen réussi) | | | |
+| 13 | App installée fermée depuis plus d'1 h, rouverte en mode avion → écran d'accueil normal, progression visible | | | |
 
 Conseils :
 - Ligne 6 : ouvre la leçon 2 une fois en ligne avant de couper le réseau, et note si le contenu était déjà en cache.

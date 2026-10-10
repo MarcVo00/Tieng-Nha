@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { THEME_KEY } from "@/domain/storageKeys";
 import { useAppState } from "@/app/appState";
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
@@ -17,7 +18,7 @@ export function ThemeController() {
     apply();
     try {
       // Read by the inline script in index.html to avoid a flash on next start.
-      localStorage.setItem("vl-theme", theme);
+      localStorage.setItem(THEME_KEY, theme);
     } catch {
       // Storage may be unavailable (private mode); the theme still applies for this session.
     }

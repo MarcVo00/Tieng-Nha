@@ -1,12 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
+import { AVATARS } from "@/domain/avatars";
 import { InvalidInviteError, InvalidProfileError, OfflineError, PseudoTakenError } from "@/domain/errors";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { Avatar, Button, tap } from "@/ui";
 import { TextField } from "@/features/onboarding/TextField";
-
-const AVATARS = ["🐉", "🐯", "🐼", "🦊", "🐸", "🐙", "🦄", "🐢", "🐧", "🦋", "🌸", "🍜", "🥭", "🛵", "🏮", "⭐"] as const;
 
 type ProfileStepProps = {
   inviteCode: string;

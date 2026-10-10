@@ -141,9 +141,11 @@ test("the device test sheet stores capabilities", async () => {
 test("sign out clears local data and goes to /welcome", async () => {
   const { services, router, user } = await setup();
   await services.progress.appendEvent({ type: "lesson_completed", refId: "l01", xp: 10, payload: {} }, NOW);
+  localStorage.setItem("vl-theme", "dark");
   await user.click(screen.getByRole("button", { name: fr.profile.account.signOut.open }));
   await user.click(await screen.findByRole("button", { name: fr.profile.account.signOut.confirm }));
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
+  expect(localStorage.getItem("vl-theme")).toBeNull();
   expect(await services.progress.listEvents()).toEqual([]);
   expect(localStorage.getItem("vl-profile")).toBeNull();
   expect(useAppState.getState()).toMatchObject({ session: null, profile: null, snapshot: null });
@@ -186,4 +188,36 @@ test("offline deletion shows an error toast and keeps the data", async () => {
   expect(router.state.location.pathname).toBe("/me");
   expect(await services.progress.listEvents()).toHaveLength(1);
   expect(localStorage.getItem("vl-profile")).not.toBeNull();
+});
+
+test("a failing clearAll after a successful delete still resets state and lands on /welcome", async () => {
+  const { services, router, user } = await setup();
+  vi.spyOn(services.progress, "clearAll").mockRejectedValue(new Error("idb"));
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+  await user.click(screen.getByRole("button", { name: fr.profile.account.delete.open }));
+  const dialog = await screen.findByRole("alertdialog");
+  await user.type(within(dialog).getByLabelText(fr.ui.confirm.inputLabel), "SUPPRIMER");
+  await user.click(within(dialog).getByRole("button", { name: fr.profile.account.delete.confirm }));
+  await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
+  expect(warn).toHaveBeenCalled();
+  expect(localStorage.getItem("vl-profile")).toBeNull();
+  expect(useAppState.getState()).toMatchObject({ session: null, profile: null, snapshot: null });
+  warn.mockRestore();
+});
+
+test("offline sign-out shows an error toast and wipes nothing", async () => {
+  class OfflineAuth extends FakeAuthService {
+    override async signOut(): Promise<void> {
+      throw new OfflineError();
+    }
+  }
+  const { services, router, user } = await setup({ auth: new OfflineAuth() });
+  await services.progress.appendEvent({ type: "lesson_completed", refId: "l01", xp: 10, payload: {} }, NOW);
+  await user.click(screen.getByRole("button", { name: fr.profile.account.signOut.open }));
+  await user.click(await screen.findByRole("button", { name: fr.profile.account.signOut.confirm }));
+  expect((await screen.findAllByText(fr.profile.account.offline)).length).toBeGreaterThan(0);
+  expect(router.state.location.pathname).toBe("/me");
+  expect(await services.progress.listEvents()).toHaveLength(1);
+  expect(localStorage.getItem("vl-profile")).not.toBeNull();
+  expect(useAppState.getState().profile).not.toBeNull();
 });

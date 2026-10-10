@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { fr } from "@/i18n/fr";
 import { Button, Icon } from "@/ui";
-import { detectPlatform } from "@/features/onboarding/DeviceStep";
+import { detectPlatform } from "@/domain/platform";
 import { getInstallPrompt, promptInstall, subscribeInstallPrompt } from "@/features/onboarding/installPrompt";
 
 export function isStandalone(): boolean {
@@ -37,7 +37,7 @@ type InstallStepProps = { onFinish(): void };
 export function InstallStep({ onFinish }: InstallStepProps) {
   const t = fr.onboarding.install;
   const canPrompt = useSyncExternalStore(subscribeInstallPrompt, () => getInstallPrompt() !== null);
-  const ios = detectPlatform(navigator.userAgent) === "ios";
+  const ios = detectPlatform(navigator.userAgent, navigator.maxTouchPoints) === "ios";
 
   async function install() {
     try {

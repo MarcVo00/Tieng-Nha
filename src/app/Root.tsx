@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { z } from "zod";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
+import { PROFILE_KEY } from "@/domain/storageKeys";
 import { OfflineError } from "@/domain/errors";
 import { useAppState, useRefreshProgress, type AppProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
@@ -10,7 +11,6 @@ import { UpdatePrompt } from "@/app/UpdatePrompt";
 import { fr } from "@/i18n/fr";
 import { ToastViewport } from "@/ui";
 
-const PROFILE_KEY = "vl-profile";
 const ProfileSchema = z.object({ pseudo: z.string(), avatarEmoji: z.string() });
 
 function readCachedProfile(): AppProfile | null {

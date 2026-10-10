@@ -13,11 +13,13 @@ type ConfirmDialogProps = {
   cancelLabel: string;
   danger?: boolean;
   requireText?: string;
+  /** True while the confirmed action is running: the confirm button shows its loading state. */
+  busy?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 };
 
-function Panel({ title, body, confirmLabel, cancelLabel, danger, requireText, onConfirm, onCancel }: Omit<ConfirmDialogProps, "open">) {
+function Panel({ title, body, confirmLabel, cancelLabel, danger, requireText, busy = false, onConfirm, onCancel }: Omit<ConfirmDialogProps, "open">) {
   const [typed, setTyped] = useState("");
   const titleId = useId();
   const canConfirm = requireText === undefined || typed === requireText;
@@ -62,7 +64,7 @@ function Panel({ title, body, confirmLabel, cancelLabel, danger, requireText, on
         <Button variant="secondary" onClick={onCancel} autoFocus={requireText === undefined}>
           {cancelLabel}
         </Button>
-        <Button variant={danger ? "danger" : "primary"} disabled={!canConfirm} onClick={onConfirm}>
+        <Button variant={danger ? "danger" : "primary"} loading={busy} disabled={!canConfirm || busy} onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </div>

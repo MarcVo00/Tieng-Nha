@@ -1,9 +1,10 @@
 import type { ProgressRepository } from "@/ports";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import type { AppEvent, LeaderboardRow, NewEvent, Settings, VocabProgress } from "@/domain/types";
+import { THEME_KEY } from "@/domain/storageKeys";
 import type { VietLearnDb } from "@/adapters/dexie/db";
 
-export const THEME_STORAGE_KEY = "vl-theme";
+export const THEME_STORAGE_KEY = THEME_KEY;
 const SETTINGS_KEY = "settings";
 const lbKey = (p: "week" | "all") => `leaderboard:${p}`;
 

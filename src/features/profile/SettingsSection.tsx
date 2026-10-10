@@ -1,17 +1,10 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import type { Capabilities, Settings } from "@/domain/types";
-import { useSettings } from "@/app/appState";
-import { useServices } from "@/app/ServicesProvider";
+import type { Settings } from "@/domain/types";
+import { detectPlatform } from "@/domain/platform";
+import { useDeviceTest, useSettings } from "@/app/appState";
 import { fr } from "@/i18n/fr";
 import { Button, DeviceCheck, Sheet, tap, useToast } from "@/ui";
-
-function platformOf(userAgent: string): "ios" | "android" | "other" {
-  if (/iPhone|iPad|iPod/.test(userAgent)) return "ios";
-  if (/Android/.test(userAgent)) return "android";
-  if (/Macintosh/.test(userAgent) && navigator.maxTouchPoints > 1) return "ios";
-  return "other";
-}
 
 type SegmentedProps<T extends string> = { label: string; value: T; options: readonly { id: T; label: string }[]; onChange(v: T): void };
 
@@ -38,50 +31,12 @@ function Segmented<T extends string>({ label, value, options, onChange }: Segmen
   );
 }
 
-// Same wiring as the onboarding device step: detection and persistence are best-effort.
 function DeviceSheetBody() {
-  const { tts, stt, detectCapabilities } = useServices();
-  const { settings, updateSettings } = useSettings();
-  const [result, setResult] = useState<Capabilities | null>(settings.capabilities);
-  const [busy, setBusy] = useState<"voice" | "mic" | null>(null);
-
-  async function refresh(): Promise<void> {
-    try {
-      const caps = await detectCapabilities();
-      setResult(caps);
-      await updateSettings({ capabilities: caps });
-    } catch {
-      // Keep whatever result is already shown.
-    }
-  }
-
-  // Called straight from the click handler: iOS only starts speech synthesis inside a user gesture.
-  async function testVoice(): Promise<void> {
-    setBusy("voice");
-    try {
-      await tts.speak("Xin chào!", { rate: 1 });
-    } catch {
-      // Reported by the detection below.
-    }
-    await refresh();
-    setBusy(null);
-  }
-
-  async function testMic(): Promise<void> {
-    setBusy("mic");
-    try {
-      await stt.listen({ lang: "vi-VN", timeoutMs: 6000 });
-    } catch {
-      // Denied, silent or unsupported: the detection below shows what works.
-    }
-    await refresh();
-    setBusy(null);
-  }
-
+  const { result, busy, listening, testVoice, testMic } = useDeviceTest();
   return (
     <div className="max-h-[75dvh] overflow-y-auto">
       <h2 className="mb-3 text-heading text-ink">{fr.profile.settings.device.title}</h2>
-      <DeviceCheck result={result} platform={platformOf(navigator.userAgent)} onTestVoice={testVoice} onTestMic={testMic} busy={busy !== null} listening={busy === "mic"} />
+      <DeviceCheck result={result} platform={detectPlatform(navigator.userAgent, navigator.maxTouchPoints)} onTestVoice={testVoice} onTestMic={testMic} busy={busy} listening={listening} />
     </div>
   );
 }

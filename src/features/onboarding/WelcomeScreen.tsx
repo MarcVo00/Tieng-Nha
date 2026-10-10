@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { PROFILE_KEY } from "@/domain/storageKeys";
 import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -17,7 +18,6 @@ type Step = 1 | 2 | 3 | 4 | 5;
 const STEPS: readonly Step[] = [1, 2, 3, 4, 5];
 
 // Same key/format as the bootstrap cache in `app/Root.tsx`.
-const PROFILE_KEY = "vl-profile";
 const ProfileSchema = z.object({ pseudo: z.string(), avatarEmoji: z.string() });
 
 function cacheProfile(profile: AppProfile): void {

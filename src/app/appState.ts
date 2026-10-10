@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { useCallback } from "react";
-import type { ProgressSnapshot, Session, Settings } from "@/domain/types";
+import { useCallback, useState } from "react";
+import type { Capabilities, ProgressSnapshot, Session, Settings } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { useServices } from "@/app/ServicesProvider";
 
@@ -35,4 +35,47 @@ export function useRefreshProgress() {
     const [snapshot, dueCount] = await Promise.all([activity.getSnapshot(), progress.countDueVocab(clock())]);
     useAppState.getState().set({ snapshot, dueCount });
   }, [activity, progress, clock]);
+}
+
+/** Device test wiring shared by onboarding and the profile screen. Detection and persistence are best-effort. */
+export function useDeviceTest() {
+  const { tts, stt, detectCapabilities } = useServices();
+  const { settings, updateSettings } = useSettings();
+  const [result, setResult] = useState<Capabilities | null>(settings.capabilities);
+  const [busy, setBusy] = useState<"voice" | "mic" | null>(null);
+
+  const refresh = useCallback(async (): Promise<void> => {
+    try {
+      const caps = await detectCapabilities();
+      setResult(caps);
+      await updateSettings({ capabilities: caps });
+    } catch {
+      // Keep whatever result is already shown.
+    }
+  }, [detectCapabilities, updateSettings]);
+
+  // Called straight from the click handler: iOS only starts speech synthesis inside a user gesture.
+  const testVoice = useCallback(async (): Promise<void> => {
+    setBusy("voice");
+    try {
+      await tts.speak("Xin chào!", { rate: 1 });
+    } catch {
+      // A failed test voice is reported by the detection below.
+    }
+    await refresh();
+    setBusy(null);
+  }, [tts, refresh]);
+
+  const testMic = useCallback(async (): Promise<void> => {
+    setBusy("mic");
+    try {
+      await stt.listen({ lang: "vi-VN", timeoutMs: 6000 });
+    } catch {
+      // Denied, silent or unsupported: the detection below shows what works.
+    }
+    await refresh();
+    setBusy(null);
+  }, [stt, refresh]);
+
+  return { result, busy: busy !== null, listening: busy === "mic", testVoice, testMic, refresh };
 }

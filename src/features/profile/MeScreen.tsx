@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
+import { PROFILE_KEY, THEME_KEY } from "@/domain/storageKeys";
 import { OfflineError } from "@/domain/errors";
 import type { BadgeDef } from "@/domain/types";
 import { useAppState } from "@/app/appState";
@@ -17,8 +18,6 @@ import { ReportProblemSheet } from "@/features/profile/ReportProblemSheet";
 import { SettingsSection } from "@/features/profile/SettingsSection";
 
 const PASS = 70;
-const PROFILE_KEY = "vl-profile";
-const THEME_KEY = "vl-theme";
 
 function removeKey(key: string): void {
   try {
@@ -77,7 +76,7 @@ function BadgeSheet({ badge, unlocked, onClose }: { badge: BadgeDef | null; unlo
 }
 
 export function MeScreen() {
-  const { auth, progress, content, clock } = useServices();
+  const { auth, progress, content, sync } = useServices();
   const navigate = useNavigate();
   const toast = useToast();
   const profile = useAppState((s) => s.profile);
@@ -90,6 +89,7 @@ export function MeScreen() {
   const [certOpen, setCertOpen] = useState(false);
   const [badge, setBadge] = useState<BadgeDef | null>(null);
   const [confirm, setConfirm] = useState<"signout" | "delete" | null>(null);
+  const [pending, setPending] = useState(false);
   const leaving = useRef(false);
 
   const examBest = snapshot?.examBest ?? null;
@@ -129,8 +129,8 @@ export function MeScreen() {
 
   const mention = examBest === null ? "presque" : examMention(examBest);
   const certificate: CertificateProps | null =
-    passed && examBest !== null && mention !== "presque" && profile
-      ? { pseudo: profile.pseudo, score: examBest, mention, dateIso: bestDate?.dateIso ?? clock(), noSpeaking: bestDate?.noSpeaking ?? false }
+    passed && examBest !== null && mention !== "presque" && profile && bestDate
+      ? { pseudo: profile.pseudo, score: examBest, mention, dateIso: bestDate.dateIso, noSpeaking: bestDate.noSpeaking }
       : null;
 
   const unlockedIds = new Set(snapshot?.badges ?? []);
@@ -139,26 +139,35 @@ export function MeScreen() {
   async function leave(kind: "signout" | "delete"): Promise<void> {
     if (leaving.current) return;
     leaving.current = true;
+    setPending(true);
+    // Only the remote call can abort: once it succeeded the user is gone, so local cleanup never blocks.
     try {
       if (kind === "signout") await auth.signOut();
       else await auth.deleteAccount();
-      await progress.clearAll();
     } catch (e) {
       leaving.current = false;
+      setPending(false);
       setConfirm(null);
       toast.show({ title: e instanceof OfflineError ? fr.profile.account.offline : fr.profile.account.error });
       return;
     }
-    removeKey(PROFILE_KEY);
-    if (kind === "delete") removeKey(THEME_KEY);
-    useAppState.getState().set({
-      session: null,
-      profile: null,
-      snapshot: null,
-      dueCount: 0,
-      settings: { ...DEFAULT_SETTINGS, onboardingDone: false },
-    });
-    navigate("/welcome", { replace: true });
+    try {
+      if (kind === "signout") await sync.flush().catch(() => undefined);
+      await progress.clearAll();
+    } catch (e) {
+      console.warn("Local cleanup failed", e);
+    } finally {
+      removeKey(PROFILE_KEY);
+      removeKey(THEME_KEY);
+      useAppState.getState().set({
+        session: null,
+        profile: null,
+        snapshot: null,
+        dueCount: 0,
+        settings: { ...DEFAULT_SETTINGS, onboardingDone: false },
+      });
+      navigate("/welcome", { replace: true });
+    }
   }
 
   const a = fr.profile.account;
@@ -240,6 +249,7 @@ export function MeScreen() {
         open={confirm === "signout"}
         title={a.signOut.title}
         body={a.signOut.body}
+        busy={pending}
         confirmLabel={a.signOut.confirm}
         cancelLabel={a.signOut.cancel}
         onConfirm={() => void leave("signout")}
@@ -252,6 +262,7 @@ export function MeScreen() {
         confirmLabel={a.delete.confirm}
         cancelLabel={a.delete.cancel}
         danger
+        busy={pending}
         requireText={a.delete.word}
         onConfirm={() => void leave("delete")}
         onCancel={() => setConfirm(null)}

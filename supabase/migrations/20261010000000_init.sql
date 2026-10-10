@@ -20,7 +20,7 @@ create table public.profiles (
   id uuid primary key references auth.users on delete cascade,
   group_id uuid not null references public.groups,
   pseudo text not null check (char_length(pseudo) between 2 and 20),
-  avatar_emoji text not null default '🐉',
+  avatar_emoji text not null default '🐉' check (char_length(avatar_emoji) between 1 and 8),
   created_at timestamptz not null default now(),
   unique (group_id, pseudo)
 );
@@ -93,8 +93,9 @@ begin
     insert into public.profiles (id, group_id, pseudo, avatar_emoji)
     values (auth.uid(), g, p_pseudo, p_avatar)
     on conflict (id) do update set pseudo = excluded.pseudo, avatar_emoji = excluded.avatar_emoji;
-  exception when unique_violation then
-    raise exception 'pseudo_taken';
+  exception
+    when unique_violation then raise exception 'pseudo_taken';
+    when check_violation then raise exception 'invalid_profile';
   end;
   insert into public.user_stats (user_id, group_id) values (auth.uid(), g) on conflict (user_id) do nothing;
 end $$;
@@ -107,8 +108,10 @@ declare
   v_today date := public.paris_today();
   v_week date := public.paris_week_start(public.paris_today());
   v_day date := (least(new.client_created_at, now()) at time zone 'Europe/Paris')::date;
-  v_score int := coalesce((new.payload->>'score')::int, 0);
-  v_credit int;
+  v_score int := case when new.payload->>'score' ~ '^[0-9]+(\.[0-9]+)?$'
+    then least(100, greatest(0, round((new.payload->>'score')::numeric)))::int else null end;
+  v_attempt uuid;
+  v_credit int := 0;
 begin
   select * into s from public.user_stats where user_id = new.user_id for update;
   if not found then return new; end if;
@@ -117,8 +120,19 @@ begin
   if s.week_start <> v_week then s.xp_week := 0; s.week_start := v_week; end if;
 
   if new.type = 'exam_finished' then
-    v_credit := greatest(0, v_score - coalesce(s.exam_best, 0));  -- client xp ignored
-    s.exam_best := greatest(coalesce(s.exam_best, 0), v_score);
+    -- Client xp is ignored. The event must reference one of the user's unscored attempts,
+    -- otherwise it credits 0 (never raise: a raising trigger would block the whole sync batch).
+    if new.payload->>'attemptId' ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then
+      v_attempt := (new.payload->>'attemptId')::uuid;
+    end if;
+    if v_score is not null and v_attempt is not null then
+      update public.exam_attempts set score = v_score
+      where id = v_attempt and user_id = new.user_id and score is null;
+      if found then
+        v_credit := greatest(0, v_score - coalesce(s.exam_best, 0));
+        s.exam_best := greatest(coalesce(s.exam_best, 0), v_score);
+      end if;
+    end if;
   else
     v_credit := new.xp;
   end if;
@@ -160,6 +174,7 @@ language plpgsql security definer set search_path = public as $$
 declare n int; a uuid;
 begin
   if auth.uid() is null then raise exception 'not_authenticated'; end if;
+  perform pg_advisory_xact_lock(hashtextextended(auth.uid()::text, 0));
   select count(*) into n from public.exam_attempts
   where user_id = auth.uid() and (started_at at time zone 'Europe/Paris')::date = public.paris_today();
   if n >= 3 then raise exception 'exam_limit'; end if;
@@ -212,6 +227,9 @@ revoke update on public.exam_attempts from anon, authenticated;
 grant update (score) on public.exam_attempts to authenticated;
 revoke all on public.user_stats from anon;
 revoke insert, update, delete on public.user_stats from authenticated;
-revoke all on function public.delete_my_account() from anon;
-revoke all on function public.start_exam_attempt() from anon;
-revoke all on function public.join_group(text, text, text) from anon;
+revoke execute on function public.delete_my_account() from public, anon;
+revoke execute on function public.start_exam_attempt() from public, anon;
+revoke execute on function public.join_group(text, text, text) from public, anon;
+grant execute on function public.delete_my_account() to authenticated;
+grant execute on function public.start_exam_attempt() to authenticated;
+grant execute on function public.join_group(text, text, text) to authenticated;

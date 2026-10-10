@@ -8,11 +8,11 @@ import type { Exercise } from "@/domain/types";
 
 const ex = { id: "sp1", type: "speak" as const, vi: "Cho tui một ly trà đá.", fr: "Je voudrais un thé glacé.", vocabIds: ["v_tra_da"] } satisfies Extract<Exercise, { type: "speak" }>;
 
-function setup(caps: { tts?: boolean; stt?: boolean; recorder?: boolean } = {}) {
+function setup(caps: { tts?: boolean; stt?: boolean; recorder?: boolean } = {}, recorder = new FakeVoiceRecorder()) {
   const stt = new FakeSpeechRecognizer();
   const onResult = vi.fn();
   const onCapabilityLost = vi.fn();
-  const services = { tts: new FakeSpeechSynthesizer(), stt, recorder: new FakeVoiceRecorder() };
+  const services = { tts: new FakeSpeechSynthesizer(), stt, recorder };
   renderWithServices(
     <ExerciseHost
       exercise={ex}
@@ -74,4 +74,24 @@ test("no capability at all offers skip", async () => {
   const { onResult } = setup({ tts: false, stt: false, recorder: false });
   await userEvent.click(screen.getByRole("button", { name: /passer/i }));
   expect(onResult).toHaveBeenCalledWith(expect.objectContaining({ skipped: true, correct: false }));
+});
+
+test("a permission error from the recorder reports the capability loss and offers skip", async () => {
+  const recorder = new FakeVoiceRecorder();
+  vi.spyOn(recorder, "record").mockRejectedValue(new DOMException("denied", "NotAllowedError"));
+  const { onCapabilityLost } = setup({ stt: false }, recorder);
+  await userEvent.click(screen.getByRole("button", { name: /parler/i }));
+  await vi.waitFor(() => expect(onCapabilityLost).toHaveBeenCalledWith("recorder"));
+  expect(await screen.findByRole("button", { name: /passer/i })).toBeInTheDocument();
+});
+
+test("any other recorder failure shows the retry message and stays in recorder mode", async () => {
+  const recorder = new FakeVoiceRecorder();
+  vi.spyOn(recorder, "record").mockRejectedValue(new Error("encoder hiccup"));
+  const { onCapabilityLost } = setup({ stt: false }, recorder);
+  await userEvent.click(screen.getByRole("button", { name: /parler/i }));
+  expect(await screen.findByText(/je n'ai rien entendu/i)).toBeInTheDocument();
+  expect(onCapabilityLost).not.toHaveBeenCalled();
+  expect(screen.getByRole("button", { name: /parler/i })).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /passer/i })).not.toBeInTheDocument();
 });

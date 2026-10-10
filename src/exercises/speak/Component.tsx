@@ -11,6 +11,12 @@ type Mode = "stt" | "recorder" | "none";
 const MAX_RECORD_MS = 6000;
 const LISTEN_TIMEOUT_MS = 8000;
 const FAILURES_BEFORE_SELF_ASSESS = 2;
+const PERMANENT_RECORDER_ERRORS: readonly string[] = ["NotAllowedError", "NotFoundError", "SecurityError"];
+
+/** Only permission or device errors mean the recorder is gone for good; anything else is worth a retry. */
+function isRecorderLost(e: unknown): boolean {
+  return typeof e === "object" && e !== null && "name" in e && typeof e.name === "string" && PERMANENT_RECORDER_ERRORS.includes(e.name);
+}
 
 // Hero: the sentence to say + the mic. Secondary: French meaning, model voice. One action at a time:
 // speak (stt), record then self-assess (recorder), or pass (none).
@@ -100,11 +106,15 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
       urlRef.current = url;
       setVoiceUrl(url);
       setPhase("recorded");
-    } catch {
+    } catch (e) {
       if (!mounted.current) return;
-      onCapabilityLost?.("recorder");
-      setOverride("none");
       setPhase("idle");
+      if (isRecorderLost(e)) {
+        onCapabilityLost?.("recorder");
+        setOverride("none");
+        return;
+      }
+      setMessage(fr.exercises.speak.notHeard);
     }
   };
 

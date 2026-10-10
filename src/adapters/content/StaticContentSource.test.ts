@@ -33,5 +33,6 @@ test("createStaticContentSource lists real lessons in order and copes with missi
   expect(lessons.map((l) => l.order)).toEqual(lessons.map((_, i) => i + 1));
   expect(lessons.map((l) => l.id)).toEqual([...lessons.map((l) => l.id)].sort());
   for (const l of lessons) expect((await real.getLesson(l.id)).id).toBe(l.id);
+  expect(await real.getExamPool()).toEqual([]);
   expect((await real.getBadges()).length).toBe(12);
 });

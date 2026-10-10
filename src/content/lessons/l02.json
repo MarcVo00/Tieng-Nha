@@ -1,35 +1,198 @@
 {
   "id": "l02",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Politesse & pronoms",
   "description": "En vietnamien, on choisit « je » et « tu » selon l'âge et le lien avec la personne. Apprends les pronoms de base, comment t'excuser et demander des nouvelles.",
   "emoji": "🙏",
   "dialogueId": "d02",
   "vocab": [
-    { "id": "v_tui", "vi": "tui", "fr": "je, moi", "dialect": "south", "note": "« Tui » est la forme du Sud de « tôi » (je). Dans cette appli, tu parles de toi avec « tui »." },
-    { "id": "v_ban", "vi": "bạn", "fr": "toi, ami(e)", "dialect": "south", "note": "« Bạn » est neutre. En situation réelle, on dit « anh » à un homme et « chị » à une femme un peu plus âgés." },
-    { "id": "v_anh", "vi": "anh", "fr": "grand frère / monsieur (jeune)", "dialect": "south", "note": "Pour s'adresser à un homme un peu plus âgé que soi." },
-    { "id": "v_chi", "vi": "chị", "fr": "grande sœur / madame (jeune)", "dialect": "south", "note": "Pour s'adresser à une femme un peu plus âgée que soi." },
-    { "id": "v_em", "vi": "em", "fr": "petit frère / petite sœur / plus jeune", "dialect": "south", "note": "Pour s'adresser à quelqu'un de plus jeune que soi, par exemple un serveur." },
-    { "id": "v_co_tante", "vi": "cô", "fr": "tante (côté du père) / madame d'âge mûr", "dialect": "south", "note": "Aussi utilisé pour une enseignante." },
-    { "id": "v_chu", "vi": "chú", "fr": "oncle (frère cadet du père) / monsieur d'âge mûr", "dialect": "south" },
-    { "id": "v_ong", "vi": "ông", "fr": "grand-père / monsieur âgé", "dialect": "south" },
-    { "id": "v_ba_grand_mere", "vi": "bà", "fr": "grand-mère / dame âgée", "dialect": "south", "note": "Ton huyền (accent grave), à ne pas confondre avec « ba » (trois, papa) qui est plat." },
-    { "id": "v_xin_loi", "vi": "xin lỗi", "fr": "pardon, excuse-moi", "dialect": "south" },
-    { "id": "v_khong_sao", "vi": "không sao", "fr": "ce n'est pas grave", "dialect": "south" },
-    { "id": "v_khoe_khong", "vi": "khỏe không", "fr": "tu vas bien ?", "dialect": "south", "note": "Se dit après un pronom : « Bạn khỏe không? »" }
+    {
+      "id": "v_tui",
+      "vi": "tui",
+      "fr": "je, moi",
+      "dialect": "south",
+      "note": "« Tui » est la forme du Sud de « tôi » (je). Dans cette appli, tu parles de toi avec « tui »."
+    },
+    {
+      "id": "v_ban",
+      "vi": "bạn",
+      "fr": "toi, ami(e)",
+      "dialect": "south",
+      "note": "« Bạn » est neutre. En situation réelle, on dit « anh » à un homme et « chị » à une femme un peu plus âgés."
+    },
+    {
+      "id": "v_anh",
+      "vi": "anh",
+      "fr": "grand frère / monsieur (jeune)",
+      "dialect": "south",
+      "note": "Pour s'adresser à un homme un peu plus âgé que soi."
+    },
+    {
+      "id": "v_chi",
+      "vi": "chị",
+      "fr": "grande sœur / madame (jeune)",
+      "dialect": "south",
+      "note": "Pour s'adresser à une femme un peu plus âgée que soi."
+    },
+    {
+      "id": "v_em",
+      "vi": "em",
+      "fr": "petit frère / petite sœur / plus jeune",
+      "dialect": "south",
+      "note": "Pour s'adresser à quelqu'un de plus jeune que soi, par exemple un serveur."
+    },
+    {
+      "id": "v_co_tante",
+      "vi": "cô",
+      "fr": "tante (côté du père) / madame d'âge mûr",
+      "dialect": "south",
+      "note": "Aussi utilisé pour une enseignante."
+    },
+    {
+      "id": "v_chu",
+      "vi": "chú",
+      "fr": "oncle (frère cadet du père) / monsieur d'âge mûr",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ong",
+      "vi": "ông",
+      "fr": "grand-père / monsieur âgé",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ba_grand_mere",
+      "vi": "bà",
+      "fr": "grand-mère / dame âgée",
+      "dialect": "south",
+      "note": "Ton huyền (accent grave), à ne pas confondre avec « ba » (trois, papa) qui est plat."
+    },
+    {
+      "id": "v_xin_loi",
+      "vi": "xin lỗi",
+      "fr": "pardon, excuse-moi",
+      "dialect": "south"
+    },
+    {
+      "id": "v_khong_sao",
+      "vi": "không sao",
+      "fr": "ce n'est pas grave",
+      "dialect": "south"
+    },
+    {
+      "id": "v_khoe_khong",
+      "vi": "khỏe không",
+      "fr": "tu vas bien ?",
+      "dialect": "south",
+      "note": "Se dit après un pronom : « Bạn khỏe không? »"
+    }
   ],
   "exercises": [
-    { "id": "l02_e01", "type": "listen_choose", "vocabId": "v_tui", "choices": ["v_tui", "v_ban", "v_anh", "v_em"] },
-    { "id": "l02_e02", "type": "listen_choose", "vocabId": "v_xin_loi", "choices": ["v_xin_loi", "v_khong_sao", "v_khoe_khong", "v_cam_on"] },
-    { "id": "l02_e03", "type": "listen_choose", "vocabId": "v_chu", "choices": ["v_chu", "v_co_tante", "v_ong", "v_ba_grand_mere"] },
-    { "id": "l02_e04", "type": "tone_pick", "syllable": "bà", "answerTone": "huyen" },
-    { "id": "l02_e05", "type": "tone_pick", "syllable": "chị", "answerTone": "nang" },
-    { "id": "l02_e06", "type": "tone_pick", "syllable": "chú", "answerTone": "sac" },
-    { "id": "l02_e07", "type": "translate_choose", "promptFr": "Pardon.", "answerVi": "Xin lỗi.", "distractorsVi": ["Không sao.", "Cảm ơn.", "Dạ."] },
-    { "id": "l02_e08", "type": "translate_choose", "promptFr": "Comment vas-tu ?", "answerVi": "Bạn khỏe không?", "distractorsVi": ["Cảm ơn bạn.", "Không sao.", "Xin lỗi bạn."] },
-    { "id": "l02_e09", "type": "word_order", "fr": "Merci, madame (dame âgée).", "tokensVi": ["Cảm ơn", "bà"], "extraTokens": ["ông", "cô"] },
-    { "id": "l02_e10", "type": "speak", "vi": "Bạn khỏe không?", "fr": "Comment vas-tu ?", "vocabIds": ["v_ban", "v_khoe_khong"] },
-    { "id": "l02_e11", "type": "speak", "vi": "Xin lỗi. Không sao.", "fr": "Pardon. Ce n'est pas grave.", "vocabIds": ["v_xin_loi", "v_khong_sao"] }
+    {
+      "id": "l02_e01",
+      "type": "listen_choose",
+      "vocabId": "v_tui",
+      "choices": [
+        "v_tui",
+        "v_ban",
+        "v_anh",
+        "v_em"
+      ]
+    },
+    {
+      "id": "l02_e02",
+      "type": "listen_choose",
+      "vocabId": "v_xin_loi",
+      "choices": [
+        "v_xin_loi",
+        "v_khong_sao",
+        "v_khoe_khong",
+        "v_cam_on"
+      ]
+    },
+    {
+      "id": "l02_e03",
+      "type": "listen_choose",
+      "vocabId": "v_chu",
+      "choices": [
+        "v_chu",
+        "v_co_tante",
+        "v_ong",
+        "v_ba_grand_mere"
+      ]
+    },
+    {
+      "id": "l02_e04",
+      "type": "tone_pick",
+      "syllable": "bà",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l02_e05",
+      "type": "tone_pick",
+      "syllable": "chị",
+      "answerTone": "nang"
+    },
+    {
+      "id": "l02_e06",
+      "type": "tone_pick",
+      "syllable": "chú",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l02_e07",
+      "type": "translate_choose",
+      "promptFr": "Pardon.",
+      "answerVi": "Xin lỗi.",
+      "distractorsVi": [
+        "Không sao.",
+        "Cảm ơn.",
+        "Dạ."
+      ]
+    },
+    {
+      "id": "l02_e08",
+      "type": "translate_choose",
+      "promptFr": "Comment vas-tu ?",
+      "answerVi": "Bạn khỏe không?",
+      "distractorsVi": [
+        "Cảm ơn bạn.",
+        "Không sao.",
+        "Xin lỗi bạn."
+      ]
+    },
+    {
+      "id": "l02_e09",
+      "type": "word_order",
+      "fr": "Merci, madame (dame âgée).",
+      "tokensVi": [
+        "Cảm ơn",
+        "bà"
+      ],
+      "extraTokens": [
+        "ông",
+        "anh"
+      ]
+    },
+    {
+      "id": "l02_e10",
+      "type": "speak",
+      "vi": "Bạn khỏe không?",
+      "fr": "Comment vas-tu ?",
+      "vocabIds": [
+        "v_ban",
+        "v_khoe_khong"
+      ]
+    },
+    {
+      "id": "l02_e11",
+      "type": "speak",
+      "vi": "Xin lỗi bạn.",
+      "fr": "Pardon.",
+      "vocabIds": [
+        "v_xin_loi",
+        "v_ban"
+      ]
+    }
   ]
 }

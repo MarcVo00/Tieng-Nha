@@ -43,7 +43,7 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
 
   constructor(
     private readonly getMyEvents: () => Promise<AppEvent[]>,
-    private readonly me: Me,
+    private readonly me: Me | (() => Promise<Me>),
     private readonly now: () => string = () => new Date().toISOString(),
   ) {}
 
@@ -54,7 +54,8 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
     const mine = events.filter((e) => since === undefined || parisWall(new Date(e.createdAt)).wall >= since);
     const myXp = mine.reduce((sum, e) => sum + e.xp, 0);
     const lessonsDone = new Set(events.filter((e) => e.type === "lesson_completed").map((e) => e.refId)).size;
-    const meRow: LeaderboardRow = { ...this.me, xp: myXp, streak: 0, lessonsDone, isMe: true };
+    const me = typeof this.me === "function" ? await this.me() : this.me;
+    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, isMe: true };
     return [...BOTS.map((b) => ({ ...b, isMe: false })), meRow].sort((a, b) => b.xp - a.xp);
   }
 

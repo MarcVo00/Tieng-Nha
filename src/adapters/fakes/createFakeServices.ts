@@ -27,6 +27,12 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     overrides.content ??
     new InMemoryContentSource([lessonFixture], [dialogueFixture], examPoolFixture, BadgesFileSchema.parse(badgesFile).badges);
   const sync = createSyncService({ outbox, sink });
+  const auth = new FakeAuthService();
+  // The player's own row follows the profile chosen during onboarding (falls back to a fixed persona before it exists).
+  const me = async () => {
+    const profile = await auth.getMyProfile();
+    return { userId: "me", pseudo: profile?.pseudo ?? "Moi", avatarEmoji: profile?.avatarEmoji ?? "🐉" };
+  };
   const base: Services = {
     env: { VITE_WELCOME_MESSAGE: "", VITE_USE_FAKES: true, VITE_FAKE_SPEECH: true },
     flags: { aiConversation: false, streakFreeze: false, humanAudio: false },
@@ -35,8 +41,8 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     progress,
     outbox,
     sink,
-    leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), { userId: "me", pseudo: "Moi", avatarEmoji: "🐉" }, clock),
-    auth: new FakeAuthService(),
+    leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), me, clock),
+    auth,
     exam: new FakeExamGateway(clock),
     tts: new FakeSpeechSynthesizer(),
     stt: new FakeSpeechRecognizer(),

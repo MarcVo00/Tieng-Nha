@@ -458,6 +458,49 @@ export const fr = {
     notFound: { title: "Profil introuvable", body: "Cette personne n'est pas (ou plus) au classement." },
     error: { title: "Le profil n'a pas pu se charger", body: "Réessaie dans un instant." },
   },
+  // --- profile ---
+  profile: {
+    title: "Mon profil",
+    editAria: "Modifier mon profil",
+    stats: { xp: "XP au total", streak: "Série en cours", exam: "Meilleur score au test final", examNone: "Pas encore passé", examScore: (n: number) => `${n} / 100` },
+    certificate: { open: "Voir mon certificat", sheet: "Mon certificat", download: "Télécharger", error: "Le certificat n'a pas pu être créé." },
+    edit: {
+      title: "Modifier mon profil",
+      pseudoLabel: "Pseudo",
+      pseudoHint: "2 à 20 caractères",
+      pseudoInvalid: "Ton pseudo doit faire entre 2 et 20 caractères",
+      pseudoTaken: "Ce pseudo est déjà pris dans ton groupe",
+      offline: "Pas de connexion : réessaie quand tu es en ligne.",
+      generic: "Impossible d'enregistrer pour le moment. Réessaie.",
+      avatarLabel: "Ton avatar",
+      avatarOption: (emoji: string) => `Avatar ${emoji}`,
+      save: "Enregistrer",
+      saved: "Profil mis à jour",
+    },
+    badges: { title: "Badges", count: (unlocked: number, total: number) => `${unlocked} sur ${total}`, locked: "Pas encore débloqué", unlocked: "Débloqué", close: "Fermer", loadError: "Les badges n'ont pas pu se charger." },
+    settings: {
+      title: "Réglages",
+      theme: { label: "Thème", system: "Système", light: "Clair", dark: "Sombre" },
+      voice: { label: "Vitesse de la voix", normal: "Normale", slow: "Lente 🐢" },
+      saveError: "Ce réglage n'a pas pu être enregistré.",
+      device: { open: "Tester à nouveau mon appareil", title: "Test de l'appareil" },
+      report: "Signaler un problème",
+    },
+    account: {
+      title: "Compte",
+      signOut: { open: "Se déconnecter", title: "Se déconnecter ?", body: "Ta progression sur cet appareil sera effacée. Elle reste enregistrée si tu l'as synchronisée.", confirm: "Me déconnecter", cancel: "Annuler" },
+      delete: {
+        open: "Supprimer mon compte",
+        title: "Supprimer mon compte ?",
+        body: "Toutes tes données seront supprimées pour de bon, y compris ta place au classement du groupe. Cette action est irréversible.",
+        word: "SUPPRIMER",
+        confirm: "Supprimer définitivement",
+        cancel: "Annuler",
+      },
+      offline: "Pas de connexion : réessaie quand tu es en ligne.",
+      error: "Quelque chose a coincé. Réessaie dans un instant.",
+    },
+  },
 } as const;
 
 export type Fr = typeof fr;

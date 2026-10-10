@@ -301,6 +301,34 @@ export const fr = {
       finish: "Terminer",
     },
   },
+  // --- conversation ---
+  conversation: {
+    loadError: { title: "Le dialogue n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
+    quit: "Quitter le dialogue",
+    log: "Conversation",
+    typing: "Ton interlocuteur écrit…",
+    npc: "Interlocuteur",
+    you: "Toi",
+    translate: "Traduire",
+    hideTranslation: "Masquer la traduction",
+    yourTurn: "À toi de répondre",
+    options: "Tes réponses possibles",
+    speakHint: "Réponds à voix haute",
+    orChoose: "ou touche une réponse",
+    misunderstood: "Je n'ai pas compris, réessaie ou choisis une réponse",
+    notHeard: "Je n'ai rien entendu, réessaie ou choisis une réponse",
+    micDenied: "Le micro est refusé. Pas de souci, touche une réponse.",
+    micUnsupported: "La reconnaissance vocale n'est pas disponible ici. Touche une réponse.",
+    saving: "On enregistre ton dialogue…",
+    saveError: { title: "Ton dialogue n'a pas pu être enregistré", body: "Réessaie dans un instant." },
+    done: {
+      title: "Cảm ơn bạn !",
+      body: "Dialogue terminé.",
+      badges: "Nouveaux badges",
+      home: "Retour à l'accueil",
+      replay: "Rejouer",
+    },
+  },
 } as const;
 
 export type Fr = typeof fr;

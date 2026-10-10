@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(36);
+select plan(37);
 
 -- fixtures (as postgres)
 insert into auth.users (id, email) values
@@ -80,6 +80,7 @@ select throws_ok($$ insert into public.events (client_id, user_id, type, ref_id,
 -- exam limit (2 used, third is the last)
 select is(pg_temp.start_attempt('a3'), 0, 'attempt 3 leaves 0');
 select throws_ok($$ select public.start_exam_attempt() $$, 'P0001', 'exam_limit', '4th attempt refused');
+select throws_ok($$ update public.exam_attempts set score = 100 where id = current_setting('t.a3')::uuid $$, '42501', null, 'exam score not writable by clients');
 
 -- weekly reset (stale week_start set by postgres)
 reset role;
@@ -101,9 +102,8 @@ select throws_ok($$ select public.join_group('FAM', 'Alice', '🐯') $$, 'P0001'
 select lives_ok($$ select public.join_group('FAM', 'Bob', '🐯') $$, 'bob joins FAM');
 select is((select count(*)::int from public.leaderboard), 2, 'bob sees 2 rows in his group leaderboard');
 select is((select count(*)::int from public.events), 0, 'bob cannot read alice events');
-select is(
-  (with u as (update public.profiles set pseudo = 'Hacked' where id = '11111111-1111-1111-1111-111111111111' returning 1) select count(*)::int from u),
-  0, 'bob cannot update alice profile');
+update public.profiles set pseudo = 'Hacked' where id = '11111111-1111-1111-1111-111111111111';
+select is((select pseudo from public.profiles where id = '11111111-1111-1111-1111-111111111111'), 'Alice', 'bob cannot update alice profile');
 select throws_ok($$ update public.profiles set group_id = 'aaaaaaaa-0000-0000-0000-000000000002' where id = auth.uid() $$,
   '42501', null, 'group_id not updatable');
 

@@ -20,7 +20,7 @@ create table public.profiles (
   id uuid primary key references auth.users on delete cascade,
   group_id uuid not null references public.groups,
   pseudo text not null check (char_length(pseudo) between 2 and 20),
-  avatar_emoji text not null default '🐉' check (char_length(avatar_emoji) between 1 and 8),
+  avatar_emoji text not null default '🐉' check (char_length(avatar_emoji) between 1 and 16),
   created_at timestamptz not null default now(),
   unique (group_id, pseudo)
 );
@@ -217,14 +217,12 @@ create policy events_select on public.events for select to authenticated using (
 create policy events_insert on public.events for insert to authenticated with check (user_id = auth.uid());
 create policy stats_select on public.user_stats for select to authenticated using (group_id = public.my_group_id());
 create policy exam_select on public.exam_attempts for select to authenticated using (user_id = auth.uid());
-create policy exam_update on public.exam_attempts for update to authenticated using (user_id = auth.uid() and score is null) with check (user_id = auth.uid());
 create policy reports_insert on public.content_reports for insert to authenticated with check (user_id = auth.uid());
 
--- Column-level privileges: only pseudo/avatar and score are updatable by clients.
+-- Column-level privileges: only pseudo/avatar are updatable (exam score is written solely by apply_event) by clients.
 revoke update on public.profiles from anon, authenticated;
 grant update (pseudo, avatar_emoji) on public.profiles to authenticated;
 revoke update on public.exam_attempts from anon, authenticated;
-grant update (score) on public.exam_attempts to authenticated;
 revoke all on public.user_stats from anon;
 revoke insert, update, delete on public.user_stats from authenticated;
 revoke execute on function public.delete_my_account() from public, anon;

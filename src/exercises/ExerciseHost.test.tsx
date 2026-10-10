@@ -71,7 +71,7 @@ test("translate_choose works through the host", async () => {
 });
 
 test("getPlugin throws a clear error for an unregistered type", () => {
-  expect(() => getPlugin("speak")).toThrow(/no exercise plugin registered for type "speak"/i);
+  expect(() => getPlugin("bogus" as never)).toThrow(/no exercise plugin registered for type "bogus"/i);
 });
 
 test("a new exercise starts with a clean state", async () => {

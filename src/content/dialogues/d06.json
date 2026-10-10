@@ -1,0 +1,96 @@
+{
+  "id": "d06",
+  "contentVersion": 1,
+  "title": "Au restaurant",
+  "scene": "Quán cơm tấm — un restaurant de riz brisé à Sài Gòn",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào bạn! Bạn muốn ăn gì?",
+      "fr": "Bonjour ! Qu'est-ce que tu veux manger ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Cho tui một dĩa cơm tấm.",
+          "fr": "Une assiette de riz brisé pour moi.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Cho tui hủ tiếu.",
+          "fr": "Un hủ tiếu pour moi.",
+          "next": "t3"
+        },
+        {
+          "id": "o3",
+          "vi": "Cho tui phở.",
+          "fr": "Un phở pour moi.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Dạ. Bạn uống gì không?",
+      "fr": "D'accord. Tu bois quelque chose ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Cho tui một ly trà đá.",
+          "fr": "Un thé glacé pour moi.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Cho tui một ly nước.",
+          "fr": "Un verre d'eau pour moi.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Dạ, của bạn đây. Bạn ăn ngon nha!",
+      "fr": "Voilà pour toi. Bon appétit !",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Ngon quá!",
+          "fr": "Que c'est bon !",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Cảm ơn bạn!",
+          "fr": "Merci !",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Dạ, cảm ơn bạn. Hẹn gặp lại nha!",
+      "fr": "Merci à toi. À bientôt, hein !",
+      "next": null
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "d03",
+  "contentVersion": 1,
+  "title": "Donner son numéro",
+  "scene": "Au téléphone — Gọi điện thoại",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Alô? Chào bạn! Số điện thoại của bạn là số mấy?",
+      "fr": "Allô ? Bonjour ! Quel est ton numéro de téléphone ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Số của tui là chín bảy ba hai năm sáu.",
+          "fr": "Mon numéro est 9 7 3 2 5 6.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Số của tui là tám bốn một sáu chín bảy.",
+          "fr": "Mon numéro est 8 4 1 6 9 7.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Cảm ơn bạn! Bạn có số của tui không?",
+      "fr": "Merci ! Tu as mon numéro ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, không. Số của bạn là số mấy?",
+          "fr": "Non. Quel est ton numéro ?",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, có rồi.",
+          "fr": "Oui, je l'ai déjà.",
+          "next": "t6"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Số của tui là tám tám chín ba sáu hai. Tạm biệt bạn!",
+      "fr": "Mon numéro est 8 8 9 3 6 2. Au revoir !",
+      "next": null
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Tốt quá! Tạm biệt bạn nha.",
+      "fr": "Parfait ! Au revoir, hein.",
+      "next": null
+    }
+  ]
+}

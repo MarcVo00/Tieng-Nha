@@ -1,0 +1,65 @@
+{
+  "id": "d05",
+  "contentVersion": 1,
+  "title": "Commander au café",
+  "scene": "Quán cà phê — un petit café de trottoir à Sài Gòn",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào bạn! Bạn uống gì?",
+      "fr": "Bonjour ! Tu bois quoi ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Cho tui một ly cà phê sữa đá.",
+          "fr": "Un café au lait glacé pour moi.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Cho tui một ly trà đá.",
+          "fr": "Un thé glacé pour moi.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Dạ, bạn đợi chút nha.",
+      "fr": "D'accord, attends un instant.",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Cảm ơn em.",
+          "fr": "Merci.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, cảm ơn.",
+          "fr": "Oui, merci.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Của bạn đây. Ngon lắm nha!",
+      "fr": "Voilà pour toi. C'est très bon !",
+      "next": null
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "d04",
+  "contentVersion": 1,
+  "title": "Montrer une photo de famille",
+  "scene": "Chez des amis — Nhà bạn",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Đây là hình gia đình của tui.",
+      "fr": "Voici la photo de ma famille.",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Gia đình bạn có mấy người?",
+          "fr": "Il y a combien de personnes dans ta famille ?",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Bạn có anh hai không?",
+          "fr": "Tu as un grand frère ?",
+          "next": "t4"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Có năm người: ba, má, anh hai, em gái và tui. Bạn có anh chị em không?",
+      "fr": "Cinq : papa, maman, mon grand frère, ma petite sœur et moi. Et toi, tu as des frères et sœurs ?",
+      "next": "t5"
+    },
+    {
+      "id": "t4",
+      "speaker": "npc",
+      "vi": "Có, tui có anh hai và em gái. Bạn có anh chị em không?",
+      "fr": "Oui, j'ai un grand frère et une petite sœur. Et toi, tu as des frères et sœurs ?",
+      "next": "t5"
+    },
+    {
+      "id": "t5",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, tui có em gái.",
+          "fr": "Oui, j'ai une petite sœur.",
+          "next": "t6"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, tui không có anh chị em.",
+          "fr": "Non, je n'ai ni frères ni sœurs.",
+          "next": "t6"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Vậy à! Gặp bạn tui vui lắm.",
+      "fr": "Ah bon ! Je suis très content(e) de te voir.",
+      "next": null
+    }
+  ]
+}

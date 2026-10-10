@@ -1,0 +1,97 @@
+{
+  "id": "d07",
+  "contentVersion": 1,
+  "title": "Marchander des fruits",
+  "scene": "Chợ Bến Thành — le marché Bến Thành à Sài Gòn",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào bạn! Bạn mua trái cây gì?",
+      "fr": "Bonjour ! Tu veux quels fruits ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Xoài bao nhiêu tiền?",
+          "fr": "La mangue, combien ça coûte ?",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Thơm rẻ không?",
+          "fr": "L'ananas est bon marché ?",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Dạ, bốn mươi ngàn một ký. Bạn mua mấy ký?",
+      "fr": "Quarante mille le kilo. Tu en prends combien de kilos ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Mắc quá! Bớt cho tui nha.",
+          "fr": "Trop cher ! Fais-moi un rabais, hein.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Rẻ quá! Cho tui hai ký.",
+          "fr": "Pas cher ! Donne-m'en deux kilos.",
+          "next": "t6"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Dạ, bớt cho bạn. Ba mươi lăm ngàn một ký nha.",
+      "fr": "D'accord, je te fais un rabais. Trente-cinq mille le kilo, hein.",
+      "next": "t7"
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Dạ, hai ký, tám mươi ngàn.",
+      "fr": "D'accord, deux kilos, quatre-vingt mille.",
+      "next": "t7"
+    },
+    {
+      "id": "t7",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Cảm ơn bạn nha!",
+          "fr": "Merci, hein !",
+          "next": "t8"
+        },
+        {
+          "id": "o2",
+          "vi": "Tính tiền nha!",
+          "fr": "Je te paie, hein !",
+          "next": "t8"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "speaker": "npc",
+      "vi": "Dạ, cảm ơn bạn! Ăn ngon nha.",
+      "fr": "Merci à toi ! Bon appétit.",
+      "next": null
+    }
+  ]
+}

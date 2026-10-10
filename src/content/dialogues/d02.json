@@ -1,0 +1,65 @@
+{
+  "id": "d02",
+  "contentVersion": 1,
+  "title": "Saluer un voisin",
+  "scene": "Devant la maison — Trước nhà",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào bạn! Bạn khỏe không?",
+      "fr": "Bonjour ! Tu vas bien ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, tui khỏe. Cảm ơn bạn.",
+          "fr": "Oui, je vais bien. Merci.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, tui không khỏe lắm.",
+          "fr": "Oui, je ne vais pas très bien.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Tui ở nhà bên cạnh. Rất vui được gặp bạn!",
+      "fr": "J'habite la maison d'à côté. Ravi(e) de te rencontrer !",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, chào cô.",
+          "fr": "Bonjour, madame.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, chào chú.",
+          "fr": "Bonjour, monsieur.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Chào bạn! Hẹn gặp lại nha.",
+      "fr": "Salut ! À bientôt, hein.",
+      "next": null
+    }
+  ]
+}

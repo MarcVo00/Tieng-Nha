@@ -1,0 +1,90 @@
+{
+  "id": "d10",
+  "contentVersion": 1,
+  "title": "Se présenter à la famille",
+  "scene": "Bữa cơm gia đình — un repas de famille",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào bạn! Mời bạn vô nhà.",
+      "fr": "Bonjour ! Entre, je t'en prie.",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, rất vui được gặp bạn.",
+          "fr": "Oui, ravi(e) de te rencontrer.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Xin chào! Tui là người Pháp.",
+          "fr": "Bonjour ! Je suis français(e).",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Bạn nói tiếng Việt giỏi quá! Bạn học ở đâu?",
+      "fr": "Tu parles très bien vietnamien ! Où as-tu appris ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Tui học ở Sài Gòn.",
+          "fr": "J'ai appris à Sài Gòn.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Tui học tiếng Việt ở Pháp.",
+          "fr": "J'ai appris le vietnamien en France.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Vậy à! Mời bạn ăn cơm. Bạn đói không?",
+      "fr": "Ah bon ! À table. Tu as faim ?",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, đói quá!",
+          "fr": "Oui, très faim !",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, tui no rồi.",
+          "fr": "Merci, je n'ai plus faim.",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Bạn ăn nhiều nha. Cơm má tui ngon lắm.",
+      "fr": "Mange bien, hein. La cuisine de ma mère est très bonne.",
+      "next": null
+    }
+  ]
+}

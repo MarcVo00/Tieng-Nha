@@ -1,0 +1,96 @@
+{
+  "id": "d09",
+  "contentVersion": 1,
+  "title": "Fixer un rendez-vous",
+  "scene": "Au téléphone — Gọi điện thoại",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Alô, chào bạn! Bạn muốn gặp hôm nay hay ngày mai?",
+      "fr": "Allô, bonjour ! Tu veux qu'on se voie aujourd'hui ou demain ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Gặp hôm nay nha.",
+          "fr": "On se voit aujourd'hui, hein.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Ngày mai, tui gặp bạn nha.",
+          "fr": "Demain, je te vois, hein.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Dạ. Bạn muốn gặp lúc mấy giờ?",
+      "fr": "D'accord. À quelle heure tu veux ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Tám giờ sáng.",
+          "fr": "À huit heures du matin.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Hai giờ chiều.",
+          "fr": "À deux heures de l'après-midi.",
+          "next": "t5"
+        },
+        {
+          "id": "o3",
+          "vi": "Bảy giờ tối.",
+          "fr": "À sept heures du soir.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Dạ, được. Vậy gặp bạn nha!",
+      "fr": "D'accord. Alors à tout à l'heure, hein !",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, tạm biệt bạn!",
+          "fr": "D'accord, au revoir !",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Cảm ơn bạn nha!",
+          "fr": "Merci, hein !",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Tạm biệt bạn!",
+      "fr": "Au revoir !",
+      "next": null
+    }
+  ]
+}

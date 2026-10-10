@@ -1,0 +1,96 @@
+{
+  "id": "d08",
+  "contentVersion": 1,
+  "title": "Prendre un xe ôm",
+  "scene": "Ngã tư — au carrefour",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào bạn! Bạn đi đâu?",
+      "fr": "Bonjour ! Tu vas où ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Tui đi chợ.",
+          "fr": "Je vais au marché.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Tui đi gần đây.",
+          "fr": "Je vais tout près d'ici.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Dạ, bạn lên xe đi.",
+      "fr": "D'accord, monte.",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Đi thẳng nha.",
+          "fr": "Tout droit, hein.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Quẹo trái nha.",
+          "fr": "Tourne à gauche, hein.",
+          "next": "t5"
+        },
+        {
+          "id": "o3",
+          "vi": "Quẹo phải nha.",
+          "fr": "Tourne à droite, hein.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Dạ. Bạn muốn dừng ở đâu?",
+      "fr": "D'accord. Où veux-tu t'arrêter ?",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dừng lại đây nha.",
+          "fr": "Arrête-toi ici, hein.",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Dừng lại gần chợ nha.",
+          "fr": "Arrête-toi près du marché, hein.",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Dạ, tới rồi. Mười lăm ngàn nha.",
+      "fr": "Voilà, on est arrivés. Quinze mille, hein.",
+      "next": null
+    }
+  ]
+}

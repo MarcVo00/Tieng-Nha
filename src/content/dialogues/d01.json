@@ -1,0 +1,65 @@
+{
+  "id": "d01",
+  "contentVersion": 1,
+  "title": "Première rencontre",
+  "scene": "Dans la rue — Trên đường",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Xin chào bạn! Bạn có vui không?",
+      "fr": "Bonjour ! Tu es content(e) ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, vui lắm.",
+          "fr": "Oui, très content(e).",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, không vui.",
+          "fr": "Oui, pas content(e).",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Vậy à! Tui phải đi rồi nha.",
+      "fr": "Ah bon ! Je dois y aller, hein.",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Tạm biệt!",
+          "fr": "Au revoir !",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, chào bạn nha!",
+          "fr": "D'accord, salut !",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Chào bạn nha! Vui quá.",
+      "fr": "Salut ! C'était sympa.",
+      "next": null
+    }
+  ]
+}

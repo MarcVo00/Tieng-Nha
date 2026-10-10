@@ -17,8 +17,8 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Chuối rẻ không?",
-          "fr": "Les bananes sont bon marché ?",
+          "vi": "Chuối có rẻ không?",
+          "fr": "Les bananes, c'est bon marché ?",
           "next": "t3"
         },
         {

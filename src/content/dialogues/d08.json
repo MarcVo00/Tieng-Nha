@@ -17,8 +17,8 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Tui đi gần đây.",
-          "fr": "Je vais tout près d'ici.",
+          "vi": "Tui đi ăn phở.",
+          "fr": "Je vais manger un phở.",
           "next": "t3"
         },
         {

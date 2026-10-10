@@ -42,7 +42,7 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Dạ, tui khỏe. Cảm ơn bạn.",
+          "vi": "Dạ, tui khỏe. Cảm ơn.",
           "fr": "Oui, je vais bien. Merci.",
           "next": "t5"
         },

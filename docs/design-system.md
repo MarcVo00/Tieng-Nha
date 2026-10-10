@@ -93,6 +93,7 @@ colors: {
 ```
 La palette Tailwind par défaut est **désactivée** (`theme.colors` remplacé, pas `extend`) : `bg-blue-500`, `text-gray-600`, etc. n'existent pas, ce qui empêche les couleurs hors thème.
 Thème : `settings.theme ∈ {system, light, dark}` ; la classe `dark` est posée sur `<html>` par un script inline dans `index.html` (avant le rendu, pour éviter le flash).
+Objet « papier » (ex. le certificat) : `data-theme="light"` sur l’élément force les tokens du thème clair même sous `:root.dark` (bloc dédié dans `tokens.css`).
 `<meta name="theme-color">` mis à jour avec `--color-bg` du thème actif.
 
 ## 3. Typographie

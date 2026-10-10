@@ -111,10 +111,8 @@ function Corrections({ state }: { state: ResultState }) {
 // Hero: the score counting up. Passed: the certificate and its download; failed: try again or review.
 function ResultContent({ state }: { state: ResultState }) {
   const navigate = useNavigate();
-  const { clock } = useServices();
   const profile = useAppState((s) => s.profile);
   const xpTotal = useAppState((s) => s.snapshot?.xpTotal);
-  const [dateIso] = useState(() => clock());
   const [downloadFailed, setDownloadFailed] = useState(false);
   const passed = state.score >= EXAM_PASS;
   const pseudo = profile?.pseudo ?? "";
@@ -124,7 +122,7 @@ function ResultContent({ state }: { state: ResultState }) {
     const sum = idx.reduce((acc, i) => acc + (state.results[i]?.skipped ? 0 : (state.results[i]?.score ?? 0)), 0);
     return { section: s, pct: idx.length === 0 ? 0 : Math.round((100 * sum) / idx.length) };
   });
-  const certificate = passed && mention !== null ? { pseudo, score: state.score, mention, dateIso, noSpeaking: state.noSpeaking } : null;
+  const certificate = passed && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking } : null;
 
   const download = async () => {
     if (!certificate) return;

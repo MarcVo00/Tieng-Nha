@@ -6,14 +6,15 @@ import { examPoolFixture } from "@/adapters/fakes/seed/exam";
 import { useAppState } from "@/app/appState";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import type { Services } from "@/app/services";
-import { ExamLimitError } from "@/domain/errors";
+import { OfflineError } from "@/domain/errors";
 import type { ExamQuestion, ProgressSnapshot, Settings } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { fr } from "@/i18n/fr";
 import { drawExam } from "@/services/exam";
 import { seedFromString } from "@/services/random";
 import { ExamIntroScreen, ExamResultScreen, ExamRunScreen } from "@/features/exam";
-import type { ResultState, RunState } from "@/features/exam/examState";
+import { EXAM_TOTAL, markAttempt, type ResultState, type RunState } from "@/features/exam/examState";
+import { PRINT_CSS } from "@/ui/Certificate";
 
 const TEST_TIMEOUT = 90_000;
 const ATTEMPT: RunState = { attemptId: "attempt-fixed", remainingToday: 2 };
@@ -62,6 +63,8 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  sessionStorage.clear();
+  document.documentElement.classList.remove("dark");
 });
 
 describe("intro", () => {
@@ -105,22 +108,52 @@ describe("intro", () => {
     expect(await screen.findByRole("button", { name: /Partie 1/ })).toBeInTheDocument();
   });
 
-  test("a refused attempt other than the limit shows a generic message", async () => {
+  test("an unexpected failure shows the generic message", async () => {
     const services = createFakeServices();
-    vi.spyOn(services.exam, "startAttempt").mockRejectedValue(new ExamLimitError());
+    vi.spyOn(services.exam, "startAttempt").mockRejectedValue(new Error("boom"));
     renderExam({ services, entry: "/exam" });
     await userEvent.click(await screen.findByRole("button", { name: fr.exam.intro.start }));
-    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent(fr.exam.intro.error);
+  });
+
+  test("an offline failure shows the offline message", async () => {
+    const services = createFakeServices();
+    vi.spyOn(services.exam, "startAttempt").mockRejectedValue(new OfflineError());
+    renderExam({ services, entry: "/exam" });
+    await userEvent.click(await screen.findByRole("button", { name: fr.exam.intro.start }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Le test nécessite une connexion");
+  });
+
+  test("shows the interrupted-attempt message after a reload", async () => {
+    renderExam({ entry: { pathname: "/exam", state: { interrupted: true } } });
+    expect(await screen.findByRole("status")).toHaveTextContent("Essai interrompu — il est compté.");
   });
 });
 
 describe("run", () => {
+  test("a reload of the run page abandons the attempt and says so", async () => {
+    markAttempt("pending", ATTEMPT.attemptId);
+    const first = renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
+    expect(await screen.findByRole("button", { name: /Partie 1/ })).toBeInTheDocument();
+    first.unmount();
+    renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
+    expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Essai interrompu — il est compté.");
+  });
+
+  test("a run page without a started attempt goes back to the intro", async () => {
+    renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
+    expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
   test("redirects to the intro without an attempt", async () => {
     renderExam({ entry: "/exam/run" });
     expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
   });
 
   test("quitting asks for confirmation and counts the attempt", async () => {
+    markAttempt("pending", ATTEMPT.attemptId);
     renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
     await userEvent.click(await screen.findByRole("button", { name: fr.exam.run.quit.aria }));
     expect(await screen.findByText(fr.exam.run.quit.body)).toBeInTheDocument();
@@ -147,7 +180,7 @@ describe("run", () => {
       const ex = q.exercise;
       const leaving = last.el;
       if (leaving) await waitFor(() => expect(leaving.isConnected).toBe(false));
-      await screen.findByText(fr.exam.run.counter(i + 1, 30));
+      await screen.findByText(fr.exam.run.counter(i + 1, EXAM_TOTAL));
       const verify = () => press(screen.getByRole("button", { name: fr.exercises.verify }));
       switch (ex.type) {
         case "listen_choose": {
@@ -180,6 +213,7 @@ describe("run", () => {
 
   function setupRun(stt: boolean) {
     useAppState.setState({ settings: withCapabilities(stt) });
+    markAttempt("pending", ATTEMPT.attemptId);
     const recognizer = new FakeSpeechRecognizer();
     const services = createFakeServices({ stt: recognizer });
     const finishExam = vi.spyOn(services.activity, "finishExam");
@@ -193,13 +227,13 @@ describe("run", () => {
     "30 right answers give 100, one saved finish, and the certificate",
     async () => {
       const { services, recognizer, finishExam, submit, questions } = setupRun(true);
-      expect(questions).toHaveLength(30);
+      expect(questions).toHaveLength(EXAM_TOTAL);
       expect(questions.filter((q) => q.section === "speaking")).toHaveLength(6);
       await answerAll(questions, recognizer);
 
       expect(await screen.findByText(fr.exam.result.scoreLabel(100), {}, { timeout: 8000 })).toBeInTheDocument();
       expect(screen.getByRole("img", { name: fr.exam.certificate.aria("Linh", 100) })).toBeInTheDocument();
-      expect(screen.getByText("100 / 100")).toBeInTheDocument();
+      expect(within(screen.getByRole("img", { name: /Certificat/ })).getByText("100 / 100")).toBeInTheDocument();
       expect(screen.queryByText(fr.exam.certificate.noSpeaking)).not.toBeInTheDocument();
       expect(screen.getByRole("button", { name: fr.exam.result.download })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: fr.exam.result.print })).toBeInTheDocument();
@@ -220,13 +254,13 @@ describe("run", () => {
     "without speech recognition no speaking question is drawn and the certificate says so",
     async () => {
       const { recognizer, finishExam, questions } = setupRun(false);
-      expect(questions).toHaveLength(30);
+      expect(questions).toHaveLength(EXAM_TOTAL);
       expect(questions.some((q) => q.section === "speaking")).toBe(false);
       await answerAll(questions, recognizer);
 
       expect(await screen.findByText(fr.exam.result.scoreLabel(100), {}, { timeout: 8000 })).toBeInTheDocument();
       expect(screen.queryByText(fr.exercises.speak.prompt)).not.toBeInTheDocument();
-      expect(screen.getByText(fr.exam.certificate.noSpeaking)).toBeInTheDocument();
+      expect(within(screen.getByRole("img", { name: /Certificat/ })).getByText(fr.exam.certificate.noSpeaking)).toBeInTheDocument();
       expect(finishExam).toHaveBeenCalledTimes(1);
       expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 100, noSpeaking: true });
     },
@@ -245,6 +279,7 @@ describe("result", () => {
     xpGained: 5,
     newBadges: [],
     remainingToday,
+    dateIso: "2026-11-09T10:00:00.000Z",
   });
 
   test("redirects to the intro without a result", async () => {
@@ -288,13 +323,58 @@ describe("result", () => {
     renderExam({ entry: { pathname: "/exam/result", state } });
 
     expect(await screen.findByRole("img", { name: fr.exam.certificate.aria("Linh", 88) })).toBeInTheDocument();
-    expect(screen.getByText("Très bien", { selector: "text" })).toBeInTheDocument();
+    expect(within(screen.getByRole("img", { name: /Certificat/ })).getByText("Très bien")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: fr.exam.result.download }));
     await waitFor(() => expect(click).toHaveBeenCalledTimes(1));
     expect(ctxCalls).toContain("Linh");
     expect(ctxCalls).toContain("88 / 100");
     await userEvent.click(screen.getByRole("button", { name: fr.exam.result.print }));
     expect(print).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("certificate on the result page", () => {
+  const passed = (): ResultState => {
+    const qs = drawExam(examPoolFixture, 7, true);
+    return {
+      score: 90,
+      mention: "tres_bien",
+      results: qs.map(() => ({ score: 1, correct: true, skipped: false, expected: "x" })),
+      questions: qs,
+      noSpeaking: false,
+      xpGained: 0,
+      newBadges: [],
+      remainingToday: 1,
+      dateIso: "2026-11-09T10:00:00.000Z",
+    };
+  };
+
+  test("keeps the light palette in a dark document", async () => {
+    document.documentElement.classList.add("dark");
+    renderExam({ entry: { pathname: "/exam/result", state: passed() } });
+    expect(await screen.findByRole("img", { name: /Certificat/ })).toHaveAttribute("data-theme", "light");
+  });
+
+  test("the printable copy is a portal on body, outside the app tree, and its style goes away with it", async () => {
+    const view = renderExam({ entry: { pathname: "/exam/result", state: passed() } });
+    await screen.findByRole("img", { name: /Certificat/ });
+    const copy = document.body.querySelector(":scope > [data-certificate-print]");
+    expect(copy).not.toBeNull();
+    expect(view.container.contains(copy)).toBe(false);
+    expect(copy?.querySelector("style")?.textContent).toBe(PRINT_CSS);
+    expect(PRINT_CSS).toContain("#root{display:none!important}");
+    expect(PRINT_CSS).not.toContain("visibility");
+    view.unmount();
+    expect(document.body.querySelector("[data-certificate-print]")).toBeNull();
+    expect(document.querySelector("style")).toBeNull();
+  });
+
+  test("no certificate is offered without a pseudo", async () => {
+    useAppState.setState({ profile: null });
+    renderExam({ entry: { pathname: "/exam/result", state: passed() } });
+    await screen.findByText(fr.exam.result.scoreLabel(90));
+    expect(screen.queryByRole("img", { name: /Certificat/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: fr.exam.result.download })).not.toBeInTheDocument();
   });
 });
 

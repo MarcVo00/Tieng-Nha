@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
 import { Button, Card, Icon, Motif, ProgressBar, Skeleton, type IconName } from "@/ui";
-import { EXAM_LESSONS_REQUIRED, SECTION_ORDER, type RunState } from "@/features/exam/examState";
+import { EXAM_LESSONS_REQUIRED, isInterruptedState, markAttempt, SECTION_ORDER, type RunState } from "@/features/exam/examState";
 
 const SECTION_ICON: Record<(typeof SECTION_ORDER)[number], IconName> = {
   listening: "speaker",
@@ -33,6 +33,7 @@ function useOnline(): boolean {
 export function ExamIntroScreen() {
   const { exam } = useServices();
   const navigate = useNavigate();
+  const interrupted = isInterruptedState((useLocation() as { state: unknown }).state);
   const snapshot = useAppState((s) => s.snapshot);
   const online = useOnline();
   const [starting, setStarting] = useState(false);
@@ -55,6 +56,7 @@ export function ExamIntroScreen() {
     try {
       const { attemptId, remainingToday } = await exam.startAttempt();
       const state: RunState = { attemptId, remainingToday };
+      markAttempt("pending", attemptId);
       navigate("/exam/run", { state });
     } catch (e) {
       setStarting(false);
@@ -75,6 +77,11 @@ export function ExamIntroScreen() {
         </p>
         <h1 className="text-title text-ink">{fr.exam.intro.title}</h1>
         <p className="text-body text-ink-muted">{fr.exam.intro.lead}</p>
+        {interrupted ? (
+          <p role="status" className="pt-1 text-body-strong text-error">
+            {fr.exam.intro.interrupted}
+          </p>
+        ) : null}
         {unlocked && snapshot.examBest !== null ? (
           <p className="pt-1 text-body-strong text-gold-ink tabular">{fr.exam.intro.best(snapshot.examBest)}</p>
         ) : null}

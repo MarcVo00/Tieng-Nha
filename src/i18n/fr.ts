@@ -364,6 +364,7 @@ export const fr = {
       },
       start: "Commencer",
       offline: "Le test nécessite une connexion",
+      interrupted: "Essai interrompu — il est compté.",
       limit: "Tu as utilisé tes 3 essais aujourd'hui. Reviens demain !",
       error: "Impossible de lancer le test pour le moment. Réessaie dans un instant.",
     },

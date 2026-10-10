@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { fr } from "@/i18n/fr";
 import { CERTIFICATE_SIZE, formatCertificateDate, type CertificateData } from "@/ui/drawCertificate";
 import { Motif } from "@/ui/Motif";
@@ -5,27 +6,28 @@ import { Motif } from "@/ui/Motif";
 export type { CertificateMention } from "@/ui/drawCertificate";
 export type CertificateProps = CertificateData;
 
-// Print: hide the whole page except the certificate, A4 landscape, backgrounds kept.
-const PRINT_CSS =
+// Print: the printable copy lives in a portal on <body>, outside #root. Printing hides #root and shows
+// only that copy in normal flow (no transforms, no visibility tricks). The style exists only while a certificate is mounted.
+export const PRINT_CSS =
   "@page{size:A4 landscape;margin:0}" +
-  "@media print{body *{visibility:hidden}" +
-  "[data-certificate],[data-certificate] *{visibility:visible}" +
-  "[data-certificate]{position:fixed;inset:0;width:100vw;height:100vh;max-width:none;border-radius:0;box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}}";
+  "@media print{#root{display:none!important}html,body{background:none!important}" +
+  "[data-certificate-print]{display:block!important;position:static;width:100%}" +
+  "[data-certificate-print] [data-certificate]{box-shadow:none;border-radius:0;print-color-adjust:exact;-webkit-print-color-adjust:exact}}";
 
 const { w: W, h: H } = CERTIFICATE_SIZE;
 const CORNER_POS = ["left-[3.7%] top-[5.2%]", "right-[3.7%] top-[5.2%]", "bottom-[5.2%] left-[3.7%]", "bottom-[5.2%] right-[3.7%]"] as const;
 
 // Hero: the pseudo, large, on cream. Same composition as drawCertificate (shared 1754 x 1240 space).
-export function Certificate({ pseudo, score, mention, dateIso, noSpeaking }: CertificateProps) {
+function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking }: CertificateProps) {
   const pseudoSize = Math.min(112, Math.floor(1300 / Math.max(1, pseudo.length * 0.62)));
   return (
     <div
       data-certificate=""
+      data-theme="light"
       role="img"
       aria-label={fr.exam.certificate.aria(pseudo, score)}
       className="relative aspect-[1754/1240] w-full overflow-hidden rounded-sm bg-bg shadow-raised"
     >
-      <style>{PRINT_CSS}</style>
       {CORNER_POS.map((pos) => (
         <div key={pos} aria-hidden="true" className={`absolute aspect-square w-[10.8%] text-gold ${pos}`}>
           <Motif kind="scales" />
@@ -70,5 +72,21 @@ export function Certificate({ pseudo, score, mention, dateIso, noSpeaking }: Cer
         </text>
       </svg>
     </div>
+  );
+}
+
+// Hero: the pseudo, large, on cream. Always the light palette (paper object), whatever the app theme.
+export function Certificate(props: CertificateProps) {
+  return (
+    <>
+      <CertificateCard {...props} />
+      {createPortal(
+        <div data-certificate-print="" aria-hidden="true" className="hidden">
+          <style>{PRINT_CSS}</style>
+          <CertificateCard {...props} />
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }

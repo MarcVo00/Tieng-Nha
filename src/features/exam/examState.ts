@@ -21,6 +21,7 @@ export type ResultState = {
   xpGained: number;
   newBadges: BadgeDef[];
   remainingToday: number;
+  dateIso: string;
 };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
@@ -37,6 +38,7 @@ export function isResultState(v: unknown): v is ResultState {
     typeof v["noSpeaking"] === "boolean" &&
     typeof v["xpGained"] === "number" &&
     typeof v["remainingToday"] === "number" &&
+    typeof v["dateIso"] === "string" &&
     Array.isArray(v["newBadges"]) &&
     Array.isArray(v["results"]) &&
     Array.isArray(v["questions"]) &&
@@ -68,4 +70,38 @@ export function describeQuestion(ex: Exercise): { prompt: string; subject?: stri
 export function formatElapsed(totalSeconds: number): string {
   const s = Math.max(0, Math.floor(totalSeconds));
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/** Router state of the intro after an attempt was abandoned (reload of the run page). */
+export const INTERRUPTED_STATE = { interrupted: true } as const;
+export const isInterruptedState = (v: unknown): boolean => isRecord(v) && v["interrupted"] === true;
+
+// Attempt marker in sessionStorage: "pending:<id>" once started, "running:<id>" once the run page mounted.
+// A run page mounting on a "running" marker is a reload: the attempt is abandoned (and counted).
+const MARK_KEY = "vietlearn.exam.attempt";
+export type AttemptMark = "pending" | "running" | "none";
+
+export function markAttempt(kind: "pending" | "running", attemptId: string): void {
+  try {
+    sessionStorage.setItem(MARK_KEY, kind + ":" + attemptId);
+  } catch {
+    // storage unavailable: the reload guard is simply off
+  }
+}
+export function readAttemptMark(attemptId: string): AttemptMark {
+  try {
+    const v = sessionStorage.getItem(MARK_KEY);
+    if (v === "pending:" + attemptId) return "pending";
+    if (v === "running:" + attemptId) return "running";
+  } catch {
+    // ignore
+  }
+  return "none";
+}
+export function clearAttemptMark(): void {
+  try {
+    sessionStorage.removeItem(MARK_KEY);
+  } catch {
+    // ignore
+  }
 }

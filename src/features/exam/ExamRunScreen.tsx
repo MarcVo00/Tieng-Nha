@@ -9,10 +9,14 @@ import type { GradeResult } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import { drawExam, examMention, examScore } from "@/services/exam";
 import { seedFromString } from "@/services/random";
-import { Button, ConfirmDialog, duration, EmptyState, ease, FocusHeader, Motif, Skeleton } from "@/ui";
+import { Button, ConfirmDialog, duration, EmptyState, ease, FocusHeader, Motif, ProgressBar, Skeleton } from "@/ui";
 import {
+  clearAttemptMark,
   formatElapsed,
+  INTERRUPTED_STATE,
   isRunState,
+  markAttempt,
+  readAttemptMark,
   sectionsOf,
   type QuestionOutcome,
   type ResultState,
@@ -134,14 +138,16 @@ function ExamRun({ run }: { run: RunState }) {
           xpGained: result.xpGained,
           newBadges: result.newBadges,
           remainingToday: run.remainingToday,
+          dateIso: clock(),
         };
+        clearAttemptMark();
         navigate("/exam/result", { state, replace: true });
       } catch {
         finishing.current = false; // nothing was committed: the learner may retry
         if (mounted.current) setSaveError(true);
       }
     },
-    [exam, activity, refreshProgress, navigate, run.attemptId, run.remainingToday],
+    [exam, activity, refreshProgress, navigate, clock, run.attemptId, run.remainingToday],
   );
 
   const onResult = useCallback(
@@ -158,7 +164,10 @@ function ExamRun({ run }: { run: RunState }) {
     [questions, index, finish],
   );
 
-  const goBack = () => navigate("/exam", { replace: true });
+  const goBack = () => {
+    clearAttemptMark();
+    navigate("/exam", { replace: true });
+  };
   const part = useMemo(() => (questions && question ? sectionsOf(questions).indexOf(question.section) + 1 : 0), [questions, question]);
 
   if (load.status === "error") {
@@ -186,17 +195,20 @@ function ExamRun({ run }: { run: RunState }) {
     );
   }
 
-  const header = (
-    <FocusHeader
-      progress={saving ? 1 : index / questions.length}
-      onClose={() => setQuitting(true)}
-      closeLabel={fr.exam.run.quit.aria}
-      right={
-        <span className="text-body-strong text-ink-muted tabular" role="timer" aria-label={fr.exam.run.elapsed(formatElapsed(elapsed))}>
-          {formatElapsed(elapsed)}
-        </span>
-      }
-    />
+  const timer = (
+    <span className="text-body-strong text-ink-muted tabular" role="timer" aria-label={fr.exam.run.elapsed(formatElapsed(elapsed))}>
+      {formatElapsed(elapsed)}
+    </span>
+  );
+  const header = saving ? (
+    <div className="flex items-center gap-3 px-5 py-3">
+      <div className="flex-1">
+        <ProgressBar value={1} label={fr.ui.progress.label} />
+      </div>
+      {timer}
+    </div>
+  ) : (
+    <FocusHeader progress={index / questions.length} onClose={() => setQuitting(true)} closeLabel={fr.exam.run.quit.aria} right={timer} />
   );
 
   return (
@@ -266,6 +278,14 @@ function ExamRun({ run }: { run: RunState }) {
 
 export function ExamRunScreen() {
   const { state } = useLocation() as { state: unknown };
+  // Decided once, on the first render (before the effect below marks the run as running).
+  const [mark] = useState(() => (isRunState(state) ? readAttemptMark(state.attemptId) : "none"));
+  const attemptId = isRunState(state) ? state.attemptId : null;
+  useEffect(() => {
+    if (attemptId && mark === "pending") markAttempt("running", attemptId);
+  }, [attemptId, mark]);
   if (!isRunState(state)) return <Navigate to="/exam" replace />;
+  if (mark === "running") return <Navigate to="/exam" replace state={INTERRUPTED_STATE} />;
+  if (mark === "none") return <Navigate to="/exam" replace />;
   return <ExamRun run={state} />;
 }

@@ -83,6 +83,7 @@ export async function drawCertificate(
     await Promise.all([
       document.fonts.load("800 96px 'Be Vietnam Pro'"),
       document.fonts.load("400 40px 'Be Vietnam Pro'"),
+      document.fonts.load("600 40px 'Be Vietnam Pro'"),
       document.fonts.load("700 40px 'Be Vietnam Pro'"),
     ]).catch(() => undefined);
   }

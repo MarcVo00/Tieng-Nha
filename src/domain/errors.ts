@@ -6,6 +6,7 @@ export class DomainError extends Error {
 }
 export class InvalidInviteError extends DomainError { constructor() { super("invalid_invite"); } }
 export class PseudoTakenError extends DomainError { constructor() { super("pseudo_taken"); } }
+export class InvalidProfileError extends DomainError { constructor() { super("invalid_profile"); } }
 export class ExamLimitError extends DomainError { constructor() { super("exam_limit"); } }
 export class OfflineError extends DomainError { constructor() { super("offline"); } }
 export class NotAuthenticatedError extends DomainError { constructor() { super("not_authenticated"); } }

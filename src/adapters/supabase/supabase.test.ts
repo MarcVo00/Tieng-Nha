@@ -1,7 +1,7 @@
 import { mapError } from "@/adapters/supabase/errors";
 import { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
 import { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
-import { ExamLimitError, InvalidInviteError, OfflineError } from "@/domain/errors";
+import { ExamLimitError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError } from "@/domain/errors";
 import type { AppEvent } from "@/domain/types";
 import type { ExamGateway } from "@/ports";
 
@@ -9,9 +9,15 @@ test("error mapping", () => {
   expect(mapError({ message: "invalid_invite" })).toBeInstanceOf(InvalidInviteError);
   expect(mapError({ message: "exam_limit" })).toBeInstanceOf(ExamLimitError);
   expect(mapError({ message: "TypeError: Failed to fetch" })).toBeInstanceOf(OfflineError);
+  expect(mapError({ message: "invalid_profile" })).toBeInstanceOf(InvalidProfileError);
 });
 
-const user = { auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "u1" } }, error: null }) } };
+test("signed-out auth error maps to NotAuthenticatedError", () => {
+  expect(mapError({ name: "AuthSessionMissingError", message: "Auth session missing!" })).toBeInstanceOf(NotAuthenticatedError);
+  expect(mapError({ message: "Auth session missing!" })).toBeInstanceOf(NotAuthenticatedError);
+});
+
+const user = { auth: { getSession: vi.fn().mockResolvedValue({ data: { session: { user: { id: "u1" } } }, error: null }) } };
 const ev = (clientId: string): AppEvent => ({
   clientId, schemaVersion: 1, type: "lesson_completed", refId: "l01", xp: 10, payload: { a: 1 }, createdAt: "2026-10-10T08:00:00.000Z",
 });
@@ -70,4 +76,16 @@ test("exam gateway maps the start_exam_attempt payload and submitAttempt is a no
   await expect(gw.startAttempt()).resolves.toEqual({ attemptId: "a1", remainingToday: 2 });
   await expect(gw.submitAttempt("a1", 80)).resolves.toBeUndefined();
   expect(db.rpc).toHaveBeenCalledTimes(1);
+});
+
+test("event sink keeps events queued on an FK violation (no profile)", async () => {
+  const upsert = vi.fn().mockResolvedValue({ error: { code: "23503", message: "fk violation" } });
+  const db = { from: vi.fn(() => ({ upsert })), ...user };
+  await expect(new SupabaseEventSink(db as never).push([ev("c1")])).rejects.toBeInstanceOf(NotAuthenticatedError);
+  expect(upsert).toHaveBeenCalledTimes(1);
+});
+
+test("event sink throws NotAuthenticatedError without a session", async () => {
+  const db = { from: vi.fn(), auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }) } };
+  await expect(new SupabaseEventSink(db as never).push([ev("c1")])).rejects.toBeInstanceOf(NotAuthenticatedError);
 });

@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithServices } from "@/test/renderWithServices";
 import { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
@@ -42,4 +42,35 @@ test("without TTS the Vietnamese word is shown with a caption", () => {
   expect(screen.getByText("cà phê sữa đá")).toHaveAttribute("lang", "vi");
   expect(screen.getByText(/pas de voix vietnamienne/i)).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /^écouter$/i })).not.toBeInTheDocument();
+});
+
+test("Enter on a focused speaker button does not submit the selection", async () => {
+  vi.stubGlobal("PointerEvent", MouseEvent); // jsdom lacks it; motion's keyboard press handler needs it
+  const onAnswer = vi.fn();
+  renderWithServices(<Component {...props({ onAnswer })} />);
+  await userEvent.keyboard("1");
+  const speaker = screen.getByRole("button", { name: /^écouter$/i });
+  speaker.focus();
+  fireEvent.keyDown(speaker, { key: "Enter" });
+  expect(onAnswer).not.toHaveBeenCalled();
+  vi.unstubAllGlobals();
+});
+
+test("a rejecting tts.speak causes no unhandled rejection", async () => {
+  class FailingTts extends FakeSpeechSynthesizer {
+    override async speak(): Promise<void> {
+      throw new Error("tts down");
+    }
+  }
+  const p = props();
+  renderWithServices(<Component {...p} services={{ ...p.services, tts: new FailingTts() }} />);
+  await userEvent.click(screen.getByRole("button", { name: /^écouter$/i }));
+  expect(screen.getByRole("button", { name: /vérifier/i })).toBeDisabled();
+});
+
+test("cancels speech on unmount", () => {
+  const p = props();
+  const cancel = vi.spyOn(p.services.tts, "cancel");
+  renderWithServices(<Component {...p} />).unmount();
+  expect(cancel).toHaveBeenCalled();
 });

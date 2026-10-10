@@ -16,23 +16,27 @@ export type ExerciseHostProps = {
   onResult: (r: GradeResult) => void; // practice: after the user taps "Continuer"
   onReport?: (refId: string) => void;
   onCapabilityLost?: (c: "stt" | "recorder") => void;
+  attempt?: number; // bump when the same exercise is presented again (retry)
 };
 
 const SHAKE = { x: [0, -6, 6, -4, 4, 0] };
-const SHAKE_TRANSITION = { duration: 0.3, ease: ease.inOut }; // design-system §6.2: 300 ms
+const SHAKE_TRANSITION = { duration: duration.base, ease: ease.inOut };
 
-export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onReport, onCapabilityLost }: ExerciseHostProps) {
+export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onReport, onCapabilityLost, attempt = 0 }: ExerciseHostProps) {
   const plugin = getPlugin(exercise.type);
-  const [result, setResult] = useState<GradeResult | null>(null);
-  const answeredId = useRef<string | null>(null);
+  // Each presentation (exercise id + attempt) owns its result and its one-answer guard.
+  const presentation = `${exercise.id}:${attempt}`;
+  const [state, setState] = useState<{ presentation: string; result: GradeResult } | null>(null);
+  const result = state?.presentation === presentation ? state.result : null;
+  const answered = useRef<string | null>(null);
   const seed = useMemo(() => seedFromString(exercise.id), [exercise.id]);
 
   const handleAnswer = (answer: unknown) => {
-    if (answeredId.current === exercise.id) return; // one answer per exercise
-    answeredId.current = exercise.id;
+    if (answered.current === presentation) return; // one answer per presentation
+    answered.current = presentation;
     const r = plugin.grade(exercise, answer, { vocabIndex });
     if (mode === "exam") onResult(r);
-    else setResult(r);
+    else setState({ presentation, result: r });
   };
 
   const wrong = result !== null && !result.correct && !result.skipped;
@@ -40,7 +44,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
     <>
       <AnimatePresence mode="wait">
         <motion.div
-          key={exercise.id}
+          key={presentation}
           initial={{ x: 24, opacity: 0 }}
           animate={{ x: 0, opacity: 1, transition: { duration: duration.base, ease: ease.out } }}
           exit={{ x: -24, opacity: 0, transition: { duration: duration.fast * EXIT_RATIO, ease: ease.in } }}
@@ -72,8 +76,8 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
           {...(onReport ? { onReport: () => onReport(exercise.id) } : {})}
           onContinue={() => {
             if (!result) return;
-            setResult(null);
             onResult(result);
+            setState(null);
           }}
         >
           {result && plugin.Feedback ? <plugin.Feedback exercise={exercise} result={result} /> : null}

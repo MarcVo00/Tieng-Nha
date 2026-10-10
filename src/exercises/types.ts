@@ -3,6 +3,8 @@ import type { z } from "zod";
 import type { Capabilities, Exercise, VocabId, VocabItem } from "@/domain/types";
 import type { SpeechRecognizer, SpeechSynthesizer, VoiceRecorder } from "@/ports";
 
+export const SLOW_VOICE_RATE = 0.6;
+
 export type ExerciseServices = { tts: SpeechSynthesizer; stt: SpeechRecognizer; recorder: VoiceRecorder };
 export type GradeContext = { vocabIndex: ReadonlyMap<VocabId, VocabItem> };
 

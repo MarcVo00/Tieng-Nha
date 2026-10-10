@@ -73,3 +73,28 @@ test("translate_choose works through the host", async () => {
 test("getPlugin throws a clear error for an unregistered type", () => {
   expect(() => getPlugin("speak")).toThrow(/no exercise plugin registered for type "speak"/i);
 });
+
+test("a new exercise starts with a clean state", async () => {
+  const onResult = vi.fn();
+  const { rerender } = renderWithServices(<ExerciseHost {...base} exercise={ex} mode="practice" onResult={onResult} />);
+  await userEvent.keyboard("1");
+  await userEvent.click(screen.getByRole("button", { name: /vérifier/i }));
+  expect(await screen.findByRole("status")).toBeInTheDocument();
+  await userEvent.click(screen.getByRole("button", { name: /continuer/i }));
+  rerender(<ExerciseHost {...base} exercise={translate} mode="practice" onResult={onResult} />);
+  expect(await screen.findByRole("button", { name: /^cho tui một ly cà phê đen\.$/i })).toHaveAttribute("aria-pressed", "false");
+  expect(screen.getByRole("button", { name: /vérifier/i })).toBeDisabled();
+  expect(screen.queryByRole("status")).not.toBeInTheDocument();
+});
+
+test("the same exercise can be answered again with a new attempt", async () => {
+  const onResult = vi.fn();
+  const { rerender } = renderWithServices(<ExerciseHost {...base} exercise={ex} mode="exam" onResult={onResult} />);
+  await userEvent.keyboard("1{Enter}");
+  expect(onResult).toHaveBeenCalledTimes(1);
+  rerender(<ExerciseHost {...base} exercise={ex} mode="exam" attempt={1} onResult={onResult} />);
+  await screen.findByRole("button", { name: /vérifier/i });
+  expect(screen.getByRole("button", { name: /vérifier/i })).toBeDisabled();
+  await userEvent.keyboard("2{Enter}");
+  expect(onResult).toHaveBeenCalledTimes(2);
+});

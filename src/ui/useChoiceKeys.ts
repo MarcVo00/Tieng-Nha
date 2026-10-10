@@ -11,10 +11,9 @@ export function useChoiceKeys(opts: Options): void {
       const { ids, selected, disabled, onSelect, onSubmit } = ref.current;
       if (disabled || e.ctrlKey || e.metaKey || e.altKey) return;
       const target = e.target;
-      if (target instanceof HTMLElement && target.closest("input, textarea, select, [role=dialog]")) return;
+      // A focused control (speaker, option, Vérifier...) keeps its own keys; shortcuts work when nothing is focused.
+      if (target instanceof HTMLElement && target.closest("button, a, input, textarea, select, [role=dialog]")) return;
       if (e.key === "Enter") {
-        // The focused "Vérifier" button handles Enter natively.
-        if (target instanceof HTMLElement && target.dataset["submit"] === "true") return;
         if (selected === null) return;
         e.preventDefault();
         onSubmit();

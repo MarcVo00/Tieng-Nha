@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FC } from "react";
 import type { Exercise } from "@/domain/types";
-import type { ExerciseProps } from "@/exercises/types";
+import { SLOW_VOICE_RATE, type ExerciseProps } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import { createRng, shuffle } from "@/services/random";
 import { Button, ChoiceGrid, SpeakerButton, useChoiceKeys } from "@/ui";
@@ -46,6 +46,8 @@ export const Component: FC<ExerciseProps<ListenChoose>> = ({ exercise, disabled,
     }
     return () => {
       mounted.current = false;
+      autoplayed.current = false; // StrictMode re-runs the effect: play again after the cancel below
+      services.tts.cancel();
     };
     // Auto-play exactly once per mounted exercise.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,7 +64,7 @@ export const Component: FC<ExerciseProps<ListenChoose>> = ({ exercise, disabled,
       <h2 className="text-heading text-ink">{fr.exercises.listenChoose.prompt}</h2>
       <div className="flex flex-col items-center gap-3 py-2">
         {capabilities.tts ? (
-          <SpeakerButton size="xl" playing={playing} onSpeak={() => speak(voiceRate)} onSpeakSlow={() => speak(0.6)} />
+          <SpeakerButton size="xl" playing={playing} onSpeak={() => speak(voiceRate)} onSpeakSlow={() => speak(SLOW_VOICE_RATE)} />
         ) : (
           <>
             <p lang="vi" className="text-display text-ink">
@@ -80,7 +82,7 @@ export const Component: FC<ExerciseProps<ListenChoose>> = ({ exercise, disabled,
         correctId={revealed ? exercise.vocabId : null}
         wrongId={revealed && selected !== exercise.vocabId ? selected : null}
       />
-      <Button size="lg" fullWidth data-submit="true" disabled={disabled || selected === null} onClick={submit}>
+      <Button size="lg" fullWidth disabled={disabled || selected === null} onClick={submit}>
         {fr.exercises.verify}
       </Button>
     </div>

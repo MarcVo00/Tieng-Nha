@@ -55,7 +55,7 @@ export const Component: FC<ExerciseProps<TranslateChoose>> = ({ exercise, disabl
         wrongId={revealed && selected !== exercise.answerVi ? selected : null}
         {...(capabilities.tts ? { accessory: listenButton } : {})}
       />
-      <Button size="lg" fullWidth data-submit="true" disabled={disabled || selected === null} onClick={submit}>
+      <Button size="lg" fullWidth disabled={disabled || selected === null} onClick={submit}>
         {fr.exercises.verify}
       </Button>
     </div>

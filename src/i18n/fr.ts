@@ -226,6 +226,17 @@ export const fr = {
       aria: (locked: boolean) => `Bài kiểm tra, test final${locked ? ", verrouillé" : ""}`,
     },
   },
+  // --- report ---
+  report: {
+    title: "Signaler un problème",
+    hint: "Une faute, une traduction étrange ? Dis-nous ce qui cloche.",
+    field: "Ton message",
+    placeholder: "Qu'est-ce qui ne va pas ?",
+    count: (n: number, max: number) => `${n} / ${max}`,
+    send: "Envoyer",
+    sent: "Merci, c'est noté !",
+    error: "Impossible d'envoyer pour le moment. Réessaie.",
+  },
   // --- lessons ---
   lessons: {
     loadError: { title: "La leçon n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
@@ -251,16 +262,6 @@ export const fr = {
     },
     saving: { title: "On enregistre ta leçon…" },
     saveError: { title: "Ta leçon n'a pas pu être enregistrée", body: "Tes réponses sont gardées. Réessaie dans un instant." },
-    report: {
-      title: "Signaler un problème",
-      hint: "Une faute, une traduction étrange ? Dis-nous ce qui cloche.",
-      field: "Ton message",
-      placeholder: "Qu'est-ce qui ne va pas ?",
-      count: (n: number, max: number) => `${n} / ${max}`,
-      send: "Envoyer",
-      sent: "Merci, c'est noté !",
-      error: "Impossible d'envoyer pour le moment. Réessaie.",
-    },
     done: {
       perfect: "Giỏi quá !",
       good: "Bien joué !",
@@ -304,7 +305,13 @@ export const fr = {
   // --- conversation ---
   conversation: {
     loadError: { title: "Le dialogue n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
-    quit: "Quitter le dialogue",
+    quit: {
+      aria: "Quitter le dialogue",
+      title: "Quitter le dialogue ?",
+      body: "Tu pourras le rejouer quand tu veux.",
+      confirm: "Quitter",
+      cancel: "Rester",
+    },
     log: "Conversation",
     typing: "Ton interlocuteur écrit…",
     npc: "Interlocuteur",
@@ -322,7 +329,7 @@ export const fr = {
     saving: "On enregistre ton dialogue…",
     saveError: { title: "Ton dialogue n'a pas pu être enregistré", body: "Réessaie dans un instant." },
     done: {
-      title: "Cảm ơn bạn !",
+      title: "Cảm ơn bạn!",
       body: "Dialogue terminé.",
       badges: "Nouveaux badges",
       home: "Retour à l'accueil",

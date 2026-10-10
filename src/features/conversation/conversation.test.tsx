@@ -49,7 +49,8 @@ describe("DialogueScreen", () => {
     setup();
     await screen.findByText("Chào bạn! Bạn uống gì?", undefined, SLOW);
     await userEvent.click(screen.getByRole("button", { name: fr.conversation.translate }));
-    expect(await screen.findByRole("button", { name: "Bonjour ! Tu bois quoi ?" })).toBeInTheDocument();
+    const hide = await screen.findByRole("button", { name: fr.conversation.hideTranslation });
+    expect(hide).toHaveTextContent("Bonjour ! Tu bois quoi ?");
   });
 
   it("walks the whole dialogue by tapping and shows the XP result once", async () => {
@@ -157,5 +158,32 @@ describe("DialogueScreen", () => {
     );
     expect(await screen.findByText(fr.conversation.loadError.title)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: fr.app.error.retry })).toBeInTheDocument();
+  });
+
+  it("asks for confirmation before leaving with the close button", async () => {
+    setup();
+    await screen.findByText("Chào bạn! Bạn uống gì?", undefined, SLOW);
+    await userEvent.click(screen.getByRole("button", { name: fr.conversation.quit.aria }));
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: fr.conversation.quit.cancel }));
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(screen.queryByText(HOME)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: fr.conversation.quit.aria }));
+    await userEvent.click(await screen.findByRole("button", { name: fr.conversation.quit.confirm }));
+    expect(await screen.findByText(HOME)).toBeInTheDocument();
+  });
+
+  it("restarts cleanly in the middle of a reveal", async () => {
+    const { completeDialogue } = setup();
+    await userEvent.click(await optionButton(/Cho tui một ly cà phê sữa đá/));
+    await screen.findByText("Dạ, bạn đợi chút nha.", undefined, SLOW);
+    await userEvent.click(await optionButton(/Cảm ơn em/));
+    await userEvent.click(await screen.findByRole("button", { name: fr.conversation.done.replay }, SLOW));
+    // Restart while the first line is still being revealed.
+    expect(await screen.findByRole("status", { name: fr.conversation.typing })).toBeInTheDocument();
+    expect(screen.queryByText("Của bạn đây. Ngon lắm nha!")).not.toBeInTheDocument();
+    expect(await screen.findByText("Chào bạn! Bạn uống gì?", undefined, SLOW)).toBeInTheDocument();
+    expect(screen.getAllByText("Chào bạn! Bạn uống gì?")).toHaveLength(1);
+    expect(completeDialogue).toHaveBeenCalledTimes(1);
   });
 });

@@ -4,9 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { Dialogue } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bubble";
-import { ReportSheet } from "@/features/conversation/ReportSheet";
+import { useServices } from "@/app/ServicesProvider";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
-import { BadgeMedal, Button, Card, Confetti, duration, EmptyState, FocusHeader, MicButton, Motif, Skeleton, spring, tap, XpCounter } from "@/ui";
+import { BadgeMedal, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, MicButton, Motif, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
 
 const BADGE_STAGGER_MS = 280;
@@ -95,10 +95,12 @@ function ResultCard({ result, onHome, onReplay }: { result: ActivityResult; onHo
 export function DialogueScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { reporter } = useServices();
   const reduced = useReducedMotion();
   const d = useDialogue(id);
+  const [quitting, setQuitting] = useState(false);
   const [reportRef, setReportRef] = useState<string | null>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLLIElement>(null);
   const goHome = () => navigate("/", { replace: true });
 
   const lineCount = d.lines.length;
@@ -136,10 +138,12 @@ export function DialogueScreen() {
   const yourTurn = d.phase === "user" || d.phase === "answering";
   const sttOn = d.capabilities.stt;
   const dialogueId = d.dialogue.id;
+  const contentVersion = d.dialogue.contentVersion;
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <FocusHeader progress={d.phase === "done" ? 1 : d.progress} onClose={goHome} closeLabel={fr.conversation.quit} />
+      <FocusHeader progress={d.phase === "done" ? 1 : d.progress} onClose={() => (d.phase === "done" ? goHome() : setQuitting(true))}
+        closeLabel={fr.conversation.quit.aria} />
       <SceneCard dialogue={d.dialogue} />
 
       <ol role="log" aria-label={fr.conversation.log} aria-live="polite" className="flex flex-1 flex-col gap-3 px-5 pb-6 pt-5">
@@ -176,7 +180,7 @@ export function DialogueScreen() {
             <ResultCard result={d.result} onHome={goHome} onReplay={d.restart} />
           </li>
         ) : null}
-        <div ref={endRef} aria-hidden="true" />
+        <li ref={endRef} aria-hidden="true" className="h-0" />
       </ol>
 
       <AnimatePresence>
@@ -208,8 +212,9 @@ export function DialogueScreen() {
             </p>
             <ul aria-label={fr.conversation.options} className="flex flex-col gap-2">
               {d.options.map((o) => (
-                <motion.li
-                  key={`${o.id}-${d.pulse}`}
+                <li key={o.id}>
+                <motion.div
+                  key={d.pulse}
                   initial={{ scale: 1 }}
                   animate={d.pulse > 0 ? { scale: [1, 1.03, 1] } : { scale: 1 }}
                   transition={{ duration: duration.slow }}
@@ -231,14 +236,31 @@ export function DialogueScreen() {
                   <div className="pr-2">
                     <MiniSpeaker onSpeak={() => d.replay(o.vi)} disabled={d.phase !== "user" || !d.capabilities.tts} />
                   </div>
-                </motion.li>
+                </motion.div>
+                </li>
               ))}
             </ul>
           </motion.section>
         ) : null}
       </AnimatePresence>
 
-      <ReportSheet refId={reportRef} contentVersion={d.dialogue.contentVersion} onClose={() => setReportRef(null)} />
+      <ConfirmDialog
+        open={quitting}
+        title={fr.conversation.quit.title}
+        body={fr.conversation.quit.body}
+        confirmLabel={fr.conversation.quit.confirm}
+        cancelLabel={fr.conversation.quit.cancel}
+        danger
+        onConfirm={goHome}
+        onCancel={() => setQuitting(false)}
+      />
+      <ReportSheet
+        open={reportRef !== null}
+        onClose={() => setReportRef(null)}
+        onSubmit={(message) =>
+          reportRef === null ? Promise.resolve() : reporter.report({ refId: reportRef, message, contentVersion })
+        }
+      />
     </div>
   );
 }

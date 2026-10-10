@@ -122,8 +122,8 @@ test("intro deck: shows the first word, plays it, advances and reports a card", 
   await waitFor(() => expect(tts.spoken).toContain(second.vi));
 
   await userEvent.click(screen.getAllByRole("button", { name: fr.ui.report.aria })[0]!);
-  await userEvent.type(await screen.findByRole("textbox", { name: fr.lessons.report.field }), "Le ton est faux");
-  await userEvent.click(screen.getByRole("button", { name: fr.lessons.report.send }));
+  await userEvent.type(await screen.findByRole("textbox", { name: fr.report.field }), "Le ton est faux");
+  await userEvent.click(screen.getByRole("button", { name: fr.report.send }));
   await waitFor(() => expect(reporter.reports).toEqual([{ refId: second.id, message: "Le ton est faux", contentVersion: 1 }]));
 });
 

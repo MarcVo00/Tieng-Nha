@@ -5,8 +5,7 @@ import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
-import { Button, ConfirmDialog, EmptyState, FocusHeader, Hearts, Skeleton } from "@/ui";
-import { ReportSheet } from "@/features/lessons/ReportSheet";
+import { Button, ConfirmDialog, EmptyState, FocusHeader, Hearts, ReportSheet, Skeleton } from "@/ui";
 import { LESSON_HEARTS, useLessonRun } from "@/features/lessons/useLessonRun";
 import { VocabDeck } from "@/features/lessons/VocabDeck";
 
@@ -15,7 +14,7 @@ import { VocabDeck } from "@/features/lessons/VocabDeck";
 export function LessonScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { tts, stt, recorder } = useServices();
+  const { tts, stt, recorder, reporter } = useServices();
   const { settings, updateSettings } = useSettings();
   const run = useLessonRun(id);
   const [quitting, setQuitting] = useState(false);
@@ -135,7 +134,13 @@ export function LessonScreen() {
         onConfirm={goHome}
         onCancel={() => setQuitting(false)}
       />
-      <ReportSheet refId={reportRef} contentVersion={lesson.contentVersion} onClose={() => setReportRef(null)} />
+      <ReportSheet
+        open={reportRef !== null}
+        onClose={() => setReportRef(null)}
+        onSubmit={(message) =>
+          reportRef === null ? Promise.resolve() : reporter.report({ refId: reportRef, message, contentVersion: lesson.contentVersion })
+        }
+      />
     </div>
   );
 }

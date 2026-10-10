@@ -60,6 +60,7 @@ export function Bubble({ speaker, vi, fr: translation, onReplay, replayDisabled,
               <motion.button
                 type="button"
                 aria-expanded={shown}
+                aria-label={fr.conversation.translate}
                 aria-hidden={shown || undefined}
                 tabIndex={shown ? -1 : 0}
                 onClick={() => setShown(true)}
@@ -73,6 +74,7 @@ export function Bubble({ speaker, vi, fr: translation, onReplay, replayDisabled,
               <motion.button
                 type="button"
                 title={fr.conversation.hideTranslation}
+                aria-label={fr.conversation.hideTranslation}
                 aria-hidden={shown ? undefined : true}
                 tabIndex={shown ? 0 : -1}
                 onClick={() => setShown(false)}

@@ -220,9 +220,10 @@ export function useDialogue(dialogueId: string | undefined) {
     (optionId: string) => {
       if (inFlight.current) return;
       if (mic === "listening") stt.abort();
+      tts.cancel();
       void submit({ kind: "choice", optionId });
     },
-    [mic, stt, submit],
+    [mic, stt, tts, submit],
   );
 
   const listen = useCallback(async () => {
@@ -244,7 +245,7 @@ export function useDialogue(dialogueId: string | undefined) {
       if (code === "aborted") return;
       if (code === "not-allowed" || code === "unsupported") {
         setNotice(code === "not-allowed" ? "micDenied" : "micUnsupported");
-        void updateSettings({ capabilities: { ...latest.current.capabilities, stt: false } });
+        updateSettings({ capabilities: { ...latest.current.capabilities, stt: false } }).catch(() => undefined);
         return;
       }
       setNotice("notHeard");

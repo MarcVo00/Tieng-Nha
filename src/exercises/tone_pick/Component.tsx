@@ -72,7 +72,7 @@ export const Component: FC<ExerciseProps<TonePick>> = ({ exercise, disabled, onA
       </div>
       <div className="grid grid-cols-3 gap-3">
         {TONES.map((tone) => (
-          <ToneButton key={tone} tone={tone} selected={selected === tone} state={stateOf(tone)} onClick={() => !disabled && setSelected(tone)} />
+          <ToneButton key={tone} tone={tone} selected={selected === tone} state={stateOf(tone)} onClick={() => !disabled && pick(tone)} />
         ))}
       </div>
       <button type="button" onClick={() => setRecapOpen(true)} className="min-h-11 self-center rounded-sm px-3 text-caption text-ink-muted underline underline-offset-4">

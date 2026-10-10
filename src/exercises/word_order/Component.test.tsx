@@ -48,3 +48,9 @@ test("clicking an answer tile returns it to the bank", async () => {
   expect(bank().getByRole("button", { name: "Cho" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /vérifier/i })).toBeDisabled();
 });
+
+test("disabled disables the tiles and Vérifier", () => {
+  renderWithServices(<Component {...props()} disabled />);
+  bank().getAllByRole("button").forEach((b) => expect(b).toBeDisabled());
+  expect(screen.getByRole("button", { name: /vérifier/i })).toBeDisabled();
+});

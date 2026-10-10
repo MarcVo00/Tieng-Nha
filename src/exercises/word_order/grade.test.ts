@@ -10,3 +10,10 @@ test("vocabIds are the vocab found in the sentence", () => {
   expect(grade(ex, { tokens: [] }, { vocabIndex }).vocabIds).toEqual(["v_ca"]);
 });
 test("malformed answer is wrong, never throws", () => expect(grade(ex, undefined, { vocabIndex: new Map() }).correct).toBe(false));
+const dup = { id: "d", type: "word_order" as const, fr: "…", tokensVi: ["ly", "cà phê", "ly"] };
+test("repeated tokens in different positions are graded by position", () => {
+  expect(grade(dup, { tokens: ["ly", "cà phê", "ly"] }, { vocabIndex: new Map() }).correct).toBe(true);
+  expect(grade(dup, { tokens: ["ly", "ly", "cà phê"] }, { vocabIndex: new Map() }).correct).toBe(false);
+});
+test("a shorter answer than expected is wrong", () => expect(grade(dup, { tokens: ["ly", "cà phê"] }, { vocabIndex: new Map() }).correct).toBe(false));
+test("a multi-word tile in the wrong position is wrong", () => expect(grade(dup, { tokens: ["cà phê", "ly", "ly"] }, { vocabIndex: new Map() }).correct).toBe(false));

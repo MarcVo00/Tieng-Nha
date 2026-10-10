@@ -36,8 +36,13 @@ export function ToneButton({ tone, selected, state = "idle", onClick }: ToneButt
       <svg viewBox="0 0 40 28" width={40} height={28} fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d={CONTOUR[tone]} />
       </svg>
-      <span className="text-caption text-ink" lang="vi">
-        {ui.name}
+      <span className="flex items-center gap-1.5">
+        <span aria-hidden="true" className="text-body-strong leading-none">
+          {ui.sign}
+        </span>
+        <span className="text-caption text-ink" lang="vi">
+          {ui.name}
+        </span>
       </span>
     </motion.button>
   );

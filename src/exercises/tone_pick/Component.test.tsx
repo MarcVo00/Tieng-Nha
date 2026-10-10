@@ -81,3 +81,10 @@ test("the tone recap sheet lists the six descriptions", async () => {
   expect(dialog).toHaveTextContent("monte vers l'aigu");
   expect(dialog).toHaveTextContent("bref, tombe et s'arrête");
 });
+
+test("each tone button shows its sign next to the name", () => {
+  renderWithServices(<Component {...props()} />);
+  expect(screen.getByRole("button", { name: "sắc" })).toHaveTextContent("´");
+  expect(screen.getByRole("button", { name: "ngang" })).toHaveTextContent("–");
+  expect(screen.getByRole("button", { name: "nặng" })).toHaveTextContent(".");
+});

@@ -8,6 +8,7 @@ import type { Services } from "@/app/services";
 import { useAppState } from "@/app/appState";
 import { introduce } from "@/services/leitner";
 import { lessonFixture } from "@/test/fixtures/lessonFixture";
+import { useToastStore } from "@/ui/Toast";
 import { fr } from "@/i18n/fr";
 import { ReviewRunScreen, ReviewScreen } from "@/features/review";
 
@@ -106,12 +107,62 @@ test(
       const p = await services.progress.getVocabProgress(id);
       expect((p?.correct ?? 0) + (p?.wrong ?? 0)).toBe(1);
     }
+    // Answered words actually moved: box and due date are updated by the answer.
+    for (const id of DUE) {
+      const p = await services.progress.getVocabProgress(id);
+      if (!p) throw new Error(`missing progress for ${id}`);
+      expect(p.dueAt).not.toBe("2026-10-02T10:00:00.000Z");
+      expect(p.box).toBe(p.correct === 1 ? 2 : 1);
+      expect(p.lastSeenAt).toBe(new Date(Date.parse(T0) + 2 * DAY).toISOString());
+    }
     const untouched = await services.progress.getVocabProgress("v_nuoc");
     expect(untouched).toMatchObject({ correct: 0, wrong: 0, box: 3 });
 
     await userEvent.click(screen.getByRole("button", { name: fr.review.done.finish }));
     expect(await screen.findByText("écran révision")).toBeInTheDocument();
     expect(completeReview).toHaveBeenCalledTimes(1);
+  },
+  TEST_TIMEOUT,
+);
+
+async function playOneWord(ui: ReactElement) {
+  render(ui);
+  const options = await screen.findAllByRole("button", { pressed: false }, { timeout: 4000 });
+  const choice = options.find((b) => b.hasAttribute("aria-pressed"));
+  if (!choice) throw new Error("no choice button");
+  await userEvent.click(choice);
+  await userEvent.click(screen.getByRole("button", { name: fr.exercises.verify }));
+  await screen.findByRole("status");
+}
+
+test(
+  "a double tap on Continuer records one answer for the word",
+  async () => {
+    const { ui, services, completeReview } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    const recordAnswer = vi.spyOn(services.activity, "recordAnswer");
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await playOneWord(ui);
+    await userEvent.dblClick(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    expect(await screen.findByText(fr.review.done.title, {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(recordAnswer).toHaveBeenCalledTimes(1);
+    expect(completeReview).toHaveBeenCalledTimes(1);
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  "answers that cannot be saved are retried once, then reported without blocking the review",
+  async () => {
+    useToastStore.setState({ toasts: [] });
+    const { ui, services, completeReview } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    const recordAnswer = vi.spyOn(services.activity, "recordAnswer").mockRejectedValue(new Error("disk full"));
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await playOneWord(ui);
+    await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    expect(await screen.findByText(fr.review.done.title, {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(recordAnswer).toHaveBeenCalledTimes(2);
+    expect(completeReview).toHaveBeenCalledTimes(1);
+    expect(useToastStore.getState().toasts.map((t) => t.title)).toEqual([fr.review.recordFailed]);
   },
   TEST_TIMEOUT,
 );

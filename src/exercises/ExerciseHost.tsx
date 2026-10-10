@@ -29,6 +29,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
   const [state, setState] = useState<{ presentation: string; result: GradeResult } | null>(null);
   const result = state?.presentation === presentation ? state.result : null;
   const answered = useRef<string | null>(null);
+  const emitted = useRef<string | null>(null); // the exiting sheet keeps its old onContinue: emit once per presentation
   const seed = useMemo(() => seedFromString(exercise.id), [exercise.id]);
 
   const handleAnswer = (answer: unknown) => {
@@ -78,7 +79,8 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
           }}
           {...(onReport ? { onReport: () => onReport(exercise.id) } : {})}
           onContinue={() => {
-            if (!result) return;
+            if (!result || emitted.current === presentation) return;
+            emitted.current = presentation;
             onResult(result);
             setState(null);
           }}

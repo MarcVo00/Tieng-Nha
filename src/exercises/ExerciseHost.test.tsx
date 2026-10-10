@@ -34,6 +34,16 @@ test("practice: shows feedback then reports the result on Continuer", async () =
   expect(onResult).toHaveBeenCalledWith(expect.objectContaining({ correct: true }));
 });
 
+test("practice: a double tap on Continuer emits one result", async () => {
+  const onResult = vi.fn();
+  renderWithServices(<ExerciseHost {...base} exercise={ex} mode="practice" onResult={onResult} />);
+  await userEvent.click(screen.getByRole("button", { name: /café au lait glacé/i }));
+  await userEvent.click(screen.getByRole("button", { name: /vérifier/i }));
+  await screen.findByRole("status");
+  await userEvent.dblClick(screen.getByRole("button", { name: /continuer/i }));
+  expect(onResult).toHaveBeenCalledTimes(1);
+});
+
 test("practice: a wrong answer shows the expected answer", async () => {
   renderWithServices(<ExerciseHost {...base} exercise={ex} mode="practice" onResult={() => {}} />);
   await userEvent.click(screen.getByRole("button", { name: /thé glacé/i }));

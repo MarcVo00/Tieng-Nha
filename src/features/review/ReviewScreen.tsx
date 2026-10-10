@@ -9,8 +9,9 @@ import { Button, Card, EmptyState, Skeleton, duration, ease } from "@/ui";
 
 const BOXES: readonly LeitnerBox[] = [1, 2, 3, 4, 5];
 const BAR_HEIGHT = 96; // px of the tallest column
+const EMPTY_BAR_HEIGHT = 4; // px of the baseline shown for an empty box
 
-type Load = { status: "loading" } | { status: "error" } | { status: "ready"; words: VocabProgress[] };
+type Load = { status: "loading" } | { status: "error" } | { status: "ready"; words: VocabProgress[]; now: string };
 
 // Hero: the number of words waiting. One action: Réviser. The distribution below is quiet context.
 export function ReviewScreen() {
@@ -24,9 +25,10 @@ export function ReviewScreen() {
     let cancelled = false;
     setLoad({ status: "loading" });
     // Every word is due within 16 days, so a one-year horizon returns all known words, sorted by dueAt.
-    progress.listDueVocab(addDaysIso(clock(), 365), 10000).then(
+    const now = clock();
+    progress.listDueVocab(addDaysIso(now, 365), 10000).then(
       (words) => {
-        if (!cancelled) setLoad({ status: "ready", words });
+        if (!cancelled) setLoad({ status: "ready", words, now });
       },
       () => {
         if (!cancelled) setLoad({ status: "error" });
@@ -56,8 +58,7 @@ export function ReviewScreen() {
     );
   }
 
-  const now = clock();
-  const { words } = load;
+  const { words, now } = load;
   const dueCount = words.filter((w) => w.dueAt <= now).length;
   const first = words[0];
 
@@ -98,7 +99,7 @@ export function ReviewScreen() {
                 <div className="flex w-full items-end justify-center" style={{ height: BAR_HEIGHT }} aria-hidden="true">
                   <motion.div
                     className={`w-full origin-bottom rounded-sm ${count === 0 ? "bg-line" : "bg-primary"}`}
-                    style={{ height: count === 0 ? 4 : BAR_HEIGHT }}
+                    style={{ height: count === 0 ? EMPTY_BAR_HEIGHT : BAR_HEIGHT }}
                     initial={{ scaleY: reduced ? 1 : 0, opacity: reduced ? 0 : 1 }}
                     animate={{ scaleY: count === 0 ? 1 : Math.max(0.12, count / max), opacity: 1 }}
                     transition={{ duration: reduced ? duration.fast : duration.slow, ease: ease.out, delay: reduced ? 0 : i * 0.05 }}

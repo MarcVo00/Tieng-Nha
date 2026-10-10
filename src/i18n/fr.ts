@@ -278,6 +278,7 @@ export const fr = {
       none: "Termine une leçon pour commencer tes révisions.",
       next: (days: number) => (days <= 1 ? "Prochaine révision : demain" : `Prochaine révision : dans ${days} jours`),
     },
+    recordFailed: "Certaines réponses n'ont pas pu être enregistrées.",
     due: (n: number) => `${n} ${n > 1 ? "mots" : "mot"} à réviser`,
     start: "Réviser",
     boxes: {

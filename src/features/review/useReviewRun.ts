@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppState, useRefreshProgress, useSettings } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { fr } from "@/i18n/fr";
 import type { VocabId, VocabItem } from "@/domain/types";
 import type { GradeResult } from "@/exercises/types";
 import type { ActivityResult } from "@/services/activity";
@@ -15,6 +16,7 @@ import {
 } from "@/services/lessonSession";
 import { createRng, seedFromString } from "@/services/random";
 import { buildReviewSession } from "@/services/reviewBuilder";
+import { useToast } from "@/ui";
 
 const OPTIONS: SessionOptions = { hearts: null, retryWrong: false };
 
@@ -32,6 +34,7 @@ export function useReviewRun() {
   const { settings } = useSettings();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [phase, setPhase] = useState<ReviewPhase>({ name: "loading" });
   const [session, setSession] = useState<SessionState | null>(null);
@@ -47,6 +50,7 @@ export function useReviewRun() {
   const completed = useRef(false);
   const leaving = useRef(false);
   const handledKey = useRef<string | null>(null);
+  const recordFailures = useRef(0);
   const answers = useRef<Promise<void>>(Promise.resolve()); // recordAnswer calls, strictly sequential
 
   useEffect(() => {
@@ -103,6 +107,10 @@ export function useReviewRun() {
       let result: ActivityResult;
       try {
         await answers.current;
+        if (recordFailures.current > 0) {
+          recordFailures.current = 0;
+          toast.show({ title: fr.review.recordFailed });
+        }
         result = await activity.completeReview({ correctCount, total });
       } catch {
         completing.current = false; // nothing was committed: the learner may retry
@@ -112,7 +120,7 @@ export function useReviewRun() {
       completed.current = true;
       if (mounted.current) setPhase({ name: "done", result: { ...result, correctCount, total } });
     },
-    [activity],
+    [activity, toast],
   );
 
   const submit = useCallback(
@@ -126,8 +134,17 @@ export function useReviewRun() {
 
       if (!result.skipped) {
         answers.current = answers.current
-          .then(() => activity.recordAnswer(result.vocabIds, result.correct))
-          .catch(() => undefined);
+          .then(async () => {
+            try {
+              await activity.recordAnswer(result.vocabIds, result.correct);
+            } catch {
+              // One retry; a second failure is remembered and surfaced once at the end.
+              await activity.recordAnswer(result.vocabIds, result.correct);
+            }
+          })
+          .catch(() => {
+            recordFailures.current += 1;
+          });
       }
       const next = applyResult(s, OPTIONS, result);
       sessionRef.current = next;

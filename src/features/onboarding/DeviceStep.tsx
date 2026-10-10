@@ -8,6 +8,8 @@ import { Button, DeviceCheck } from "@/ui";
 export function detectPlatform(userAgent: string): "ios" | "android" | "other" {
   if (/iPhone|iPad|iPod/.test(userAgent)) return "ios";
   if (/Android/.test(userAgent)) return "android";
+  // iPadOS 13+ reports itself as a Mac; only touch distinguishes it.
+  if (/Macintosh/.test(userAgent) && navigator.maxTouchPoints > 1) return "ios";
   return "other";
 }
 
@@ -16,51 +18,47 @@ export function DeviceStep({ onNext }: { onNext(): void }) {
   const { settings, updateSettings } = useSettings();
   const t = fr.onboarding.device;
   const [result, setResult] = useState<Capabilities | null>(settings.capabilities);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<"voice" | "mic" | null>(null);
   const [continuing, setContinuing] = useState(false);
 
+  // Detection and persistence are best-effort: a failure here never blocks the user.
   async function refresh(): Promise<void> {
-    const caps = await detectCapabilities();
-    setResult(caps);
-    await updateSettings({ capabilities: caps });
+    try {
+      const caps = await detectCapabilities();
+      setResult(caps);
+      await updateSettings({ capabilities: caps });
+    } catch {
+      // Keep whatever result is already shown.
+    }
   }
 
   // Called straight from the click handler: iOS only starts speech synthesis inside a user gesture.
   async function testVoice(): Promise<void> {
-    setBusy(true);
+    setBusy("voice");
     try {
       await tts.speak("Xin chào!", { rate: 1 });
     } catch {
       // A failed test voice is reported by the detection below.
     }
-    try {
-      await refresh();
-    } finally {
-      setBusy(false);
-    }
+    await refresh();
+    setBusy(null);
   }
 
   async function testMic(): Promise<void> {
-    setBusy(true);
+    setBusy("mic");
     try {
       await stt.listen({ lang: "vi-VN", timeoutMs: 6000 });
     } catch {
       // Denied, silent or unsupported: the detection below shows what works.
     }
-    try {
-      await refresh();
-    } finally {
-      setBusy(false);
-    }
+    await refresh();
+    setBusy(null);
   }
 
   async function next(): Promise<void> {
     setContinuing(true);
-    try {
-      if (!result) await refresh();
-    } finally {
-      setContinuing(false);
-    }
+    if (!result) await refresh();
+    setContinuing(false);
     onNext();
   }
 
@@ -73,9 +71,10 @@ export function DeviceStep({ onNext }: { onNext(): void }) {
         platform={detectPlatform(navigator.userAgent)}
         onTestVoice={testVoice}
         onTestMic={testMic}
-        busy={busy}
+        busy={busy !== null}
+        listening={busy === "mic"}
       />
-      <Button size="lg" fullWidth loading={continuing} disabled={busy} onClick={() => void next()}>
+      <Button size="lg" fullWidth loading={continuing} disabled={busy !== null} onClick={() => void next()}>
         {t.next}
       </Button>
     </section>

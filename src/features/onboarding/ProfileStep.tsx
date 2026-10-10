@@ -56,7 +56,7 @@ export function ProfileStep({ inviteCode, onInvalidInvite, onJoined }: ProfileSt
             label={t.pseudoLabel}
             value={pseudo}
             onChange={(e) => setPseudo(e.target.value)}
-            maxLength={40}
+            maxLength={20}
             autoComplete="nickname"
             hint={t.pseudoHint}
             error={error}

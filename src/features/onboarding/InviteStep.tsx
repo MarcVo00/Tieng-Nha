@@ -30,6 +30,7 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
   const [busy, setBusy] = useState(false);
   const [wait, setWait] = useState(0);
   const [resent, setResent] = useState(false);
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
     if (wait <= 0) return undefined;
@@ -74,17 +75,22 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
     ev.preventDefault();
     setCodeError(null);
     setBusy(true);
+    let verified: Session;
     try {
-      const s = await auth.verifyOtp(email.trim(), code);
-      await onAuthenticated(s);
+      verified = await auth.verifyOtp(email.trim(), code);
     } catch (e) {
       setCodeError(e instanceof Error && e.message === "invalid_otp" ? t.invalidOtp : messageFor(e));
-    } finally {
       setBusy(false);
+      return;
     }
+    // The code is spent: from here on the parent handles every failure and moves on.
+    await onAuthenticated(verified);
+    setBusy(false);
   }
 
   async function resend() {
+    if (resending || wait > 0) return;
+    setResending(true);
     setCodeError(null);
     setResent(false);
     try {
@@ -93,6 +99,8 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
       setWait(RESEND_DELAY_S);
     } catch (e) {
       setCodeError(messageFor(e));
+    } finally {
+      setResending(false);
     }
   }
 
@@ -115,7 +123,7 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
           {t.verify}
         </Button>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Button variant="ghost" disabled={wait > 0} onClick={() => void resend()}>
+          <Button variant="ghost" disabled={wait > 0 || resending} onClick={() => void resend()}>
             {wait > 0 ? t.resendIn(wait) : t.resend}
           </Button>
           <Button variant="ghost" onClick={() => setPhase("email")}>

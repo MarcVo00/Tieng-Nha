@@ -40,8 +40,13 @@ export function InstallStep({ onFinish }: InstallStepProps) {
   const ios = detectPlatform(navigator.userAgent) === "ios";
 
   async function install() {
-    await promptInstall();
-    onFinish();
+    try {
+      await promptInstall();
+    } catch {
+      // The native dialog failing must not block the end of onboarding.
+    } finally {
+      onFinish();
+    }
   }
 
   return (

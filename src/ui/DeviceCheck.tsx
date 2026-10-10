@@ -9,6 +9,8 @@ export type DeviceCheckProps = {
   onTestVoice(): Promise<void>;
   onTestMic(): Promise<void>;
   busy: boolean;
+  /** True only while the microphone test is running (shows the listening label). */
+  listening?: boolean;
 };
 
 type RowKey = "tts" | "stt" | "mic";
@@ -35,7 +37,7 @@ function Row({ label, ok, help }: { label: string; ok: boolean | null; help: str
 }
 
 /** Presentational device test: two action buttons and one status row per capability. */
-export function DeviceCheck({ result, platform, onTestVoice, onTestMic, busy }: DeviceCheckProps) {
+export function DeviceCheck({ result, platform, onTestVoice, onTestMic, busy, listening = false }: DeviceCheckProps) {
   const d = fr.onboarding.device;
   const values: Record<RowKey, boolean | null> = {
     tts: result ? result.tts : null,
@@ -53,7 +55,7 @@ export function DeviceCheck({ result, platform, onTestVoice, onTestMic, busy }: 
         </Button>
         <Button variant="secondary" disabled={busy} onClick={() => void onTestMic()} className="flex-1">
           <Icon name="mic" size={20} />
-          {busy ? d.listening : d.speak}
+          {listening ? d.listening : d.speak}
         </Button>
       </div>
       <ul aria-label={d.resultsLabel} className="divide-y divide-line rounded-md bg-surface px-4 shadow-card">

@@ -126,6 +126,8 @@ export const fr = {
   },
   // --- onboarding ---
   onboarding: {
+    finishError: "Impossible d'enregistrer ton choix pour le moment. Réessaie.",
+    retry: "Réessayer",
     stepLabel: (n: number, total: number) => `Étape ${n} sur ${total}`,
     welcome: {
       title: "Chào bạn !",
@@ -192,7 +194,6 @@ export const fr = {
         "Choisis « Sur l'écran d'accueil »",
         "Touche « Ajouter » en haut à droite",
       ],
-      iosShareIcon: "Icône Partager",
       action: "Installer l'application",
       later: "Plus tard",
       finish: "C'est parti !",

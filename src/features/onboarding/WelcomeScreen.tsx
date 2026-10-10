@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -6,7 +6,7 @@ import type { Session } from "@/domain/types";
 import { useAppState, useSettings, type AppProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
-import { duration, ease, EXIT_RATIO } from "@/ui";
+import { Button, duration, ease, EXIT_RATIO } from "@/ui";
 import { DeviceStep } from "@/features/onboarding/DeviceStep";
 import { InstallStep, isStandalone } from "@/features/onboarding/InstallStep";
 import { InviteStep } from "@/features/onboarding/InviteStep";
@@ -56,6 +56,22 @@ export function WelcomeScreen() {
   const [inviteCode, setInviteCode] = useState("");
   const [inviteError, setInviteError] = useState<string | null>(null);
   const session = useAppState((s) => s.session);
+  const [finishError, setFinishError] = useState(false);
+  const stepRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+
+  // Move focus to the new step's heading so keyboard and screen-reader users land on it.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    const heading = stepRef.current?.querySelector("h1");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }, [step]);
 
   function go(next: Step) {
     setDir(next >= step ? 1 : -1);
@@ -63,20 +79,32 @@ export function WelcomeScreen() {
   }
 
   async function finish() {
-    await updateSettings({ onboardingDone: true });
+    setFinishError(false);
+    try {
+      await updateSettings({ onboardingDone: true });
+    } catch {
+      setFinishError(true);
+      return;
+    }
     navigate("/", { replace: true });
   }
 
+  // Never throws: once the code is verified the session is kept, and any failure to read the profile
+  // is treated as "no profile yet" so the user is never sent back to a spent OTP form.
   async function authenticated(s: Session) {
     useAppState.getState().set({ session: s });
-    if (await auth.hasProfile()) {
-      const profile = await auth.getMyProfile();
-      if (profile) {
-        useAppState.getState().set({ profile });
-        cacheProfile(profile);
-        go(4);
-        return;
+    try {
+      if (await auth.hasProfile()) {
+        const profile = await auth.getMyProfile();
+        if (profile) {
+          useAppState.getState().set({ profile });
+          cacheProfile(profile);
+          go(4);
+          return;
+        }
       }
+    } catch {
+      // Fall through to the profile step.
     }
     go(3);
   }
@@ -95,8 +123,16 @@ export function WelcomeScreen() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col overflow-x-hidden bg-bg px-5 pb-8">
       <Dots step={step} />
+      {finishError ? (
+        <div role="alert" className="mb-4 flex flex-col gap-2 rounded-md bg-error-soft p-4">
+          <p className="text-body text-ink">{fr.onboarding.finishError}</p>
+          <Button variant="secondary" onClick={() => void finish()}>
+            {fr.onboarding.retry}
+          </Button>
+        </div>
+      ) : null}
       <AnimatePresence mode="wait" custom={dir} initial={false}>
-        <motion.div key={step} custom={dir} variants={slide} initial="enter" animate="center" exit="exit" className="flex flex-1 flex-col">
+        <motion.div ref={stepRef} key={step} custom={dir} variants={slide} initial="enter" animate="center" exit="exit" className="flex flex-1 flex-col">
           {step === 1 ? <WelcomeStep message={env.VITE_WELCOME_MESSAGE} onStart={() => go(2)} /> : null}
           {step === 2 ? (
             <InviteStep

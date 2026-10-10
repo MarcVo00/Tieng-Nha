@@ -7,6 +7,8 @@ import { Root } from "@/app/Root";
 import { FocusLayout } from "@/app/layouts/FocusLayout";
 import { TabLayout } from "@/app/layouts/TabLayout";
 import { Skeleton } from "@/ui";
+// Side effect only: starts capturing `beforeinstallprompt` at boot while the onboarding screens stay lazy.
+import "@/features/onboarding/installPrompt";
 
 const WelcomeScreen = lazy(() => import("@/features/onboarding").then((m) => ({ default: m.WelcomeScreen })));
 const AuthCallbackScreen = lazy(() => import("@/features/onboarding").then((m) => ({ default: m.AuthCallbackScreen })));

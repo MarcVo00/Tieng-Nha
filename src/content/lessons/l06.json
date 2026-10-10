@@ -1,0 +1,226 @@
+{
+  "id": "l06",
+  "contentVersion": 1,
+  "title": "Manger",
+  "description": "Parle de nourriture : les plats emblématiques du Sud (phở, cơm tấm, bánh mì, hủ tiếu), les verbes manger et boire, et les couverts.",
+  "emoji": "🍜",
+  "dialogueId": "d06",
+  "vocab": [
+    {
+      "id": "v_pho",
+      "vi": "phở",
+      "fr": "phở (soupe de nouilles de riz)",
+      "dialect": "south",
+      "note": "Le plat le plus connu du Vietnam : bouillon, nouilles de riz et viande."
+    },
+    {
+      "id": "v_com_tam",
+      "vi": "cơm tấm",
+      "fr": "riz brisé (avec porc grillé)",
+      "dialect": "south",
+      "note": "Plat typique de Sài Gòn : du riz brisé servi avec du porc grillé."
+    },
+    {
+      "id": "v_banh_mi",
+      "vi": "bánh mì",
+      "fr": "sandwich vietnamien (baguette)",
+      "dialect": "south"
+    },
+    {
+      "id": "v_hu_tieu",
+      "vi": "hủ tiếu",
+      "fr": "hủ tiếu (soupe de nouilles du Sud)",
+      "dialect": "south",
+      "note": "Une soupe de nouilles très populaire dans le Sud."
+    },
+    {
+      "id": "v_com",
+      "vi": "cơm",
+      "fr": "riz (cuit), repas",
+      "dialect": "south",
+      "note": "« Ăn cơm » veut dire « manger » au sens de « prendre un repas »."
+    },
+    {
+      "id": "v_an",
+      "vi": "ăn",
+      "fr": "manger",
+      "dialect": "south"
+    },
+    {
+      "id": "v_uong",
+      "vi": "uống",
+      "fr": "boire",
+      "dialect": "south"
+    },
+    {
+      "id": "v_doi",
+      "vi": "đói",
+      "fr": "avoir faim",
+      "dialect": "south"
+    },
+    {
+      "id": "v_no",
+      "vi": "no",
+      "fr": "être rassasié",
+      "dialect": "south",
+      "note": "Attention : « no » veut dire « avoir assez mangé », pas « non » (non se dit « không »)."
+    },
+    {
+      "id": "v_chen",
+      "vi": "chén",
+      "fr": "bol",
+      "dialect": "south",
+      "note": "Au Nord on dit « bát »."
+    },
+    {
+      "id": "v_muong",
+      "vi": "muỗng",
+      "fr": "cuillère",
+      "dialect": "south",
+      "note": "Au Nord on dit « thìa »."
+    },
+    {
+      "id": "v_dua",
+      "vi": "đũa",
+      "fr": "baguettes",
+      "dialect": "south"
+    },
+    {
+      "id": "v_dia",
+      "vi": "dĩa",
+      "fr": "assiette",
+      "dialect": "south",
+      "note": "Au Nord on dit « đĩa »."
+    },
+    {
+      "id": "v_ngon_qua",
+      "vi": "ngon quá",
+      "fr": "que c'est bon !",
+      "dialect": "south",
+      "note": "« Quá » renforce l'adjectif : « ngon quá ! » = « délicieux ! »."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l06_e01",
+      "type": "listen_choose",
+      "vocabId": "v_pho",
+      "choices": [
+        "v_pho",
+        "v_com_tam",
+        "v_banh_mi",
+        "v_hu_tieu"
+      ]
+    },
+    {
+      "id": "l06_e02",
+      "type": "listen_choose",
+      "vocabId": "v_doi",
+      "choices": [
+        "v_doi",
+        "v_no",
+        "v_an",
+        "v_uong"
+      ]
+    },
+    {
+      "id": "l06_e03",
+      "type": "listen_choose",
+      "vocabId": "v_dua",
+      "choices": [
+        "v_dua",
+        "v_muong",
+        "v_chen",
+        "v_dia"
+      ]
+    },
+    {
+      "id": "l06_e04",
+      "type": "tone_pick",
+      "syllable": "phở",
+      "answerTone": "hoi"
+    },
+    {
+      "id": "l06_e05",
+      "type": "tone_pick",
+      "syllable": "đói",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l06_e06",
+      "type": "tone_pick",
+      "syllable": "dĩa",
+      "answerTone": "nga"
+    },
+    {
+      "id": "l06_e07",
+      "type": "translate_choose",
+      "promptFr": "J'ai faim.",
+      "answerVi": "Tui đói.",
+      "distractorsVi": [
+        "Tui no rồi.",
+        "Tui uống nước.",
+        "Tui ăn cơm."
+      ]
+    },
+    {
+      "id": "l06_e08",
+      "type": "translate_choose",
+      "promptFr": "Je mange du phở.",
+      "answerVi": "Tui ăn phở.",
+      "distractorsVi": [
+        "Tui uống phở.",
+        "Tui ăn bánh mì.",
+        "Tui uống trà đá."
+      ]
+    },
+    {
+      "id": "l06_e09",
+      "type": "word_order",
+      "fr": "Tu manges du riz ?",
+      "tokensVi": [
+        "Bạn",
+        "ăn",
+        "cơm",
+        "không"
+      ],
+      "extraTokens": [
+        "uống"
+      ]
+    },
+    {
+      "id": "l06_e10",
+      "type": "word_order",
+      "fr": "Un bol de riz pour moi.",
+      "tokensVi": [
+        "Cho tui",
+        "một",
+        "chén",
+        "cơm"
+      ],
+      "extraTokens": [
+        "uống"
+      ]
+    },
+    {
+      "id": "l06_e11",
+      "type": "speak",
+      "vi": "Cho tui một dĩa cơm tấm.",
+      "fr": "Une assiette de riz brisé pour moi.",
+      "vocabIds": [
+        "v_cho_tui",
+        "v_dia",
+        "v_com_tam"
+      ]
+    },
+    {
+      "id": "l06_e12",
+      "type": "speak",
+      "vi": "Ngon quá!",
+      "fr": "Que c'est bon !",
+      "vocabIds": [
+        "v_ngon_qua"
+      ]
+    }
+  ]
+}

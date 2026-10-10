@@ -1,0 +1,209 @@
+{
+  "id": "l09",
+  "contentVersion": 1,
+  "title": "Le temps",
+  "description": "Situe-toi dans le temps : aujourd'hui, demain, hier, les moments de la journée, et demande l'heure (jusqu'à dix heures).",
+  "emoji": "🕰️",
+  "dialogueId": "d09",
+  "vocab": [
+    {
+      "id": "v_hom_nay",
+      "vi": "hôm nay",
+      "fr": "aujourd'hui",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ngay_mai",
+      "vi": "ngày mai",
+      "fr": "demain",
+      "dialect": "south"
+    },
+    {
+      "id": "v_hom_qua",
+      "vi": "hôm qua",
+      "fr": "hier",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ngay",
+      "vi": "ngày",
+      "fr": "jour",
+      "dialect": "south"
+    },
+    {
+      "id": "v_bay_gio",
+      "vi": "bây giờ",
+      "fr": "maintenant",
+      "dialect": "south"
+    },
+    {
+      "id": "v_gio",
+      "vi": "giờ",
+      "fr": "heure",
+      "dialect": "south",
+      "note": "À l'oral du Sud, « gi » se prononce comme un « y ». Le nombre précède « giờ » : « tám giờ » = huit heures."
+    },
+    {
+      "id": "v_may_gio",
+      "vi": "mấy giờ",
+      "fr": "quelle heure ?",
+      "dialect": "south",
+      "note": "« Mấy giờ ? » = « À quelle heure ? / Quelle heure est-il ? »."
+    },
+    {
+      "id": "v_sang",
+      "vi": "sáng",
+      "fr": "matin",
+      "dialect": "south",
+      "note": "On place le moment de la journée après l'heure : « tám giờ sáng » = huit heures du matin."
+    },
+    {
+      "id": "v_trua",
+      "vi": "trưa",
+      "fr": "midi, début d'après-midi",
+      "dialect": "south"
+    },
+    {
+      "id": "v_chieu",
+      "vi": "chiều",
+      "fr": "après-midi, fin d'après-midi",
+      "dialect": "south",
+      "note": "« Ba giờ chiều » = trois heures de l'après-midi."
+    },
+    {
+      "id": "v_toi_soir",
+      "vi": "tối",
+      "fr": "soir",
+      "dialect": "south"
+    },
+    {
+      "id": "v_gap",
+      "vi": "gặp",
+      "fr": "rencontrer, voir (quelqu'un)",
+      "dialect": "south",
+      "note": "« Gặp bạn ngày mai nha » = « On se voit demain »."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l09_e01",
+      "type": "listen_choose",
+      "vocabId": "v_hom_nay",
+      "choices": [
+        "v_hom_nay",
+        "v_ngay_mai",
+        "v_hom_qua",
+        "v_bay_gio"
+      ]
+    },
+    {
+      "id": "l09_e02",
+      "type": "listen_choose",
+      "vocabId": "v_may_gio",
+      "choices": [
+        "v_may_gio",
+        "v_bay_gio",
+        "v_gio",
+        "v_ngay"
+      ]
+    },
+    {
+      "id": "l09_e03",
+      "type": "listen_choose",
+      "vocabId": "v_chieu",
+      "choices": [
+        "v_sang",
+        "v_trua",
+        "v_chieu",
+        "v_toi_soir"
+      ]
+    },
+    {
+      "id": "l09_e04",
+      "type": "tone_pick",
+      "syllable": "giờ",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l09_e05",
+      "type": "tone_pick",
+      "syllable": "tối",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l09_e06",
+      "type": "tone_pick",
+      "syllable": "gặp",
+      "answerTone": "nang"
+    },
+    {
+      "id": "l09_e07",
+      "type": "translate_choose",
+      "promptFr": "Quelle heure est-il ?",
+      "answerVi": "Bây giờ là mấy giờ?",
+      "distractorsVi": [
+        "Bây giờ là ba giờ.",
+        "Ngày mai gặp bạn nha.",
+        "Hôm qua mấy giờ?"
+      ]
+    },
+    {
+      "id": "l09_e08",
+      "type": "translate_choose",
+      "promptFr": "Il est trois heures de l'après-midi.",
+      "answerVi": "Bây giờ là ba giờ chiều.",
+      "distractorsVi": [
+        "Bây giờ là ba giờ sáng.",
+        "Bây giờ là năm giờ chiều.",
+        "Bây giờ là ba giờ tối."
+      ]
+    },
+    {
+      "id": "l09_e09",
+      "type": "translate_choose",
+      "promptFr": "Je te vois demain.",
+      "answerVi": "Ngày mai gặp bạn.",
+      "distractorsVi": [
+        "Hôm qua gặp bạn.",
+        "Hôm nay gặp bạn.",
+        "Bây giờ gặp bạn."
+      ]
+    },
+    {
+      "id": "l09_e10",
+      "type": "word_order",
+      "fr": "Il est huit heures du matin.",
+      "tokensVi": [
+        "Bây giờ",
+        "là",
+        "tám",
+        "giờ",
+        "sáng"
+      ],
+      "extraTokens": [
+        "gặp"
+      ]
+    },
+    {
+      "id": "l09_e11",
+      "type": "speak",
+      "vi": "Bây giờ là mấy giờ?",
+      "fr": "Quelle heure est-il ?",
+      "vocabIds": [
+        "v_bay_gio",
+        "v_may_gio"
+      ]
+    },
+    {
+      "id": "l09_e12",
+      "type": "speak",
+      "vi": "Ngày mai gặp bạn nha.",
+      "fr": "On se voit demain, d'accord ?",
+      "vocabIds": [
+        "v_ngay_mai",
+        "v_gap",
+        "v_ban"
+      ]
+    }
+  ]
+}

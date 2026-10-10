@@ -1,0 +1,210 @@
+{
+  "id": "l07",
+  "contentVersion": 1,
+  "title": "Au marché",
+  "description": "Fais tes courses au marché : demande le prix, dis que c'est trop cher, demande un petit rabais et achète un kilo de fruits.",
+  "emoji": "🥭",
+  "dialogueId": "d07",
+  "vocab": [
+    {
+      "id": "v_bao_nhieu_tien",
+      "vi": "bao nhiêu tiền",
+      "fr": "combien ça coûte ?",
+      "dialect": "south",
+      "note": "Pour un prix au kilo : « Xoài bao nhiêu tiền một ký ? »."
+    },
+    {
+      "id": "v_tien",
+      "vi": "tiền",
+      "fr": "argent, prix",
+      "dialect": "south"
+    },
+    {
+      "id": "v_mac_qua",
+      "vi": "mắc quá",
+      "fr": "trop cher !",
+      "dialect": "south",
+      "note": "« Mắc » veut dire « cher » (au Nord : « đắt »)."
+    },
+    {
+      "id": "v_re",
+      "vi": "rẻ",
+      "fr": "pas cher, bon marché",
+      "dialect": "south"
+    },
+    {
+      "id": "v_bot",
+      "vi": "bớt",
+      "fr": "faire un rabais, baisser le prix",
+      "dialect": "south",
+      "note": "On dit « Bớt chút nha » pour demander un petit rabais."
+    },
+    {
+      "id": "v_mua",
+      "vi": "mua",
+      "fr": "acheter",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ban_vendre",
+      "vi": "bán",
+      "fr": "vendre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_trai_cay",
+      "vi": "trái cây",
+      "fr": "fruits",
+      "dialect": "south",
+      "note": "Au Sud on dit « trái cây » (au Nord : « quả »)."
+    },
+    {
+      "id": "v_xoai",
+      "vi": "xoài",
+      "fr": "mangue",
+      "dialect": "south"
+    },
+    {
+      "id": "v_thom",
+      "vi": "thơm",
+      "fr": "ananas",
+      "dialect": "south",
+      "note": "Au Sud « thơm » désigne l'ananas (au Nord : « dứa »). Le mot veut aussi dire « qui sent bon »."
+    },
+    {
+      "id": "v_chuoi",
+      "vi": "chuối",
+      "fr": "banane",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ky",
+      "vi": "ký",
+      "fr": "kilo",
+      "dialect": "south",
+      "note": "Abréviation de « ký-lô ». Les fruits se vendent au kilo : « một ký »."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l07_e01",
+      "type": "listen_choose",
+      "vocabId": "v_mac_qua",
+      "choices": [
+        "v_mac_qua",
+        "v_re",
+        "v_bot",
+        "v_mua"
+      ]
+    },
+    {
+      "id": "l07_e02",
+      "type": "listen_choose",
+      "vocabId": "v_xoai",
+      "choices": [
+        "v_xoai",
+        "v_chuoi",
+        "v_thom",
+        "v_trai_cay"
+      ]
+    },
+    {
+      "id": "l07_e03",
+      "type": "listen_choose",
+      "vocabId": "v_ban_vendre",
+      "choices": [
+        "v_mua",
+        "v_ban_vendre",
+        "v_re",
+        "v_ky"
+      ]
+    },
+    {
+      "id": "l07_e04",
+      "type": "tone_pick",
+      "syllable": "xoài",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l07_e05",
+      "type": "tone_pick",
+      "syllable": "rẻ",
+      "answerTone": "hoi"
+    },
+    {
+      "id": "l07_e06",
+      "type": "tone_pick",
+      "syllable": "mắc",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l07_e07",
+      "type": "translate_choose",
+      "promptFr": "Combien ça coûte ?",
+      "answerVi": "Bao nhiêu tiền?",
+      "distractorsVi": [
+        "Mắc quá!",
+        "Cho tui một ký.",
+        "Tính tiền."
+      ]
+    },
+    {
+      "id": "l07_e08",
+      "type": "translate_choose",
+      "promptFr": "C'est trop cher !",
+      "answerVi": "Mắc quá!",
+      "distractorsVi": [
+        "Rẻ quá!",
+        "Ngon quá!",
+        "Bớt chút nha."
+      ]
+    },
+    {
+      "id": "l07_e09",
+      "type": "translate_choose",
+      "promptFr": "Un kilo de mangues, s'il te plaît.",
+      "answerVi": "Cho tui một ký xoài.",
+      "distractorsVi": [
+        "Cho tui một ký chuối.",
+        "Cho tui một ký thơm.",
+        "Cho tui một ly nước."
+      ]
+    },
+    {
+      "id": "l07_e10",
+      "type": "word_order",
+      "fr": "Les bananes coûtent dix mille le kilo.",
+      "tokensVi": [
+        "Chuối",
+        "mười",
+        "ngàn",
+        "một",
+        "ký"
+      ],
+      "extraTokens": [
+        "mua"
+      ]
+    },
+    {
+      "id": "l07_e11",
+      "type": "speak",
+      "vi": "Mắc quá! Bớt chút nha.",
+      "fr": "C'est trop cher ! Fais-moi un petit rabais, s'il te plaît.",
+      "vocabIds": [
+        "v_mac_qua",
+        "v_bot"
+      ]
+    },
+    {
+      "id": "l07_e12",
+      "type": "speak",
+      "vi": "Chuối bao nhiêu tiền một ký?",
+      "fr": "Combien coûte le kilo de bananes ?",
+      "vocabIds": [
+        "v_chuoi",
+        "v_bao_nhieu_tien",
+        "v_ky"
+      ]
+    }
+  ]
+}

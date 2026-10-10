@@ -1,0 +1,205 @@
+{
+  "id": "l08",
+  "contentVersion": 1,
+  "title": "Se déplacer",
+  "description": "Prends un xe ôm (moto-taxi) : demande où se trouve un endroit, indique la direction et dis au chauffeur de s'arrêter.",
+  "emoji": "🛵",
+  "dialogueId": "d08",
+  "vocab": [
+    {
+      "id": "v_xe_om",
+      "vi": "xe ôm",
+      "fr": "moto-taxi",
+      "dialect": "south",
+      "note": "Le moyen de transport typique : le conducteur t'emmène sur sa moto et tu t'accroches à lui (« ôm » = serrer dans ses bras)."
+    },
+    {
+      "id": "v_di",
+      "vi": "đi",
+      "fr": "aller, partir",
+      "dialect": "south",
+      "note": "« Đi chợ » = aller au marché."
+    },
+    {
+      "id": "v_o_dau",
+      "vi": "ở đâu",
+      "fr": "où ?, où est… ?",
+      "dialect": "south",
+      "note": "Se place après le sujet : « Chợ ở đâu ? » = « Où est le marché ? »."
+    },
+    {
+      "id": "v_cho_marche",
+      "vi": "chợ",
+      "fr": "marché",
+      "dialect": "south"
+    },
+    {
+      "id": "v_queo_trai",
+      "vi": "quẹo trái",
+      "fr": "tourner à gauche",
+      "dialect": "south",
+      "note": "« Quẹo » est la forme du Sud (au Nord : « rẽ »). « Trái » veut dire « gauche », mais c'est aussi le mot « fruit » dans « trái cây »."
+    },
+    {
+      "id": "v_queo_phai",
+      "vi": "quẹo phải",
+      "fr": "tourner à droite",
+      "dialect": "south"
+    },
+    {
+      "id": "v_di_thang",
+      "vi": "đi thẳng",
+      "fr": "aller tout droit",
+      "dialect": "south"
+    },
+    {
+      "id": "v_dung_lai",
+      "vi": "dừng lại",
+      "fr": "s'arrêter, arrête-toi",
+      "dialect": "south"
+    },
+    {
+      "id": "v_gan",
+      "vi": "gần",
+      "fr": "près",
+      "dialect": "south"
+    },
+    {
+      "id": "v_xa",
+      "vi": "xa",
+      "fr": "loin",
+      "dialect": "south"
+    },
+    {
+      "id": "v_day",
+      "vi": "đây",
+      "fr": "ici",
+      "dialect": "south"
+    },
+    {
+      "id": "v_do",
+      "vi": "đó",
+      "fr": "là, là-bas",
+      "dialect": "south"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l08_e01",
+      "type": "listen_choose",
+      "vocabId": "v_xe_om",
+      "choices": [
+        "v_xe_om",
+        "v_di",
+        "v_gan",
+        "v_xa"
+      ]
+    },
+    {
+      "id": "l08_e02",
+      "type": "listen_choose",
+      "vocabId": "v_gan",
+      "choices": [
+        "v_gan",
+        "v_xa",
+        "v_day",
+        "v_do"
+      ]
+    },
+    {
+      "id": "l08_e03",
+      "type": "listen_choose",
+      "vocabId": "v_queo_phai",
+      "choices": [
+        "v_queo_trai",
+        "v_queo_phai",
+        "v_di_thang",
+        "v_dung_lai"
+      ]
+    },
+    {
+      "id": "l08_e04",
+      "type": "tone_pick",
+      "syllable": "gần",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l08_e05",
+      "type": "tone_pick",
+      "syllable": "đó",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l08_e06",
+      "type": "tone_pick",
+      "syllable": "chợ",
+      "answerTone": "nang"
+    },
+    {
+      "id": "l08_e07",
+      "type": "translate_choose",
+      "promptFr": "Où est le marché ?",
+      "answerVi": "Chợ ở đâu?",
+      "distractorsVi": [
+        "Chợ ở đây.",
+        "Bạn đi đâu?",
+        "Chợ xa quá!"
+      ]
+    },
+    {
+      "id": "l08_e08",
+      "type": "translate_choose",
+      "promptFr": "Tourne à gauche.",
+      "answerVi": "Quẹo trái.",
+      "distractorsVi": [
+        "Quẹo phải.",
+        "Đi thẳng.",
+        "Dừng lại."
+      ]
+    },
+    {
+      "id": "l08_e09",
+      "type": "translate_choose",
+      "promptFr": "Arrête-toi ici.",
+      "answerVi": "Dừng lại đây.",
+      "distractorsVi": [
+        "Đi thẳng.",
+        "Quẹo phải.",
+        "Chợ gần đây."
+      ]
+    },
+    {
+      "id": "l08_e10",
+      "type": "word_order",
+      "fr": "Combien pour aller au marché ?",
+      "tokensVi": [
+        "Đi",
+        "chợ",
+        "bao nhiêu tiền"
+      ],
+      "extraTokens": [
+        "dừng lại"
+      ]
+    },
+    {
+      "id": "l08_e11",
+      "type": "speak",
+      "vi": "Dừng lại đây nha.",
+      "fr": "Arrête-toi ici, s'il te plaît.",
+      "vocabIds": [
+        "v_dung_lai",
+        "v_day"
+      ]
+    },
+    {
+      "id": "l08_e12",
+      "type": "speak",
+      "vi": "Đi thẳng, quẹo trái.",
+      "fr": "Va tout droit, puis tourne à gauche.",
+      "vocabIds": [
+        "v_di_thang",
+        "v_queo_trai"
+      ]
+    }
+  ]
+}

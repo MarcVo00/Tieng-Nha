@@ -4,14 +4,47 @@ import type { AuthService } from "@/ports";
 
 type Profile = { pseudo: string; avatarEmoji: string };
 
+const STORAGE_KEY = "vietlearn.fake-auth";
+
+function storage(): Storage | null {
+  try {
+    return typeof sessionStorage === "undefined" ? null : sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
 export class FakeAuthService implements AuthService {
   otpRequests: string[] = [];
   private session: Session | null = null;
   private profile: Profile | null = null;
   private listeners = new Set<(s: Session | null) => void>();
 
+  /** `persist` keeps session and profile in sessionStorage so a reload or deep link stays signed in (app runtime only). */
+  constructor(private readonly persist = false) {
+    const raw = persist ? storage()?.getItem(STORAGE_KEY) : null;
+    if (!raw) return;
+    try {
+      const saved = JSON.parse(raw) as { session: Session | null; profile: Profile | null };
+      this.session = saved.session;
+      this.profile = saved.profile;
+    } catch {
+      // Corrupt entry: start signed out.
+    }
+  }
+
+  private save(): void {
+    if (!this.persist) return;
+    try {
+      storage()?.setItem(STORAGE_KEY, JSON.stringify({ session: this.session, profile: this.profile }));
+    } catch {
+      // Storage unavailable: the fake simply stays in-memory.
+    }
+  }
+
   private setSession(s: Session | null): void {
     this.session = s;
+    this.save();
     for (const cb of this.listeners) cb(s);
   }
 
@@ -51,6 +84,7 @@ export class FakeAuthService implements AuthService {
     if (inviteCode !== "TEST-CODE") throw new InvalidInviteError();
     if (pseudo === "Taken") throw new PseudoTakenError();
     this.profile = { pseudo, avatarEmoji };
+    this.save();
   }
 
   async getMyProfile(): Promise<Profile | null> {
@@ -61,6 +95,7 @@ export class FakeAuthService implements AuthService {
     this.requireSession();
     if (p.pseudo === "Taken") throw new PseudoTakenError();
     this.profile = { ...p };
+    this.save();
   }
 
   async signOut(): Promise<void> {

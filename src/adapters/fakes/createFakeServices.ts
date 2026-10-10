@@ -27,7 +27,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     overrides.content ??
     new InMemoryContentSource([lessonFixture], [dialogueFixture], examPoolFixture, BadgesFileSchema.parse(badgesFile).badges);
   const sync = createSyncService({ outbox, sink });
-  const auth = new FakeAuthService();
+  const auth = overrides.auth ?? new FakeAuthService();
   // The player's own row follows the profile chosen during onboarding (falls back to a fixed persona before it exists).
   const me = async () => {
     const profile = await auth.getMyProfile();

@@ -1,28 +1,33 @@
 import { expect, test } from "@playwright/test";
-import { fr } from "../src/i18n/fr";
-import { onboard, openFirstLessonAndFinishDeck, playThrough } from "./helpers";
+import { fr } from "@/i18n/fr";
+import { firstLessonLink, onboard, openFirstLessonAndFinishDeck } from "./helpers";
 
-// The service worker is not guaranteed to be active in the first session, so this asserts in-app behaviour:
-// once the lesson chunks are loaded, the lesson plays through with the network cut and the app recovers online.
-test("lesson 1 is playable offline and the app recovers after reconnecting", async ({ page, context }) => {
+test("with the service worker in control, the app shell boots offline and lesson 1 starts from cache", async ({ page, context }) => {
   await onboard(page);
-  // Warm the lesson route (lazy chunks) while still online, then go back home.
-  await page.getByRole("link", { name: /^Leçon 1 :.*disponible/ }).click();
-  await expect(page.getByRole("button", { name: fr.lessons.deck.next })).toBeVisible();
-  await page.goBack();
-  await expect(page).toHaveURL(/\/$/);
+
+  // The preview build registers the service worker: wait until it is active, then make sure it controls the page.
+  await page.evaluate(() => navigator.serviceWorker.ready.then(() => undefined));
+  if (!(await page.evaluate(() => navigator.serviceWorker.controller !== null))) await page.reload();
+  await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller !== null)).toBe(true);
+  await expect(firstLessonLink(page, "disponible")).toBeVisible();
 
   await context.setOffline(true);
-  await openFirstLessonAndFinishDeck(page);
-  const outcome = await playThrough(page);
-  expect(["done", "failed"]).toContain(outcome);
+  expect(await page.evaluate(() => navigator.onLine)).toBe(false);
 
-  // In-app navigation still works offline: leave the result screen and land back on the home path.
-  await page.getByRole("button", { name: outcome === "done" ? fr.lessons.done.continue : fr.lessons.failed.back }).click();
-  await expect(page.getByRole("link", { name: /^Leçon 1 :/ })).toBeVisible();
-  await context.setOffline(false);
+  // A cold reload without network is served by the service worker; the fake session survives in sessionStorage.
   await page.reload();
   await expect(page.getByRole("heading", { name: fr.app.error.title })).toHaveCount(0);
-  // The fake auth session is in-memory, so a reload lands on the welcome screen: the app booted without an error screen.
-  await expect(page.getByRole("button", { name: fr.onboarding.welcome.start })).toBeVisible();
+  await expect(firstLessonLink(page, "disponible")).toBeVisible();
+
+  // The lesson itself opens and reaches its first exercise with the network cut.
+  await openFirstLessonAndFinishDeck(page);
+  await expect(
+    page.getByRole("button", { name: fr.exercises.verify }).or(page.getByRole("button", { name: fr.exercises.speak.micLabel, exact: true })),
+  ).toBeVisible();
+
+  await context.setOffline(false);
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: fr.app.error.title })).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: fr.ui.nav.label })).toBeVisible();
+  await expect(firstLessonLink(page)).toBeVisible();
 });

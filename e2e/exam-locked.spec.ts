@@ -1,8 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { navigateInApp, onboard } from "./helpers";
+import { fr } from "@/i18n/fr";
+import { onboard } from "./helpers";
 
-test("the final test is locked until the 10 lessons are done", async ({ page }) => {
+test("the final test is locked with 0 lessons done and cannot be started", async ({ page }) => {
   await onboard(page);
-  await navigateInApp(page, "/exam");
-  await expect(page.getByText(/0\s*\/\s*10/)).toBeVisible();
+  await page.goto("/exam"); // deep link: the fake session survives a full page load
+  const t = fr.exam.intro.locked;
+  await expect(page.getByText(t.title)).toBeVisible();
+  await expect(page.getByText(t.progress(0, 10), { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: fr.exam.intro.start })).toHaveCount(0);
 });

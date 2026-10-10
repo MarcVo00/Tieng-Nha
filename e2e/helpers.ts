@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import { fr } from "../src/i18n/fr";
+import { fr } from "@/i18n/fr";
 
 export const PSEUDO = "Marc";
 
@@ -30,9 +30,15 @@ export async function onboard(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/$/);
 }
 
+/** First stop of the home path, available once onboarding is done. */
+export function firstLessonLink(page: Page, state: "disponible" | "any" = "any") {
+  const suffix = state === "disponible" ? ".*disponible" : "";
+  return page.getByRole("link", { name: new RegExp(`^Leçon 1 :${suffix}`) });
+}
+
 /** Opens the first available lesson from the home path and clicks through the vocab deck. */
 export async function openFirstLessonAndFinishDeck(page: Page): Promise<void> {
-  await page.getByRole("link", { name: /^Leçon 1 :.*disponible/ }).click();
+  await firstLessonLink(page, "disponible").click();
   await expect(page).toHaveURL(/\/lesson\//);
   const start = page.getByRole("button", { name: fr.lessons.deck.start });
   const next = page.getByRole("button", { name: fr.lessons.deck.next });
@@ -89,16 +95,4 @@ export async function playThrough(page: Page): Promise<"done" | "failed"> {
     await cont.or(done).or(failed).first().waitFor();
   }
   throw new Error("Lesson did not reach the done or failed state");
-}
-
-/**
- * Client-side navigation. The fake auth session lives in memory, so a full page load (page.goto) would send the
- * player back to /welcome; this keeps the SPA (and its session) alive.
- */
-export async function navigateInApp(page: Page, path: string): Promise<void> {
-  await page.evaluate((to) => {
-    window.history.pushState({}, "", to);
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }, path);
-  await expect(page).toHaveURL(new RegExp(`${path}$`));
 }

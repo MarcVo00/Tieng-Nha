@@ -1,7 +1,7 @@
 import type { Env } from "@/domain/config";
 import type { Services } from "@/app/services";
 import { flags } from "@/app/flags";
-import { createFakeServices, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
+import { createFakeServices, FakeAuthService, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
 import { VietLearnDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
 import { WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
 import { createStaticContentSource } from "@/adapters/content";
@@ -34,7 +34,7 @@ export function createServices(env: Env): Services {
   // Remote (fake or Supabase)
   let remote: Remote;
   if (env.VITE_USE_FAKES) {
-    const f = createFakeServices({ clock, progress });
+    const f = createFakeServices({ clock, progress, auth: new FakeAuthService(true) });
     remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, reporter: f.reporter };
   } else {
     const url = env.VITE_SUPABASE_URL;

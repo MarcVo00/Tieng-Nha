@@ -1,7 +1,10 @@
 import { z } from "zod";
 import type { Env } from "@/domain/config";
 
-const bool = z.enum(["true", "false"]).default("false").transform((v) => v === "true");
+const bool = z
+  .enum(["true", "false"])
+  .default("false")
+  .transform((v) => v === "true");
 const EnvSchema = z
   .object({
     VITE_SUPABASE_URL: z.string().url().optional(),
@@ -12,9 +15,19 @@ const EnvSchema = z
   })
   .superRefine((e, ctx) => {
     if (!e.VITE_USE_FAKES && (!e.VITE_SUPABASE_URL || !e.VITE_SUPABASE_ANON_KEY))
-      ctx.addIssue({ code: "custom", message: "VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are required unless VITE_USE_FAKES=true" });
+      ctx.addIssue({
+        code: "custom",
+        message: "VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are required unless VITE_USE_FAKES=true",
+      });
   });
 
 export function parseEnv(raw: Record<string, unknown>): Env {
   return EnvSchema.parse(raw);
+}
+
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
+
+/** True when a production build would run on fakes outside a local host (E2E previews on localhost). */
+export function shouldRefuseFakes(input: { prod: boolean; useFakes: boolean; hostname: string }): boolean {
+  return input.prod && input.useFakes && !LOCAL_HOSTS.has(input.hostname);
 }

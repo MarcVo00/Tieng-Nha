@@ -10,6 +10,7 @@ export const fr = {
     update: { available: "Nouvelle version disponible", action: "Mettre à jour" },
     error: { title: "Oups, quelque chose a coincé", body: "Ce n'est pas ta faute. Réessaie, ou reviens à l'accueil.", retry: "Réessayer", home: "Retour à l'accueil" },
     notFound: { title: "Page introuvable", body: "Cette page n'existe pas (ou plus).", home: "Retour à l'accueil" },
+    fakesGuard: { title: "Configuration invalide", body: "Cette version tourne avec des données factices. Elle ne peut pas être utilisée en ligne." },
     soon: { title: "Bientôt prêt", body: "Cet écran arrive très vite !" },
   },
   // --- ui ---

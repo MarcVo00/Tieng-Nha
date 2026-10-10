@@ -13,7 +13,7 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
-    "test": "vitest run && tsx scripts/validate-content.ts",
+    "test": "vitest run && tsx scripts/validate-content.ts --strict",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",

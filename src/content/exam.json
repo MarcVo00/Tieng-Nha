@@ -1,5 +1,5 @@
 {
-  "contentVersion": 1,
+  "contentVersion": 2,
   "questions": [
     {
       "id": "exam_q001",
@@ -24,10 +24,10 @@
         "type": "listen_choose",
         "vocabId": "v_ma_mais",
         "choices": [
-          "v_ma_fantome",
           "v_ma_mais",
+          "v_ma_tombe",
           "v_ma_maman",
-          "v_ma_riz"
+          "v_ma_fantome"
         ]
       }
     },
@@ -161,8 +161,8 @@
         "choices": [
           "v_duong",
           "v_sua",
-          "v_nuoc",
-          "v_da"
+          "v_tra",
+          "v_ca_phe_den"
         ]
       }
     },
@@ -192,7 +192,7 @@
           "v_com_tam",
           "v_pho",
           "v_banh_mi",
-          "v_hu_tieu"
+          "v_tra_da"
         ]
       }
     },
@@ -221,8 +221,8 @@
         "choices": [
           "v_muong",
           "v_dua",
-          "v_dia",
-          "v_chen"
+          "v_chen",
+          "v_ly"
         ]
       }
     },
@@ -237,7 +237,7 @@
           "v_re",
           "v_mac_qua",
           "v_bot",
-          "v_mua"
+          "v_ban_vendre"
         ]
       }
     },
@@ -252,7 +252,7 @@
           "v_chuoi",
           "v_xoai",
           "v_thom",
-          "v_trai_cay"
+          "v_ky"
         ]
       }
     },
@@ -312,7 +312,7 @@
           "v_hom_qua",
           "v_hom_nay",
           "v_ngay_mai",
-          "v_bay_gio"
+          "v_toi_soir"
         ]
       }
     },
@@ -341,7 +341,7 @@
         "choices": [
           "v_tuoi",
           "v_ten",
-          "v_hoc",
+          "v_tieng_viet",
           "v_song_o"
         ]
       }
@@ -367,12 +367,12 @@
       "exercise": {
         "id": "exam_e025",
         "type": "translate_choose",
-        "promptFr": "Oui, merci.",
-        "answerVi": "Dạ, cảm ơn.",
+        "promptFr": "Non, merci.",
+        "answerVi": "Không, cảm ơn.",
         "distractorsVi": [
-          "Dạ, tạm biệt.",
-          "Không, cảm ơn.",
-          "Xin chào bạn."
+          "Dạ, cảm ơn.",
+          "Không sao.",
+          "Tạm biệt."
         ]
       }
     },
@@ -397,7 +397,7 @@
       "exercise": {
         "id": "exam_e027",
         "type": "word_order",
-        "fr": "Je m'excuse, monsieur.",
+        "fr": "Je m'excuse, monsieur (homme âgé).",
         "tokensVi": [
           "Tui",
           "xin lỗi",
@@ -556,12 +556,12 @@
       "exercise": {
         "id": "exam_e037",
         "type": "translate_choose",
-        "promptFr": "C'est vraiment pas cher !",
+        "promptFr": "Ce n'est vraiment pas cher !",
         "answerVi": "Rẻ quá!",
         "distractorsVi": [
           "Mắc quá!",
-          "Ngon quá!",
-          "Bớt chút nha."
+          "Bớt chút nha.",
+          "Bao nhiêu tiền?"
         ]
       }
     },
@@ -627,7 +627,7 @@
           "trưa"
         ],
         "extraTokens": [
-          "chiều"
+          "sáng"
         ]
       }
     },
@@ -744,7 +744,7 @@
       "exercise": {
         "id": "exam_e052",
         "type": "tone_pick",
-        "syllable": "muỗng",
+        "syllable": "lỗi",
         "answerTone": "nga"
       }
     },
@@ -880,13 +880,13 @@
       "exercise": {
         "id": "exam_e063",
         "type": "speak",
-        "vi": "Tui có một em gái.",
-        "fr": "J'ai une petite sœur.",
+        "vi": "Tui có hai em trai.",
+        "fr": "J'ai deux petits frères.",
         "vocabIds": [
           "v_tui",
           "v_co_avoir",
-          "v_mot",
-          "v_em_gai"
+          "v_hai",
+          "v_em_trai"
         ]
       }
     },
@@ -941,7 +941,7 @@
         "id": "exam_e067",
         "type": "speak",
         "vi": "Chuối rẻ quá!",
-        "fr": "Les bananes sont vraiment pas chères !",
+        "fr": "Les bananes ne sont vraiment pas chères !",
         "vocabIds": [
           "v_chuoi",
           "v_re"
@@ -1001,12 +1001,12 @@
       "exercise": {
         "id": "exam_e071",
         "type": "speak",
-        "vi": "Tui sống ở Sài Gòn.",
-        "fr": "J'habite à Sài Gòn.",
+        "vi": "Tui sống ở Pháp.",
+        "fr": "J'habite en France.",
         "vocabIds": [
           "v_tui",
           "v_song_o",
-          "v_sai_gon"
+          "v_phap"
         ]
       }
     },

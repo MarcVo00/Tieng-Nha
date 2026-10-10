@@ -26,7 +26,7 @@ test("exam pool and badges", async () => {
   expect(await src.getExamPool()).toHaveLength(60);
   expect((await src.getBadges()).length).toBe(12);
 });
-test("createStaticContentSource lists real lessons in order and copes with missing dialogues files", async () => {
+test("createStaticContentSource lists real lessons in order and loads the real exam pool", async () => {
   const real = createStaticContentSource();
   const lessons = await real.listLessons();
   expect(lessons.length).toBeGreaterThan(0);

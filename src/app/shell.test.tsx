@@ -1,9 +1,12 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { createFakeServices } from "@/adapters/fakes";
 import { appRoutes } from "@/app/router";
 import { useAppState } from "@/app/appState";
+import { OfflineError } from "@/domain/errors";
+import type { Session } from "@/domain/types";
+import type { AuthEvent } from "@/ports";
 import "@/test/routerTestEnv";
 
 vi.mock("virtual:pwa-register/react", () => ({
@@ -76,4 +79,45 @@ test("a failing bootstrap still reaches a rendered app", async () => {
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
   expect(errorLog).toHaveBeenCalled();
   errorLog.mockRestore();
+});
+
+test("offline cold start with an expired token keeps the cached profile and saved settings", async () => {
+  const services = await onboardedServices();
+  await services.progress.saveSettings({ theme: "dark", voiceRate: "slow", capabilities: null, onboardingDone: true });
+  localStorage.setItem("vl-session", JSON.stringify({ userId: "me", email: "a@b.c" }));
+  localStorage.setItem("vl-profile", JSON.stringify({ pseudo: "Marc", avatarEmoji: "🐉" }));
+  vi.spyOn(services.auth, "getSession").mockRejectedValue(new OfflineError());
+  vi.spyOn(services.auth, "getMyProfile").mockRejectedValue(new OfflineError());
+  const { router } = renderAt("/", services);
+  expect(await screen.findByRole("navigation")).toBeInTheDocument();
+  expect(router.state.location.pathname).toBe("/");
+  expect(useAppState.getState().profile).toEqual({ pseudo: "Marc", avatarEmoji: "🐉" });
+  expect(useAppState.getState().settings).toMatchObject({ theme: "dark", voiceRate: "slow", onboardingDone: true });
+});
+
+test("a null INITIAL_SESSION does not sign the user out, an explicit SIGNED_OUT does", async () => {
+  const services = await onboardedServices();
+  let emit: (s: Session | null, e?: AuthEvent) => void = () => undefined;
+  vi.spyOn(services.auth, "onChange").mockImplementation((cb) => {
+    emit = cb;
+    return () => undefined;
+  });
+  renderAt("/", services);
+  await screen.findByRole("navigation");
+  act(() => emit(null, "INITIAL_SESSION"));
+  expect(useAppState.getState().session).not.toBeNull();
+  expect(useAppState.getState().profile).not.toBeNull();
+  act(() => emit(null, "SIGNED_OUT"));
+  expect(useAppState.getState().session).toBeNull();
+  expect(useAppState.getState().profile).toBeNull();
+});
+
+test("returning to the app flushes pending sync", async () => {
+  const services = await onboardedServices();
+  const flush = vi.spyOn(services.sync, "flush");
+  renderAt("/", services);
+  await screen.findByRole("navigation");
+  flush.mockClear();
+  document.dispatchEvent(new Event("visibilitychange"));
+  expect(flush).toHaveBeenCalledTimes(1);
 });

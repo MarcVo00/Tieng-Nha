@@ -1,3 +1,4 @@
+import { SupabaseAuthService } from "@/adapters/supabase/SupabaseAuthService";
 import { mapError } from "@/adapters/supabase/errors";
 import { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
 import { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
@@ -88,4 +89,35 @@ test("event sink keeps events queued on an FK violation (no profile)", async () 
 test("event sink throws NotAuthenticatedError without a session", async () => {
   const db = { from: vi.fn(), auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }) } };
   await expect(new SupabaseEventSink(db as never).push([ev("c1")])).rejects.toBeInstanceOf(NotAuthenticatedError);
+});
+
+describe("SupabaseAuthService offline session fallback", () => {
+  const retryable = { name: "AuthRetryableFetchError", message: "fetch failed" };
+  const make = (getSession: () => Promise<unknown>) =>
+    new SupabaseAuthService({ auth: { getSession } } as never);
+  beforeEach(() => localStorage.clear());
+
+  test("returns the cached identity when the refresh fails offline", async () => {
+    await make(async () => ({ data: { session: { user: { id: "u1", email: "a@b.c" } } }, error: null })).getSession();
+    const offline = make(async () => ({ data: { session: null }, error: retryable }));
+    await expect(offline.getSession()).resolves.toEqual({ userId: "u1", email: "a@b.c" });
+    expect(localStorage.getItem("vl-session")).not.toBeNull();
+  });
+
+  test("throws OfflineError when offline and nothing is cached", async () => {
+    await expect(make(async () => ({ data: { session: null }, error: retryable })).getSession()).rejects.toBeInstanceOf(OfflineError);
+  });
+
+  test("a definitive missing session clears the cache; explicit sign-out clears it too", async () => {
+    localStorage.setItem("vl-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
+    await expect(make(async () => ({ data: { session: null }, error: null })).getSession()).resolves.toBeNull();
+    expect(localStorage.getItem("vl-session")).toBeNull();
+    localStorage.setItem("vl-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
+    await new SupabaseAuthService({ auth: { signOut: async () => ({ error: null }) } } as never).signOut();
+    expect(localStorage.getItem("vl-session")).toBeNull();
+  });
+});
+
+test("AuthRetryableFetchError maps to OfflineError", () => {
+  expect(mapError({ name: "AuthRetryableFetchError", message: "x" })).toBeInstanceOf(OfflineError);
 });

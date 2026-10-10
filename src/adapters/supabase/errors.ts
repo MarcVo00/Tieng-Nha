@@ -4,6 +4,7 @@ import { ExamLimitError, InvalidInviteError, InvalidProfileError, NotAuthenticat
 export function mapError(err: { name?: string | undefined; message?: string | undefined; code?: string | undefined } | null | undefined): Error {
   const msg = err?.message ?? "";
   if (typeof navigator !== "undefined" && !navigator.onLine) return new OfflineError();
+  if (err?.name === "AuthRetryableFetchError") return new OfflineError();
   if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(msg)) return new OfflineError();
   if (err?.name === "AuthSessionMissingError" || /auth session missing/i.test(msg)) return new NotAuthenticatedError();
   if (msg.includes("invalid_profile")) return new InvalidProfileError();

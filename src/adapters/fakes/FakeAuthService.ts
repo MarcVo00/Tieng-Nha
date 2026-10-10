@@ -1,6 +1,6 @@
 import { InvalidInviteError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
 import type { Session } from "@/domain/types";
-import type { AuthService } from "@/ports";
+import type { AuthEvent, AuthService } from "@/ports";
 
 type Profile = { pseudo: string; avatarEmoji: string };
 
@@ -18,7 +18,7 @@ export class FakeAuthService implements AuthService {
   otpRequests: string[] = [];
   private session: Session | null = null;
   private profile: Profile | null = null;
-  private listeners = new Set<(s: Session | null) => void>();
+  private listeners = new Set<(s: Session | null, event?: AuthEvent) => void>();
 
   /** `persist` keeps session and profile in sessionStorage so a reload or deep link stays signed in (app runtime only). */
   constructor(private readonly persist = false) {
@@ -45,7 +45,7 @@ export class FakeAuthService implements AuthService {
   private setSession(s: Session | null): void {
     this.session = s;
     this.save();
-    for (const cb of this.listeners) cb(s);
+    for (const cb of this.listeners) cb(s, s ? "SIGNED_IN" : "SIGNED_OUT");
   }
 
   private requireSession(): Session {
@@ -57,7 +57,7 @@ export class FakeAuthService implements AuthService {
     return this.session;
   }
 
-  onChange(cb: (s: Session | null) => void): () => void {
+  onChange(cb: (s: Session | null, event?: AuthEvent) => void): () => void {
     this.listeners.add(cb);
     return () => {
       this.listeners.delete(cb);

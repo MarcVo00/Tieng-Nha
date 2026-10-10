@@ -1,37 +1,15 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { z } from "zod";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
-import { PROFILE_KEY } from "@/domain/storageKeys";
+import { readCachedSession } from "@/domain/sessionCache";
+import type { Session } from "@/domain/types";
 import { OfflineError } from "@/domain/errors";
-import { useAppState, useRefreshProgress, type AppProfile } from "@/app/appState";
+import { clearCachedProfile, readCachedProfile, useAppState, useRefreshProgress, writeCachedProfile, type AppProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { ThemeController } from "@/app/ThemeController";
 import { UpdatePrompt } from "@/app/UpdatePrompt";
 import { fr } from "@/i18n/fr";
 import { ToastViewport } from "@/ui";
-
-const ProfileSchema = z.object({ pseudo: z.string(), avatarEmoji: z.string() });
-
-function readCachedProfile(): AppProfile | null {
-  try {
-    const raw = localStorage.getItem(PROFILE_KEY);
-    if (!raw) return null;
-    const parsed = ProfileSchema.safeParse(JSON.parse(raw));
-    return parsed.success ? parsed.data : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeCachedProfile(profile: AppProfile | null): void {
-  try {
-    if (profile) localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-    else localStorage.removeItem(PROFILE_KEY);
-  } catch {
-    // Cache is best-effort; without it an offline cold start just asks to sign in again.
-  }
-}
 
 function Splash() {
   return (
@@ -54,7 +32,8 @@ export function Root() {
     async function loadProfile(): Promise<AppProfile | null> {
       try {
         const profile = await auth.getMyProfile();
-        writeCachedProfile(profile);
+        if (profile) writeCachedProfile(profile);
+        else clearCachedProfile();
         return profile;
       } catch (e) {
         // With a valid session, any failure falls back to the cached profile so the app still opens.
@@ -65,21 +44,50 @@ export function Root() {
 
     sync.start();
     const offSize = sync.onSizeChange((n) => set({ pendingSync: n }));
-    const offAuth = auth.onChange((session) => {
-      set({ session });
+    const offAuth = auth.onChange((session, event) => {
       if (!session) {
-        writeCachedProfile(null);
-        set({ profile: null });
+        // Only an explicit sign-out clears local identity; a null INITIAL_SESSION or a failed
+        // refresh while offline must not log the user out.
+        if (event !== "SIGNED_OUT") return;
+        clearCachedProfile();
+        set({ session: null, profile: null });
         return;
       }
+      set({ session });
       void loadProfile().then((profile) => {
         if (!cancelled) set({ profile });
       });
     });
 
+    // Settings never depend on the session: a session failure must not replace saved settings.
+    async function loadSettings() {
+      try {
+        return await progress.getSettings();
+      } catch (e) {
+        console.error("Bootstrap failed", e);
+        return { ...DEFAULT_SETTINGS };
+      }
+    }
+
+    async function loadSession(): Promise<Session | null> {
+      try {
+        return await auth.getSession();
+      } catch (e) {
+        // Offline with an expired token: keep the last known identity instead of sending the user to onboarding.
+        if (e instanceof OfflineError) return readCachedSession();
+        console.error("Could not read session", e);
+        return null;
+      }
+    }
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void sync.flush().catch(() => undefined);
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
     void (async () => {
       try {
-        const [settings, session] = await Promise.all([progress.getSettings(), auth.getSession()]);
+        const [settings, session] = await Promise.all([loadSettings(), loadSession()]);
         const profile = session ? await loadProfile() : null;
         if (cancelled) return;
         set({ settings, session, profile });
@@ -87,7 +95,7 @@ export function Root() {
         await refreshProgress().catch(() => undefined);
       } catch (e) {
         console.error("Bootstrap failed", e);
-        if (!cancelled) set({ settings: { ...DEFAULT_SETTINGS }, session: null, profile: null });
+        if (!cancelled) set({ session: null, profile: null });
       } finally {
         if (!cancelled) set({ ready: true });
       }
@@ -95,6 +103,7 @@ export function Root() {
 
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
       offSize();
       offAuth();
       sync.stop();

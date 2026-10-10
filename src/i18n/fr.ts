@@ -270,6 +270,36 @@ export const fr = {
       continue: "Continuer",
     },
   },
+  // --- review ---
+  review: {
+    loadError: { title: "Les révisions n'ont pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
+    empty: {
+      title: "Rien à réviser aujourd'hui — reviens demain !",
+      none: "Termine une leçon pour commencer tes révisions.",
+      next: (days: number) => (days <= 1 ? "Prochaine révision : demain" : `Prochaine révision : dans ${days} jours`),
+    },
+    due: (n: number) => `${n} ${n > 1 ? "mots" : "mot"} à réviser`,
+    start: "Réviser",
+    boxes: {
+      label: "Tes mots par niveau",
+      names: ["Nouveau", "En cours", "Familier", "Solide", "Maîtrisé"],
+      aria: (name: string, n: number) => `${name} : ${n} ${n > 1 ? "mots" : "mot"}`,
+    },
+    run: {
+      quit: { aria: "Quitter la révision", title: "Quitter la révision ?", body: "Tes réponses déjà données sont gardées.", confirm: "Quitter", cancel: "Rester" },
+      loading: "On prépare ta révision…",
+      saving: "On enregistre ta révision…",
+      saveError: { title: "Ta révision n'a pas pu être enregistrée", body: "Tes réponses sont gardées. Réessaie dans un instant." },
+      nothing: { title: "Pas de quoi réviser pour l'instant", body: "Reviens quand de nouveaux mots seront prêts." },
+      back: "Retour",
+    },
+    done: {
+      title: "Révision terminée !",
+      score: (right: number, total: number) => `${right}/${total} justes`,
+      badges: "Nouveaux badges",
+      finish: "Terminer",
+    },
+  },
 } as const;
 
 export type Fr = typeof fr;

@@ -2,6 +2,8 @@ import type { Exercise, ExerciseType } from "@/domain/types";
 import type { ExercisePlugin } from "@/exercises/types";
 import { listenChoose } from "@/exercises/listen_choose";
 import { translateChoose } from "@/exercises/translate_choose";
+import { tonePick } from "@/exercises/tone_pick";
+import { wordOrder } from "@/exercises/word_order";
 
 type PluginMap = { [K in ExerciseType]: ExercisePlugin<Extract<Exercise, { type: K }>> };
 
@@ -11,6 +13,9 @@ export const plugins: Partial<PluginMap> = {
   listen_choose: listenChoose,
   // --- translate_choose ---
   translate_choose: translateChoose,
+  // --- T19 ---
+  tone_pick: tonePick,
+  word_order: wordOrder,
 };
 
 export function getPlugin<T extends ExerciseType>(type: T): ExercisePlugin<Extract<Exercise, { type: T }>> {

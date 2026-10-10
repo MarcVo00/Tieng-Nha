@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { motion, type HTMLMotionProps } from "motion/react";
 import { fr } from "@/i18n/fr";
-import { spring, tap } from "@/ui/motion";
+import { duration, spring, tap } from "@/ui/motion";
 
 export type ButtonProps = Omit<HTMLMotionProps<"button">, "children"> & {
   variant?: "primary" | "secondary" | "ghost" | "danger";
@@ -15,7 +15,7 @@ const VARIANT: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary: "bg-primary text-primary-on border-b-4 border-primary-hover active:translate-y-[2px] active:border-b-2",
   secondary: "bg-surface border-2 border-line text-ink",
   ghost: "bg-transparent text-primary",
-  danger: "bg-error text-primary-on border-b-4 border-ink/30 active:translate-y-[2px] active:border-b-2",
+  danger: "bg-error text-primary-on border-b-4 border-ink active:translate-y-[2px] active:border-b-2",
 };
 
 function Dots() {
@@ -26,7 +26,7 @@ function Dots() {
           key={i}
           className="h-2 w-2 rounded-full bg-current"
           animate={{ opacity: [0.25, 1, 0.25] }}
-          transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
+          transition={{ duration: duration.pulse, repeat: Infinity, delay: i * 0.15 }}
         />
       ))}
     </span>

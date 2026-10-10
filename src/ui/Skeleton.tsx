@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
+import { duration } from "@/ui/motion";
 
 type SkeletonProps = { className?: string; lines?: number };
 
@@ -13,7 +14,7 @@ export function Skeleton({ className, lines = 1 }: SkeletonProps) {
               className="absolute inset-0 bg-surface opacity-60"
               initial={{ x: "-100%" }}
               animate={{ x: "100%" }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "linear", repeatDelay: 0.2 }}
+              transition={{ duration: duration.loop, repeat: Infinity, ease: "linear", repeatDelay: 0.2 }}
             />
           )}
         </div>

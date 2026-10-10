@@ -23,11 +23,11 @@ function ResultIcon({ correct }: { correct: boolean }) {
     <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-primary-on ${correct ? "bg-success" : "bg-error"}`}>
       <svg viewBox="0 0 24 24" width={24} height={24} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
         {correct ? (
-          <motion.path d="M5 12.5 10 17.5 19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.25, ease: ease.out }} />
+          <motion.path d="M5 12.5 10 17.5 19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: duration.base, ease: ease.out }} />
         ) : (
           <>
-            <motion.path d="M7 7l10 10" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.2, ease: ease.out }} />
-            <motion.path d="M17 7 7 17" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.2, delay: duration.instant, ease: ease.out }} />
+            <motion.path d="M7 7l10 10" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: duration.base, ease: ease.out }} />
+            <motion.path d="M17 7 7 17" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: duration.base, delay: duration.instant, ease: ease.out }} />
           </>
         )}
       </svg>

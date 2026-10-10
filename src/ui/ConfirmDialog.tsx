@@ -1,8 +1,9 @@
-import { useEffect, useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { Button } from "@/ui/Button";
 import { duration, EXIT_RATIO, spring } from "@/ui/motion";
+import { useFocusTrap } from "@/ui/useFocusTrap";
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -21,20 +22,17 @@ function Panel({ title, body, confirmLabel, cancelLabel, danger, requireText, on
   const titleId = useId();
   const canConfirm = requireText === undefined || typed === requireText;
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onCancel]);
+  const ref = useRef<HTMLDivElement>(null);
+  useFocusTrap(ref, onCancel);
 
   return (
     <motion.div
+      ref={ref}
+      tabIndex={-1}
       role="alertdialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      className="relative w-full max-w-sm rounded-lg bg-surface p-5 shadow-raised"
+      className="relative w-full max-w-sm outline-none rounded-lg bg-surface p-5 shadow-raised"
       initial={{ opacity: 0, scale: 0.94, y: 12 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96, transition: { duration: duration.fast * EXIT_RATIO } }}
@@ -78,7 +76,7 @@ export function ConfirmDialog({ open, ...rest }: ConfirmDialogProps) {
       {open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-5">
           <motion.div
-            className="absolute inset-0 bg-ink/30"
+            className="absolute inset-0 bg-scrim"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: duration.fast * EXIT_RATIO } }}

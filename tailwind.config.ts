@@ -18,6 +18,7 @@ export default {
       error: { DEFAULT: "var(--color-error)", soft: "var(--color-error-soft)" },
       info: "var(--color-info)",
       streak: "var(--color-streak)",
+      scrim: "var(--color-scrim)",
       tone: {
         ngang: "var(--tone-ngang)", huyen: "var(--tone-huyen)", sac: "var(--tone-sac)",
         hoi: "var(--tone-hoi)", nga: "var(--tone-nga)", nang: "var(--tone-nang)",

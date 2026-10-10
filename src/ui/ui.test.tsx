@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { useState } from "react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Button, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
+import { Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
 
 test("Button shows loading state and is disabled", () => {
   render(<Button loading>Valider</Button>);
@@ -51,4 +52,45 @@ test("Toast store shows a status message", async () => {
   render(<Harness />);
   await userEvent.click(screen.getByRole("button", { name: "go" }));
   expect(screen.getByRole("status")).toHaveTextContent("Badge débloqué");
+});
+
+describe("modal focus", () => {
+  test("ConfirmDialog moves focus in, Escape cancels, focus returns on close", async () => {
+    const onCancel = vi.fn();
+    function Harness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>opener</button>
+          <ConfirmDialog open={open} title="Sûr ?" confirmLabel="Oui" cancelLabel="Non" onConfirm={() => {}} onCancel={() => { onCancel(); setOpen(false); }} />
+        </>
+      );
+    }
+    render(<Harness />);
+    const opener = screen.getByRole("button", { name: "opener" });
+    opener.focus();
+    await userEvent.click(opener);
+    expect(screen.getByRole("alertdialog")).toContainElement(document.activeElement as HTMLElement);
+    await userEvent.keyboard("{Escape}");
+    expect(onCancel).toHaveBeenCalled();
+    await waitFor(() => expect(opener).toHaveFocus());
+  });
+  test("Sheet traps Tab inside and closes on Escape", async () => {
+    const onClose = vi.fn();
+    render(
+      <Sheet open label="Feuille" onClose={onClose}>
+        <button>a</button>
+        <button>b</button>
+      </Sheet>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+    expect(screen.getByRole("button", { name: "a" })).toHaveFocus();
+    await userEvent.tab();
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "a" })).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    expect(screen.getByRole("button", { name: "b" })).toHaveFocus();
+    await userEvent.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalled();
+  });
 });

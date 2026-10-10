@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { Icon } from "@/ui/icons";
-import { spring, tap } from "@/ui/motion";
+import { duration, spring, tap } from "@/ui/motion";
 
 type SpeakerButtonProps = {
   onSpeak: () => void;
@@ -27,7 +27,7 @@ export function SpeakerButton({ onSpeak, onSpeakSlow, disabled = false, disabled
                   className="pointer-events-none absolute inset-0 rounded-full border-2 border-primary"
                   initial={{ scale: 1, opacity: 0.5 }}
                   animate={{ scale: 1.6, opacity: 0 }}
-                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.4 }}
+                  transition={{ duration: duration.loop, repeat: Infinity, delay: i * 0.4 }}
                 />
               ))
             : null}

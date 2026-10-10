@@ -1,5 +1,5 @@
 // Motion tokens — values from docs/design-system.md §6. Animate only transform/opacity.
-export const duration = { instant: 0.08, fast: 0.15, base: 0.22, slow: 0.36, celebrate: 0.8 } as const; // seconds
+export const duration = { instant: 0.08, fast: 0.15, base: 0.22, slow: 0.36, celebrate: 0.8, loop: 1.2, pulse: 0.9 } as const; // seconds
 export const ease = {
   out: [0.22, 1, 0.36, 1],
   inOut: [0.65, 0, 0.35, 1],

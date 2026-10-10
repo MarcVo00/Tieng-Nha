@@ -33,6 +33,7 @@ Toutes les paires ci-dessous ont été vérifiées (WCAG 2.1) : texte normal ≥
 | `--color-error-soft` | `#F7E0D2` | fond de feuille « mauvaise réponse » | — |
 | `--color-info` | `#2C4A7A` | indigo (chàm) : infos, aide | 7.8 sur bg |
 | `--color-streak` | `#D9531E` | flamme du streak (icône uniquement) | décoratif |
+| `--color-scrim` | `rgb(31 26 23 / 0.35)` | voile derrière feuilles et dialogues | décoratif |
 
 ### 2.2 Thème sombre — « Laque noire »
 | Token CSS | Hex | Contraste |
@@ -54,6 +55,7 @@ Toutes les paires ci-dessous ont été vérifiées (WCAG 2.1) : texte normal ≥
 | `--color-error-soft` | `#3A2418` | — |
 | `--color-info` | `#8FB0E0` | 8.5 |
 | `--color-streak` | `#F07A3C` | — |
+| `--color-scrim` | `rgb(0 0 0 / 0.55)` | — |
 
 ### 2.3 Couleurs des 6 tons (pédagogiques — toujours les mêmes partout)
 Chaque ton a **une couleur + un signe + un nom** (jamais la couleur seule, pour les daltoniens).
@@ -85,7 +87,7 @@ colors: {
   gold: { DEFAULT: 'var(--color-gold)', ink: 'var(--color-gold-ink)' },
   success: { DEFAULT: 'var(--color-success)', soft: 'var(--color-success-soft)' },
   error: { DEFAULT: 'var(--color-error)', soft: 'var(--color-error-soft)' },
-  info: 'var(--color-info)', streak: 'var(--color-streak)',
+  info: 'var(--color-info)', streak: 'var(--color-streak)', scrim: 'var(--color-scrim)',
   tone: { ngang: 'var(--tone-ngang)', huyen: 'var(--tone-huyen)', sac: 'var(--tone-sac)', hoi: 'var(--tone-hoi)', nga: 'var(--tone-nga)', nang: 'var(--tone-nang)' },
 }
 ```

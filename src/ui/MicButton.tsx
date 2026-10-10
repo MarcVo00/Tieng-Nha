@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { Icon } from "@/ui/icons";
-import { spring, tap } from "@/ui/motion";
+import { duration, spring, tap } from "@/ui/motion";
 
 type MicButtonProps = { state: "idle" | "listening" | "processing"; onPress: () => void; disabled?: boolean; label: string };
 
@@ -19,7 +19,7 @@ export function MicButton({ state, onPress, disabled = false, label }: MicButton
                 className="pointer-events-none absolute inset-0 rounded-full border-2 border-primary"
                 initial={{ scale: 1, opacity: 0.5 }}
                 animate={{ scale: 1.6, opacity: 0 }}
-                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.4 }}
+                transition={{ duration: duration.loop, repeat: Infinity, delay: i * 0.4 }}
               />
             ))
           : null}
@@ -41,7 +41,7 @@ export function MicButton({ state, onPress, disabled = false, label }: MicButton
                   key={i}
                   className="h-2 w-2 rounded-full bg-current"
                   animate={{ opacity: [0.25, 1, 0.25] }}
-                  transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
+                  transition={{ duration: duration.pulse, repeat: Infinity, delay: i * 0.15 }}
                 />
               ))}
             </span>

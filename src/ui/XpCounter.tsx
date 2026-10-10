@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { animate, AnimatePresence, motion, useMotionValue, useTransform } from "motion/react";
+import { animate, AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { duration } from "@/ui/motion";
 
@@ -8,10 +8,15 @@ type XpCounterProps = { value: number; delta?: number };
 export function XpCounter({ value, delta }: XpCounterProps) {
   const mv = useMotionValue(value);
   const rounded = useTransform(mv, (v) => Math.round(v));
+  const reduced = useReducedMotion();
   useEffect(() => {
+    if (reduced) {
+      mv.set(value);
+      return;
+    }
     const controls = animate(mv, value, { duration: 0.6 });
     return () => controls.stop();
-  }, [mv, value]);
+  }, [mv, value, reduced]);
 
   return (
     <span className="relative inline-flex items-baseline gap-1 text-heading text-gold-ink">

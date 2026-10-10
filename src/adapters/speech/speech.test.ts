@@ -162,3 +162,100 @@ test("detectCapabilities combines the three adapters", async () => {
   );
   await expect(detect()).resolves.toEqual({ tts: true, stt: true, recorder: false });
 });
+
+test("synthesizer picks up voices that arrive after the cutoff", async () => {
+  vi.useFakeTimers();
+  try {
+    let voices: SpeechSynthesisVoice[] = [];
+    const tts = new WebSpeechSynthesizer(fakeSynthWindow(() => voices, []) as never);
+    const ready = tts.ready();
+    await vi.advanceTimersByTimeAsync(1500);
+    await ready;
+    expect(tts.isAvailable()).toBe(false);
+    voices = [voice("Linh", "vi-VN")];
+    expect(tts.isAvailable()).toBe(true);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+describe("MediaRecorderVoiceRecorder.record", () => {
+  type Handlers = { ondataavailable: ((e: { data: Blob }) => void) | null; onstop: (() => void) | null; onerror: (() => void) | null };
+  type Inst = Handlers & { state: string; mimeType: string };
+  let created: Inst[];
+  let startError: Error | null;
+  let tracks: Array<{ stop: ReturnType<typeof vi.fn> }>;
+  const nav = () =>
+    ({
+      mediaDevices: {
+        getUserMedia: async () => {
+          tracks = [{ stop: vi.fn() }];
+          return { getTracks: () => tracks };
+        },
+      },
+    }) as never;
+
+  beforeEach(() => {
+    created = [];
+    startError = null;
+    vi.stubGlobal(
+      "MediaRecorder",
+      class {
+        static isTypeSupported = () => true;
+        state = "inactive";
+        mimeType = "audio/webm";
+        ondataavailable: Handlers["ondataavailable"] = null;
+        onstop: Handlers["onstop"] = null;
+        onerror: Handlers["onerror"] = null;
+        constructor() {
+          created.push(this);
+        }
+        start() {
+          if (startError) throw startError;
+          this.state = "recording";
+        }
+        stop() {
+          this.state = "inactive";
+          this.ondataavailable?.({ data: new Blob(["abc"]) });
+          this.onstop?.();
+        }
+      },
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  test("stops at maxMs, returns a Blob and releases the mic", async () => {
+    vi.useFakeTimers();
+    const p = new MediaRecorderVoiceRecorder(nav()).record(3000);
+    await vi.advanceTimersByTimeAsync(3000);
+    const blob = await p;
+    expect(blob.size).toBe(3);
+    expect(tracks[0]?.stop).toHaveBeenCalled();
+  });
+
+  test("recorder error rejects and releases the mic", async () => {
+    const p = new MediaRecorderVoiceRecorder(nav()).record(3000).catch((e: unknown) => e);
+    await vi.waitFor(() => expect(created).toHaveLength(1));
+    created[0]?.onerror?.();
+    expect(await p).toBeInstanceOf(Error);
+    expect(tracks[0]?.stop).toHaveBeenCalled();
+  });
+
+  test("start() throwing rejects and releases the mic", async () => {
+    startError = new Error("boom");
+    await expect(new MediaRecorderVoiceRecorder(nav()).record(3000)).rejects.toThrow("boom");
+    expect(tracks[0]?.stop).toHaveBeenCalled();
+  });
+
+  test("pre-aborted signal releases the mic and resolves with an empty Blob", async () => {
+    const ctrl = new AbortController();
+    ctrl.abort();
+    const blob = await new MediaRecorderVoiceRecorder(nav()).record(3000, ctrl.signal);
+    expect(blob.size).toBe(0);
+    expect(tracks[0]?.stop).toHaveBeenCalled();
+    expect(created).toHaveLength(0);
+  });
+});

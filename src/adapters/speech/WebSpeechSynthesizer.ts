@@ -47,7 +47,15 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
   }
 
   isAvailable(): boolean {
+    this.refreshVoice();
     return this.voice !== null;
+  }
+
+  /** Voices may arrive after the 1.5 s cutoff: retry the lookup lazily. */
+  private refreshVoice(): void {
+    if (this.voice) return;
+    const synth = this.win.speechSynthesis;
+    if (synth) this.voice = pickVietnameseVoice(synth.getVoices());
   }
 
   async speak(text: string, opts: SpeakOptions = {}): Promise<void> {
@@ -62,6 +70,7 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
       return;
     }
     await this.ready();
+    this.refreshVoice();
     const synth = this.win.speechSynthesis;
     const Utt = this.win.SpeechSynthesisUtterance;
     if (!synth || !Utt || !this.voice) throw new Error("tts_unavailable");

@@ -1,8 +1,64 @@
 import type { Env } from "@/domain/config";
 import type { Services } from "@/app/services";
-import { createFakeServices } from "@/adapters/fakes";
+import { flags } from "@/app/flags";
+import { createFakeServices, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
+import { VietLearnDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
+import { WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
+import { createStaticContentSource } from "@/adapters/content";
+import { ScriptedConversationEngine } from "@/adapters/conversation";
+import {
+  createSupabase, SupabaseAuthService, SupabaseEventSink, SupabaseLeaderboardRepository, SupabaseExamGateway, SupabaseContentReporter,
+} from "@/adapters/supabase";
+import { createActivityService } from "@/services/activity";
+import { createSyncService } from "@/services/sync";
 
-/** Composition root. Real adapters are wired in T15; until then everything is fake. */
+type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "reporter">;
+
+/** Composition root: the only place that picks concrete adapters. */
 export function createServices(env: Env): Services {
-  return createFakeServices({ env });
+  const clock = () => new Date().toISOString();
+  const db = new VietLearnDb();
+  const progress = new DexieProgressRepository(db);
+  const outbox = new DexieOutbox(db);
+  const content = createStaticContentSource();
+
+  // Speech
+  const tts = env.VITE_FAKE_SPEECH ? new FakeSpeechSynthesizer() : new WebSpeechSynthesizer();
+  const stt = env.VITE_FAKE_SPEECH ? new FakeSpeechRecognizer() : new WebSpeechRecognizer();
+  const recorder = env.VITE_FAKE_SPEECH ? new FakeVoiceRecorder() : new MediaRecorderVoiceRecorder();
+  const detectCapabilities =
+    tts instanceof WebSpeechSynthesizer
+      ? createDetectCapabilities(tts, stt, recorder)
+      : async () => ({ tts: true, stt: true, recorder: true });
+
+  // Remote (fake or Supabase)
+  let remote: Remote;
+  if (env.VITE_USE_FAKES) {
+    const f = createFakeServices({ clock, progress });
+    remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, reporter: f.reporter };
+  } else {
+    const url = env.VITE_SUPABASE_URL;
+    const key = env.VITE_SUPABASE_ANON_KEY;
+    if (!url || !key) throw new Error("Supabase env missing");
+    const sb = createSupabase(url, key);
+    const reporter = new SupabaseContentReporter(sb, new DexieReportQueue(db));
+    reporter.flushReports().catch((e: unknown) => {
+      console.warn("Could not flush queued content reports", e);
+    });
+    remote = {
+      sink: new SupabaseEventSink(sb),
+      auth: new SupabaseAuthService(sb),
+      leaderboard: new SupabaseLeaderboardRepository(sb),
+      exam: new SupabaseExamGateway(sb),
+      reporter,
+    };
+  }
+
+  const sync = createSyncService({ outbox, sink: remote.sink });
+  const activity = createActivityService({ progress, outbox, content, clock, onEventAppended: () => sync.notifyEnqueued() });
+
+  return {
+    env, flags, clock, content, progress, outbox, ...remote, tts, stt, recorder, detectCapabilities,
+    conversation: new ScriptedConversationEngine(content), activity, sync,
+  };
 }

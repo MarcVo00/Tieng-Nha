@@ -1,0 +1,9 @@
+export { createSupabase } from "@/adapters/supabase/client";
+export type { Db } from "@/adapters/supabase/client";
+export { mapError } from "@/adapters/supabase/errors";
+export { SupabaseAuthService } from "@/adapters/supabase/SupabaseAuthService";
+export { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
+export { SupabaseLeaderboardRepository } from "@/adapters/supabase/SupabaseLeaderboardRepository";
+export { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
+export { SupabaseContentReporter } from "@/adapters/supabase/SupabaseContentReporter";
+export type { ReportQueue } from "@/adapters/supabase/SupabaseContentReporter";

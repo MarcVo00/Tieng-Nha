@@ -1,6 +1,6 @@
 {
   "id": "l09",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Le temps",
   "description": "Situe-toi dans le temps : aujourd'hui, demain, hier, les moments de la journée, et demande l'heure (jusqu'à dix heures).",
   "emoji": "🕰️",
@@ -144,7 +144,7 @@
       "distractorsVi": [
         "Bây giờ là ba giờ.",
         "Ngày mai gặp bạn nha.",
-        "Hôm qua mấy giờ?"
+        "Ngày mai mấy giờ?"
       ]
     },
     {
@@ -155,13 +155,13 @@
       "distractorsVi": [
         "Bây giờ là ba giờ sáng.",
         "Bây giờ là năm giờ chiều.",
-        "Bây giờ là ba giờ tối."
+        "Bây giờ là tám giờ tối."
       ]
     },
     {
       "id": "l09_e09",
       "type": "translate_choose",
-      "promptFr": "Je te vois demain.",
+      "promptFr": "On se voit demain.",
       "answerVi": "Ngày mai gặp bạn.",
       "distractorsVi": [
         "Hôm qua gặp bạn.",

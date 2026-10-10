@@ -1,8 +1,8 @@
 {
   "id": "l06",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Manger",
-  "description": "Parle de nourriture : les plats emblématiques du Sud (phở, cơm tấm, bánh mì, hủ tiếu), les verbes manger et boire, et les couverts.",
+  "description": "Parle de nourriture : les plats qu'on mange partout à Sài Gòn (phở, cơm tấm, bánh mì, hủ tiếu), les verbes manger et boire, et les couverts.",
   "emoji": "🍜",
   "dialogueId": "d06",
   "vocab": [
@@ -90,7 +90,7 @@
       "vi": "dĩa",
       "fr": "assiette",
       "dialect": "south",
-      "note": "Au Nord on dit « đĩa »."
+      "note": "Au Nord on dit « đĩa » ; attention, au Nord « dĩa » veut dire « fourchette »."
     },
     {
       "id": "v_ngon_qua",
@@ -155,8 +155,8 @@
     {
       "id": "l06_e07",
       "type": "translate_choose",
-      "promptFr": "J'ai faim.",
-      "answerVi": "Tui đói.",
+      "promptFr": "J'ai très faim.",
+      "answerVi": "Tui đói quá.",
       "distractorsVi": [
         "Tui no rồi.",
         "Tui uống nước.",
@@ -199,7 +199,7 @@
         "cơm"
       ],
       "extraTokens": [
-        "uống"
+        "đũa"
       ]
     },
     {

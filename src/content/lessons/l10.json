@@ -1,6 +1,6 @@
 {
   "id": "l10",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Se présenter",
   "description": "Présente-toi : ton prénom, ton pays, ce que tu apprends. Tu peux enfin dire « enchanté(e) » à une famille vietnamienne !",
   "emoji": "🤝",
@@ -18,7 +18,7 @@
       "vi": "tên là",
       "fr": "s'appeler",
       "dialect": "south",
-      "note": "« Tui tên là Anna » = « Je m'appelle Anna »."
+      "note": "« Tui tên là Camille » = « Je m'appelle Camille »."
     },
     {
       "id": "v_phap",
@@ -81,7 +81,7 @@
     {
       "id": "v_rat_vui",
       "vi": "rất vui được gặp bạn",
-      "fr": "enchanté(e) de te rencontrer",
+      "fr": "ravi(e) de te rencontrer",
       "dialect": "south",
       "note": "Expression toute faite pour la première rencontre. En situation réelle, remplace « bạn » par « anh » ou « chị »."
     }
@@ -115,9 +115,9 @@
       "vocabId": "v_hoc",
       "choices": [
         "v_hoc",
-        "v_ten",
-        "v_tuoi",
-        "v_song_o"
+        "v_tieng_viet",
+        "v_phap",
+        "v_ten"
       ]
     },
     {
@@ -141,8 +141,8 @@
     {
       "id": "l10_e07",
       "type": "translate_choose",
-      "promptFr": "Je m'appelle Anna.",
-      "answerVi": "Tui tên là Anna.",
+      "promptFr": "Je m'appelle Camille.",
+      "answerVi": "Tui tên là Camille.",
       "distractorsVi": [
         "Tui là người Pháp.",
         "Tui học tiếng Việt.",
@@ -152,11 +152,11 @@
     {
       "id": "l10_e08",
       "type": "translate_choose",
-      "promptFr": "Tu es français(e) ?",
-      "answerVi": "Bạn là người Pháp không?",
+      "promptFr": "Tu habites en France ?",
+      "answerVi": "Bạn sống ở Pháp không?",
       "distractorsVi": [
-        "Bạn là người Việt không?",
-        "Bạn sống ở Pháp không?",
+        "Bạn sống ở Việt Nam không?",
+        "Bạn học tiếng Việt không?",
         "Bạn tên gì?"
       ]
     },
@@ -168,18 +168,16 @@
       "distractorsVi": [
         "Tui là người Việt.",
         "Tui sống ở Việt Nam.",
-        "Tui tên là Anna."
+        "Tui tên là Camille."
       ]
     },
     {
       "id": "l10_e10",
       "type": "word_order",
-      "fr": "J'apprends le vietnamien à Sài Gòn.",
+      "fr": "J'habite à Sài Gòn.",
       "tokensVi": [
         "Tui",
-        "học",
-        "tiếng Việt",
-        "ở",
+        "sống ở",
         "Sài Gòn"
       ],
       "extraTokens": [
@@ -189,18 +187,18 @@
     {
       "id": "l10_e11",
       "type": "speak",
-      "vi": "Tui tên là Anna.",
-      "fr": "Je m'appelle Anna.",
+      "vi": "Tui là người Pháp.",
+      "fr": "Je suis français(e).",
       "vocabIds": [
         "v_tui",
-        "v_ten_la"
+        "v_nguoi_phap"
       ]
     },
     {
       "id": "l10_e12",
       "type": "speak",
       "vi": "Rất vui được gặp bạn!",
-      "fr": "Ravi(e) de te rencontrer !",
+      "fr": "ravi(e) de te rencontrer !",
       "vocabIds": [
         "v_rat_vui"
       ]

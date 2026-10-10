@@ -1,6 +1,6 @@
 {
   "id": "l07",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "title": "Au marché",
   "description": "Fais tes courses au marché : demande le prix, dis que c'est trop cher, demande un petit rabais et achète un kilo de fruits.",
   "emoji": "🥭",
@@ -16,7 +16,7 @@
     {
       "id": "v_tien",
       "vi": "tiền",
-      "fr": "argent, prix",
+      "fr": "argent",
       "dialect": "south"
     },
     {
@@ -173,16 +173,15 @@
     {
       "id": "l07_e10",
       "type": "word_order",
-      "fr": "Les bananes coûtent dix mille le kilo.",
+      "fr": "Un kilo de bananes pour moi.",
       "tokensVi": [
-        "Chuối",
-        "mười",
-        "ngàn",
+        "Cho tui",
         "một",
-        "ký"
+        "ký",
+        "chuối"
       ],
       "extraTokens": [
-        "mua"
+        "bán"
       ]
     },
     {

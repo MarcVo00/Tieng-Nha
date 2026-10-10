@@ -1,10 +1,42 @@
 import { create } from "zustand";
+import { z } from "zod";
 import { useCallback, useState } from "react";
 import type { Capabilities, ProgressSnapshot, Session, Settings } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
+import { PROFILE_KEY } from "@/domain/storageKeys";
 import { useServices } from "@/app/ServicesProvider";
 
 export type AppProfile = { pseudo: string; avatarEmoji: string };
+const ProfileSchema = z.object({ pseudo: z.string(), avatarEmoji: z.string() });
+
+/** Offline cache of the profile, so the app opens without the network. All three helpers are best-effort. */
+export function readCachedProfile(): AppProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (!raw) return null;
+    const parsed = ProfileSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+export function writeCachedProfile(profile: AppProfile): void {
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  } catch {
+    // Without the cache an offline cold start just asks to sign in again.
+  }
+}
+
+export function clearCachedProfile(): void {
+  try {
+    localStorage.removeItem(PROFILE_KEY);
+  } catch {
+    // Storage may be unavailable; nothing to clean then.
+  }
+}
+
 type Fields = {
   ready: boolean; session: Session | null; profile: AppProfile | null; settings: Settings;
   snapshot: ProgressSnapshot | null; dueCount: number; pendingSync: number;

@@ -1,9 +1,8 @@
 import { useId, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { AVATARS } from "@/domain/avatars";
-import { PROFILE_KEY } from "@/domain/storageKeys";
 import { InvalidProfileError, OfflineError, PseudoTakenError } from "@/domain/errors";
-import { useAppState } from "@/app/appState";
+import { useAppState, writeCachedProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { Avatar, Button, Sheet, tap, useToast } from "@/ui";
@@ -35,11 +34,7 @@ function Form({ onClose, current }: Omit<Props, "open">) {
       await auth.updateProfile({ pseudo: clean, avatarEmoji: emoji });
       const next = { pseudo: clean, avatarEmoji: emoji };
       useAppState.getState().set({ profile: next });
-      try {
-        localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
-      } catch {
-        // The offline cache is best-effort.
-      }
+      writeCachedProfile(next);
       toast.show({ title: t.saved });
       onClose();
     } catch (e) {

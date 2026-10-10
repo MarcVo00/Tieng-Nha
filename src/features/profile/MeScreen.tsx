@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
-import { PROFILE_KEY, THEME_KEY } from "@/domain/storageKeys";
+import { THEME_KEY } from "@/domain/storageKeys";
 import { OfflineError } from "@/domain/errors";
 import type { BadgeDef } from "@/domain/types";
-import { useAppState } from "@/app/appState";
+import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { examMention } from "@/services/exam";
 import { fr } from "@/i18n/fr";
@@ -174,7 +174,7 @@ export function MeScreen() {
     } catch (e) {
       console.warn("Local cleanup failed", e);
     } finally {
-      removeKey(PROFILE_KEY);
+      clearCachedProfile();
       removeKey(THEME_KEY);
       useAppState.getState().set({
         session: null,

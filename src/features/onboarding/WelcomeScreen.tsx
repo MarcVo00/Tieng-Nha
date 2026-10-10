@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { PROFILE_KEY } from "@/domain/storageKeys";
 import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
 import type { Session } from "@/domain/types";
-import { useAppState, useSettings, type AppProfile } from "@/app/appState";
+import { useAppState, useSettings, writeCachedProfile, type AppProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { Button, duration, ease, EXIT_RATIO } from "@/ui";
@@ -16,17 +14,6 @@ import { WelcomeStep } from "@/features/onboarding/WelcomeStep";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 const STEPS: readonly Step[] = [1, 2, 3, 4, 5];
-
-// Same key/format as the bootstrap cache in `app/Root.tsx`.
-const ProfileSchema = z.object({ pseudo: z.string(), avatarEmoji: z.string() });
-
-function cacheProfile(profile: AppProfile): void {
-  try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(ProfileSchema.parse(profile)));
-  } catch {
-    // Best-effort cache.
-  }
-}
 
 function Dots({ step }: { step: Step }) {
   return (
@@ -98,7 +85,7 @@ export function WelcomeScreen() {
         const profile = await auth.getMyProfile();
         if (profile) {
           useAppState.getState().set({ profile });
-          cacheProfile(profile);
+          writeCachedProfile(profile);
           go(4);
           return;
         }
@@ -111,7 +98,7 @@ export function WelcomeScreen() {
 
   async function joined(profile: AppProfile) {
     useAppState.getState().set({ profile });
-    cacheProfile(profile);
+    writeCachedProfile(profile);
     go(4);
   }
 

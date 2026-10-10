@@ -54,6 +54,8 @@ export default tseslint.config(
           { from: "ports", allow: ["ports", "domain"] },
           { from: "domain", allow: ["domain", "content"] },
           { from: "adapters", allow: [["adapters", { name: "${from.name}" }], "di", "services", "ports", "domain", "content"] },
+          // The fake service bundle composes the scripted conversation engine over the fake content.
+          { from: [["adapters", { name: "fakes" }]], allow: [["adapters", { name: "conversation" }]] },
           { from: "content", allow: ["content"] },
           { from: "test", allow: ["di", "app", "feature", "exercise-registry", "exercise", "ui", "services", "ports", "domain", "adapters", "content", "i18n"] },
         ],

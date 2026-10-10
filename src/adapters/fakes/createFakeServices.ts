@@ -13,6 +13,7 @@ import { FakeLeaderboardRepository } from "@/adapters/fakes/FakeLeaderboardRepos
 import { FakeExamGateway } from "@/adapters/fakes/FakeExamGateway";
 import { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes/FakeSpeech";
 import { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
+import { ScriptedConversationEngine } from "@/adapters/conversation";
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
 
@@ -41,12 +42,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     stt: new FakeSpeechRecognizer(),
     recorder: new FakeVoiceRecorder(),
     detectCapabilities: async () => ({ tts: true, stt: true, recorder: true }),
-    conversation: {
-      start: async () => {
-        throw new Error("Conversation engine is wired in T13");
-      },
-      answer: async (state) => state,
-    },
+    conversation: new ScriptedConversationEngine(content),
     reporter: new FakeContentReporter(),
     activity: createActivityService({ progress, outbox, content, clock, onEventAppended: () => sync.notifyEnqueued() }),
     sync,

@@ -69,6 +69,21 @@ export const fr = {
       toastBody: "Premier café vietnamien",
     },
   },
+  // --- exercises ---
+  exercises: {
+    skipped: "Exercice passé",
+    listenChoose: {
+      prompt: "Qu'as-tu entendu ?",
+      noAudio: "Pas de voix vietnamienne sur cet appareil : lis le mot et choisis sa traduction.",
+    },
+    translateChoose: {
+      prompt: "Comment dit-on ça en vietnamien ?",
+      listen: (text: string) => `Écouter : ${text}`,
+    },
+    verify: "Vérifier",
+    correctChoice: "Bonne réponse",
+    wrongChoice: "Réponse incorrecte",
+  },
 } as const;
 
 export type Fr = typeof fr;

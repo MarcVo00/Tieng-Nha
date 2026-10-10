@@ -24,3 +24,5 @@ export { MicButton } from "@/ui/MicButton";
 export { ReportButton } from "@/ui/ReportButton";
 export { Confetti } from "@/ui/Confetti";
 export { Motif } from "@/ui/Motif";
+export { ChoiceGrid, type ChoiceOption } from "@/ui/ChoiceGrid";
+export { useChoiceKeys } from "@/ui/useChoiceKeys";

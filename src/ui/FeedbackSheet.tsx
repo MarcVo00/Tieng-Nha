@@ -10,6 +10,7 @@ import { SpeakerButton } from "@/ui/SpeakerButton";
 type FeedbackSheetProps = {
   open: boolean;
   correct: boolean;
+  skipped?: boolean; // neither right nor wrong (e.g. microphone unavailable)
   expected: string;
   heard?: string;
   onContinue: () => void;
@@ -18,11 +19,13 @@ type FeedbackSheetProps = {
   children?: ReactNode;
 };
 
-function ResultIcon({ correct }: { correct: boolean }) {
+function ResultIcon({ correct, skipped }: { correct: boolean; skipped: boolean }) {
   return (
-    <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-primary-on ${correct ? "bg-success" : "bg-error"}`}>
+    <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${skipped ? "bg-surface-2 text-ink-muted" : `text-primary-on ${correct ? "bg-success" : "bg-error"}`}`}>
       <svg viewBox="0 0 24 24" width={24} height={24} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-        {correct ? (
+        {skipped ? (
+          <path d="M6 12h12" />
+        ) : correct ? (
           <motion.path d="M5 12.5 10 17.5 19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: duration.base, ease: ease.out }} />
         ) : (
           <>
@@ -35,7 +38,7 @@ function ResultIcon({ correct }: { correct: boolean }) {
   );
 }
 
-function Body({ correct, expected, heard, onContinue, onSpeak, onReport, children }: Omit<FeedbackSheetProps, "open">) {
+function Body({ correct, skipped = false, expected, heard, onContinue, onSpeak, onReport, children }: Omit<FeedbackSheetProps, "open">) {
   // Enter continues, unless a control already handles the key natively.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -51,8 +54,8 @@ function Body({ correct, expected, heard, onContinue, onSpeak, onReport, childre
   return (
     <div className="flex flex-col gap-4">
       <div role="status" className="flex items-center gap-3">
-        <ResultIcon correct={correct} />
-        <span className="text-heading text-ink">{correct ? fr.ui.feedback.correct : fr.ui.feedback.wrong}</span>
+        <ResultIcon correct={correct} skipped={skipped} />
+        <span className="text-heading text-ink">{skipped ? fr.exercises.skipped : correct ? fr.ui.feedback.correct : fr.ui.feedback.wrong}</span>
       </div>
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
@@ -83,10 +86,10 @@ function Body({ correct, expected, heard, onContinue, onSpeak, onReport, childre
   );
 }
 
-export function FeedbackSheet({ open, correct, ...rest }: FeedbackSheetProps) {
+export function FeedbackSheet({ open, correct, skipped = false, ...rest }: FeedbackSheetProps) {
   return (
-    <Sheet open={open} label={fr.ui.feedback.sheetLabel} tone={correct ? "success" : "error"}>
-      <Body correct={correct} {...rest} />
+    <Sheet open={open} label={fr.ui.feedback.sheetLabel} tone={skipped ? "neutral" : correct ? "success" : "error"}>
+      <Body correct={correct} skipped={skipped} {...rest} />
     </Sheet>
   );
 }

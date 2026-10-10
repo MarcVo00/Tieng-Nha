@@ -1,8 +1,16 @@
 // All user-facing French strings. Each feature appends its own block: `// --- <feature> ---`.
 export const fr = {
+  // --- app ---
   app: {
     name: "VietLearn",
     loading: "Chargement…",
+    tabs: { learn: "Apprendre", review: "Révision", leaderboard: "Classement", me: "Moi" },
+    header: { profile: "Ouvrir mon profil" },
+    sync: { pending: (n: number) => `${n} ${n > 1 ? "événements" : "événement"} en attente de synchronisation` },
+    update: { available: "Nouvelle version disponible", action: "Mettre à jour" },
+    error: { title: "Oups, quelque chose a coincé", body: "Ce n'est pas ta faute. Réessaie, ou reviens à l'accueil.", retry: "Réessayer", home: "Retour à l'accueil" },
+    notFound: { title: "Page introuvable", body: "Cette page n'existe pas (ou plus), bạn.", home: "Retour à l'accueil" },
+    soon: { title: "Bientôt prêt", body: "Cet écran arrive très vite, bạn !" },
   },
   // --- ui ---
   ui: {
@@ -27,7 +35,7 @@ export const fr = {
     report: { label: "Signaler", aria: "Signaler un problème avec cette réponse" },
     confirm: { typeToConfirm: (text: string) => `Tape « ${text} » pour confirmer`, inputLabel: "Confirmation" },
     tones: { ngang: "ngang", huyen: "huyền", sac: "sắc", hoi: "hỏi", nga: "ngã", nang: "nặng" },
-    nav: { label: "Navigation principale" },
+    nav: { label: "Navigation principale", due: (n: number) => `${n} à réviser` },
     gallery: {
       title: "Galerie UI",
       light: "Clair",

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#A3201C"/>
+  <!-- nón lá: cone with a curved brim, gold -->
+  <path d="M256 78 C200 150 128 210 76 262 C150 290 362 290 436 262 C384 210 312 150 256 78 Z" fill="#C8962E"/>
+  <path d="M256 78 C236 140 200 214 150 272 M256 78 C256 150 256 220 256 281 M256 78 C276 140 312 214 362 272" fill="none" stroke="#A3201C" stroke-width="7" stroke-linecap="round" opacity="0.35"/>
+  <path d="M96 268 C170 296 342 296 416 268" fill="none" stroke="#8A6416" stroke-width="10" stroke-linecap="round"/>
+  <path d="M138 342 L188 432 L238 342 M296 342 V432 H372" fill="none" stroke="#FFF8EE" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

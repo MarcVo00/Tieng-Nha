@@ -43,7 +43,7 @@ export default tseslint.config(
       "boundaries/element-types": ["error", {
         default: "disallow",
         rules: [
-          { from: "root", allow: ["root", "app", "styles", "i18n", "ui"] },
+          { from: "root", allow: ["root", "app", "di", "styles", "i18n", "ui"] },
           { from: "di", allow: ["di", "ports", "domain", "services", "content"] },
           { from: "app", allow: ["di", "app", "feature", "exercise-registry", "exercise", "ui", "services", "ports", "domain", "adapters", "content", "i18n", "styles"] },
           { from: "feature", allow: [["feature", { name: "${from.name}" }], "di", "exercise-registry", "ui", "services", "ports", "domain", "i18n"] },

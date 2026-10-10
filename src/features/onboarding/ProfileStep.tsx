@@ -31,7 +31,7 @@ export function ProfileStep({ inviteCode, onInvalidInvite, onJoined }: ProfileSt
     setError(null);
     setBusy(true);
     try {
-      await auth.joinGroup(inviteCode.trim(), clean, emoji);
+      await auth.joinGroup(inviteCode.trim().toUpperCase(), clean, emoji);
       await onJoined({ pseudo: clean, avatarEmoji: emoji });
     } catch (e) {
       if (e instanceof InvalidInviteError) onInvalidInvite();

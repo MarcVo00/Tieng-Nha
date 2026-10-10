@@ -87,7 +87,7 @@ language plpgsql security definer set search_path = public as $$
 declare g uuid;
 begin
   if auth.uid() is null then raise exception 'not_authenticated'; end if;
-  select id into g from public.groups where invite_code = p_invite_code;
+  select id into g from public.groups where upper(trim(invite_code)) = upper(trim(p_invite_code));
   if g is null then raise exception 'invalid_invite'; end if;
   begin
     insert into public.profiles (id, group_id, pseudo, avatar_emoji)

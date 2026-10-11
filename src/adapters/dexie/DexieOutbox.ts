@@ -1,9 +1,9 @@
 import type { Outbox } from "@/ports";
 import type { AppEvent } from "@/domain/types";
-import type { VietLearnDb } from "@/adapters/dexie/db";
+import type { TiengNhaDb } from "@/adapters/dexie/db";
 
 export class DexieOutbox implements Outbox {
-  constructor(private readonly db: VietLearnDb) {}
+  constructor(private readonly db: TiengNhaDb) {}
   async enqueue(e: AppEvent): Promise<void> {
     await this.db.outbox.put(e);
   }

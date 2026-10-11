@@ -2,7 +2,7 @@ import type { Env } from "@/domain/config";
 import type { Services } from "@/app/services";
 import { flags } from "@/app/flags";
 import { createFakeServices, FakeAuthService, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
-import { VietLearnDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
+import { TiengNhaDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
 import { WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
 import { createStaticContentSource } from "@/adapters/content";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
@@ -17,7 +17,7 @@ type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "reporte
 /** Composition root: the only place that picks concrete adapters. */
 export function createServices(env: Env): Services {
   const clock = () => new Date().toISOString();
-  const db = new VietLearnDb();
+  const db = new TiengNhaDb();
   const progress = new DexieProgressRepository(db);
   const outbox = new DexieOutbox(db);
   const content = createStaticContentSource();

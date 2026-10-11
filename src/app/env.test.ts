@@ -4,7 +4,7 @@ test("fakes mode needs no supabase keys", () =>
 test("real mode requires supabase keys", () =>
   expect(() => parseEnv({ VITE_USE_FAKES: "false" })).toThrow(/required/));
 describe("shouldRefuseFakes", () => {
-  const base = { prod: true, useFakes: true, hostname: "vietlearn.netlify.app" };
+  const base = { prod: true, useFakes: true, hostname: "tieng-nha.netlify.app" };
   test("refuses fakes in production on a public host", () => expect(shouldRefuseFakes(base)).toBe(true));
   test.each(["localhost", "127.0.0.1", "[::1]"])("allows fakes in production on %s", (hostname) =>
     expect(shouldRefuseFakes({ ...base, hostname })).toBe(false),

@@ -78,7 +78,7 @@ export const isInterruptedState = (v: unknown): boolean => isRecord(v) && v["int
 
 // Attempt marker in sessionStorage: "pending:<id>" once started, "running:<id>" once the run page mounted.
 // A run page mounting on a "running" marker is a reload: the attempt is abandoned (and counted).
-const MARK_KEY = "vietlearn.exam.attempt";
+const MARK_KEY = "tieng-nha.exam.attempt";
 export type AttemptMark = "pending" | "running" | "none";
 
 export function markAttempt(kind: "pending" | "running", attemptId: string): void {

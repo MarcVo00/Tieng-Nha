@@ -15,7 +15,7 @@ function Splash() {
   return (
     <main aria-busy="true" className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-bg">
       <img src="/icons/icon.svg" alt="" width={96} height={96} className="rounded-lg shadow-raised" />
-      <p className="text-title text-primary">{fr.app.name}</p>
+      <p lang="vi" className="text-title text-primary">{fr.app.name}</p>
     </main>
   );
 }

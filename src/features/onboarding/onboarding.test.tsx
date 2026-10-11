@@ -62,7 +62,7 @@ test("happy path ends on / with onboarding done and profile cached", async () =>
   expect(useAppState.getState().settings.onboardingDone).toBe(true);
   expect((await services.progress.getSettings()).onboardingDone).toBe(true);
   expect(useAppState.getState().profile).toEqual({ pseudo: "Marc", avatarEmoji: "🐉" });
-  expect(JSON.parse(localStorage.getItem("vl-profile") ?? "null")).toEqual({ pseudo: "Marc", avatarEmoji: "🐉" });
+  expect(JSON.parse(localStorage.getItem("tn-profile") ?? "null")).toEqual({ pseudo: "Marc", avatarEmoji: "🐉" });
 });
 
 test("the test voice button speaks Vietnamese and stores capabilities", async () => {
@@ -130,7 +130,7 @@ test("auth callback explains how to continue and links to /welcome", async () =>
     </ServicesProvider>,
   );
   expect(screen.getByText(/saisis le code à 6 chiffres/i)).toBeInTheDocument();
-  await userEvent.click(screen.getByRole("button", { name: "Ouvrir VietLearn" }));
+  await userEvent.click(screen.getByRole("button", { name: "Ouvrir Tiếng Nhà" }));
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
 });
 

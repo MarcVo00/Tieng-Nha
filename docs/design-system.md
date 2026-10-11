@@ -1,4 +1,4 @@
-# VietLearn — Design system « Sơn mài »
+# Tiếng Nhà — Design system « Sơn mài »
 
 > Source de vérité visuelle. Tout travail UI commence par la lecture de ce fichier **et** le chargement du skill `vietlearn-design`.
 > Aucune couleur, durée, rayon ou ombre en dur dans les composants : uniquement les tokens ci-dessous.

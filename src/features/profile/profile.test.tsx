@@ -42,7 +42,7 @@ async function setup(given: Partial<Services> | Services = {}) {
 
 beforeEach(() => {
   localStorage.clear();
-  localStorage.setItem("vl-profile", JSON.stringify({ pseudo: "Marc", avatarEmoji: "🐉" }));
+  localStorage.setItem("tn-profile", JSON.stringify({ pseudo: "Marc", avatarEmoji: "🐉" }));
   useAppState.setState({
     ready: true, session: { userId: "me", email: "m@x.fr" }, profile: { pseudo: "Marc", avatarEmoji: "🐉" },
     settings: { ...DEFAULT_SETTINGS, onboardingDone: true }, snapshot: snapshot(), dueCount: 0,
@@ -88,7 +88,7 @@ test("updating the pseudo calls the auth service and refreshes the cached profil
   await user.click(screen.getByRole("button", { name: fr.profile.edit.save }));
   await waitFor(() => expect(spy).toHaveBeenCalledWith({ pseudo: "Marco", avatarEmoji: "🌸" }));
   await waitFor(() => expect(useAppState.getState().profile).toEqual({ pseudo: "Marco", avatarEmoji: "🌸" }));
-  expect(JSON.parse(localStorage.getItem("vl-profile") ?? "null")).toEqual({ pseudo: "Marco", avatarEmoji: "🌸" });
+  expect(JSON.parse(localStorage.getItem("tn-profile") ?? "null")).toEqual({ pseudo: "Marco", avatarEmoji: "🌸" });
 });
 
 test("a taken pseudo shows its message and keeps the sheet open", async () => {
@@ -141,13 +141,13 @@ test("the device test sheet stores capabilities", async () => {
 test("sign out clears local data and goes to /welcome", async () => {
   const { services, router, user } = await setup();
   await services.progress.appendEvent({ type: "lesson_completed", refId: "l01", xp: 10, payload: {} }, NOW);
-  localStorage.setItem("vl-theme", "dark");
+  localStorage.setItem("tn-theme", "dark");
   await user.click(screen.getByRole("button", { name: fr.profile.account.signOut.open }));
   await user.click(await screen.findByRole("button", { name: fr.profile.account.signOut.confirm }));
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
-  expect(localStorage.getItem("vl-theme")).toBeNull();
+  expect(localStorage.getItem("tn-theme")).toBeNull();
   expect(await services.progress.listEvents()).toEqual([]);
-  expect(localStorage.getItem("vl-profile")).toBeNull();
+  expect(localStorage.getItem("tn-profile")).toBeNull();
   expect(useAppState.getState()).toMatchObject({ session: null, profile: null, snapshot: null });
 });
 
@@ -155,7 +155,7 @@ test("account deletion requires typing SUPPRIMER, then clears everything", async
   const { services, router, user } = await setup();
   await services.progress.appendEvent({ type: "lesson_completed", refId: "l01", xp: 10, payload: {} }, NOW);
   await services.progress.saveSettings({ ...DEFAULT_SETTINGS, theme: "dark", onboardingDone: true });
-  localStorage.setItem("vl-theme", "dark");
+  localStorage.setItem("tn-theme", "dark");
   const del = vi.spyOn(services.auth, "deleteAccount");
   await user.click(screen.getByRole("button", { name: fr.profile.account.delete.open }));
   const dialog = await screen.findByRole("alertdialog");
@@ -167,8 +167,8 @@ test("account deletion requires typing SUPPRIMER, then clears everything", async
   expect(del).toHaveBeenCalledTimes(1);
   expect(await services.progress.listEvents()).toEqual([]);
   expect((await services.progress.getSettings()).onboardingDone).toBe(false);
-  expect(localStorage.getItem("vl-profile")).toBeNull();
-  expect(localStorage.getItem("vl-theme")).toBeNull();
+  expect(localStorage.getItem("tn-profile")).toBeNull();
+  expect(localStorage.getItem("tn-theme")).toBeNull();
   expect(useAppState.getState().settings.onboardingDone).toBe(false);
 });
 
@@ -187,7 +187,7 @@ test("offline deletion shows an error toast and keeps the data", async () => {
   expect(await screen.findByText(fr.profile.account.offline)).toBeInTheDocument();
   expect(router.state.location.pathname).toBe("/me");
   expect(await services.progress.listEvents()).toHaveLength(1);
-  expect(localStorage.getItem("vl-profile")).not.toBeNull();
+  expect(localStorage.getItem("tn-profile")).not.toBeNull();
 });
 
 test("a failing clearAll after a successful delete still resets state and lands on /welcome", async () => {
@@ -200,7 +200,7 @@ test("a failing clearAll after a successful delete still resets state and lands 
   await user.click(within(dialog).getByRole("button", { name: fr.profile.account.delete.confirm }));
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
   expect(warn).toHaveBeenCalled();
-  expect(localStorage.getItem("vl-profile")).toBeNull();
+  expect(localStorage.getItem("tn-profile")).toBeNull();
   expect(useAppState.getState()).toMatchObject({ session: null, profile: null, snapshot: null });
   warn.mockRestore();
 });
@@ -218,7 +218,7 @@ test("offline sign-out shows an error toast and wipes nothing", async () => {
   expect((await screen.findAllByText(fr.profile.account.offline)).length).toBeGreaterThan(0);
   expect(router.state.location.pathname).toBe("/me");
   expect(await services.progress.listEvents()).toHaveLength(1);
-  expect(localStorage.getItem("vl-profile")).not.toBeNull();
+  expect(localStorage.getItem("tn-profile")).not.toBeNull();
   expect(useAppState.getState().profile).not.toBeNull();
 });
 

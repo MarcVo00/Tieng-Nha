@@ -4,7 +4,7 @@ import type { AuthEvent, AuthService } from "@/ports";
 
 type Profile = { pseudo: string; avatarEmoji: string };
 
-const STORAGE_KEY = "vietlearn.fake-auth";
+const STORAGE_KEY = "tieng-nha.fake-auth";
 
 function storage(): Storage | null {
   try {

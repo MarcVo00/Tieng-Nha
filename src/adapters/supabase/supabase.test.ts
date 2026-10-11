@@ -101,11 +101,11 @@ describe("SupabaseAuthService offline session fallback", () => {
     await make(async () => ({ data: { session: { user: { id: "u1", email: "a@b.c" } } }, error: null })).getSession();
     const offline = make(async () => ({ data: { session: null }, error: retryable }));
     await expect(offline.getSession()).resolves.toEqual({ userId: "u1", email: "a@b.c" });
-    expect(localStorage.getItem("vl-session")).not.toBeNull();
+    expect(localStorage.getItem("tn-session")).not.toBeNull();
   });
 
   test("a thrown fetch failure uses the same cached fallback", async () => {
-    localStorage.setItem("vl-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
+    localStorage.setItem("tn-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
     const throwing = make(async () => {
       throw new TypeError("Failed to fetch");
     });
@@ -119,12 +119,12 @@ describe("SupabaseAuthService offline session fallback", () => {
   });
 
   test("a definitive missing session clears the cache; explicit sign-out clears it too", async () => {
-    localStorage.setItem("vl-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
+    localStorage.setItem("tn-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
     await expect(make(async () => ({ data: { session: null }, error: null })).getSession()).resolves.toBeNull();
-    expect(localStorage.getItem("vl-session")).toBeNull();
-    localStorage.setItem("vl-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
+    expect(localStorage.getItem("tn-session")).toBeNull();
+    localStorage.setItem("tn-session", JSON.stringify({ userId: "u1", email: "a@b.c" }));
     await new SupabaseAuthService({ auth: { signOut: async () => ({ error: null }) } } as never).signOut();
-    expect(localStorage.getItem("vl-session")).toBeNull();
+    expect(localStorage.getItem("tn-session")).toBeNull();
   });
 });
 

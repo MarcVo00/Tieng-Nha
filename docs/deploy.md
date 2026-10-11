@@ -1,10 +1,10 @@
-# Runbook de déploiement VietLearn
+# Runbook de déploiement Tiếng Nhà
 
 Document destiné à Marc. Toutes les actions qui demandent tes comptes (GitHub, Supabase, Netlify) sont faites **par toi**. Ne copie jamais une clé ou un secret dans ce fichier, dans un commit ou dans une conversation.
 
 Durée estimée : 1 h 30 environ, en une ou deux séances.
 
-> Repère : la branche de travail est `feat/v1`. Le dépôt GitHub s'appellera `vietlearn`, le projet Supabase `vietlearn-prod`.
+> Repère : la branche de travail est `feat/v1`. Le dépôt GitHub s'appellera `MarcVo00/Tieng-Nha`, le projet Supabase `tieng-nha`.
 
 ---
 
@@ -47,10 +47,10 @@ Pour arrêter la base locale ensuite : `npx supabase stop`.
 
 ## Étape 1 : GitHub
 
-1. Sur github.com : **New repository** → nom `vietlearn` → **Private** → ne coche aucune option d'initialisation (pas de README, pas de .gitignore).
+1. Sur github.com : **New repository** → nom `Tieng-Nha` → **Private** → ne coche aucune option d'initialisation (pas de README, pas de .gitignore).
 2. Dans le dossier du projet :
    ```bash
-   git remote add origin https://github.com/<ton-compte>/vietlearn.git
+   git remote add origin https://github.com/MarcVo00/Tieng-Nha.git
    git push -u origin feat/v1
    ```
    Si la branche `main` locale existe, pousse-la aussi : `git push origin main`.
@@ -72,7 +72,7 @@ Pour arrêter la base locale ensuite : `npx supabase stop`.
 
 ## Étape 2 : Supabase production
 
-1. Sur supabase.com : **New project** → nom `vietlearn-prod` → région **Europe** (West Europe / Paris ou Frankfurt) → choisis un mot de passe de base de données fort et **range-le dans ton gestionnaire de mots de passe** (jamais dans le dépôt).
+1. Sur supabase.com : **New project** → nom `tieng-nha` → région **Europe** (West Europe / Paris ou Frankfurt) → choisis un mot de passe de base de données fort et **range-le dans ton gestionnaire de mots de passe** (jamais dans le dépôt).
 2. Récupère la **référence du projet** (Project Settings → General → « Reference ID »).
 3. En local :
    ```bash
@@ -105,7 +105,7 @@ L'application utilise la connexion par **code à 6 chiffres reçu par e-mail** (
    - **Magic Link** ;
    - **Confirm signup**.
 
-   Pour chacun, colle le contenu de `supabase/templates/otp.html` et mets le sujet `Ton code VietLearn`. Le corps **doit contenir `{{ .Token }}`** : c'est lui qui affiche le code à 6 chiffres. Sans lui, l'e-mail ne contient qu'un lien et la connexion échoue.
+   Pour chacun, colle le contenu de `supabase/templates/otp.html` et mets le sujet `Ton code Tiếng Nhà`. Le corps **doit contenir `{{ .Token }}`** : c'est lui qui affiche le code à 6 chiffres. Sans lui, l'e-mail ne contient qu'un lien et la connexion échoue.
 3. **Authentication → URL Configuration** :
    - **Site URL** = l'URL Netlify (obtenue à l'étape 5, reviens ici ensuite) ;
    - **Redirect URLs** : ajoute la même URL Netlify.
@@ -130,7 +130,7 @@ Si tu ne le fais pas : fais inscrire les personnes **quelques-unes à la fois**,
 
 ## Étape 5 : Netlify
 
-1. Sur netlify.com : **Add new site → Import an existing project → GitHub** → dépôt `vietlearn` (branche de production : `main`).
+1. Sur netlify.com : **Add new site → Import an existing project → GitHub** → dépôt `Tieng-Nha` (branche de production : `main`).
 2. Les réglages de build viennent de `netlify.toml` (commande `npm run build`, dossier `dist`, Node 20) ; ne les change pas. La redirection SPA (`/* → /index.html`) vient de `public/_redirects`.
 3. **Site configuration → Environment variables**, ajoute :
 
@@ -143,7 +143,7 @@ Si tu ne le fais pas : fais inscrire les personnes **quelques-unes à la fois**,
    | `VITE_FAKE_SPEECH` | `false` |
 
    **Garde-fou :** l'application refuse de démarrer si elle est compilée avec `VITE_USE_FAKES=true` sur un vrai domaine (hors `localhost` / `127.0.0.1`). Si tu vois un écran d'erreur au lieu de l'app, vérifie d'abord ces variables. Elles sont lues au moment du **build** : après toute modification, redéploie (Deploys → Trigger deploy → Clear cache and deploy site).
-4. Lance le déploiement. Optionnel : **Site configuration → Change site name** → `vietlearn-<nom>.netlify.app`.
+4. Lance le déploiement. Optionnel : **Site configuration → Change site name** → `tieng-nha.netlify.app`.
 5. Copie l'URL finale et retourne à l'**étape 3.3** (Site URL et Redirect URLs de Supabase) si ce n'est pas fait.
 6. URL de production, à compléter : `<URL à compléter>`
 

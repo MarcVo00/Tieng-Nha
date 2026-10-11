@@ -1,8 +1,8 @@
-import { VietLearnDb, DexieProgressRepository, DexieOutbox, DexieReportQueue, THEME_STORAGE_KEY } from "@/adapters/dexie";
+import { TiengNhaDb, DexieProgressRepository, DexieOutbox, DexieReportQueue, THEME_STORAGE_KEY } from "@/adapters/dexie";
 
 const NOW = "2026-10-10T08:00:00.000Z";
-let db: VietLearnDb;
-beforeEach(() => { db = new VietLearnDb(`test-${crypto.randomUUID()}`); });
+let db: TiengNhaDb;
+beforeEach(() => { db = new TiengNhaDb(`test-${crypto.randomUUID()}`); });
 afterEach(async () => { await db.delete(); });
 
 test("events are appended with uuid/createdAt and listed in order", async () => {

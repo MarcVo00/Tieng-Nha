@@ -1,9 +1,9 @@
-import type { VietLearnDb } from "@/adapters/dexie/db";
+import type { TiengNhaDb } from "@/adapters/dexie/db";
 
 export type QueuedReport = { id: number; refId: string; message: string; contentVersion?: number };
 
 export class DexieReportQueue {
-  constructor(private readonly db: VietLearnDb) {}
+  constructor(private readonly db: TiengNhaDb) {}
 
   async add(r: { refId: string; message: string; contentVersion?: number }): Promise<void> {
     await this.db.reports.add(r);

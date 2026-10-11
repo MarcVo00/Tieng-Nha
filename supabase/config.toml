@@ -146,11 +146,11 @@ otp_expiry = 3600
 
 # Uncomment to customize email template
 [auth.email.template.magic_link]
-subject = "Ton code VietLearn"
+subject = "Ton code Tiếng Nhà"
 content_path = "./supabase/templates/otp.html"
 
 [auth.email.template.confirmation]
-subject = "Ton code VietLearn"
+subject = "Ton code Tiếng Nhà"
 content_path = "./supabase/templates/otp.html"
 
 # [auth.email.template.invite]

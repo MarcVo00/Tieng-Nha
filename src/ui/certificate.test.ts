@@ -35,7 +35,7 @@ test("draws the pseudo, the score and the mention with the border and seal", asy
   expect(texts).toContain("92 / 100");
   expect(texts).toContain("Très bien");
   expect(texts).toContain("Chứng nhận");
-  expect(texts).toContain("VietLearn");
+  expect(texts).toContain("Tiếng Nhà");
   expect(texts).not.toContain("Sans épreuve orale");
   expect(calls.filter(([n]) => n === "strokeRect")).toHaveLength(2); // double border
   expect(calls.some(([n]) => n === "fillRect")).toBe(true);

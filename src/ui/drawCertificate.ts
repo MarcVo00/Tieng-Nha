@@ -132,7 +132,7 @@ export async function drawCertificate(
   ctx.beginPath();
   ctx.arc(w - at(330), at(1040), at(72), 0, Math.PI * 2);
   ctx.stroke();
-  text(ctx, fr.exam.certificate.seal, w - at(330), at(1052), `800 ${at(30)}px ${FONT}`, PAPER.onPrimary);
+  text(ctx, fr.exam.certificate.seal, w - at(330), at(1052), `800 ${at(26)}px ${FONT}`, PAPER.onPrimary, "center", at(124));
 }
 
 /** Renders the certificate to a PNG blob; null when the canvas API is unavailable. */
@@ -146,14 +146,14 @@ export async function certificateToBlob(data: CertificateData, size = CERTIFICAT
   return new Promise((resolve) => canvas.toBlob((b) => resolve(b), "image/png"));
 }
 
-/** Downloads the certificate as `vietlearn-certificat.png`. Returns false when it could not be created. */
+/** Downloads the certificate as `tieng-nha-certificat.png`. Returns false when it could not be created. */
 export async function downloadCertificate(data: CertificateData): Promise<boolean> {
   const blob = await certificateToBlob(data);
   if (!blob) return false;
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "vietlearn-certificat.png";
+  link.download = "tieng-nha-certificat.png";
   document.body.appendChild(link);
   link.click();
   link.remove();

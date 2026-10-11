@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: "prompt",
       includeAssets: ["favicon.ico", "icons/apple-touch-icon-180x180.png", "icons/icon.svg"],
       manifest: {
-        name: "VietLearn",
-        short_name: "VietLearn",
+        name: "Tiếng Nhà",
+        short_name: "Tiếng Nhà",
         lang: "fr",
         start_url: "/",
         scope: "/",

@@ -1,5 +1,7 @@
 # VietLearn — Spécification de design (V1)
 
+> Nom final de l'app : Tiếng Nhà (anciennement VietLearn)
+
 > Statut : **validé** par Marc le 2026-10-09. Toute déviation doit faire l'objet d'un nouvel ADR (`docs/adr/`).
 > Langue des docs : français. Langue du code (identifiants, commentaires, commits) : anglais.
 

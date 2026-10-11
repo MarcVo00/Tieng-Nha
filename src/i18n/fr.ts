@@ -2,7 +2,7 @@
 export const fr = {
   // --- app ---
   app: {
-    name: "VietLearn",
+    name: "Tiếng Nhà",
     loading: "Chargement…",
     tabs: { learn: "Apprendre", review: "Révision", leaderboard: "Classement", me: "Moi" },
     header: { profile: "Ouvrir mon profil" },
@@ -188,7 +188,7 @@ export const fr = {
       next: "Continuer",
     },
     install: {
-      title: "Garde VietLearn sous la main",
+      title: "Garde Tiếng Nhà sous la main",
       lead: "Installée, l'app s'ouvre en plein écran et marche même sans réseau.",
       iosSteps: [
         "Touche l'icône Partager en bas de Safari",
@@ -203,7 +203,7 @@ export const fr = {
     callback: {
       title: "Connexion réussie !",
       body: "Reviens dans l'application et saisis le code à 6 chiffres reçu par e-mail.",
-      open: "Ouvrir VietLearn",
+      open: "Ouvrir Tiếng Nhà",
     },
   },
   // --- home ---
@@ -415,7 +415,7 @@ export const fr = {
       achievement: "a réussi le test final de vietnamien du Sud",
       score: (n: number) => `${n} / 100`,
       noSpeaking: "Sans épreuve orale",
-      seal: "VietLearn",
+      seal: "Tiếng Nhà",
       aria: (pseudo: string, score: number) => `Certificat de réussite de ${pseudo}, ${score} sur 100`,
       mention: { excellent: "Excellent", tres_bien: "Très bien", bien: "Bien" },
     },

@@ -67,7 +67,7 @@ function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking }: Certif
         </text>
         <circle cx={W - 330} cy={1040} r={86} className="fill-primary" />
         <circle cx={W - 330} cy={1040} r={72} fill="none" strokeWidth={5} className="stroke-gold" />
-        <text x={W - 330} y={1052} textAnchor="middle" fontSize={30} fontWeight={800} className="fill-primary-on">
+        <text x={W - 330} y={1052} textAnchor="middle" fontSize={26} fontWeight={800} lang="vi" className="fill-primary-on">
           {fr.exam.certificate.seal}
         </text>
       </svg>

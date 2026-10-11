@@ -54,7 +54,7 @@ test("focus routes hide the tab bar", async () => {
 test("saved dark theme never drops the dark class during bootstrap", async () => {
   const services = await onboardedServices();
   await services.progress.saveSettings({ theme: "dark", voiceRate: "normal", capabilities: null, onboardingDone: true });
-  localStorage.setItem("vl-theme", "dark");
+  localStorage.setItem("tn-theme", "dark");
   document.documentElement.classList.add("dark"); // as the inline script in index.html does
   let removed = false;
   const observer = new MutationObserver(() => {
@@ -67,7 +67,7 @@ test("saved dark theme never drops the dark class during bootstrap", async () =>
   observer.disconnect();
   expect(removed).toBe(false);
   expect(document.documentElement.classList.contains("dark")).toBe(true);
-  expect(localStorage.getItem("vl-theme")).toBe("dark");
+  expect(localStorage.getItem("tn-theme")).toBe("dark");
   document.documentElement.classList.remove("dark");
 });
 
@@ -84,8 +84,8 @@ test("a failing bootstrap still reaches a rendered app", async () => {
 test("offline cold start with an expired token keeps the cached profile and saved settings", async () => {
   const services = await onboardedServices();
   await services.progress.saveSettings({ theme: "dark", voiceRate: "slow", capabilities: null, onboardingDone: true });
-  localStorage.setItem("vl-session", JSON.stringify({ userId: "me", email: "a@b.c" }));
-  localStorage.setItem("vl-profile", JSON.stringify({ pseudo: "Marc", avatarEmoji: "🐉" }));
+  localStorage.setItem("tn-session", JSON.stringify({ userId: "me", email: "a@b.c" }));
+  localStorage.setItem("tn-profile", JSON.stringify({ pseudo: "Marc", avatarEmoji: "🐉" }));
   vi.spyOn(services.auth, "getSession").mockRejectedValue(new OfflineError());
   vi.spyOn(services.auth, "getMyProfile").mockRejectedValue(new OfflineError());
   const { router } = renderAt("/", services);

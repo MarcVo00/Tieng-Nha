@@ -2,7 +2,7 @@ import type { ProgressRepository } from "@/ports";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import type { AppEvent, LeaderboardRow, NewEvent, Settings, VocabProgress } from "@/domain/types";
 import { THEME_KEY } from "@/domain/storageKeys";
-import type { VietLearnDb } from "@/adapters/dexie/db";
+import type { TiengNhaDb } from "@/adapters/dexie/db";
 
 export const THEME_STORAGE_KEY = THEME_KEY;
 const SETTINGS_KEY = "settings";
@@ -10,7 +10,7 @@ const lbKey = (p: "week" | "all") => `leaderboard:${p}`;
 
 export class DexieProgressRepository implements ProgressRepository {
   constructor(
-    private readonly db: VietLearnDb,
+    private readonly db: TiengNhaDb,
     private readonly storage: Pick<Storage, "setItem"> | undefined = typeof localStorage === "undefined" ? undefined : localStorage,
   ) {}
 

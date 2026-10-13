@@ -70,6 +70,32 @@ test("theme change persists in the stored settings", async () => {
   await waitFor(async () => expect((await services.progress.getSettings()).voiceRate).toBe("slow"));
 });
 
+test("voice selection persists and defaults to the Southern female voice", async () => {
+  const { services, user } = await setup();
+  expect(screen.getByRole("radio", { name: "Sud · Mỹ Duyên (femme)" })).toBeChecked();
+  expect(screen.getAllByRole("radio", { name: /^(Sud|Nord|Voix du téléphone)/ })).toHaveLength(5);
+  await user.click(screen.getByRole("radio", { name: "Nord · Phạm Tuyên (homme)" }));
+  expect(useAppState.getState().settings.voice).toBe("north-m");
+  await waitFor(async () => expect((await services.progress.getSettings()).voice).toBe("north-m"));
+  expect(screen.getByRole("radio", { name: "Nord · Phạm Tuyên (homme)" })).toBeChecked();
+});
+
+test("previewing a voice speaks the sample with that voice without saving it", async () => {
+  const { services, user } = await setup();
+  const speak = vi.spyOn(services.tts, "speak");
+  await user.click(screen.getByRole("button", { name: fr.profile.settings.voicePack.preview("Nord · Đoan Trang (femme)") }));
+  expect(speak).toHaveBeenCalledWith("Xin chào bạn!", { rate: 1, voice: "north-f" });
+  expect(useAppState.getState().settings.voice).toBe("south-f");
+  expect((await services.progress.getSettings()).voice).toBe("south-f");
+});
+
+test("a preview that cannot play shows a toast", async () => {
+  const { services, user } = await setup();
+  vi.spyOn(services.tts, "speak").mockRejectedValue(new Error("tts_unavailable"));
+  await user.click(screen.getByRole("button", { name: fr.profile.settings.voicePack.preview("Voix du téléphone") }));
+  expect(await screen.findByText(fr.profile.settings.voicePack.previewError)).toBeInTheDocument();
+});
+
 test("a failing settings save shows a toast instead of an unhandled rejection", async () => {
   const { services, user } = await setup();
   vi.spyOn(services.progress, "saveSettings").mockRejectedValue(new Error("disk"));

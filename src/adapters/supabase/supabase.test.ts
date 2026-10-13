@@ -128,6 +128,12 @@ describe("SupabaseAuthService offline session fallback", () => {
   });
 });
 
+test("AuthRetryableFetchError with HTTP 5xx is a server error, not offline", () => {
+  const e = mapError({ name: "AuthRetryableFetchError", message: "Error sending magic link email", status: 500 });
+  expect(e).not.toBeInstanceOf(OfflineError);
+  expect(e.message).toBe("server_error");
+});
+
 test("AuthRetryableFetchError maps to OfflineError", () => {
   expect(mapError({ name: "AuthRetryableFetchError", message: "x" })).toBeInstanceOf(OfflineError);
 });

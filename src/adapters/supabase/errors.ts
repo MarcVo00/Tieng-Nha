@@ -1,10 +1,13 @@
 import { ExamLimitError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, PseudoTakenError } from "@/domain/errors";
 
 /** Maps Supabase/PostgREST/network errors to domain errors. */
-export function mapError(err: { name?: string | undefined; message?: string | undefined; code?: string | undefined } | null | undefined): Error {
+export function mapError(
+  err: { name?: string | undefined; message?: string | undefined; code?: string | undefined; status?: number | undefined } | null | undefined,
+): Error {
   const msg = err?.message ?? "";
   if (typeof navigator !== "undefined" && !navigator.onLine) return new OfflineError();
-  if (err?.name === "AuthRetryableFetchError") return new OfflineError();
+  // auth-js also flags HTTP 5xx as "retryable": only status 0 is a real network failure.
+  if (err?.name === "AuthRetryableFetchError") return (err.status ?? 0) === 0 ? new OfflineError() : new Error("server_error");
   if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(msg)) return new OfflineError();
   if (err?.name === "AuthSessionMissingError" || /auth session missing/i.test(msg)) return new NotAuthenticatedError();
   if (msg.includes("invalid_profile")) return new InvalidProfileError();

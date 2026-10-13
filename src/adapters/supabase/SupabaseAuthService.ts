@@ -23,8 +23,8 @@ export class SupabaseAuthService implements AuthService {
     const { data, error } = result;
     if (error) {
       const mapped = mapError(error);
-      // An expired token that cannot refresh offline is not a sign-out: keep the last known identity.
-      if (mapped instanceof OfflineError) {
+      // An expired token that cannot refresh (offline or server outage) is not a sign-out: keep the last known identity.
+      if (mapped instanceof OfflineError || error.name === "AuthRetryableFetchError") {
         const cached = readCachedSession();
         if (cached) return cached;
       }

@@ -4,5 +4,5 @@ export { WebSpeechRecognizer } from "@/adapters/speech/WebSpeechRecognizer";
 export type { RecognitionWindow } from "@/adapters/speech/WebSpeechRecognizer";
 export { MediaRecorderVoiceRecorder } from "@/adapters/speech/MediaRecorderVoiceRecorder";
 export { createDetectCapabilities } from "@/adapters/speech/capabilities";
-export { AudioPackSynthesizer } from "@/adapters/speech/AudioPackSynthesizer";
-export type { AudioLike, AudioPackOptions, PrefetchResult } from "@/adapters/speech/AudioPackSynthesizer";
+export { AudioPackSynthesizer, AudioPackManifestSchema } from "@/adapters/speech/AudioPackSynthesizer";
+export type { AudioLike, AudioPackOptions, GestureTarget, PrefetchResult } from "@/adapters/speech/AudioPackSynthesizer";

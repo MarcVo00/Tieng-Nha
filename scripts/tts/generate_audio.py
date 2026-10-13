@@ -10,6 +10,7 @@ content change only generates the new texts. See scripts/tts/README.md.
 import argparse
 import hashlib
 import json
+import os
 import pathlib
 import shutil
 import subprocess
@@ -60,11 +61,17 @@ def download_model(local_dir: pathlib.Path) -> pathlib.Path:
 
 
 def convert_to_mp3(wav: pathlib.Path, mp3: pathlib.Path) -> None:
+    """Writes to <name>.tmp then renames, so an interrupted run never leaves a truncated MP3 that would be skipped later."""
     mp3.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(
-        ["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-ac", "1", "-ar", "24000", "-b:a", "32k", str(mp3)],
-        check=True,
-    )
+    tmp = mp3.with_name(mp3.name + ".tmp")
+    try:
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-ac", "1", "-ar", "24000", "-b:a", "32k", "-f", "mp3", str(tmp)],
+            check=True,
+        )
+        os.replace(tmp, mp3)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def write_manifest(out: pathlib.Path, texts: list[str]) -> None:
@@ -88,7 +95,7 @@ def main() -> int:
     parser.add_argument("--download-model", metavar="DIR", help="download the model into DIR first and use DIR/onnx_update")
     parser.add_argument("--deref-hf-cache", action="store_true", help="replace Hugging Face cache symlinks by copies (Windows)")
     parser.add_argument("--texts", default=str(HERE / "texts.json"))
-    parser.add_argument("--out", default="public/audio")
+    parser.add_argument("--out", default=str(HERE.parent.parent / "public" / "audio"), help="default: <repo>/public/audio")
     parser.add_argument("--limit", type=int, default=None, help="max new files per voice (smoke tests)")
     parser.add_argument("--manifest-only", action="store_true", help="only rewrite manifest.json from the MP3s on disk (no model, no ffmpeg)")
     args = parser.parse_args()

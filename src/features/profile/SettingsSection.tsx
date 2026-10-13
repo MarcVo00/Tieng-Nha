@@ -65,7 +65,7 @@ function VoicePicker({ value, onChange }: { value: VoiceId; onChange(v: VoiceId)
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                aria-label={voiceLabel(id)}
+                aria-labelledby={`voice-opt-${id}`}
                 whileTap={tap}
                 onClick={() => onChange(id)}
                 className={`flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-md border-2 px-3 text-left ${
@@ -78,7 +78,7 @@ function VoicePicker({ value, onChange }: { value: VoiceId; onChange(v: VoiceId)
                 >
                   {selected ? <span className="h-2.5 w-2.5 rounded-full bg-primary" /> : null}
                 </span>
-                <span aria-hidden="true" className={`text-body-strong ${selected ? "text-ink" : "text-ink-muted"}`}>
+                <span id={`voice-opt-${id}`} className={`text-body-strong ${selected ? "text-ink" : "text-ink-muted"}`}>
                   {o.prefix}
                   {o.name ? <span lang="vi">{o.name}</span> : null}
                   {o.suffix}

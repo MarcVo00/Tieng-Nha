@@ -36,10 +36,19 @@ test("listDueVocab orders by dueAt ascending and respects the limit", async () =
 test("settings default, save, and theme mirrored to storage", async () => {
   const store = new Map<string, string>();
   const repo = new DexieProgressRepository(db, { setItem: (k, v) => void store.set(k, v) });
-  expect(await repo.getSettings()).toEqual({ theme: "system", voiceRate: "normal", capabilities: null, onboardingDone: false });
-  await repo.saveSettings({ theme: "dark", voiceRate: "slow", capabilities: { tts: true, stt: false, recorder: true }, onboardingDone: true });
+  expect(await repo.getSettings()).toEqual({ theme: "system", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: false });
+  await repo.saveSettings({ theme: "dark", voiceRate: "slow", voice: "north-m", capabilities: { tts: true, stt: false, recorder: true }, onboardingDone: true });
   expect((await repo.getSettings()).theme).toBe("dark");
+  expect((await repo.getSettings()).voice).toBe("north-m");
   expect(store.get(THEME_STORAGE_KEY)).toBe("dark");
+});
+
+test("settings saved before voice packs get the default voice; unknown voices are reset", async () => {
+  const repo = new DexieProgressRepository(db);
+  await db.kv.put({ key: "settings", value: { theme: "dark", voiceRate: "slow", capabilities: null, onboardingDone: true } });
+  expect(await repo.getSettings()).toMatchObject({ theme: "dark", voiceRate: "slow", voice: "south-f" });
+  await db.kv.put({ key: "settings", value: { theme: "dark", voiceRate: "slow", voice: "klingon", capabilities: null, onboardingDone: true } });
+  expect((await repo.getSettings()).voice).toBe("south-f");
 });
 
 test("leaderboard cache roundtrip", async () => {

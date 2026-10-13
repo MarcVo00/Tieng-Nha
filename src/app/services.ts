@@ -1,5 +1,5 @@
 import type { Env, Flags } from "@/domain/config";
-import type { Capabilities } from "@/domain/types";
+import type { Capabilities, VoiceId } from "@/domain/types";
 import type {
   AuthService, ContentReporter, ContentSource, ConversationEngine, EventSink, ExamGateway, LeaderboardRepository,
   Outbox, ProgressRepository, SpeechRecognizer, SpeechSynthesizer, VoiceRecorder,
@@ -22,6 +22,7 @@ export type Services = {
   stt: SpeechRecognizer;
   recorder: VoiceRecorder;
   detectCapabilities: () => Promise<Capabilities>; // real implementation in T12 (waits for TTS voices)
+  prefetchVoice: (voice: VoiceId) => Promise<{ done: number; total: number }>; // downloads a voice pack in the background
   conversation: ConversationEngine;
   reporter: ContentReporter;
   activity: ActivityService; // real implementation in T07

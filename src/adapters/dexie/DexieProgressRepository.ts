@@ -1,6 +1,6 @@
 import type { ProgressRepository } from "@/ports";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
-import type { AppEvent, LeaderboardRow, NewEvent, Settings, VocabProgress } from "@/domain/types";
+import { VOICE_IDS, type AppEvent, type LeaderboardRow, type NewEvent, type Settings, type VocabProgress } from "@/domain/types";
 import { THEME_KEY } from "@/domain/storageKeys";
 import type { TiengNhaDb } from "@/adapters/dexie/db";
 
@@ -37,7 +37,9 @@ export class DexieProgressRepository implements ProgressRepository {
   }
   async getSettings(): Promise<Settings> {
     const row = await this.db.kv.get(SETTINGS_KEY);
-    return { ...DEFAULT_SETTINGS, ...((row?.value as Partial<Settings> | undefined) ?? {}) };
+    const merged: Settings = { ...DEFAULT_SETTINGS, ...((row?.value as Partial<Settings> | undefined) ?? {}) };
+    // Rows saved before voice packs have no voice; unknown values fall back to the default too.
+    return VOICE_IDS.includes(merged.voice) ? merged : { ...merged, voice: DEFAULT_SETTINGS.voice };
   }
   async saveSettings(s: Settings): Promise<void> {
     await this.db.kv.put({ key: SETTINGS_KEY, value: s });

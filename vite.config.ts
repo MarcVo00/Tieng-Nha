@@ -27,8 +27,20 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,woff2,json}"],
+        // Voice packs are tens of MB: fetched on demand (see runtimeCaching), never precached.
+        globIgnores: ["audio/**"],
         navigateFallback: "/index.html",
-        runtimeCaching: [{ urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i, handler: "NetworkOnly" }],
+        runtimeCaching: [
+          { urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i, handler: "NetworkOnly" },
+          // The manifest changes when a pack is regenerated: serve the cached copy at once, refresh it for next time.
+          { urlPattern: /\/audio\/manifest\.json$/, handler: "StaleWhileRevalidate", options: { cacheName: "audio-manifest" } },
+          // MP3 names are content hashes, so a cached file never goes stale. Safari's audio element needs range support.
+          {
+            urlPattern: /\/audio\/.*\.mp3$/,
+            handler: "CacheFirst",
+            options: { cacheName: "audio", expiration: { maxEntries: 3000 }, cacheableResponse: { statuses: [200] }, rangeRequests: true },
+          },
+        ],
       },
     }),
   ],

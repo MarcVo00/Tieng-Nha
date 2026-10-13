@@ -1,9 +1,11 @@
 import type { Env } from "@/domain/config";
+import type { VoiceId } from "@/domain/types";
 import type { Services } from "@/app/services";
 import { flags } from "@/app/flags";
+import { useAppState } from "@/app/appState";
 import { createFakeServices, FakeAuthService, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
 import { TiengNhaDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
-import { WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
+import { AudioPackSynthesizer, WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
 import { createStaticContentSource } from "@/adapters/content";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
 import {
@@ -23,13 +25,16 @@ export function createServices(env: Env): Services {
   const content = createStaticContentSource();
 
   // Speech
-  const tts = env.VITE_FAKE_SPEECH ? new FakeSpeechSynthesizer() : new WebSpeechSynthesizer();
+  const tts = env.VITE_FAKE_SPEECH
+    ? new FakeSpeechSynthesizer()
+    : new AudioPackSynthesizer(new WebSpeechSynthesizer(), { getVoice: () => useAppState.getState().settings.voice });
   const stt = env.VITE_FAKE_SPEECH ? new FakeSpeechRecognizer() : new WebSpeechRecognizer();
   const recorder = env.VITE_FAKE_SPEECH ? new FakeVoiceRecorder() : new MediaRecorderVoiceRecorder();
   const detectCapabilities =
-    tts instanceof WebSpeechSynthesizer
+    tts instanceof AudioPackSynthesizer
       ? createDetectCapabilities(tts, stt, recorder)
       : async () => ({ tts: true, stt: true, recorder: true });
+  const prefetchVoice = async (voice: VoiceId) => (tts instanceof AudioPackSynthesizer ? tts.prefetchVoice(voice) : { done: 0, total: 0 });
 
   // Remote (fake or Supabase)
   let remote: Remote;
@@ -58,7 +63,7 @@ export function createServices(env: Env): Services {
   const activity = createActivityService({ progress, outbox, content, clock, onEventAppended: () => sync.notifyEnqueued() });
 
   return {
-    env, flags, clock, content, progress, outbox, ...remote, tts, stt, recorder, detectCapabilities,
+    env, flags, clock, content, progress, outbox, ...remote, tts, stt, recorder, detectCapabilities, prefetchVoice,
     conversation: new ScriptedConversationEngine(content), activity, sync,
   };
 }

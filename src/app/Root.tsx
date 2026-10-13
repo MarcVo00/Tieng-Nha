@@ -4,7 +4,7 @@ import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { readCachedSession } from "@/domain/sessionCache";
 import type { Session } from "@/domain/types";
 import { OfflineError } from "@/domain/errors";
-import { clearCachedProfile, readCachedProfile, useAppState, useRefreshProgress, writeCachedProfile, type AppProfile } from "@/app/appState";
+import { clearCachedProfile, readCachedProfile, useAppState, useRefreshProgress, useVoicePrefetch, writeCachedProfile, type AppProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { ThemeController } from "@/app/ThemeController";
 import { UpdatePrompt } from "@/app/UpdatePrompt";
@@ -24,6 +24,7 @@ export function Root() {
   const { auth, progress, sync } = useServices();
   const refreshProgress = useRefreshProgress();
   const ready = useAppState((s) => s.ready);
+  useVoicePrefetch();
 
   useEffect(() => {
     let cancelled = false;

@@ -27,7 +27,7 @@ async function onboardedServices() {
   const services = createFakeServices();
   await services.auth.verifyOtp("a@b.c", "123456");
   await services.auth.joinGroup("TEST-CODE", "Marc", "🐉");
-  await services.progress.saveSettings({ theme: "system", voiceRate: "normal", capabilities: { tts: true, stt: true, recorder: true }, onboardingDone: true });
+  await services.progress.saveSettings({ theme: "system", voiceRate: "normal", voice: "south-f", capabilities: { tts: true, stt: true, recorder: true }, onboardingDone: true });
   return services;
 }
 
@@ -53,7 +53,7 @@ test("focus routes hide the tab bar", async () => {
 
 test("saved dark theme never drops the dark class during bootstrap", async () => {
   const services = await onboardedServices();
-  await services.progress.saveSettings({ theme: "dark", voiceRate: "normal", capabilities: null, onboardingDone: true });
+  await services.progress.saveSettings({ theme: "dark", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: true });
   localStorage.setItem("tn-theme", "dark");
   document.documentElement.classList.add("dark"); // as the inline script in index.html does
   let removed = false;
@@ -83,7 +83,7 @@ test("a failing bootstrap still reaches a rendered app", async () => {
 
 test("offline cold start with an expired token keeps the cached profile and saved settings", async () => {
   const services = await onboardedServices();
-  await services.progress.saveSettings({ theme: "dark", voiceRate: "slow", capabilities: null, onboardingDone: true });
+  await services.progress.saveSettings({ theme: "dark", voiceRate: "slow", voice: "south-f", capabilities: null, onboardingDone: true });
   localStorage.setItem("tn-session", JSON.stringify({ userId: "me", email: "a@b.c" }));
   localStorage.setItem("tn-profile", JSON.stringify({ pseudo: "Marc", avatarEmoji: "🐉" }));
   vi.spyOn(services.auth, "getSession").mockRejectedValue(new OfflineError());
@@ -120,4 +120,16 @@ test("returning to the app flushes pending sync", async () => {
   flush.mockClear();
   document.dispatchEvent(new Event("visibilitychange"));
   expect(flush).toHaveBeenCalledTimes(1);
+});
+
+test("the selected voice pack is prefetched once ready, and again when the voice changes", async () => {
+  const services = await onboardedServices();
+  const prefetch = vi.spyOn(services, "prefetchVoice");
+  renderAt("/", services);
+  await screen.findByRole("navigation");
+  await waitFor(() => expect(prefetch).toHaveBeenCalledWith("south-f"));
+  act(() => useAppState.getState().set({ settings: { ...useAppState.getState().settings, voice: "north-f" } }));
+  await waitFor(() => expect(prefetch).toHaveBeenCalledWith("north-f"));
+  act(() => useAppState.getState().set({ settings: { ...useAppState.getState().settings, voice: "device" } }));
+  expect(prefetch).toHaveBeenCalledTimes(2);
 });

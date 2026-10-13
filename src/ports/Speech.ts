@@ -1,4 +1,7 @@
-export type SpeakOptions = { rate?: number; audioUrl?: string };
+import type { VoiceId } from "@/domain/types";
+
+/** `voice` overrides the configured voice for this call only (settings preview). */
+export type SpeakOptions = { rate?: number; audioUrl?: string; voice?: VoiceId };
 export interface SpeechSynthesizer {
   isAvailable(): boolean; // a vi-VN voice exists (or audioUrl playback possible)
   speak(text: string, opts?: SpeakOptions): Promise<void>; // resolves when finished

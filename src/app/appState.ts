@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { z } from "zod";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Capabilities, ProgressSnapshot, Session, Settings } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { PROFILE_KEY } from "@/domain/storageKeys";
@@ -110,4 +110,15 @@ export function useDeviceTest() {
   }, [stt, refresh]);
 
   return { result, busy: busy !== null, listening: busy === "mic", testVoice, testMic, refresh };
+}
+
+/** Downloads the selected voice pack in the background (the service worker caches it). Once per voice per session. */
+export function useVoicePrefetch(): void {
+  const { prefetchVoice } = useServices();
+  const ready = useAppState((s) => s.ready);
+  const voice = useAppState((s) => s.settings.voice);
+  useEffect(() => {
+    if (!ready || voice === "device") return;
+    prefetchVoice(voice).catch(() => undefined);
+  }, [ready, voice, prefetchVoice]);
 }

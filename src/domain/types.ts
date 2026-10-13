@@ -68,9 +68,12 @@ export type VocabProgress = {
 
 export type Capabilities = { tts: boolean; stt: boolean; recorder: boolean };
 export type ThemePref = "system" | "light" | "dark";
+export const VOICE_IDS = ["south-f", "south-m", "north-f", "north-m", "device"] as const;
+export type VoiceId = (typeof VOICE_IDS)[number];
 export type Settings = {
   theme: ThemePref;
   voiceRate: "normal" | "slow";
+  voice: VoiceId; // which accent/voice pack speaks; "device" = browser speechSynthesis
   capabilities: Capabilities | null; // null = device test not done yet
   onboardingDone: boolean;
 };

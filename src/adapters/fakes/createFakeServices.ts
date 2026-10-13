@@ -48,6 +48,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     stt: new FakeSpeechRecognizer(),
     recorder: new FakeVoiceRecorder(),
     detectCapabilities: async () => ({ tts: true, stt: true, recorder: true }),
+    prefetchVoice: async () => ({ done: 0, total: 0 }),
     conversation: new ScriptedConversationEngine(content),
     reporter: new FakeContentReporter(),
     activity: createActivityService({ progress, outbox, content, clock, onEventAppended: () => sync.notifyEnqueued() }),

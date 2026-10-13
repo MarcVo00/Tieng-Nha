@@ -8,6 +8,9 @@ class FakeAudio implements AudioLike {
   playbackRate = 1;
   defaultPlaybackRate = 1;
   duration = Number.NaN;
+  currentTime = 0;
+  onplaying: ((ev: Event) => unknown) | null = null;
+  plan: Array<() => Promise<void>> = []; // results of the next play() calls, in order
   onended: ((ev: Event) => unknown) | null = null;
   onerror: ((ev: Event | string) => unknown) | null = null;
   onpause: ((ev: Event) => unknown) | null = null;
@@ -17,6 +20,8 @@ class FakeAudio implements AudioLike {
   playError: Error | null = null;
   play(): Promise<void> {
     this.playLog.push({ src: this.src, rate: this.playbackRate });
+    const planned = this.plan.shift();
+    if (planned) return planned();
     return this.playError ? Promise.reject(this.playError) : Promise.resolve();
   }
   pause(): void {
@@ -30,6 +35,9 @@ class FakeAudio implements AudioLike {
   }
   interrupt(): void {
     this.onpause?.(new Event("pause"));
+  }
+  playing(): void {
+    this.onplaying?.(new Event("playing"));
   }
   loaded(duration: number): void {
     this.duration = duration;
@@ -46,6 +54,7 @@ type SetupOptions = {
   manifestStatus?: number;
   failingFiles?: boolean;
   playError?: Error;
+  plan?: Array<() => Promise<void>>;
   gestureTarget?: GestureTarget | null;
   now?: () => number;
   waitForServiceWorker?: () => Promise<void>;
@@ -82,6 +91,7 @@ async function setup(over: SetupOptions = {}) {
     audioFactory: () => {
       const audio = new FakeAudio();
       if (over.playError) audio.playError = over.playError;
+      if (over.plan) audio.plan = over.plan;
       elements.push(audio);
       return audio;
     },
@@ -316,39 +326,86 @@ function fakeGestureTarget() {
   return { target, listeners };
 }
 
-test("the first gesture unlocks the shared element with a silent clip, once, then removes its listeners", async () => {
+test("the first gesture unlocks the shared element with a silent clip, then removes its listeners", async () => {
   const { target, listeners } = fakeGestureTarget();
   const { tts, audio, southKeys } = await setup({ gestureTarget: target });
   await tts.ready();
-  expect([...listeners.keys()].sort()).toEqual(["keydown", "pointerdown", "touchend"]);
-  const fire = listeners.get("pointerdown");
+  expect([...listeners.keys()].sort()).toEqual(["click", "keydown", "touchend"]); // not pointerdown: not an activation on iOS
+  const fire = listeners.get("touchend");
   fire?.();
-  expect(listeners.size).toBe(0);
+  fire?.(); // the same tap also fires click: no second unlock play while the first is pending
   expect(audio().playLog).toHaveLength(1);
-  expect(audio().playLog[0]?.src).toMatch(/^data:audio\/wav;base64,/);
+  expect(audio().playLog[0]?.src.startsWith("data:audio/wav;base64,")).toBe(true);
   await flush();
+  expect(listeners.size).toBe(0); // removed only after the silent play() resolved
   expect(audio().pauses).toBe(1); // the silent clip is paused again
-  fire?.(); // a second event is ignored
+  fire?.(); // ignored
   expect(audio().playLog).toHaveLength(1);
-  // the same element then plays the real clip
-  const done = tts.speak("xin chào");
+  const done = tts.speak("xin chào"); // the same element then plays the real clip
   expect(audio().playLog[1]?.src).toBe(`/audio/south-f/${southKeys[0]}.mp3`);
   audio().end();
   await done;
 });
 
-test("the unlock does not cut a playback started by the same gesture", async () => {
+test("a refused silent play() re-arms the unlock: the next gesture retries, succeeds, then removes the listeners", async () => {
   const { target, listeners } = fakeGestureTarget();
-  const { tts, audio, southKeys } = await setup({ gestureTarget: target });
+  const { tts, audio } = await setup({ gestureTarget: target, plan: [() => Promise.reject(new Error("NotAllowedError"))] });
   await tts.ready();
-  const done = tts.speak("xin chào"); // the tap's click handler ran first
-  listeners.get("keydown")?.();
+  listeners.get("touchend")?.();
   await flush();
-  expect(audio().playLog).toHaveLength(1);
-  expect(audio().playLog[0]?.src).toBe(`/audio/south-f/${southKeys[0]}.mp3`);
+  expect(listeners.size).toBe(3); // still armed
+  listeners.get("click")?.();
+  expect(audio().playLog).toHaveLength(2); // retried
+  await flush();
+  expect(listeners.size).toBe(0);
+  expect(audio().pauses).toBe(1);
+});
+
+test("a real playback that takes over while the silent play() is pending is not paused by it", async () => {
+  const { target, listeners } = fakeGestureTarget();
+  let resolveSilent: () => void = () => undefined;
+  const silent = new Promise<void>((resolve) => (resolveSilent = resolve));
+  const { tts, audio, southKeys } = await setup({ gestureTarget: target, plan: [() => silent] });
+  await tts.ready();
+  listeners.get("touchend")?.(); // silent play() starts and stays pending
+  const done = tts.speak("xin chào"); // the real clip takes the element over
+  expect(audio().playLog[1]?.src).toBe(`/audio/south-f/${southKeys[0]}.mp3`);
+  resolveSilent();
+  await flush();
   expect(audio().pauses).toBe(0);
   audio().end();
   await done;
+});
+
+test("a gesture while a real playback is running does not start an unlock play", async () => {
+  const { target, listeners } = fakeGestureTarget();
+  const { tts, audio } = await setup({ gestureTarget: target });
+  await tts.ready();
+  const done = tts.speak("xin chào");
+  listeners.get("keydown")?.();
+  await flush();
+  expect(audio().playLog).toHaveLength(1);
+  expect(audio().pauses).toBe(0);
+  audio().end();
+  await done;
+});
+
+test("buffering after the metadata does not cut a clip: the timer is re-armed on playing", async () => {
+  const { tts, fallback, audio } = await setup();
+  await tts.ready();
+  vi.useFakeTimers();
+  const done = tts.speak("xin chào");
+  audio().loaded(2); // would give up at 4 s
+  let settled = false;
+  void done.then(() => (settled = true));
+  await vi.advanceTimersByTimeAsync(3000);
+  audio().currentTime = 0.5;
+  audio().playing(); // playback resumed after buffering: 1.5 s left + 2 s margin from now
+  await vi.advanceTimersByTimeAsync(3400); // t = 6.4 s, past the original deadline
+  expect(settled).toBe(false);
+  await vi.advanceTimersByTimeAsync(200);
+  await done;
+  expect(fallback.spoken).toEqual([]);
 });
 
 test("isAvailable: pack files for the current voice, otherwise the fallback", async () => {

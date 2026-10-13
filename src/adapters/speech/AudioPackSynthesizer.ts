@@ -20,10 +20,12 @@ export type AudioLike = {
   playbackRate: number;
   defaultPlaybackRate: number;
   readonly duration: number;
+  readonly currentTime: number;
   onended: ((ev: Event) => unknown) | null;
   onerror: ((ev: Event | string) => unknown) | null;
   onpause: ((ev: Event) => unknown) | null;
   onloadedmetadata: ((ev: Event) => unknown) | null;
+  onplaying: ((ev: Event) => unknown) | null;
   play(): Promise<void>;
   pause(): void;
 };
@@ -57,7 +59,8 @@ const MANIFEST_RETRY_MS = 30_000;
 const LOAD_TIMEOUT_MS = 8000; // cap before the file's duration is known (stalled network)
 const END_MARGIN_MS = 2000; // after duration / rate
 const SERVICE_WORKER_WAIT_MS = 5000;
-const UNLOCK_EVENTS = ["pointerdown", "touchend", "keydown"] as const;
+// iOS only counts touchend / click / keydown as media activation (a touch pointerdown does not).
+const UNLOCK_EVENTS = ["touchend", "click", "keydown"] as const;
 // 2 samples of silence: just enough for play() to be accepted inside a gesture.
 const SILENT_WAV = "data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIAAACAgA==";
 
@@ -90,6 +93,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
   private readonly waitForServiceWorker: () => Promise<void>;
   private unlockListener: (() => void) | null = null;
   private unlockTarget: GestureTarget | null = null;
+  private unlocking = false;
 
   constructor(private readonly fallback: FallbackSynthesizer, opts: AudioPackOptions) {
     this.getVoice = opts.getVoice;
@@ -238,17 +242,21 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
    */
   private installUnlock(target: GestureTarget): void {
     const listener = () => {
-      if (this.unlockListener !== listener) return; // already used
-      this.removeUnlock();
-      if (this.playing) return; // a real playback started in this gesture already unlocks the element
+      if (this.unlockListener !== listener || this.unlocking) return; // already unlocked, or this tap is being handled
+      if (this.playing) return; // a real playback started in this gesture; stay armed in case it was refused
       const audio = this.getAudio();
+      this.unlocking = true;
       audio.src = SILENT_WAV;
       audio
         .play()
         .then(() => {
-          if (!this.playing) audio.pause();
+          this.unlocking = false;
+          this.removeUnlock(); // only now: a refused play() must leave the next gesture a chance
+          if (!this.playing) audio.pause(); // never cut a real playback that took over the element meanwhile
         })
-        .catch(() => undefined); // not unlocked: the next gesture cannot retry, speak() falls back as before
+        .catch(() => {
+          this.unlocking = false; // stay armed for the next gesture
+        });
     };
     this.unlockListener = listener;
     this.unlockTarget = target;
@@ -280,6 +288,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
         audio.onerror = null;
         audio.onpause = null;
         audio.onloadedmetadata = null;
+        audio.onplaying = null;
         if (this.playing === entry) this.playing = null;
         fn();
       };
@@ -292,21 +301,27 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
       audio.onended = () => settle(resolve);
       audio.onpause = () => settle(resolve); // an interruption (call, Siri, other app) only fires `pause`
       audio.onerror = () => settle(() => reject(new Error("audio_failed")));
-      audio.onloadedmetadata = () => {
+      // Once the length is known, (re)arm the timer for what is left of the clip; buffering pauses re-arm it on the "playing" event.
+      const armEndTimer = () => {
         clearTimeout(timer);
-        const seconds = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration / (rate > 0 ? rate : 1) : 5;
+        const length = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 5;
+        const left = Math.max(0, length - (Number.isFinite(audio.currentTime) ? audio.currentTime : 0));
         timer = setTimeout(
           () =>
             settle(() => {
               audio.pause();
               resolve();
             }),
-          seconds * 1000 + END_MARGIN_MS,
+          (left / (rate > 0 ? rate : 1)) * 1000 + END_MARGIN_MS,
         );
       };
+      audio.onloadedmetadata = armEndTimer;
+      audio.onplaying = () => {
+        if (Number.isFinite(audio.duration)) armEndTimer();
+      };
       timer = setTimeout(() => {
-        audio.pause();
         settle(() => reject(new Error("audio_stalled")));
+        audio.pause();
       }, LOAD_TIMEOUT_MS);
       this.playing = entry;
       // Setting `src` resets the rate to the default one, so set both after it.

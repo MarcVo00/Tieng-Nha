@@ -1,15 +1,18 @@
 import { z } from "zod";
 import type { VoiceId } from "@/domain/types";
 import type { SpeakOptions, SpeechSynthesizer } from "@/ports";
-import { speechKey } from "@/services/speechKey";
+import { normalizeSpeechText, speechKey } from "@/services/speechKey";
 
 const ManifestSchema = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
+  keys: z.record(z.string()), // normalised text -> key, so playback can start without hashing
   voices: z.array(z.object({ id: z.string(), keys: z.array(z.string()) })),
 });
 
-/** Voice id -> set of text keys that have a pre-generated MP3. */
-type Manifest = ReadonlyMap<string, ReadonlySet<string>>;
+type Manifest = {
+  keys: ReadonlyMap<string, string>; // normalised text -> key
+  voices: ReadonlyMap<string, ReadonlySet<string>>; // voice id -> keys that have a pre-generated MP3
+};
 
 /** The few HTMLAudioElement members we use (lets tests inject a fake). */
 export type AudioLike = {
@@ -55,6 +58,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
     this.manifestUrl = opts.manifestUrl ?? `${this.baseUrl}/manifest.json`;
     this.fetchFn = opts.fetchFn ?? ((input, init) => fetch(input, init));
     this.audioFactory = opts.audioFactory ?? ((url) => new Audio(url));
+    void this.loadManifest(); // preload at startup so speak() can start playback synchronously
   }
 
   /** Resolves once the manifest (cached after the first load) and the fallback voices are known. */
@@ -64,7 +68,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
 
   isAvailable(): boolean {
     const voice = this.getVoice();
-    if (voice !== "device" && (this.manifest?.get(voice)?.size ?? 0) > 0) return true;
+    if (voice !== "device" && (this.manifest?.voices.get(voice)?.size ?? 0) > 0) return true;
     return this.fallback.isAvailable();
   }
 
@@ -74,10 +78,17 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
     this.stopAudio();
     const voice = opts.voice ?? this.getVoice();
     if (voice !== "device") {
-      const manifest = await this.loadManifest();
-      const key = await speechKey(text);
-      if (generation !== this.generation) return; // cancelled or superseded while resolving the key
-      if (manifest?.get(voice)?.has(key)) {
+      // Fast path: manifest already loaded and text known -> play() starts synchronously inside the user gesture (iOS).
+      // Nothing may be awaited before this.play() on that path.
+      let manifest = this.manifest;
+      let key = manifest?.keys.get(normalizeSpeechText(text));
+      if (!manifest) {
+        manifest = await this.loadManifest();
+        key = manifest?.keys.get(normalizeSpeechText(text));
+      }
+      if (manifest && key === undefined) key = await speechKey(text); // text not in the map: hash it
+      if (generation !== this.generation) return; // cancelled or superseded while resolving
+      if (key !== undefined && manifest?.voices.get(voice)?.has(key)) {
         try {
           await this.play(`${this.baseUrl}/${voice}/${key}.mp3`, opts.rate ?? 1);
           return;
@@ -112,7 +123,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
 
   private async runPrefetch(voice: string): Promise<PrefetchResult> {
     const manifest = await this.loadManifest();
-    const keys = [...(manifest?.get(voice) ?? [])];
+    const keys = [...(manifest?.voices.get(voice) ?? [])];
     let done = 0;
     let next = 0;
     const worker = async (): Promise<void> => {
@@ -140,7 +151,10 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
         const res = await this.fetchFn(this.manifestUrl);
         if (!res.ok) return null;
         const parsed = ManifestSchema.parse(await res.json());
-        this.manifest = new Map(parsed.voices.map((v) => [v.id, new Set(v.keys)]));
+        this.manifest = {
+          keys: new Map(Object.entries(parsed.keys)),
+          voices: new Map(parsed.voices.map((v) => [v.id, new Set(v.keys)])),
+        };
         return this.manifest;
       } catch {
         return null; // behaves as the fallback

@@ -12,3 +12,5 @@ supabase/.temp/
 *.log
 .DS_Store
 vietlearn-design-workspace/
+__pycache__/
+*.pyc

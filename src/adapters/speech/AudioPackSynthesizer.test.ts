@@ -29,12 +29,13 @@ class FakeAudio implements AudioLike {
 
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
-type SetupOptions = { voice?: VoiceId; manifest?: unknown; manifestStatus?: number; failingFiles?: boolean; playError?: Error };
+type SetupOptions = { mapKeys?: boolean; voice?: VoiceId; manifest?: unknown; manifestStatus?: number; failingFiles?: boolean; playError?: Error };
 
 async function setup(over: SetupOptions = {}) {
   const southKeys = [await speechKey("xin chào"), await speechKey("cảm ơn")];
   const manifest = over.manifest ?? {
-    version: 1,
+    version: 2,
+    keys: over.mapKeys === false ? {} : { "xin chào": southKeys[0], "cảm ơn": southKeys[1] },
     voices: [
       { id: "south-f", accent: "south", gender: "female", label: "Mỹ Duyên", keys: southKeys },
       { id: "north-f", accent: "north", gender: "female", label: "Đoan Trang", keys: [] },
@@ -81,6 +82,36 @@ test("plays the pack file for the selected voice at the requested rate", async (
   instance(0).end();
   await done;
   expect(fallback.spoken).toEqual([]);
+});
+
+test("starts playback synchronously inside the call once the manifest is loaded (iOS user gesture)", async () => {
+  const { tts, fallback } = await setup();
+  await tts.ready();
+  const play = vi.spyOn(FakeAudio.prototype, "play");
+  const done = tts.speak("  xin chào ".normalize("NFD"));
+  expect(FakeAudio.instances).toHaveLength(1); // no await happened before the audio element was created...
+  expect(play).toHaveBeenCalledTimes(1); // ...and play() was already called
+  instance(0).end();
+  await done;
+  expect(fallback.spoken).toEqual([]);
+  play.mockRestore();
+});
+
+test("preloads the manifest at construction", async () => {
+  const { tts, fetched } = await setup();
+  await flush();
+  expect(fetched.filter((u) => u.endsWith("manifest.json"))).toHaveLength(1);
+  expect(tts.isAvailable()).toBe(true);
+});
+
+test("a text missing from the key map is hashed as a fallback and still played", async () => {
+  const { tts, southKeys } = await setup({ mapKeys: false });
+  await tts.ready();
+  const done = tts.speak("xin chào");
+  await vi.waitFor(() => expect(FakeAudio.instances).toHaveLength(1));
+  expect(instance(0).url).toBe(`/audio/south-f/${southKeys[0]}.mp3`);
+  instance(0).end();
+  await done;
 });
 
 test("falls back to device TTS when the key is missing from the manifest", async () => {
@@ -194,7 +225,7 @@ test("prefetchVoice fetches every file of the voice, at most 6 at a time, once p
   const fetched: string[] = [];
   const fetchFn = (async (input: RequestInfo | URL) => {
     const url = String(input);
-    if (url.endsWith("manifest.json")) return new Response(JSON.stringify({ version: 1, voices: [{ id: "south-m", keys }] }));
+    if (url.endsWith("manifest.json")) return new Response(JSON.stringify({ version: 2, keys: {}, voices: [{ id: "south-m", keys }] }));
     fetched.push(url);
     inFlight++;
     peak = Math.max(peak, inFlight);

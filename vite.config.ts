@@ -29,6 +29,8 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,svg,png,woff2,json}"],
         // Voice packs are tens of MB: fetched on demand (see runtimeCaching), never precached.
         globIgnores: ["audio/**"],
+        // First install takes control of the page, so the first-session voice prefetch goes through the cache. No skipWaiting: updates still wait for the prompt.
+        clientsClaim: true,
         navigateFallback: "/index.html",
         runtimeCaching: [
           { urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i, handler: "NetworkOnly" },

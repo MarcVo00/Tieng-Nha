@@ -75,7 +75,9 @@ def write_manifest(out: pathlib.Path, texts: list[str]) -> None:
         if present:
             voices.append({"id": voice_id, "accent": meta["accent"], "gender": meta["gender"], "label": meta["label"], "keys": present})
     out.mkdir(parents=True, exist_ok=True)
-    (out / "manifest.json").write_text(json.dumps({"version": 1, "voices": voices}, ensure_ascii=False) + "\n", encoding="utf-8")
+    # "keys" maps each normalised text to its key, so the app can start playback without hashing (iOS user gesture).
+    manifest = {"version": 2, "keys": dict(zip(texts, keys)), "voices": voices}
+    (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def main() -> int:
@@ -88,10 +90,19 @@ def main() -> int:
     parser.add_argument("--texts", default=str(HERE / "texts.json"))
     parser.add_argument("--out", default="public/audio")
     parser.add_argument("--limit", type=int, default=None, help="max new files per voice (smoke tests)")
+    parser.add_argument("--manifest-only", action="store_true", help="only rewrite manifest.json from the MP3s on disk (no model, no ffmpeg)")
     args = parser.parse_args()
 
     if args.deref_hf_cache:
         print("dereferenced", deref_hf_cache(), "cache files")
+    texts = json.loads(pathlib.Path(args.texts).read_text(encoding="utf-8"))
+    texts = sorted({normalize_speech_text(t) for t in texts if normalize_speech_text(t)})
+    out = pathlib.Path(args.out)
+    if args.manifest_only:
+        write_manifest(out, texts)
+        print("manifest written:", out / "manifest.json")
+        return 0
+
     onnx_dir = args.onnx_dir
     if args.download_model:
         onnx_dir = str(download_model(pathlib.Path(args.download_model)))
@@ -104,10 +115,6 @@ def main() -> int:
     unknown = [v for v in voice_ids if v not in VOICES]
     if unknown:
         parser.error(f"unknown voices: {', '.join(unknown)}")
-
-    texts = json.loads(pathlib.Path(args.texts).read_text(encoding="utf-8"))
-    texts = sorted({normalize_speech_text(t) for t in texts if normalize_speech_text(t)})
-    out = pathlib.Path(args.out)
 
     from vieneu import Vieneu  # imported late so --help works without the heavy dependency
 

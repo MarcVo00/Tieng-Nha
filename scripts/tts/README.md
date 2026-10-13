@@ -29,6 +29,7 @@ node scripts/tts/extract_texts.mjs          # -> scripts/tts/texts.json (every s
   --onnx-dir ../tts-tools/models/v3turbo/onnx_update
 ```
 Options: `--voices south-f,north-m` (subset), `--out public/audio`, `--limit 3` (max new files per voice, smoke test: write to a scratch `--out` and delete it).
+`--manifest-only` rewrites `manifest.json` (version 2: text -> key map + per-voice key lists) from the MP3s already on disk and `texts.json`, without the model or ffmpeg.
 The full run synthesises ~380 texts x 4 voices; it is resumable (existing MP3s are skipped).
 
 ## After changing content

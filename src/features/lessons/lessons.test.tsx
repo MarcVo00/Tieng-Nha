@@ -145,7 +145,7 @@ test(
     // A double tap on the final Continuer must not report the last exercise twice.
     for (const [i, ex] of lessonFixture.exercises.entries()) await play(ex, true, i === last);
 
-    expect(await screen.findByRole("heading", { name: "Giỏi quá !" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Giỏi quá!" })).toBeInTheDocument();
     expect(await screen.findByText("+15")).toBeInTheDocument();
     expect(screen.getByText("100 % de réussite")).toBeInTheDocument();
     expect(await screen.findByText("Premier pas")).toBeInTheDocument(); // new badge medal

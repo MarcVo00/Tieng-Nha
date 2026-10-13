@@ -19,7 +19,7 @@ export const fr = {
     button: { loading: "Chargement en cours" },
     feedback: {
       sheetLabel: "Résultat de ta réponse",
-      correct: "Đúng rồi !",
+      correct: "Đúng rồi!",
       wrong: "Pas tout à fait",
       expected: "Réponse attendue",
       heard: "Ce que j'ai entendu",
@@ -131,7 +131,7 @@ export const fr = {
     retry: "Réessayer",
     stepLabel: (n: number, total: number) => `Étape ${n} sur ${total}`,
     welcome: {
-      title: "Chào bạn !",
+      title: "Chào bạn!",
       lead: "Prêt·e pour ton premier café vietnamien ? On apprend le parler du Sud, à deux voix.",
       start: "Commencer",
     },
@@ -264,7 +264,7 @@ export const fr = {
     saving: { title: "On enregistre ta leçon…" },
     saveError: { title: "Ta leçon n'a pas pu être enregistrée", body: "Tes réponses sont gardées. Réessaie dans un instant." },
     done: {
-      perfect: "Giỏi quá !",
+      perfect: "Giỏi quá!",
       good: "Bien joué !",
       accuracy: (pct: number) => `${pct} % de réussite`,
       badges: "Nouveaux badges",

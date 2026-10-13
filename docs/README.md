@@ -27,3 +27,4 @@
 | [0008](adr/0008-config-and-flags.md) | Configuration et feature flags |
 | [0009](adr/0009-quality-gates.md) | Garde-fous qualité |
 | [0010](adr/0010-motion-and-fluidity.md) | Fluidité et animations |
+| [0011](adr/0011-voice-packs.md) | Packs de voix pré-générés (Sud / Nord) |

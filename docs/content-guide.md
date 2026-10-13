@@ -137,3 +137,4 @@ Règles dialogue : 4–8 tours ; alternance PNJ/utilisateur ; commence par le PN
 - [ ] Les phrases respectent les longueurs §1.4.
 - [ ] Chaque `answerTone` correspond au signe de `syllable`.
 - [ ] Les distracteurs sont plausibles mais **sans ambiguïté** (une seule bonne réponse possible).
+- [ ] Après toute modification du contenu : régénérer les voix (`node scripts/tts/extract_texts.mjs` puis `generate_audio.py`, voir `scripts/tts/README.md`) ; sans cela le nouveau texte est lu par la voix de l'appareil.

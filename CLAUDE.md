@@ -21,4 +21,4 @@ PWA pour apprendre le vietnamien du Sud (francophones débutants). Cadeau d'anni
 - Ne jamais committer de secrets (`.env*.local`, clé `service_role`).
 
 ## Commandes
-`npm run dev` · `npm run verify` · `npm test` · `npm run test:e2e` · `npx supabase start` (backend local, Docker requis)
+`npm run dev` · `npm run verify` · `npm test` · `npm run test:e2e` · `npx supabase start` (backend local, Docker requis) · voix : `node scripts/tts/extract_texts.mjs` puis `generate_audio.py` (voir `scripts/tts/README.md`)

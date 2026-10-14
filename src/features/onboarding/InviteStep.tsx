@@ -10,6 +10,10 @@ const RESEND_DELAY_S = 30;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type InviteStepProps = {
+  /** "recovery" reuses the e-mail + code flow without an invite code (forgotten password). */
+  mode?: "signup" | "recovery";
+  initialEmail?: string;
+  onBack?: () => void;
   inviteCode: string;
   inviteError: string | null;
   /** Set when the user already signed in (e.g. sent back from the profile step): no new code is needed. */
@@ -18,10 +22,10 @@ type InviteStepProps = {
   onAuthenticated(session: Session): Promise<void>;
 };
 
-export function InviteStep({ inviteCode, inviteError, session, onInviteChange, onAuthenticated }: InviteStepProps) {
+export function InviteStep({ mode = "signup", initialEmail = "", onBack, inviteCode, inviteError, session, onInviteChange, onAuthenticated }: InviteStepProps) {
   const { auth } = useServices();
   const t = fr.onboarding.invite;
-  const [email, setEmail] = useState(session?.email ?? "");
+  const [email, setEmail] = useState(session?.email ?? initialEmail);
   const [phase, setPhase] = useState<"email" | "code">("email");
   const [code, setCode] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -46,7 +50,7 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
     ev.preventDefault();
     setLocalInviteError(null);
     setEmailError(null);
-    if (!inviteCode.trim()) {
+    if (mode === "signup" && !inviteCode.trim()) {
       setLocalInviteError(t.inviteEmpty);
       return;
     }
@@ -107,7 +111,7 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
   if (phase === "code") {
     return (
       <form onSubmit={(ev) => void submitCode(ev)} className="flex flex-col gap-5">
-        <h1 className="text-title text-ink">{t.codeTitle}</h1>
+        <h1 className="text-title text-ink">{mode === "recovery" ? fr.onboarding.recovery.codeTitle : t.codeTitle}</h1>
         <p className="text-body text-ink-muted">{t.codeLead(email.trim())}</p>
         <TextField
           label={t.codeLabel}
@@ -139,18 +143,20 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
 
   return (
     <form onSubmit={(ev) => void submitEmail(ev)} noValidate className="flex flex-col gap-5">
-      <h1 className="text-title text-ink">{t.title}</h1>
-      <p className="text-body text-ink-muted">{t.lead}</p>
-      <TextField
-        label={t.inviteLabel}
-        value={inviteCode}
-        onChange={(e) => onInviteChange(e.target.value.toUpperCase())}
-        autoCapitalize="characters"
-        autoComplete="off"
-        spellCheck={false}
-        error={localInviteError ?? inviteError}
-        inputClassName="uppercase tracking-wider"
-      />
+      <h1 className="text-title text-ink">{mode === "recovery" ? fr.onboarding.recovery.title : t.title}</h1>
+      <p className="text-body text-ink-muted">{mode === "recovery" ? fr.onboarding.recovery.lead : t.lead}</p>
+      {mode === "signup" ? (
+        <TextField
+          label={t.inviteLabel}
+          value={inviteCode}
+          onChange={(e) => onInviteChange(e.target.value.toUpperCase())}
+          autoCapitalize="characters"
+          autoComplete="off"
+          spellCheck={false}
+          error={localInviteError ?? inviteError}
+          inputClassName="uppercase tracking-wider"
+        />
+      ) : null}
       <TextField
         label={t.emailLabel}
         type="email"
@@ -163,6 +169,11 @@ export function InviteStep({ inviteCode, inviteError, session, onInviteChange, o
       <Button type="submit" size="lg" fullWidth loading={busy}>
         {t.send}
       </Button>
+      {onBack ? (
+        <Button variant="ghost" onClick={onBack}>
+          {fr.onboarding.signIn.back}
+        </Button>
+      ) : null}
     </form>
   );
 }

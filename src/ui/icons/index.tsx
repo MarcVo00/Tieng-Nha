@@ -3,7 +3,7 @@ import type { ReactNode, SVGProps } from "react";
 export type IconName =
   | "home" | "review" | "trophy" | "user" | "close" | "check" | "cross" | "speaker" | "turtle" | "mic" | "stop"
   | "flag" | "chevron-right" | "chevron-left" | "lock" | "star" | "flame" | "refresh" | "settings" | "share"
-  | "download" | "chat" | "play";
+  | "download" | "chat" | "play" | "eye" | "eye-off";
 
 // 24x24 grid, 2px round strokes. Paths are drawn by hand; `flame` is the only filled glyph.
 const PATHS: Record<IconName, ReactNode> = {
@@ -30,6 +30,8 @@ const PATHS: Record<IconName, ReactNode> = {
   download: <><path d="M12 4v11" /><path d="m7.5 10.5 4.5 4.5 4.5-4.5" /><path d="M5 20h14" /></>,
   chat: <path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 19 16H11l-4.5 4v-4H5a1.5 1.5 0 0 1-1.5-1.5v-8A1.5 1.5 0 0 1 5 5Z" />,
   play: <path d="M8 5.5v13l11-6.5L8 5.5Z" />,
+  eye: <><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="3" /></>,
+  "eye-off": <><path d="M9.9 6a9.6 9.6 0 0 1 2.1-.5c6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.6 3.4" /><path d="M6.3 7.3A16 16 0 0 0 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.4 4-.9" /><path d="M10 10a3 3 0 0 0 4 4" /><path d="M4 4l16 16" /></>,
 };
 
 type IconProps = { name: IconName; size?: number; className?: string } & Omit<SVGProps<SVGSVGElement>, "name" | "children" | "ref">;

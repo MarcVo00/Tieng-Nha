@@ -5,7 +5,7 @@ import { ServicesProvider } from "@/app/ServicesProvider";
 import { useAppState } from "@/app/appState";
 import type { Services } from "@/app/services";
 import { createFakeServices, FakeAuthService } from "@/adapters/fakes";
-import { OfflineError } from "@/domain/errors";
+import { OfflineError, WeakPasswordError } from "@/domain/errors";
 import type { ProgressSnapshot } from "@/domain/types";
 import { MeScreen } from "@/features/profile";
 import { fr } from "@/i18n/fr";
@@ -284,4 +284,53 @@ test("sign-out warns about unsynced progress and only proceeds when confirmed", 
   await user.click(await screen.findByRole("button", { name: fr.profile.account.unsynced.confirm }));
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
   expect(signOut).toHaveBeenCalledTimes(1);
+});
+
+test("changing the password calls setPassword, closes the sheet and shows the toast", async () => {
+  const { services, user } = await setup();
+  const spy = vi.spyOn(services.auth, "setPassword");
+  await user.click(screen.getByRole("button", { name: fr.profile.settings.password.open }));
+  await user.type(await screen.findByLabelText(fr.password.newLabel), "secret123");
+  await user.type(screen.getByLabelText(fr.password.confirmLabel), "secret123");
+  await user.click(screen.getByRole("button", { name: fr.password.submit }));
+  expect(await screen.findByText(fr.profile.settings.password.updated)).toBeInTheDocument();
+  expect(spy).toHaveBeenCalledWith("secret123");
+  await waitFor(() => expect(screen.queryByLabelText(fr.password.newLabel)).not.toBeInTheDocument());
+  expect(await services.auth.hasPassword()).toBe(true);
+});
+
+test("a short or mismatched password is refused without calling the server", async () => {
+  const { services, user } = await setup();
+  const spy = vi.spyOn(services.auth, "setPassword");
+  await user.click(screen.getByRole("button", { name: fr.profile.settings.password.open }));
+  await user.type(await screen.findByLabelText(fr.password.newLabel), "short");
+  await user.type(screen.getByLabelText(fr.password.confirmLabel), "short");
+  await user.click(screen.getByRole("button", { name: fr.password.submit }));
+  expect(await screen.findByText(fr.password.tooShort)).toBeInTheDocument();
+  await user.clear(screen.getByLabelText(fr.password.newLabel));
+  await user.type(screen.getByLabelText(fr.password.newLabel), "secret123");
+  await user.click(screen.getByRole("button", { name: fr.password.submit }));
+  expect(await screen.findByText(fr.password.mismatch)).toBeInTheDocument();
+  expect(spy).not.toHaveBeenCalled();
+});
+
+test("a weak password rejected by the server shows the weak message and keeps the sheet open", async () => {
+  const { services, user } = await setup();
+  vi.spyOn(services.auth, "setPassword").mockRejectedValue(new WeakPasswordError());
+  await user.click(screen.getByRole("button", { name: fr.profile.settings.password.open }));
+  await user.type(await screen.findByLabelText(fr.password.newLabel), "secret123");
+  await user.type(screen.getByLabelText(fr.password.confirmLabel), "secret123");
+  await user.click(screen.getByRole("button", { name: fr.password.submit }));
+  expect(await screen.findByText(fr.password.tooShort)).toBeInTheDocument();
+  expect(screen.getByLabelText(fr.password.newLabel)).toBeInTheDocument();
+});
+
+test("being offline while changing the password shows the offline message", async () => {
+  const { services, user } = await setup();
+  vi.spyOn(services.auth, "setPassword").mockRejectedValue(new OfflineError());
+  await user.click(screen.getByRole("button", { name: fr.profile.settings.password.open }));
+  await user.type(await screen.findByLabelText(fr.password.newLabel), "secret123");
+  await user.type(screen.getByLabelText(fr.password.confirmLabel), "secret123");
+  await user.click(screen.getByRole("button", { name: fr.password.submit }));
+  expect(await within(await screen.findByRole("dialog")).findByText(fr.profile.edit.offline)).toBeInTheDocument();
 });

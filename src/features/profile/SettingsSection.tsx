@@ -5,6 +5,7 @@ import { detectPlatform } from "@/domain/platform";
 import { useDeviceTest, useSettings } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
+import { ChangePasswordSheet } from "@/features/profile/ChangePasswordSheet";
 import { Button, DeviceCheck, Icon, Sheet, tap, useToast } from "@/ui";
 
 type SegmentedProps<T extends string> = { label: string; value: T; options: readonly { id: T; label: string }[]; onChange(v: T): void };
@@ -116,6 +117,7 @@ export function SettingsSection({ onReport }: { onReport(): void }) {
   const { settings, updateSettings } = useSettings();
   const toast = useToast();
   const [deviceOpen, setDeviceOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const t = fr.profile.settings;
 
   function change(patch: Partial<Settings>): void {
@@ -151,10 +153,14 @@ export function SettingsSection({ onReport }: { onReport(): void }) {
         <Button variant="secondary" fullWidth onClick={() => setDeviceOpen(true)}>
           {t.device.open}
         </Button>
+        <Button variant="secondary" fullWidth onClick={() => setPasswordOpen(true)}>
+          {t.password.open}
+        </Button>
         <Button variant="secondary" fullWidth onClick={onReport}>
           {t.report}
         </Button>
       </div>
+      <ChangePasswordSheet open={passwordOpen} onClose={() => setPasswordOpen(false)} />
       <Sheet open={deviceOpen} onClose={() => setDeviceOpen(false)} label={t.device.title}>
         {deviceOpen ? <DeviceSheetBody /> : null}
       </Sheet>

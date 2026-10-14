@@ -10,16 +10,26 @@ import { DeviceStep } from "@/features/onboarding/DeviceStep";
 import { InstallStep, isStandalone } from "@/features/onboarding/InstallStep";
 import { InviteStep } from "@/features/onboarding/InviteStep";
 import { ProfileStep } from "@/features/onboarding/ProfileStep";
+import { SetPasswordStep, type PasswordMode } from "@/features/onboarding/SetPasswordStep";
+import { SignInStep } from "@/features/onboarding/SignInStep";
 import { WelcomeStep } from "@/features/onboarding/WelcomeStep";
 
-type Step = 1 | 2 | 3 | 4 | 5;
-const STEPS: readonly Step[] = [1, 2, 3, 4, 5];
+type Step = "welcome" | "signin" | "recovery" | "invite" | "password" | "profile" | "device" | "install";
+type Next = "profile" | "existing";
+type Origin = "otp" | "password" | "recovery";
+
+/** The sign-up path owns the progress dots. Sign-in and recovery are side trips and show none. */
+const DOT_STEPS: readonly Step[] = ["welcome", "invite", "password", "profile", "device", "install"];
+/** Slide direction: moving to a later entry slides in from the right. */
+const ORDER: readonly Step[] = ["welcome", "signin", "recovery", "invite", "password", "profile", "device", "install"];
 
 function Dots({ step }: { step: Step }) {
+  const index = DOT_STEPS.indexOf(step);
+  if (index < 0) return <div className="h-8" aria-hidden="true" />;
   return (
-    <div role="img" aria-label={fr.onboarding.stepLabel(step, STEPS.length)} className="flex justify-center gap-2 py-4">
-      {STEPS.map((s) => (
-        <span key={s} aria-hidden="true" className={`h-2 rounded-full ${s === step ? "w-6 bg-primary" : s < step ? "w-2 bg-primary" : "w-2 bg-line"}`} />
+    <div role="img" aria-label={fr.onboarding.stepLabel(index + 1, DOT_STEPS.length)} className="flex justify-center gap-2 py-4">
+      {DOT_STEPS.map((s, i) => (
+        <span key={s} aria-hidden="true" className={`h-2 rounded-full ${i === index ? "w-6 bg-primary" : i < index ? "w-2 bg-primary" : "w-2 bg-line"}`} />
       ))}
     </div>
   );
@@ -37,11 +47,15 @@ export function WelcomeScreen() {
   const { updateSettings } = useSettings();
   const [step, setStep] = useState<Step>(() => {
     const s = useAppState.getState();
-    return s.session && s.profile ? 4 : 1;
+    return s.session && s.profile ? "device" : "welcome";
   });
   const [dir, setDir] = useState(1);
   const [inviteCode, setInviteCode] = useState("");
   const [inviteError, setInviteError] = useState<string | null>(null);
+  const [passwordMode, setPasswordMode] = useState<PasswordMode>("create");
+  const [afterPassword, setAfterPassword] = useState<Next>("profile");
+  const [askInvite, setAskInvite] = useState(false);
+  const [prefillEmail, setPrefillEmail] = useState("");
   const session = useAppState((s) => s.session);
   const [finishError, setFinishError] = useState(false);
   const stepRef = useRef<HTMLDivElement>(null);
@@ -61,7 +75,7 @@ export function WelcomeScreen() {
   }, [step]);
 
   function go(next: Step) {
-    setDir(next >= step ? 1 : -1);
+    setDir(ORDER.indexOf(next) >= ORDER.indexOf(step) ? 1 : -1);
     setStep(next);
   }
 
@@ -76,35 +90,69 @@ export function WelcomeScreen() {
     navigate("/", { replace: true });
   }
 
-  // Never throws: once the code is verified the session is kept, and any failure to read the profile
+  // Existing account: already onboarded on this device means straight home, otherwise the device test.
+  function continueExisting() {
+    if (useAppState.getState().settings.onboardingDone) navigate("/", { replace: true });
+    else go("device");
+  }
+
+  function continueAfterPassword(next: Next) {
+    if (next === "existing") continueExisting();
+    else go("profile");
+  }
+
+  // Never throws: once the code or password is verified the session is kept, and any failure to read the profile
   // is treated as "no profile yet" so the user is never sent back to a spent OTP form.
-  async function authenticated(s: Session) {
+  async function authenticated(s: Session, origin: Origin) {
     useAppState.getState().set({ session: s });
+    let hasProfile = false;
     try {
       if (await auth.hasProfile()) {
         const profile = await auth.getMyProfile();
         if (profile) {
           useAppState.getState().set({ profile });
           writeCachedProfile(profile);
-          go(4);
-          return;
+          hasProfile = true;
         }
       }
     } catch {
       // Fall through to the profile step.
     }
-    go(3);
+    const next: Next = hasProfile ? "existing" : "profile";
+    // Reached by password or recovery without a profile: the invite code was never given, so the profile step asks for it.
+    setAskInvite(!hasProfile && origin !== "otp");
+    if (origin === "recovery") {
+      setPasswordMode("reset");
+      setAfterPassword(next);
+      go("password");
+      return;
+    }
+    let known = true;
+    if (origin === "otp") {
+      try {
+        known = await auth.hasPassword();
+      } catch {
+        // Cannot tell: never block the user on a password prompt.
+      }
+    }
+    if (!known) {
+      setPasswordMode(hasProfile ? "upgrade" : "create");
+      setAfterPassword(next);
+      go("password");
+      return;
+    }
+    continueAfterPassword(next);
   }
 
   async function joined(profile: AppProfile) {
     useAppState.getState().set({ profile });
     writeCachedProfile(profile);
-    go(4);
+    go("device");
   }
 
   function afterDevice() {
     if (isStandalone()) void finish();
-    else go(5);
+    else go("install");
   }
 
   return (
@@ -120,8 +168,31 @@ export function WelcomeScreen() {
       ) : null}
       <AnimatePresence mode="wait" custom={dir} initial={false}>
         <motion.div ref={stepRef} key={step} custom={dir} variants={slide} initial="enter" animate="center" exit="exit" className="flex flex-1 flex-col">
-          {step === 1 ? <WelcomeStep message={env.VITE_WELCOME_MESSAGE} onStart={() => go(2)} /> : null}
-          {step === 2 ? (
+          {step === "welcome" ? <WelcomeStep message={env.VITE_WELCOME_MESSAGE} onStart={() => go("invite")} onSignIn={() => go("signin")} /> : null}
+          {step === "signin" ? (
+            <SignInStep
+              initialEmail={prefillEmail}
+              onAuthenticated={(s) => authenticated(s, "password")}
+              onForgot={(email) => {
+                setPrefillEmail(email);
+                go("recovery");
+              }}
+              onBack={() => go("welcome")}
+            />
+          ) : null}
+          {step === "recovery" ? (
+            <InviteStep
+              mode="recovery"
+              initialEmail={prefillEmail}
+              inviteCode=""
+              inviteError={null}
+              session={null}
+              onInviteChange={() => undefined}
+              onBack={() => go("signin")}
+              onAuthenticated={(s) => authenticated(s, "recovery")}
+            />
+          ) : null}
+          {step === "invite" ? (
             <InviteStep
               inviteCode={inviteCode}
               inviteError={inviteError}
@@ -130,23 +201,33 @@ export function WelcomeScreen() {
                 setInviteCode(c);
                 setInviteError(null);
               }}
-              onAuthenticated={async (s) => {
-                await authenticated(s);
-              }}
+              onAuthenticated={(s) => authenticated(s, "otp")}
             />
           ) : null}
-          {step === 3 ? (
+          {step === "password" ? (
+            <SetPasswordStep
+              mode={passwordMode}
+              onDone={async () => continueAfterPassword(afterPassword)}
+              onSkip={() => continueAfterPassword(afterPassword)}
+            />
+          ) : null}
+          {step === "profile" ? (
             <ProfileStep
               inviteCode={inviteCode}
+              askInvite={askInvite}
+              onInviteChange={(c) => {
+                setInviteCode(c);
+                setInviteError(null);
+              }}
               onInvalidInvite={() => {
                 setInviteError(fr.onboarding.invite.inviteInvalid);
-                go(2);
+                go("invite");
               }}
               onJoined={joined}
             />
           ) : null}
-          {step === 4 ? <DeviceStep onNext={afterDevice} /> : null}
-          {step === 5 ? <InstallStep onFinish={() => void finish()} /> : null}
+          {step === "device" ? <DeviceStep onNext={afterDevice} /> : null}
+          {step === "install" ? <InstallStep onFinish={() => void finish()} /> : null}
         </motion.div>
       </AnimatePresence>
     </main>

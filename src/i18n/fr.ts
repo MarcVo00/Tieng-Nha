@@ -134,6 +134,28 @@ export const fr = {
       title: "Chào bạn!",
       lead: "Prêt·e pour ton premier café vietnamien ? On apprend le parler du Sud, à deux voix.",
       start: "Commencer",
+      signIn: "Déjà un compte ? Se connecter",
+    },
+    signIn: {
+      title: "Content de te revoir",
+      lead: "Ton e-mail et ton mot de passe, et c'est reparti.",
+      emailLabel: "E-mail",
+      passwordLabel: "Mot de passe",
+      submit: "Se connecter",
+      invalid: "E-mail ou mot de passe incorrect",
+      passwordEmpty: "Entre ton mot de passe",
+      forgot: "Mot de passe oublié ?",
+      back: "Retour",
+    },
+    recovery: {
+      title: "Mot de passe oublié ?",
+      lead: "Donne-nous ton e-mail : on t'envoie un code à 6 chiffres pour en choisir un nouveau.",
+      codeTitle: "Regarde ta boîte mail",
+    },
+    password: {
+      create: { title: "Choisis ton mot de passe", lead: "La prochaine fois, plus besoin d'attendre un code par e-mail." },
+      upgrade: { title: "Un mot de passe, c'est plus simple", lead: "Choisis-en un pour te reconnecter d'un seul geste.", later: "Plus tard" },
+      reset: { title: "Nouveau mot de passe", lead: "Choisis-en un nouveau, tu en auras besoin à ta prochaine connexion." },
     },
     invite: {
       title: "Entre dans le cercle",
@@ -166,6 +188,7 @@ export const fr = {
       avatarLabel: "Ton avatar",
       avatarOption: (emoji: string) => `Avatar ${emoji}`,
       submit: "Rejoindre le groupe",
+      inviteLead: "Ton compte n'a pas encore de groupe : entre ton code d'invitation.",
     },
     device: {
       title: "Test de l'appareil",
@@ -205,6 +228,18 @@ export const fr = {
       body: "Reviens dans l'application et saisis le code à 6 chiffres reçu par e-mail.",
       open: "Ouvrir Tiếng Nhà",
     },
+  },
+  // --- password (shared by onboarding and profile) ---
+  password: {
+    label: "Mot de passe",
+    newLabel: "Nouveau mot de passe",
+    hint: "8 caractères minimum",
+    confirmLabel: "Confirme ton mot de passe",
+    submit: "Enregistrer",
+    tooShort: "Mot de passe trop faible (8 caractères minimum)",
+    mismatch: "Les deux mots de passe ne sont pas identiques",
+    show: "Afficher le mot de passe",
+    hide: "Masquer le mot de passe",
   },
   // --- home ---
   home: {
@@ -484,6 +519,7 @@ export const fr = {
       theme: { label: "Thème", system: "Système", light: "Clair", dark: "Sombre" },
       voice: { label: "Vitesse de la voix", normal: "Normale", slow: "Lente 🐢" },
       saveError: "Ce réglage n'a pas pu être enregistré.",
+      password: { open: "Changer mon mot de passe", title: "Changer mon mot de passe", updated: "Mot de passe mis à jour" },
       voicePack: {
         label: "Voix",
         hint: "Les voix du Sud et du Nord se téléchargent en arrière-plan, pour marcher aussi sans réseau.",

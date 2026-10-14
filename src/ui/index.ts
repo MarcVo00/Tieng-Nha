@@ -1,5 +1,6 @@
 export * from "@/ui/motion";
 export { Icon, type IconName } from "@/ui/icons";
+export { PasswordField } from "@/ui/PasswordField";
 export { Button, type ButtonProps } from "@/ui/Button";
 export { Card } from "@/ui/Card";
 export { Sheet } from "@/ui/Sheet";

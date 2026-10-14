@@ -2,19 +2,25 @@ import { expect, type Page } from "@playwright/test";
 import { fr } from "@/i18n/fr";
 
 export const PSEUDO = "Marc";
+export const EMAIL = "test@example.com";
+export const PASSWORD = "secret-pass-1";
 
-/** Welcome -> invite + email -> OTP -> pseudo + avatar -> device check -> install, ending on the home path. */
+/** Welcome -> invite + email -> OTP -> new password -> pseudo + avatar -> device check -> install, ending on the home path. */
 export async function onboard(page: Page): Promise<void> {
   await page.goto("/");
   await page.waitForURL("**/welcome");
   await page.getByRole("button", { name: fr.onboarding.welcome.start }).click();
 
   await page.getByLabel(fr.onboarding.invite.inviteLabel).fill("TEST-CODE");
-  await page.getByLabel(fr.onboarding.invite.emailLabel).fill("test@example.com");
+  await page.getByLabel(fr.onboarding.invite.emailLabel).fill(EMAIL);
   await page.getByRole("button", { name: fr.onboarding.invite.send }).click();
 
   await page.getByLabel(fr.onboarding.invite.codeLabel).fill("123456");
   await page.getByRole("button", { name: fr.onboarding.invite.verify }).click();
+
+  await page.getByLabel(fr.password.label, { exact: true }).fill(PASSWORD);
+  await page.getByLabel(fr.password.confirmLabel).fill(PASSWORD);
+  await page.getByRole("button", { name: fr.password.submit }).click();
 
   await page.getByLabel(fr.onboarding.profile.pseudoLabel).fill(PSEUDO);
   await page.getByRole("radiogroup", { name: fr.onboarding.profile.avatarLabel }).getByRole("radio").first().click();

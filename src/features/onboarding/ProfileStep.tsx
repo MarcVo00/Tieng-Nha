@@ -9,16 +9,20 @@ import { TextField } from "@/features/onboarding/TextField";
 
 type ProfileStepProps = {
   inviteCode: string;
+  /** Edge case (signed in with a password but never joined a group): the invite code is asked here. */
+  askInvite?: boolean;
+  onInviteChange?: (code: string) => void;
   onInvalidInvite(): void;
   onJoined(profile: { pseudo: string; avatarEmoji: string }): Promise<void>;
 };
 
-export function ProfileStep({ inviteCode, onInvalidInvite, onJoined }: ProfileStepProps) {
+export function ProfileStep({ inviteCode, askInvite = false, onInviteChange, onInvalidInvite, onJoined }: ProfileStepProps) {
   const { auth } = useServices();
   const t = fr.onboarding.profile;
   const [pseudo, setPseudo] = useState("");
   const [emoji, setEmoji] = useState<string>(AVATARS[0]);
   const [error, setError] = useState<string | null>(null);
+  const [inviteError, setInviteError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function submit(ev: FormEvent) {
@@ -29,12 +33,20 @@ export function ProfileStep({ inviteCode, onInvalidInvite, onJoined }: ProfileSt
       return;
     }
     setError(null);
+    setInviteError(null);
+    if (askInvite && !inviteCode.trim()) {
+      setInviteError(fr.onboarding.invite.inviteEmpty);
+      return;
+    }
     setBusy(true);
     try {
       await auth.joinGroup(inviteCode.trim().toUpperCase(), clean, emoji);
       await onJoined({ pseudo: clean, avatarEmoji: emoji });
     } catch (e) {
-      if (e instanceof InvalidInviteError) onInvalidInvite();
+      if (e instanceof InvalidInviteError) {
+        if (askInvite) setInviteError(fr.onboarding.invite.inviteInvalid);
+        else onInvalidInvite();
+      }
       else if (e instanceof PseudoTakenError) setError(t.pseudoTaken);
       else if (e instanceof InvalidProfileError) setError(t.pseudoInvalid);
       else if (e instanceof OfflineError) setError(fr.onboarding.invite.offline);
@@ -47,7 +59,19 @@ export function ProfileStep({ inviteCode, onInvalidInvite, onJoined }: ProfileSt
   return (
     <form onSubmit={(ev) => void submit(ev)} noValidate className="flex flex-col gap-5">
       <h1 className="text-title text-ink">{t.title}</h1>
-      <p className="text-body text-ink-muted">{t.lead}</p>
+      <p className="text-body text-ink-muted">{askInvite ? t.inviteLead : t.lead}</p>
+      {askInvite ? (
+        <TextField
+          label={fr.onboarding.invite.inviteLabel}
+          value={inviteCode}
+          onChange={(e) => onInviteChange?.(e.target.value.toUpperCase())}
+          autoCapitalize="characters"
+          autoComplete="off"
+          spellCheck={false}
+          error={inviteError}
+          inputClassName="uppercase tracking-wider"
+        />
+      ) : null}
       <div className="flex items-start gap-4">
         <Avatar emoji={emoji} size="lg" ring="primary" />
         <div className="min-w-0 flex-1">

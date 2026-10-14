@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { createFakeServices, FakeAuthService } from "@/adapters/fakes";
-import { OfflineError } from "@/domain/errors";
+import { InvalidCredentialsError, OfflineError, WeakPasswordError } from "@/domain/errors";
 import { useAppState } from "@/app/appState";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { AuthCallbackScreen, WelcomeScreen } from "@/features/onboarding";
@@ -41,7 +41,32 @@ async function signIn(user: User, invite = "test-code") {
   await toOtpStep(user, invite);
   await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
   await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+  await choosePassword(user);
   await screen.findByLabelText("Pseudo");
+}
+
+/** Fills the two password fields of SetPasswordStep and submits. */
+async function choosePassword(user: User, password = "secret123", confirmation = password) {
+  await user.type(await screen.findByLabelText("Mot de passe"), password);
+  await user.type(screen.getByLabelText("Confirme ton mot de passe"), confirmation);
+  await user.click(screen.getByRole("button", { name: "Enregistrer" }));
+}
+
+async function passwordSignIn(user: User, email = "marc@example.com", password = "secret123") {
+  await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+  await user.type(await screen.findByLabelText("E-mail"), email);
+  await user.type(screen.getByLabelText("Mot de passe"), password);
+  await user.click(screen.getByRole("button", { name: "Se connecter" }));
+}
+
+/** An account that already exists on the fake backend (profile, optional password), signed out. */
+async function existingAccount(withPassword: boolean) {
+  const auth = new FakeAuthService();
+  await auth.verifyOtp("marc@example.com", "123456");
+  await auth.joinGroup("TEST-CODE", "Marc", "🐯");
+  if (withPassword) await auth.setPassword("secret123");
+  await auth.signOut();
+  return auth;
 }
 
 beforeEach(() => {
@@ -168,6 +193,7 @@ test("a user who already has a profile skips the profile step after the code", a
   await toOtpStep(user);
   await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
   await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+  await user.click(await screen.findByRole("button", { name: "Plus tard" }));
   expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
   expect(useAppState.getState().profile).toEqual({ pseudo: "Marc", avatarEmoji: "🐯" });
 });
@@ -200,6 +226,173 @@ test("the resend button is disabled for 30 seconds, then enabled", async () => {
   } finally {
     vi.useRealTimers();
   }
+});
+
+describe("password", () => {
+  test("sign-up asks for a password after the code, then the profile", async () => {
+    const { services, user } = setup();
+    await toOtpStep(user);
+    await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    expect(await screen.findByRole("heading", { name: "Choisis ton mot de passe" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Plus tard" })).not.toBeInTheDocument();
+    await choosePassword(user);
+    expect(await screen.findByLabelText("Pseudo")).toBeInTheDocument();
+    expect(await services.auth.hasPassword()).toBe(true);
+  });
+
+  test("a password under 8 characters or a mismatch is refused before calling the server", async () => {
+    const { services, user } = setup();
+    await toOtpStep(user);
+    await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    await choosePassword(user, "short", "short");
+    expect(await screen.findByText("Mot de passe trop faible (8 caractères minimum)")).toBeInTheDocument();
+    await user.clear(screen.getByLabelText("Mot de passe"));
+    await user.clear(screen.getByLabelText("Confirme ton mot de passe"));
+    await choosePassword(user, "secret123", "secret124");
+    expect(await screen.findByText("Les deux mots de passe ne sont pas identiques")).toBeInTheDocument();
+    expect(await services.auth.hasPassword()).toBe(false);
+  });
+
+  test("the server's weak password error shows the same message", async () => {
+    const auth = new FakeAuthService();
+    auth.setPassword = async () => {
+      throw new WeakPasswordError();
+    };
+    const { user } = setup({ auth });
+    await toOtpStep(user);
+    await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    await choosePassword(user);
+    expect(await screen.findByText("Mot de passe trop faible (8 caractères minimum)")).toBeInTheDocument();
+  });
+
+  test("the eye button reveals the password", async () => {
+    const { user } = setup();
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    const field = await screen.findByLabelText("Mot de passe");
+    expect(field).toHaveAttribute("type", "password");
+    expect(field).toHaveAttribute("autocomplete", "current-password");
+    await user.click(screen.getByRole("button", { name: "Afficher le mot de passe" }));
+    expect(field).toHaveAttribute("type", "text");
+  });
+
+  test("signing in with a password sends an onboarded user straight home", async () => {
+    const auth = await existingAccount(true);
+    useAppState.setState({ settings: { ...DEFAULT_SETTINGS, onboardingDone: true } });
+    const { router, user } = setup({ auth });
+    await passwordSignIn(user);
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    expect(useAppState.getState().profile).toEqual({ pseudo: "Marc", avatarEmoji: "🐯" });
+    expect(JSON.parse(localStorage.getItem("tn-profile") ?? "null")).toEqual({ pseudo: "Marc", avatarEmoji: "🐯" });
+  });
+
+  test("signing in with a password on a device not yet onboarded goes to the device test", async () => {
+    const auth = await existingAccount(true);
+    const { user } = setup({ auth });
+    await passwordSignIn(user);
+    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+  });
+
+  test("a wrong password shows the incorrect message", async () => {
+    const auth = await existingAccount(true);
+    const { user } = setup({ auth });
+    await passwordSignIn(user, "marc@example.com", "wrong-one");
+    expect(await screen.findByText("E-mail ou mot de passe incorrect")).toBeInTheDocument();
+    expect(useAppState.getState().session).toBeNull();
+  });
+
+  test("being offline while signing in shows the offline message", async () => {
+    const auth = new FakeAuthService();
+    auth.signInWithPassword = async () => {
+      throw new OfflineError();
+    };
+    const { user } = setup({ auth });
+    await passwordSignIn(user);
+    expect(await screen.findByText("Pas de connexion internet")).toBeInTheDocument();
+  });
+
+  test("a password sign-in without a profile asks for the invite code on the profile step", async () => {
+    const auth = new FakeAuthService();
+    await auth.verifyOtp("marc@example.com", "123456");
+    await auth.setPassword("secret123");
+    await auth.signOut();
+    const { user } = setup({ auth });
+    await passwordSignIn(user);
+    await user.type(await screen.findByLabelText("Pseudo"), "Marc");
+    await user.type(screen.getByLabelText("Code d'invitation"), "nope");
+    await user.click(screen.getByRole("button", { name: "Rejoindre le groupe" }));
+    expect(await screen.findByText("Code d'invitation incorrect")).toBeInTheDocument();
+    await user.clear(screen.getByLabelText("Code d'invitation"));
+    await user.type(screen.getByLabelText("Code d'invitation"), "test-code");
+    await user.click(screen.getByRole("button", { name: "Rejoindre le groupe" }));
+    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+  });
+
+  test("forgot password: code, new password, then home", async () => {
+    const auth = await existingAccount(true);
+    useAppState.setState({ settings: { ...DEFAULT_SETTINGS, onboardingDone: true } });
+    const { services, router, user } = setup({ auth });
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.type(await screen.findByLabelText("E-mail"), "marc@example.com");
+    await user.click(screen.getByRole("button", { name: "Mot de passe oublié ?" }));
+    const send = await screen.findByRole("button", { name: "Recevoir mon code" });
+    expect(screen.queryByLabelText("Code d'invitation")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("E-mail")).toHaveValue("marc@example.com");
+    await user.click(send);
+    await user.type(await screen.findByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    expect(await screen.findByRole("heading", { name: "Nouveau mot de passe" })).toBeInTheDocument();
+    await choosePassword(user, "brand-new-pass");
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    expect((services.auth as FakeAuthService).otpRequests).toEqual(["marc@example.com"]);
+    await services.auth.signOut();
+    await expect(services.auth.signInWithPassword("marc@example.com", "secret123")).rejects.toBeInstanceOf(InvalidCredentialsError);
+    await expect(services.auth.signInWithPassword("marc@example.com", "brand-new-pass")).resolves.toBeDefined();
+  });
+
+  test("an existing user signing in by code without a password gets the upgrade prompt, and Plus tard skips it", async () => {
+    const auth = await existingAccount(false);
+    const { services, user } = setup({ auth });
+    await toOtpStep(user);
+    await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    expect(await screen.findByRole("heading", { name: "Un mot de passe, c'est plus simple" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Plus tard" }));
+    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+    expect(await services.auth.hasPassword()).toBe(false);
+  });
+
+  test("the upgrade prompt saves a password and continues", async () => {
+    const auth = await existingAccount(false);
+    const { services, user } = setup({ auth });
+    await toOtpStep(user);
+    await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    await choosePassword(user);
+    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+    expect(await services.auth.hasPassword()).toBe(true);
+  });
+
+  test("an existing user who already has a password is not prompted after the code", async () => {
+    const auth = await existingAccount(true);
+    const { user } = setup({ auth });
+    await toOtpStep(user);
+    await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+  });
+
+  test("the progress dots appear on the sign-up path only", async () => {
+    const { user } = setup();
+    expect(screen.getByRole("img", { name: "Étape 1 sur 6" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await screen.findByLabelText("Mot de passe");
+    expect(screen.queryByRole("img", { name: /Étape/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Retour" }));
+    expect(await screen.findByRole("img", { name: "Étape 1 sur 6" })).toBeInTheDocument();
+  });
 });
 
 describe("install step", () => {

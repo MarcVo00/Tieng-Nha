@@ -12,6 +12,9 @@ export default defineConfig({
       manifest: {
         name: "Tiếng Nhà",
         short_name: "Tiếng Nhà",
+        id: "/",
+        description: "Le vietnamien du Sud, en famille.",
+        categories: ["education"],
         lang: "fr",
         start_url: "/",
         scope: "/",
@@ -20,8 +23,8 @@ export default defineConfig({
         background_color: "#F6F0E4",
         theme_color: "#A3201C",
         icons: [
-          { src: "icons/pwa-192x192.png", sizes: "192x192", type: "image/png" },
-          { src: "icons/pwa-512x512.png", sizes: "512x512", type: "image/png" },
+          { src: "icons/pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+          { src: "icons/pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
           { src: "icons/maskable-icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
       },

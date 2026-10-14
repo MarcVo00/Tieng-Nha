@@ -13,6 +13,8 @@ export const fr = {
       title: "Plus d'énergie !",
       body: (h: number, m: number) => `Fais une révision pour récupérer 1 ⚡, ou reviens dans ${h > 0 ? `${h} h ` : ""}${m} min.`,
       bodyNoWait: "Fais une révision pour récupérer 1 ⚡.",
+      waitOnly: (h: number, m: number) => `Ton énergie revient bientôt : +1 ⚡ dans ${h > 0 ? `${h} h ` : ""}${m} min.`,
+      later: "Ton énergie revient bientôt.",
       back: "Retour",
     },
     gained: (n: number) => `+${n} ⚡`,

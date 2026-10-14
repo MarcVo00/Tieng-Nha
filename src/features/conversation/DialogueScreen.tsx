@@ -5,6 +5,7 @@ import type { Dialogue } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { waitParts } from "@/services/energy";
 import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bubble";
+import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
 import { BadgeMedal, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
@@ -97,6 +98,7 @@ export function DialogueScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { reporter, clock } = useServices();
+  const dueCount = useAppState((s) => s.dueCount);
   const reduced = useReducedMotion();
   const d = useDialogue(id);
   const [quitting, setQuitting] = useState(false);
@@ -133,6 +135,7 @@ export function DialogueScreen() {
         <FocusHeader progress={0} onClose={goHome} closeLabel={fr.conversation.quit.aria} />
         <NoEnergy
           wait={d.noEnergy.nextAt ? waitParts(clock(), d.noEnergy.nextAt) : null}
+          canReview={dueCount > 0}
           onReview={() => navigate("/review")}
           onBack={goHome}
         />

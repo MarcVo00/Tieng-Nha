@@ -21,9 +21,12 @@ export function energyAt(events: readonly AppEvent[], nowIso: string): EnergySta
     current = Math.min(ENERGY.max, current + gained);
     anchor += gained * ENERGY.refillMs;
   };
+  const now = Date.parse(nowIso);
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   for (const e of sorted) {
-    const t = Date.parse(e.createdAt);
+    // A future or unparseable date (device clock moved back) counts as now, so a spend cannot freeze the gauge.
+    const parsed = Date.parse(e.createdAt);
+    const t = Number.isNaN(parsed) ? now : Math.min(parsed, now);
     regen(t);
     const wasFull = current >= ENERGY.max;
     const kind = e.payload["kind"];
@@ -34,7 +37,6 @@ export function energyAt(events: readonly AppEvent[], nowIso: string): EnergySta
       current = Math.min(ENERGY.max, current + ENERGY.reviewGain);
     }
   }
-  const now = Date.parse(nowIso);
   regen(now);
   return { current, max: ENERGY.max, nextAt: current >= ENERGY.max ? null : new Date(anchor + ENERGY.refillMs).toISOString() };
 }

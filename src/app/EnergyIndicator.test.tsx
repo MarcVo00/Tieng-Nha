@@ -20,16 +20,25 @@ function renderIndicator() {
   );
 }
 
-afterEach(() => act(() => useAppState.setState({ energy: null })));
+afterEach(() => act(() => useAppState.setState({ energy: null, dueCount: 0 })));
 
 test("opens the explanation sheet with the countdown and a review link", async () => {
-  useAppState.setState({ energy: { current: 3, max: 5, nextAt: IN_2H14 } });
+  useAppState.setState({ energy: { current: 3, max: 5, nextAt: IN_2H14 }, dueCount: 4 });
   renderIndicator();
   await userEvent.click(screen.getByRole("button", { name: fr.energy.label(3, 5) }));
   const dialog = await screen.findByRole("dialog", { name: fr.energy.title });
   expect(dialog).toHaveTextContent(fr.energy.explain);
   expect(dialog).toHaveTextContent(fr.energy.next(2, 14));
   expect(screen.getByRole("link", { name: fr.energy.review })).toHaveAttribute("href", "/review");
+  expect(dialog).toHaveTextContent(fr.energy.label(3, 5));
+});
+
+test("hides the review link when no word is due", async () => {
+  useAppState.setState({ energy: { current: 3, max: 5, nextAt: IN_2H14 }, dueCount: 0 });
+  renderIndicator();
+  await userEvent.click(screen.getByRole("button", { name: fr.energy.label(3, 5) }));
+  await screen.findByRole("dialog", { name: fr.energy.title });
+  expect(screen.queryByRole("link", { name: fr.energy.review })).toBeNull();
 });
 
 test("says the energy is full when nothing is refilling", async () => {

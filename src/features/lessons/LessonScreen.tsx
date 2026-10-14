@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSettings, voiceRateOf } from "@/app/appState";
+import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
@@ -18,6 +18,7 @@ export function LessonScreen() {
   const { tts, stt, recorder, reporter, clock } = useServices();
   const { settings, updateSettings } = useSettings();
   const run = useLessonRun(id);
+  const dueCount = useAppState((s) => s.dueCount);
   const [quitting, setQuitting] = useState(false);
   const [reportRef, setReportRef] = useState<string | null>(null);
 
@@ -58,7 +59,7 @@ export function LessonScreen() {
     return (
       <div className="pb-8">
         <FocusHeader progress={0} onClose={goHome} closeLabel={fr.lessons.quit.aria} />
-        <NoEnergy wait={nextAt ? waitParts(clock(), nextAt) : null} onReview={() => navigate("/review")} onBack={goHome} />
+        <NoEnergy wait={nextAt ? waitParts(clock(), nextAt) : null} canReview={dueCount > 0} onReview={() => navigate("/review")} onBack={goHome} />
       </div>
     );
   }

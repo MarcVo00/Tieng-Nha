@@ -147,13 +147,30 @@ describe("intro", () => {
     const services = createFakeServices();
     const startAttempt = vi.spyOn(services.exam, "startAttempt");
     for (let i = 0; i < 3; i++) await services.activity.startSession("lesson", "l05");
-    useAppState.setState({ energy: await services.activity.getEnergy() });
+    useAppState.setState({ energy: await services.activity.getEnergy(), dueCount: 2 });
     renderExam({ services, entry: "/exam" });
     expect(await screen.findByRole("button", { name: fr.exam.intro.start })).toBeDisabled();
     expect(screen.getByText(fr.exam.intro.noEnergy(3))).toBeInTheDocument();
     await userEvent.click(screen.getByRole("link", { name: fr.energy.review }));
     expect(await screen.findByText("page de révision")).toBeInTheDocument();
     expect(startAttempt).not.toHaveBeenCalled();
+  });
+
+  test("with less than 3 energy and nothing due the message stays but the review link is gone", async () => {
+    const services = createFakeServices();
+    for (let i = 0; i < 3; i++) await services.activity.startSession("lesson", "l05");
+    useAppState.setState({ energy: await services.activity.getEnergy(), dueCount: 0 });
+    renderExam({ services, entry: "/exam" });
+    expect(await screen.findByText(fr.exam.intro.noEnergy(3))).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: fr.energy.review })).toBeNull();
+  });
+
+  test("the intro reloads the energy when it opens", async () => {
+    const services = createFakeServices();
+    const getEnergy = vi.spyOn(services.activity, "getEnergy");
+    renderExam({ services, entry: "/exam" });
+    await screen.findByRole("button", { name: fr.exam.intro.start });
+    expect(getEnergy).toHaveBeenCalled();
   });
 
   test("an unexpected failure shows the generic message", async () => {

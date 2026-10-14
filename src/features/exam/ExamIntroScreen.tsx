@@ -36,6 +36,20 @@ export function ExamIntroScreen() {
   const interrupted = isInterruptedState((useLocation() as { state: unknown }).state);
   const snapshot = useAppState((s) => s.snapshot);
   const energy = useAppState((s) => s.energy);
+  const dueCount = useAppState((s) => s.dueCount);
+  // The stored energy may be stale after a suspended PWA: reload it once when the intro opens.
+  useEffect(() => {
+    let cancelled = false;
+    activity.getEnergy().then(
+      (fresh) => {
+        if (!cancelled) useAppState.getState().set({ energy: fresh });
+      },
+      () => undefined,
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [activity]);
   const [spendRefused, setSpendRefused] = useState(false);
   // A refusal is only as true as the energy it was based on: clear it once the gauge shows enough again.
   useEffect(() => {
@@ -101,6 +115,7 @@ export function ExamIntroScreen() {
     try {
       const { attemptId, remainingToday } = await exam.startAttempt();
       const spent = await activity.startSession("boss", FINAL_BOSS_ID);
+      // Accepted trade-off: if this spend fails (or throws) after startAttempt succeeded, the daily attempt is used.
       if (!spent.ok) {
         // Lost a race with another tab: the energy is gone, the attempt stays unused.
         setSpendRefused(true);
@@ -176,12 +191,14 @@ export function ExamIntroScreen() {
                 <p id="boss-no-energy" className="text-body-strong text-ink-muted">
                   {fr.exam.intro.noEnergy(ENERGY.cost.boss)}
                 </p>
-                <Link
-                  to="/review"
-                  className="inline-flex min-h-11 items-center justify-center rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
-                >
-                  {fr.energy.review}
-                </Link>
+                {dueCount > 0 ? (
+                  <Link
+                    to="/review"
+                    className="inline-flex min-h-11 items-center justify-center rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
+                  >
+                    {fr.energy.review}
+                  </Link>
+                ) : null}
               </div>
             ) : null}
             {!online ? <p className="text-caption text-ink-muted">{fr.exam.intro.offline}</p> : null}

@@ -13,6 +13,7 @@ const MINUTE_MS = 60_000;
 // explanation, the next refill, and a single secondary-weight action to review (the way to earn energy back).
 export function EnergyIndicator() {
   const energy = useAppState((s) => s.energy);
+  const dueCount = useAppState((s) => s.dueCount);
   const { clock } = useServices();
   const refreshProgress = useRefreshProgress();
   const [open, setOpen] = useState(false);
@@ -23,7 +24,7 @@ export function EnergyIndicator() {
   useEffect(() => {
     if (nextAt === null) return;
     const delay = Math.max(1000, Date.parse(nextAt) - Date.parse(clock()));
-    const timer = setTimeout(() => void refreshProgress(), delay);
+    const timer = setTimeout(() => void refreshProgress().catch(() => undefined), delay);
     return () => clearTimeout(timer);
   }, [nextAt, clock, refreshProgress]);
 
@@ -53,6 +54,7 @@ export function EnergyIndicator() {
       </motion.button>
       <Sheet open={open} onClose={() => setOpen(false)} label={fr.energy.title}>
         <div className="flex flex-col gap-4">
+          <p className="sr-only">{fr.energy.label(energy.current, energy.max)}</p>
           <div className="flex items-center gap-2" aria-hidden="true">
             {Array.from({ length: energy.max }, (_, i) => (
               <Icon key={i} name="bolt" size={32} className={i < energy.current ? "fill-gold text-gold" : "fill-surface-2 text-line"} />
@@ -61,13 +63,15 @@ export function EnergyIndicator() {
           <p className="text-body text-ink-muted">{fr.energy.explain}</p>
           <p className="text-body-strong text-ink">{wait ? fr.energy.next(wait.hours, wait.minutes) : fr.energy.full}</p>
           <div className="flex flex-wrap items-center gap-3 pt-1">
-            <Link
-              to="/review"
-              onClick={() => setOpen(false)}
-              className="inline-flex min-h-11 items-center justify-center rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
-            >
-              {fr.energy.review}
-            </Link>
+            {dueCount > 0 ? (
+              <Link
+                to="/review"
+                onClick={() => setOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
+              >
+                {fr.energy.review}
+              </Link>
+            ) : null}
             <Button variant="ghost" onClick={() => setOpen(false)}>
               {fr.energy.close}
             </Button>

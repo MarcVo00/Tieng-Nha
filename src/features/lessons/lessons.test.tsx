@@ -264,6 +264,7 @@ describe("energy", () => {
 
   test("with no energy left the lesson does not open and offers the reviews", async () => {
     const services = createFakeServices({ clock: () => NOW });
+    useAppState.setState({ dueCount: 3 });
     for (let i = 0; i < 5; i++) await services.activity.startSession("lesson", "l05");
     renderWithServices(
       <Routes>
@@ -278,6 +279,23 @@ describe("energy", () => {
     expect((await services.activity.getEnergy()).current).toBe(0);
     await userEvent.click(screen.getByRole("button", { name: fr.energy.review }));
     expect(await screen.findByText("page de révision")).toBeInTheDocument();
+  });
+
+  test("with no energy and nothing due there is no review button and Retour goes home", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    useAppState.setState({ dueCount: 0 });
+    for (let i = 0; i < 5; i++) await services.activity.startSession("lesson", "l05");
+    renderWithServices(
+      <Routes>
+        <Route path="/" element={<p>{HOME}</p>} />
+        <Route path="/lesson/:id" element={<LessonScreen />} />
+      </Routes>,
+      { services, route: "/lesson/l05" },
+    );
+    expect(await screen.findByText(fr.energy.empty.title)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: fr.energy.review })).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: fr.energy.empty.back }));
+    expect(await screen.findByText(HOME)).toBeInTheDocument();
   });
 });
 

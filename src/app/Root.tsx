@@ -82,7 +82,10 @@ export function Root() {
     }
 
     const onVisible = () => {
-      if (document.visibilityState === "visible") void sync.flush().catch(() => undefined);
+      if (document.visibilityState !== "visible") return;
+      void sync.flush().catch(() => undefined);
+      // A suspended PWA comes back with a stale gauge: reload snapshot, due count and energy.
+      void refreshProgress().catch(() => undefined);
     };
     document.addEventListener("visibilitychange", onVisible);
 

@@ -55,3 +55,7 @@ test("waitParts rounds up to the minute and never goes negative", () => {
   expect(waitParts(at(10), at(0))).toEqual({ hours: 0, minutes: 0 });
   expect(ENERGY.max).toBe(5);
 });
+
+test("an event dated in the future (clock moved back) is treated as happening now", () => {
+  expect(energyAt([start("lesson", 2 * H)], at(0))).toEqual({ current: 4, max: 5, nextAt: at(3 * H) });
+});

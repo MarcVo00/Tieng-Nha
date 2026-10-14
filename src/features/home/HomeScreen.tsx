@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import type { LessonSummary } from "@/domain/types";
+import type { LessonSummary, Tree } from "@/domain/types";
 import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
 import { PathStop } from "@/features/home/PathStop";
 import { HeroToken } from "@/features/home/HeroToken";
@@ -58,6 +58,7 @@ export function HomeScreen() {
   const reduced = useReducedMotion();
   const maskId = useId();
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
+  const [tree, setTree] = useState<Tree | null>(null);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const nextEl = useRef<HTMLElement | null>(null);
@@ -66,9 +67,11 @@ export function HomeScreen() {
   useEffect(() => {
     let cancelled = false;
     setFailed(false);
-    Promise.all([content.listLessons(), refresh()]).then(
-      ([list]) => {
-        if (!cancelled) setLessons(list);
+    Promise.all([content.listLessons(), content.getTree(), refresh()]).then(
+      ([list, loadedTree]) => {
+        if (cancelled) return;
+        setLessons(list);
+        setTree(loadedTree);
       },
       () => {
         if (!cancelled) setFailed(true);
@@ -79,7 +82,7 @@ export function HomeScreen() {
     };
   }, [content, refresh, attempt]);
 
-  const ready = lessons !== null && snapshot !== null;
+  const ready = lessons !== null && tree !== null && snapshot !== null;
   useEffect(() => {
     if (!ready || scrolled.current) return;
     scrolled.current = true;
@@ -101,7 +104,7 @@ export function HomeScreen() {
     );
   }
 
-  const layout = ready ? buildPathLayout(lessons, snapshot) : null;
+  const layout = ready ? buildPathLayout(lessons, snapshot, tree) : null;
 
   return (
     <div className="relative px-5 pb-8 pt-4">

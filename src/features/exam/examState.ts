@@ -3,7 +3,6 @@ import { fr } from "@/i18n/fr";
 import type { ExamMention } from "@/services/exam";
 
 export const EXAM_TOTAL = 30;
-export const EXAM_LESSONS_REQUIRED = 10;
 export const SECTION_ORDER: readonly ExamSection[] = ["listening", "translation", "tones", "speaking"];
 
 /** Router state handed from the intro to the run screen. */

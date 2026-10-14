@@ -1,7 +1,7 @@
-import type { LessonSummary, ProgressSnapshot } from "@/domain/types";
+import type { LessonSummary, ProgressSnapshot, Tree } from "@/domain/types";
+import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 
 export const PATH_WIDTH = 320;
-export const EXAM_UNLOCK_LESSONS = 10;
 const MAIN_OFFSETS = [-40, 0, 40, 0] as const;
 const ROW_HEIGHT = { lesson: 136, dialogue: 92, exam: 168 } as const;
 const PAD = 24;
@@ -35,12 +35,12 @@ export function lessonStateOf(lessons: readonly LessonSummary[], index: number, 
 }
 
 /** Deterministic vertical layout: stops alternate -40/0/+40/0 px around the centre line. */
-export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: ProgressSnapshot): PathLayout {
+export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: ProgressSnapshot, tree: Tree): PathLayout {
   const done = new Set<string>(snapshot.lessonsDone);
   const perfect = new Set<string>(snapshot.perfectLessons);
   const dialoguesDone = new Set<string>(snapshot.dialoguesDone);
   const nextIndex = lessons.findIndex((_, i) => lessonStateOf(lessons, i, done) === "available");
-  const examLocked = snapshot.lessonsDone.length < EXAM_UNLOCK_LESSONS;
+  const examLocked = nodeState(tree, FINAL_BOSS_ID, treeProgress(snapshot)) === "locked";
 
   const drafts: Draft[] = [];
   let mainCount = 0;

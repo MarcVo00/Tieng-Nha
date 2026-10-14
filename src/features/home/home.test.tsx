@@ -42,7 +42,9 @@ test("a completed lesson turns done and reveals its dialogue stop", async () => 
   const stop = await screen.findByRole("link", { name: /Au café.*terminée sans faute/ });
   expect(stop).toHaveAttribute("href", "/lesson/l05");
   expect(screen.getByRole("link", { name: "Dialogue : Au café" })).toHaveAttribute("href", "/dialogue/d05");
-  expect(screen.queryByText("Commencer")).not.toBeInTheDocument();
+  // The only lesson of the fakes tree is done, so the boss stop is unlocked and takes over the start chip.
+  expect(screen.queryByRole("button", { name: /Bài kiểm tra.*verrouillé/ })).not.toBeInTheDocument();
+  expect(screen.getAllByText("Commencer")).toHaveLength(1);
 });
 
 test("review card appears when words are due", async () => {

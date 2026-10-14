@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import type { Tree } from "@/domain/types";
+import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
 import { Button, Card, Icon, Motif, ProgressBar, Skeleton, type IconName } from "@/ui";
-import { EXAM_LESSONS_REQUIRED, isInterruptedState, markAttempt, SECTION_ORDER, type RunState } from "@/features/exam/examState";
+import { isInterruptedState, markAttempt, SECTION_ORDER, type RunState } from "@/features/exam/examState";
 
 const SECTION_ICON: Record<(typeof SECTION_ORDER)[number], IconName> = {
   listening: "speaker",
@@ -29,25 +31,42 @@ function useOnline(): boolean {
   return online;
 }
 
-// Hero: the test title (or the lock when 10 lessons are not done yet). One action: Commencer.
+// Hero: the test title (or the lock while the skill tree keeps it locked). One action: Commencer.
 export function ExamIntroScreen() {
-  const { exam } = useServices();
+  const { exam, content } = useServices();
   const navigate = useNavigate();
   const interrupted = isInterruptedState((useLocation() as { state: unknown }).state);
   const snapshot = useAppState((s) => s.snapshot);
   const online = useOnline();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tree, setTree] = useState<Tree | null>(null);
 
-  if (!snapshot) {
+  useEffect(() => {
+    let cancelled = false;
+    content.getTree().then(
+      (t) => {
+        if (!cancelled) setTree(t);
+      },
+      () => {},
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [content]);
+
+  if (!snapshot || !tree) {
     return (
       <div className="pt-6">
         <Skeleton lines={4} />
       </div>
     );
   }
-  const done = snapshot.lessonsDone.length;
-  const unlocked = done >= EXAM_LESSONS_REQUIRED;
+  const progress = treeProgress(snapshot);
+  const unlocked = nodeState(tree, FINAL_BOSS_ID, progress) !== "locked";
+  const trunkLessons = tree.nodes.filter((n) => n.kind === "lesson");
+  const done = trunkLessons.filter((n) => progress.lessonsDone.includes(n.id)).length;
+  const total = trunkLessons.length;
 
   const start = async () => {
     if (starting) return;
@@ -138,8 +157,8 @@ export function ExamIntroScreen() {
             <h2 className="text-heading text-ink">{fr.exam.intro.locked.title}</h2>
           </div>
           <p className="text-body text-ink-muted">{fr.exam.intro.locked.body}</p>
-          <ProgressBar value={done / EXAM_LESSONS_REQUIRED} label={fr.exam.intro.locked.progress(done, EXAM_LESSONS_REQUIRED)} />
-          <p className="text-caption text-ink-muted tabular">{fr.exam.intro.locked.progress(done, EXAM_LESSONS_REQUIRED)}</p>
+          <ProgressBar value={done / total} label={fr.exam.intro.locked.progress(done, total)} />
+          <p className="text-caption text-ink-muted tabular">{fr.exam.intro.locked.progress(done, total)}</p>
         </Card>
       )}
     </div>

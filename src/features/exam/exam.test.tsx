@@ -24,7 +24,7 @@ const snapshotWith = (lessons: number, examBest: number | null = null): Progress
   xpWeek: 40,
   xpToday: 10,
   streak: 3,
-  lessonsDone: Array.from({ length: lessons }, (_, i) => `l${String(i + 1).padStart(2, "0")}`),
+  lessonsDone: lessons > 0 ? ["l05"] : [],
   perfectLessons: [],
   dialoguesDone: [],
   vocabReviewed: 0,
@@ -68,12 +68,12 @@ afterEach(() => {
 });
 
 describe("intro", () => {
-  test("is locked below 10 lessons and shows the progress", async () => {
-    useAppState.setState({ snapshot: snapshotWith(1) });
+  test("is locked until the tree unlocks the boss and shows the progress", async () => {
+    useAppState.setState({ snapshot: snapshotWith(0) });
     renderExam({ entry: "/exam" });
     expect(await screen.findByRole("heading", { name: fr.exam.intro.locked.title })).toBeInTheDocument();
-    expect(screen.getByText("1 / 10 leçons terminées")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "10");
+    expect(screen.getByText(fr.exam.intro.locked.progress(0, 1))).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
     expect(screen.queryByRole("button", { name: fr.exam.intro.start })).not.toBeInTheDocument();
   });
 

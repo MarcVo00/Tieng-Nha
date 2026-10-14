@@ -170,18 +170,18 @@ test("tapping a bot opens its public profile", async () => {
   expect(screen.getByText(fr.publicProfile.examNone)).toBeInTheDocument();
 });
 
-test("a profile shows its lesson count and best exam score", async () => {
+test("a profile shows its lesson count and boss victory", async () => {
   const base = createFakeServices({ clock });
   const leaderboard: Services["leaderboard"] = {
     list: (period) => base.leaderboard.list(period),
     getPublicProfile: async () => ({
       userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
-      lessonsDone: ["l01", "l02"], dialoguesDone: [], badges: ["first_lesson"], examBest: 82,
+      lessonsDone: ["l01", "l02"], dialoguesDone: [], badges: ["first_lesson"], examBest: 92,
     }),
   };
   setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
   expect(await screen.findByRole("heading", { level: 1, name: "Xuân" })).toBeInTheDocument();
-  expect(screen.getByText("82 / 100")).toBeInTheDocument();
+  expect(await screen.findByText(fr.publicProfile.bossWon("Thủy Tinh", 4, 5))).toBeInTheDocument();
   expect(screen.getByText(fr.publicProfile.lessonsSummary(2))).toBeInTheDocument();
   expect(screen.getAllByText(fr.ui.badge.locked, { exact: false }).length).toBeGreaterThan(0);
 });

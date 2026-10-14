@@ -4,7 +4,9 @@ import { motion } from "motion/react";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { ContentNotFoundError, OfflineError } from "@/domain/errors";
-import type { BadgeDef, PublicProfile } from "@/domain/types";
+import type { BadgeDef, Boss, PublicProfile } from "@/domain/types";
+import { FINAL_BOSS_ID } from "@/services/tree";
+import { livesFromScore } from "@/services/bossFight";
 import { fr } from "@/i18n/fr";
 import { Avatar, BadgeMedal, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
 
@@ -29,12 +31,29 @@ function BackLink() {
   );
 }
 
+function bossStat(examBest: number | null, boss: Boss | null): string {
+  const lives = examBest !== null && boss ? livesFromScore(examBest, boss.playerLives) : null;
+  return boss && lives !== null ? fr.publicProfile.bossWon(boss.name, lives, boss.playerLives) : fr.publicProfile.examNone;
+}
+
 export function PublicProfileScreen() {
   const { userId = "" } = useParams();
   const { leaderboard, content, progress } = useServices();
   const myId = useAppState((s) => s.session?.userId);
   const [state, setState] = useState<State>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
+  const [boss, setBoss] = useState<Boss | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    content
+      .getBoss(FINAL_BOSS_ID)
+      .then((b) => !cancelled && setBoss(b))
+      .catch(() => undefined); // The stat falls back to a plain label.
+    return () => {
+      cancelled = true;
+    };
+  }, [content]);
 
   useEffect(() => {
     let cancelled = false;
@@ -150,7 +169,7 @@ export function PublicProfileScreen() {
       <Card className="mt-8 p-4">
         <p className="text-caption text-ink-muted">{fr.publicProfile.examTitle}</p>
         <p className="tabular text-heading text-ink">
-          {profile.examBest === null ? fr.publicProfile.examNone : fr.publicProfile.examScore(profile.examBest)}
+          {bossStat(profile.examBest, boss)}
         </p>
       </Card>
     </motion.div>

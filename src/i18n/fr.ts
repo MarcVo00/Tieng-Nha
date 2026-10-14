@@ -273,12 +273,10 @@ export const fr = {
     },
     dialogue: { kicker: "Dialogue", aria: (title: string) => `Dialogue : ${title}`, done: "Fait" },
     exam: {
-      vi: "Bài kiểm tra",
-      fr: "Test final",
-      lockedToast: "Termine d'abord les 10 leçons",
+      kicker: "Boss final",
+      lockedToast: "Termine d'abord les leçons pour affronter Thủy Tinh",
       lockedHint: "Après les 10 leçons",
-      best: (n: number) => `Meilleur score : ${n} %`,
-      aria: (locked: boolean) => `Bài kiểm tra, test final${locked ? ", verrouillé" : ""}`,
+      aria: (name: string, locked: boolean) => `${name}, boss final${locked ? ", verrouillé" : ""}`,
     },
   },
   // --- report ---
@@ -502,9 +500,9 @@ export const fr = {
     lessonDot: (n: number, done: boolean) => `Leçon ${n} : ${done ? "terminée" : "pas encore terminée"}`,
     lessonsSummary: (n: number) => `${n} sur 10`,
     badgesTitle: "Badges",
-    examTitle: "Meilleur score au test final",
-    examScore: (n: number) => `${n} / 100`,
-    examNone: "Pas encore passé",
+    examTitle: "Boss final",
+    bossWon: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
+    examNone: "Pas encore vaincu",
     offline: { title: "Profil indisponible hors ligne", body: "Reconnecte-toi pour voir ce profil." },
     notFound: { title: "Profil introuvable", body: "Cette personne n'est pas (ou plus) au classement." },
     error: { title: "Le profil n'a pas pu se charger", body: "Réessaie dans un instant." },
@@ -513,7 +511,13 @@ export const fr = {
   profile: {
     title: "Mon profil",
     editAria: "Modifier mon profil",
-    stats: { xp: "XP au total", streak: "Série en cours", exam: "Meilleur score au test final", examNone: "Pas encore passé", examScore: (n: number) => `${n} / 100` },
+    stats: {
+      xp: "XP au total",
+      streak: "Série en cours",
+      exam: "Boss final",
+      bossWon: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
+      examNone: "Pas encore vaincu",
+    },
     certificate: { open: "Voir mon certificat", sheet: "Mon certificat", download: "Télécharger", error: "Le certificat n'a pas pu être créé." },
     edit: {
       title: "Modifier mon profil",

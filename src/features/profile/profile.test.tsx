@@ -142,6 +142,18 @@ test("the certificate button appears from 70 and uses the best attempt's date", 
   expect(document.body).toHaveTextContent(fr.exam.certificate.noSpeaking);
 });
 
+test("the stats show the boss victory with the lives left, or not defeated yet", async () => {
+  useAppState.setState({ snapshot: snapshot({ examBest: 92 }) });
+  await setup();
+  expect(await screen.findByText(fr.profile.stats.bossWon("Thủy Tinh", 4, 5))).toBeInTheDocument();
+});
+
+test("a score that is not a victory reads as not defeated yet", async () => {
+  useAppState.setState({ snapshot: snapshot({ examBest: 36 }) });
+  await setup();
+  expect(screen.getByText(fr.profile.stats.examNone)).toBeInTheDocument();
+});
+
 test("no certificate button below 70", async () => {
   useAppState.setState({ snapshot: snapshot({ examBest: 69 }) });
   await setup();

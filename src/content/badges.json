@@ -10,7 +10,7 @@
     { "id": "vocab_100", "title": "Mémoire d'éléphant", "description": "Révise 100 mots correctement.", "icon": "🐘", "rule": { "kind": "vocab_reviewed", "gte": 100 } },
     { "id": "first_dialogue", "title": "Première conversation", "description": "Termine ton premier dialogue.", "icon": "💬", "rule": { "kind": "dialogues_done", "gte": 1 } },
     { "id": "all_dialogues", "title": "Bavard·e", "description": "Termine les 10 dialogues.", "icon": "🗣️", "rule": { "kind": "dialogues_done", "gte": 10 } },
-    { "id": "exam_passed", "title": "Diplômé·e", "description": "Obtiens au moins 70 au test final.", "icon": "📜", "rule": { "kind": "exam_score", "gte": 70 } },
-    { "id": "exam_excellent", "title": "Excellence", "description": "Obtiens au moins 90 au test final.", "icon": "🏆", "rule": { "kind": "exam_score", "gte": 90 } }
+    { "id": "exam_passed", "title": "Vainqueur de Thủy Tinh", "description": "Bats le boss final.", "icon": "📜", "rule": { "kind": "exam_score", "gte": 70 } },
+    { "id": "exam_excellent", "title": "Excellence", "description": "Bats le boss final en gardant au moins 4 vies.", "icon": "🏆", "rule": { "kind": "exam_score", "gte": 90 } }
   ]
 }

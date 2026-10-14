@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
+import { FINAL_BOSS_ID } from "@/services/tree";
 import { fr } from "@/i18n/fr";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import type { LessonSummary, Tree } from "@/domain/types";
+import type { Boss, LessonSummary, Tree } from "@/domain/types";
 import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
 import { PathStop } from "@/features/home/PathStop";
 import { HeroToken } from "@/features/home/HeroToken";
@@ -59,6 +60,7 @@ export function HomeScreen() {
   const maskId = useId();
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
   const [tree, setTree] = useState<Tree | null>(null);
+  const [boss, setBoss] = useState<Boss | null>(null);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const nextEl = useRef<HTMLElement | null>(null);
@@ -67,11 +69,12 @@ export function HomeScreen() {
   useEffect(() => {
     let cancelled = false;
     setFailed(false);
-    Promise.all([content.listLessons(), content.getTree(), refresh()]).then(
-      ([list, loadedTree]) => {
+    Promise.all([content.listLessons(), content.getTree(), content.getBoss(FINAL_BOSS_ID), refresh()]).then(
+      ([list, loadedTree, loadedBoss]) => {
         if (cancelled) return;
         setLessons(list);
         setTree(loadedTree);
+        setBoss(loadedBoss);
       },
       () => {
         if (!cancelled) setFailed(true);
@@ -82,7 +85,7 @@ export function HomeScreen() {
     };
   }, [content, refresh, attempt]);
 
-  const ready = lessons !== null && tree !== null && snapshot !== null;
+  const ready = lessons !== null && tree !== null && boss !== null && snapshot !== null;
   useEffect(() => {
     if (!ready || scrolled.current) return;
     scrolled.current = true;
@@ -104,7 +107,7 @@ export function HomeScreen() {
     );
   }
 
-  const layout = ready ? buildPathLayout(lessons, snapshot, tree) : null;
+  const layout = ready ? buildPathLayout(lessons, snapshot, tree, boss) : null;
 
   return (
     <div className="relative px-5 pb-8 pt-4">

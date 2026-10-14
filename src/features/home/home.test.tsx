@@ -30,7 +30,7 @@ test("shows the first lesson as available with a start chip, and a locked exam",
   const stop = await screen.findByRole("link", { name: /Au café.*disponible/ });
   expect(stop).toHaveAttribute("href", "/lesson/l05");
   expect(screen.getByText("Commencer")).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: /Bài kiểm tra.*verrouillé/ })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Thủy Tinh.*verrouillé/ })).toBeInTheDocument();
   expect(screen.queryByRole("link", { name: /Dialogue/ })).not.toBeInTheDocument();
   expect(screen.queryByText(/Révision du jour/)).not.toBeInTheDocument();
 });
@@ -43,7 +43,7 @@ test("a completed lesson turns done and reveals its dialogue stop", async () => 
   expect(stop).toHaveAttribute("href", "/lesson/l05");
   expect(screen.getByRole("link", { name: "Dialogue : Au café" })).toHaveAttribute("href", "/dialogue/d05");
   // The only lesson of the fakes tree is done, so the boss stop is unlocked and takes over the start chip.
-  expect(screen.queryByRole("button", { name: /Bài kiểm tra.*verrouillé/ })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /Thủy Tinh.*verrouillé/ })).not.toBeInTheDocument();
   expect(screen.getAllByText("Commencer")).toHaveLength(1);
 });
 
@@ -59,8 +59,8 @@ test("review card appears when words are due", async () => {
 test("tapping the locked exam shows a toast", async () => {
   renderHome();
   const user = userEvent.setup();
-  await user.click(await screen.findByRole("button", { name: /Bài kiểm tra/ }));
-  expect(await screen.findByRole("status")).toHaveTextContent("Termine d'abord les 10 leçons");
+  await user.click(await screen.findByRole("button", { name: /Thủy Tinh/ }));
+  expect(await screen.findByRole("status")).toHaveTextContent("Termine d'abord les leçons pour affronter Thủy Tinh");
 });
 
 test("the hero waits beside the path before the first lesson, then stands on the last lesson completed", async () => {

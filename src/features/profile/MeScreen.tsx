@@ -7,7 +7,9 @@ import { OfflineError } from "@/domain/errors";
 import type { BadgeDef } from "@/domain/types";
 import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import { bossMention } from "@/services/bossFight";
+import type { Boss } from "@/domain/types";
+import { FINAL_BOSS_ID } from "@/services/tree";
+import { bossMention, livesFromScore } from "@/services/bossFight";
 import { fr } from "@/i18n/fr";
 import {
   Avatar, BadgeMedal, Button, Card, Certificate, ConfirmDialog, Icon, Sheet, StreakFlame, downloadCertificate, tap, useToast,
@@ -97,6 +99,7 @@ export function MeScreen() {
   const toast = useToast();
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
+  const [boss, setBoss] = useState<Boss | null>(null);
   const [badges, setBadges] = useState<BadgeDef[] | null>(null);
   const [badgesFailed, setBadgesFailed] = useState(false);
   const [bestDate, setBestDate] = useState<{ dateIso: string; noSpeaking: boolean } | null>(null);
@@ -123,6 +126,17 @@ export function MeScreen() {
   }, [content]);
 
   useEffect(() => {
+    let cancelled = false;
+    content
+      .getBoss(FINAL_BOSS_ID)
+      .then((b) => !cancelled && setBoss(b))
+      .catch(() => undefined); // The stat falls back to a plain label.
+    return () => {
+      cancelled = true;
+    };
+  }, [content]);
+
+  useEffect(() => {
     if (!passed) return;
     let cancelled = false;
     progress
@@ -143,6 +157,8 @@ export function MeScreen() {
     };
   }, [passed, progress]);
 
+  const lives = examBest !== null && boss ? livesFromScore(examBest, boss.playerLives) : null;
+  const bossStat = boss && lives !== null ? fr.profile.stats.bossWon(boss.name, lives, boss.playerLives) : fr.profile.stats.examNone;
   const mention = examBest === null ? "presque" : bossMention(examBest);
   const certificate: CertificateProps | null =
     passed && examBest !== null && mention !== "presque" && profile && bestDate
@@ -222,7 +238,7 @@ export function MeScreen() {
           </div>
           <div>
             <dt className="text-caption text-ink-muted">{fr.profile.stats.exam}</dt>
-            <dd className="tabular text-body-strong text-ink">{examBest === null ? fr.profile.stats.examNone : fr.profile.stats.examScore(examBest)}</dd>
+            <dd className="tabular text-body-strong text-ink">{bossStat}</dd>
           </div>
         </dl>
         {certificate ? (

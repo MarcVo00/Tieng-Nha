@@ -1,4 +1,4 @@
-import type { LessonSummary, ProgressSnapshot, Tree } from "@/domain/types";
+import type { Boss, LessonSummary, ProgressSnapshot, Tree } from "@/domain/types";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 
 export const PATH_WIDTH = 320;
@@ -6,12 +6,14 @@ const MAIN_OFFSETS = [-40, 0, 40, 0] as const;
 const ROW_HEIGHT = { lesson: 136, dialogue: 92, exam: 168 } as const;
 const PAD = 24;
 
+export type BossInfo = Pick<Boss, "name" | "illustration">;
+
 export type LessonState = "done" | "available" | "locked";
 
 export type PathNode =
   | { kind: "lesson"; key: string; lesson: LessonSummary; order: number; state: LessonState; perfect: boolean; next: boolean; offset: number; cy: number; height: number; size: 64 }
   | { kind: "dialogue"; key: string; lesson: LessonSummary; done: boolean; offset: number; cy: number; height: number; size: 48 }
-  | { kind: "exam"; key: string; locked: boolean; best: number | null; next: boolean; offset: number; cy: number; height: number; size: 64 };
+  | { kind: "exam"; key: string; boss: BossInfo; locked: boolean; best: number | null; next: boolean; offset: number; cy: number; height: number; size: 64 };
 
 /**
  * Where the hero stands: on top of the last lesson completed (`at` = its id, (x,y) = top of the stop), or, before
@@ -35,7 +37,7 @@ export function lessonStateOf(lessons: readonly LessonSummary[], index: number, 
 }
 
 /** Deterministic vertical layout: stops alternate -40/0/+40/0 px around the centre line. */
-export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: ProgressSnapshot, tree: Tree): PathLayout {
+export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: ProgressSnapshot, tree: Tree, boss: BossInfo): PathLayout {
   const done = new Set<string>(snapshot.lessonsDone);
   const perfect = new Set<string>(snapshot.perfectLessons);
   const dialoguesDone = new Set<string>(snapshot.dialoguesDone);
@@ -55,7 +57,7 @@ export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: Pro
       drafts.push({ kind: "dialogue", key: `${lesson.id}-dialogue`, lesson, done: dialoguesDone.has(lesson.dialogueId), offset: dOffset, height: ROW_HEIGHT.dialogue, size: 48 });
     }
   });
-  drafts.push({ kind: "exam", key: "exam", locked: examLocked, best: snapshot.examBest, next: nextIndex === -1 && !examLocked, offset: mainOffset(mainCount), height: ROW_HEIGHT.exam, size: 64 });
+  drafts.push({ kind: "exam", key: "exam", boss: { name: boss.name, illustration: boss.illustration }, locked: examLocked, best: snapshot.examBest, next: nextIndex === -1 && !examLocked, offset: mainOffset(mainCount), height: ROW_HEIGHT.exam, size: 64 });
 
   let y = PAD;
   const nodes = drafts.map((n) => {

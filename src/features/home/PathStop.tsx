@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { Icon, tap, useToast, duration, spring } from "@/ui";
+import { bossArtUrl } from "@/features/home/bossArt";
 import { PATH_WIDTH, type PathNode } from "@/features/home/pathLayout";
 
 const SHAKE = [0, -6, 6, -4, 4, 0];
 
 type StopProps = { node: PathNode; nextRef: (el: HTMLElement | null) => void };
 
-type Visual = { circle: string; icon: ReactNode; title: ReactNode; sub: ReactNode; chip: boolean; to: string | null; lockedToast: string; label: string };
+type Visual = { circle: string; icon: ReactNode; title: ReactNode; sub: ReactNode; chip: boolean; badge?: ReactNode; to: string | null; lockedToast: string; label: string };
 
 function visualOf(node: PathNode): Visual {
   if (node.kind === "lesson") {
@@ -48,23 +49,22 @@ function visualOf(node: PathNode): Visual {
       label: fr.home.dialogue.aria(node.lesson.title),
     };
   }
+  const art = bossArtUrl(node.boss.illustration);
   return {
-    circle: node.locked ? "bg-surface-2 text-ink-muted" : "bg-primary text-primary-on border-b-4 border-primary-hover group-active:translate-y-[2px] group-active:border-b-2",
-    icon: node.locked ? <Icon name="lock" size={24} /> : <Icon name="trophy" size={28} />,
+    // The boss stands on the paper medallion like every character; locked = dimmed with a small lock badge.
+    circle: `overflow-hidden border-2 border-gold bg-paper shadow-card ${node.locked ? "opacity-60" : "group-active:translate-y-[2px]"}`,
+    icon: art ? <img src={art} alt="" className="h-full w-full object-contain p-1" /> : <Icon name="trophy" size={28} className="text-gold" />,
+    badge: node.locked ? <Icon name="lock" size={14} /> : null,
     title: (
-      <span className={`text-body-strong ${node.locked ? "text-ink-muted" : "text-ink"}`}>
-        <span lang="vi">{fr.home.exam.vi}</span> · {fr.home.exam.fr}
+      <span lang="vi" className={`block text-body-strong ${node.locked ? "text-ink-muted" : "text-ink"}`}>
+        {node.boss.name}
       </span>
     ),
-    sub: (
-      <span className="text-caption text-ink-muted">
-        {node.best !== null ? fr.home.exam.best(node.best) : node.locked ? fr.home.exam.lockedHint : null}
-      </span>
-    ),
+    sub: <span className="text-caption text-ink-muted">{node.locked ? fr.home.exam.lockedHint : fr.home.exam.kicker}</span>,
     chip: node.next,
     to: node.locked ? null : "/exam",
     lockedToast: fr.home.exam.lockedToast,
-    label: fr.home.exam.aria(node.locked),
+    label: fr.home.exam.aria(node.boss.name, node.locked),
   };
 }
 
@@ -93,6 +93,11 @@ export function PathStop({ node, nextRef }: StopProps) {
           />
         ) : null}
         <span className={`relative flex items-center justify-center rounded-full ${size} ${v.circle}`}>{v.icon}</span>
+        {v.badge ? (
+          <span aria-hidden="true" className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-ink-muted shadow-card">
+            {v.badge}
+          </span>
+        ) : null}
         {node.kind === "lesson" && node.perfect ? (
           <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-gold text-ink shadow-card">
             <Icon name="star" size={14} fill="currentColor" />

@@ -39,10 +39,10 @@ function DonePanel({ result, finishing, onFinish }: { result: ReviewDone; finish
         </div>
         <div className="pt-2">
           <XpCounter value={counted ? total : total - result.xpGained} {...(counted ? { delta: result.xpGained } : {})} />
-          {result.energyGained && result.energyGained > 0 ? (
+          {(result.energyGained ?? 0) > 0 ? (
             <p className="mt-3 flex items-center gap-1 text-body-strong text-gold-ink tabular">
               <Icon name="bolt" size={20} />
-              {fr.energy.gained(result.energyGained)}
+              {fr.energy.gained(result.energyGained ?? 0)}
             </p>
           ) : null}
         </div>

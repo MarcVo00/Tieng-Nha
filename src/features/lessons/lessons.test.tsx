@@ -10,7 +10,7 @@ import { orderExercises } from "@/features/lessons/useLessonRun";
 import { lessonFixture } from "@/test/fixtures/lessonFixture";
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import type { ReactElement } from "react";
+import { StrictMode, type ReactElement } from "react";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import type { Services } from "@/app/services";
 
@@ -235,10 +235,31 @@ test(
 );
 
 describe("energy", () => {
-  test("opening the lesson spends 1 energy", async () => {
-    const { services } = setup();
+  test("opening the lesson spends exactly 1 energy, even under StrictMode", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    renderWithServices(
+      <StrictMode>
+        <Routes>
+          <Route path="/lesson/:id" element={<LessonScreen />} />
+        </Routes>
+      </StrictMode>,
+      { services, route: "/lesson/l05" },
+    );
     await screen.findByRole("button", { name: fr.lessons.deck.next });
     expect((await services.activity.getEnergy()).current).toBe(4);
+  });
+
+  test("a lesson that fails to load spends nothing", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    vi.spyOn(services.content, "getLesson").mockRejectedValueOnce(new Error("offline"));
+    renderWithServices(
+      <Routes>
+        <Route path="/lesson/:id" element={<LessonScreen />} />
+      </Routes>,
+      { services, route: "/lesson/l05" },
+    );
+    expect(await screen.findByText(fr.lessons.loadError.title)).toBeInTheDocument();
+    expect((await services.activity.getEnergy()).current).toBe(5);
   });
 
   test("with no energy left the lesson does not open and offers the reviews", async () => {

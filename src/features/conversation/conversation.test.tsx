@@ -1,3 +1,4 @@
+import { StrictMode } from "react";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -11,12 +12,12 @@ import { DialogueScreen } from "@/features/conversation";
 const SLOW = { timeout: 5000 };
 const HOME = "page d'accueil";
 
-function setup() {
+function setup(opts: { strict?: boolean } = {}) {
   const stt = new FakeSpeechRecognizer();
   const tts = new FakeSpeechSynthesizer();
   const services = createFakeServices({ stt, tts });
   const completeDialogue = vi.spyOn(services.activity, "completeDialogue");
-  const view = render(
+  const tree = (
     <ServicesProvider services={services}>
       <MemoryRouter initialEntries={["/dialogue/d05"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
@@ -24,8 +25,9 @@ function setup() {
           <Route path="/dialogue/:id" element={<DialogueScreen />} />
         </Routes>
       </MemoryRouter>
-    </ServicesProvider>,
+    </ServicesProvider>
   );
+  const view = render(opts.strict ? <StrictMode>{tree}</StrictMode> : tree);
   return { ...view, services, stt, tts, completeDialogue };
 }
 
@@ -36,10 +38,36 @@ beforeEach(() => {
 });
 
 describe("energy", () => {
-  it("opening a dialogue spends 1 energy", async () => {
-    const { services } = setup();
+  it("opening a dialogue spends exactly 1 energy, even under StrictMode", async () => {
+    const { services } = setup({ strict: true });
     await screen.findByText("Commander au café");
     expect((await services.activity.getEnergy()).current).toBe(4);
+  });
+
+  it("a dialogue that fails to load spends nothing", async () => {
+    const services = createFakeServices({ stt: new FakeSpeechRecognizer(), tts: new FakeSpeechSynthesizer() });
+    vi.spyOn(services.content, "getDialogue").mockRejectedValueOnce(new Error("offline"));
+    render(
+      <ServicesProvider services={services}>
+        <MemoryRouter initialEntries={["/dialogue/d05"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route path="/dialogue/:id" element={<DialogueScreen />} />
+          </Routes>
+        </MemoryRouter>
+      </ServicesProvider>,
+    );
+    expect(await screen.findByText(fr.conversation.loadError.title)).toBeInTheDocument();
+    expect((await services.activity.getEnergy()).current).toBe(5);
+  });
+
+  it("replaying a finished dialogue spends 1 more energy", async () => {
+    const { services } = setup();
+    await userEvent.click(await optionButton(/Cho tui một ly cà phê sữa đá/));
+    await userEvent.click(await optionButton(/Cảm ơn em/));
+    expect((await services.activity.getEnergy()).current).toBe(4);
+    await userEvent.click(await screen.findByRole("button", { name: fr.conversation.done.replay }, SLOW));
+    await screen.findByText("Chào bạn! Bạn uống gì?", undefined, SLOW);
+    expect((await services.activity.getEnergy()).current).toBe(3);
   });
 
   it("with no energy left it shows the empty panel and no conversation", async () => {

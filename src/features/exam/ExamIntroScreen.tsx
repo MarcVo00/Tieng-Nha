@@ -37,6 +37,10 @@ export function ExamIntroScreen() {
   const snapshot = useAppState((s) => s.snapshot);
   const energy = useAppState((s) => s.energy);
   const [spendRefused, setSpendRefused] = useState(false);
+  // A refusal is only as true as the energy it was based on: clear it once the gauge shows enough again.
+  useEffect(() => {
+    if (energy !== null && energy.current >= ENERGY.cost.boss) setSpendRefused(false);
+  }, [energy]);
   const online = useOnline();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -164,12 +168,12 @@ export function ExamIntroScreen() {
           </section>
 
           <div className="flex flex-col gap-2">
-            <Button size="lg" fullWidth loading={starting} disabled={!online || !canFight} onClick={() => void start()}>
+            <Button size="lg" fullWidth loading={starting} disabled={!online || !canFight} aria-describedby={!canFight ? "boss-no-energy" : undefined} onClick={() => void start()}>
               {fr.exam.intro.start}
             </Button>
             {!canFight ? (
               <div className="flex flex-wrap items-center gap-3">
-                <p className="text-body-strong text-ink-muted">
+                <p id="boss-no-energy" className="text-body-strong text-ink-muted">
                   {fr.exam.intro.noEnergy(ENERGY.cost.boss)}
                 </p>
                 <Link

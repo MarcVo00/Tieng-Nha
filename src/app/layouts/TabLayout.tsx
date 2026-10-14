@@ -3,6 +3,7 @@ import { Link, useLocation, useOutlet } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { SyncIndicator } from "@/app/SyncIndicator";
 import { fr } from "@/i18n/fr";
+import { InAppBrowserNotice } from "@/features/onboarding";
 import { Avatar, PageTransition, StreakFlame, TabBar, XpCounter } from "@/ui";
 
 export function TabLayout() {
@@ -24,6 +25,7 @@ export function TabLayout() {
           <XpCounter value={snapshot?.xpTotal ?? 0} />
         </div>
       </header>
+      <InAppBrowserNotice className="mb-4" />
       <main>
         <AnimatePresence mode="wait">
         <PageTransition key={pathname} variant="tab">

@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
 import { fr } from "@/i18n/fr";
 import { Button, Icon } from "@/ui";
-import { detectPlatform } from "@/domain/platform";
+import { detectPlatform, isInAppBrowser } from "@/domain/platform";
+import { InAppBrowserNotice } from "@/features/onboarding/InAppBrowserNotice";
 import { getInstallPrompt, promptInstall, subscribeInstallPrompt } from "@/features/onboarding/installPrompt";
 
 export function isStandalone(): boolean {
@@ -38,6 +39,7 @@ export function InstallStep({ onFinish }: InstallStepProps) {
   const t = fr.onboarding.install;
   const canPrompt = useSyncExternalStore(subscribeInstallPrompt, () => getInstallPrompt() !== null);
   const ios = detectPlatform(navigator.userAgent, navigator.maxTouchPoints) === "ios";
+  const inApp = isInAppBrowser(navigator.userAgent);
 
   async function install() {
     try {
@@ -53,9 +55,10 @@ export function InstallStep({ onFinish }: InstallStepProps) {
     <section className="flex flex-col gap-5">
       <h1 className="text-title text-ink">{t.title}</h1>
       <p className="text-body text-ink-muted">{t.lead}</p>
-      {ios ? <IosSteps /> : null}
-      {!ios && !canPrompt ? <p className="text-body text-ink-muted">{t.unavailable}</p> : null}
-      {!ios && canPrompt ? (
+      {inApp ? <InAppBrowserNotice /> : null}
+      {!inApp && ios ? <IosSteps /> : null}
+      {!inApp && !ios && !canPrompt ? <p className="text-body text-ink-muted">{t.unavailable}</p> : null}
+      {!inApp && !ios && canPrompt ? (
         <>
           <Button size="lg" fullWidth onClick={() => void install()}>
             {t.action}

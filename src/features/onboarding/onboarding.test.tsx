@@ -497,6 +497,18 @@ describe("install step", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
   });
 
+  test("inside a messaging app's browser, the step sends the user to Chrome instead of installing", async () => {
+    stubUserAgent("Mozilla/5.0 (Linux; Android 14; SM-S911B; wv) AppleWebKit/537.36 Chrome/129.0 Mobile Safari/537.36 Instagram 350.0");
+    stubDisplayMode(false);
+    signedIn();
+    const { user } = setup();
+    await toInstallStep(user);
+    expect(await screen.findByText("Ouvre Tiếng Nhà dans ton navigateur")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ouvrir dans Chrome" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Installer l'application" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "C'est parti !" })).toBeInTheDocument();
+  });
+
   test("standalone display mode skips the step and finishes", async () => {
     stubDisplayMode(true);
     signedIn();

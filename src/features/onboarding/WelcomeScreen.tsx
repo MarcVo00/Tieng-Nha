@@ -13,6 +13,7 @@ import { ProfileStep } from "@/features/onboarding/ProfileStep";
 import { SetPasswordStep, type PasswordMode } from "@/features/onboarding/SetPasswordStep";
 import { SignInStep } from "@/features/onboarding/SignInStep";
 import { WelcomeStep } from "@/features/onboarding/WelcomeStep";
+import { InAppBrowserNotice } from "@/features/onboarding/InAppBrowserNotice";
 
 type Step = "welcome" | "signin" | "recovery" | "invite" | "password" | "profile" | "device" | "install";
 type Next = "profile" | "existing";
@@ -169,7 +170,12 @@ export function WelcomeScreen() {
       ) : null}
       <AnimatePresence mode="wait" custom={dir} initial={false}>
         <motion.div ref={stepRef} key={step} custom={dir} variants={slide} initial="enter" animate="center" exit="exit" className="flex flex-1 flex-col">
-          {step === "welcome" ? <WelcomeStep message={env.VITE_WELCOME_MESSAGE} onStart={() => go("invite")} onSignIn={() => go("signin")} /> : null}
+          {step === "welcome" ? (
+            <>
+              <InAppBrowserNotice className="mb-6" />
+              <WelcomeStep message={env.VITE_WELCOME_MESSAGE} onStart={() => go("invite")} onSignIn={() => go("signin")} />
+            </>
+          ) : null}
           {step === "signin" ? (
             <SignInStep
               initialEmail={prefillEmail}

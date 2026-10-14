@@ -224,6 +224,12 @@ export const fr = {
       finish: "C'est parti !",
       unavailable: "Ton navigateur ne propose pas l'installation pour le moment. Tu pourras le faire plus tard depuis son menu.",
     },
+    inApp: {
+      title: "Ouvre Tiếng Nhà dans ton navigateur",
+      android: "Tu es dans le navigateur d'une appli de messagerie : l'installation y est bloquée. Ouvre le lien dans Chrome pour installer Tiếng Nhà.",
+      ios: "Tu es dans le navigateur d'une appli de messagerie : l'installation n'y est pas possible. Touche ⋯ puis « Ouvrir dans le navigateur » pour passer sur Safari.",
+      open: "Ouvrir dans Chrome",
+    },
     callback: {
       title: "Connexion réussie !",
       body: "Reviens dans l'application et saisis le code à 6 chiffres reçu par e-mail.",

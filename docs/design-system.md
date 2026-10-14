@@ -36,6 +36,7 @@ Toutes les paires ci-dessous ont été vérifiées (WCAG 2.1) : texte normal ≥
 | `--color-info` | `#2C4A7A` | indigo (chàm) : infos, aide | 7.8 sur bg |
 | `--color-streak` | `#D9531E` | flamme du streak (icône uniquement) | décoratif |
 | `--color-scrim` | `rgb(31 26 23 / 0.35)` | voile derrière feuilles et dialogues | décoratif |
+| `--color-paper` | `#F4E4C4` | papier « giấy điệp » : médaillon des personnages (identique en sombre), voir [direction artistique](art-direction.md) | — |
 
 ### 2.2 Thème sombre — « Laque noire »
 | Token CSS | Hex | Contraste |

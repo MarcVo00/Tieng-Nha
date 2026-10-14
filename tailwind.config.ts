@@ -19,6 +19,7 @@ export default {
       info: "var(--color-info)",
       streak: "var(--color-streak)",
       scrim: "var(--color-scrim)",
+      paper: "var(--color-paper)",
       tone: {
         ngang: "var(--tone-ngang)", huyen: "var(--tone-huyen)", sac: "var(--tone-sac)",
         hoi: "var(--tone-hoi)", nga: "var(--tone-nga)", nang: "var(--tone-nang)",

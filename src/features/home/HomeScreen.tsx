@@ -7,7 +7,8 @@ import { useServices } from "@/app/ServicesProvider";
 import type { LessonSummary } from "@/domain/types";
 import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
 import { PathStop } from "@/features/home/PathStop";
-import { buildPathLayout, PATH_WIDTH } from "@/features/home/pathLayout";
+import { HeroToken } from "@/features/home/HeroToken";
+import { buildPathLayout, PATH_WIDTH, type PathLayout } from "@/features/home/pathLayout";
 
 // Hero: the winding path with the next stop pulsing. One primary action: the next stop.
 // Secondary: the review card on top. Loading: skeleton stops. Error: retry.
@@ -29,6 +30,11 @@ function ReviewCard({ count }: { count: number }) {
       </Card>
     </motion.div>
   );
+}
+
+function heroLabel(layout: PathLayout): string {
+  const stop = layout.nodes.find((n) => n.kind === "lesson" && n.key === layout.hero.at);
+  return stop && stop.kind === "lesson" ? fr.home.heroAt(stop.lesson.title) : fr.home.heroStart;
 }
 
 function SkeletonStops() {
@@ -131,6 +137,7 @@ export function HomeScreen() {
                 <PathStop key={node.key} node={node} nextRef={nextRef} />
               ))}
             </ol>
+            <HeroToken hero={layout.hero} label={heroLabel(layout)} />
           </div>
         )}
       </div>

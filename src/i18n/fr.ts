@@ -261,6 +261,8 @@ export const fr = {
   // --- home ---
   home: {
     pathLabel: "Ton parcours",
+    heroStart: "Toi, au départ du parcours",
+    heroAt: (title: string) => `Toi, après la leçon « ${title} »`,
     loadError: { title: "Le parcours n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
     review: { title: "Révision du jour", count: (n: number) => `${n} ${n > 1 ? "mots" : "mot"}` },
     start: "Commencer",

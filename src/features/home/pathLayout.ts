@@ -13,7 +13,16 @@ export type PathNode =
   | { kind: "dialogue"; key: string; lesson: LessonSummary; done: boolean; offset: number; cy: number; height: number; size: 48 }
   | { kind: "exam"; key: string; locked: boolean; best: number | null; next: boolean; offset: number; cy: number; height: number; size: 64 };
 
-export type PathLayout = { nodes: PathNode[]; height: number; d: string };
+/**
+ * Where the hero stands: on top of the last lesson completed (`at` = its id, (x,y) = top of the stop), or, before
+ * the first lesson, beside the path level with lesson 1 (`at` = null, (x,y) = where his feet touch the ground).
+ */
+export type HeroPlacement = { at: string | null; x: number; y: number };
+
+export type PathLayout = { nodes: PathNode[]; height: number; d: string; hero: HeroPlacement };
+
+const HERO_SIDE_GAP = 72; // px between lesson 1 and the waiting hero: clearly off the path, never on it
+const HERO_EDGE = 24;
 
 type Draft = PathNode extends infer N ? (N extends PathNode ? Omit<N, "cy"> : never) : never;
 
@@ -63,5 +72,17 @@ export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: Pro
       return `C${cx(prev)} ${mid} ${cx(n)} ${mid} ${cx(n)} ${n.cy}`;
     })
     .join(" ");
-  return { nodes, height: y + PAD, d };
+  return { nodes, height: y + PAD, d, hero: placeHero(nodes, cx) };
+}
+
+function placeHero(nodes: readonly PathNode[], cx: (n: PathNode) => number): HeroPlacement {
+  const lessonsOnPath = nodes.filter((n): n is Extract<PathNode, { kind: "lesson" }> => n.kind === "lesson");
+  const last = lessonsOnPath.filter((n) => n.state === "done").at(-1);
+  if (last) return { at: last.key, x: cx(last), y: last.cy - last.size / 2 };
+  const first = lessonsOnPath[0];
+  if (!first) return { at: null, x: PATH_WIDTH / 2, y: PAD };
+  // Waits on the outer side of lesson 1, so he never sits on the path itself.
+  const side = first.offset <= 0 ? -1 : 1;
+  const x = Math.min(PATH_WIDTH - HERO_EDGE, Math.max(HERO_EDGE, cx(first) + side * HERO_SIDE_GAP));
+  return { at: null, x, y: first.cy };
 }

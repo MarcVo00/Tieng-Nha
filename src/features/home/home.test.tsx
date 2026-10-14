@@ -60,3 +60,13 @@ test("tapping the locked exam shows a toast", async () => {
   await user.click(await screen.findByRole("button", { name: /Bài kiểm tra/ }));
   expect(await screen.findByRole("status")).toHaveTextContent("Termine d'abord les 10 leçons");
 });
+
+test("the hero waits beside the path before the first lesson, then stands on the last lesson completed", async () => {
+  renderHome();
+  expect(await screen.findByRole("img", { name: "Toi, au départ du parcours" })).toBeInTheDocument();
+
+  const services = createFakeServices();
+  await services.activity.completeLesson({ lessonId: "l05", mistakes: 0, durationMs: 1000, vocabIds: [] });
+  renderHome(services);
+  expect(await screen.findByRole("img", { name: "Toi, après la leçon « Au café »" })).toBeInTheDocument();
+});

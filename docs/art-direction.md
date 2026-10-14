@@ -67,6 +67,9 @@ Le héros est un **empilement de calques** SVG dans un `viewBox="0 0 120 160"`. 
 
 Le **slot** de chaque calque correspond au champ `slot` du catalogue de la boutique (voir [spec Progression V2 §5.2](superpowers/specs/2026-10-14-progression-boss-energy-design.md)) : les cadres d'avatar (`frame`) de novembre, puis `hat`, `outfit`, `accessory`… sans changer le modèle de données.
 
+### Le héros sur le parcours
+Sur l'accueil, le héros est un **pion** : son médaillon (46 px) avec une pointe or posée sur la case de la **dernière leçon réussie** (la plus avancée). Avant la première leçon, il attend **à côté du chemin**, à hauteur de la leçon 1, côté extérieur. Le pion est purement visuel (les touchers passent à la case dessous) et porte un `aria-label` (« Toi, après la leçon « Au café » »). Code : `features/home/HeroToken.tsx`, position calculée par `buildPathLayout` (`hero`).
+
 ## 5. Les boss
 
 Gabarit : `viewBox="0 0 200 200"`, calques `layer-shadow`, `layer-aura` (l'élément autour de lui), `layer-body`, `layer-weapon` (attribut), `layer-head`. Chaque boss a :

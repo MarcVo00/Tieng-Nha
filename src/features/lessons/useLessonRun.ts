@@ -26,6 +26,8 @@ export type LessonLoad =
   | { status: "ready"; lesson: Lesson; vocabIndex: ReadonlyMap<VocabId, VocabItem> };
 
 const liveExercises = (lesson: Lesson): Exercise[] => lesson.exercises.filter((e) => !e.deprecated);
+/** Retired words stay in the content (ids are immutable) but are no longer taught nor added to the reviews. */
+export const liveVocab = (lesson: Lesson): VocabItem[] => lesson.vocab.filter((v) => !v.deprecated);
 
 export function useLessonRun(lessonId: string | undefined) {
   const { content, activity, clock } = useServices();
@@ -123,7 +125,7 @@ export function useLessonRun(lessonId: string | undefined) {
         lessonId: lesson.id,
         mistakes,
         durationMs: Math.max(0, Date.parse(clock()) - startedAt.current),
-        vocabIds: lesson.vocab.map((v) => v.id),
+        vocabIds: liveVocab(lesson).map((v) => v.id),
       });
     } catch {
       completing.current = false; // nothing was committed: the learner may retry
@@ -144,7 +146,7 @@ export function useLessonRun(lessonId: string | undefined) {
     setFailPending(true);
     try {
       await answers.current;
-      await activity.introduceVocab(lesson.vocab.map((v) => v.id));
+      await activity.introduceVocab(liveVocab(lesson).map((v) => v.id));
     } catch {
       // The words simply will not be in the reviews; the failed panel still works.
     }

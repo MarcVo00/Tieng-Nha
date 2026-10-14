@@ -127,6 +127,24 @@ test("intro deck: shows the first word, plays it, advances and reports a card", 
   await waitFor(() => expect(reporter.reports).toEqual([{ refId: second.id, message: "Le ton est faux", contentVersion: 1 }]));
 });
 
+test("a deprecated word is neither shown in the deck nor added to the reviews", async () => {
+  const [retired, ...live] = lessonFixture.vocab;
+  const services = createFakeServices();
+  vi.spyOn(services.content, "getLesson").mockResolvedValue({ ...lessonFixture, vocab: [{ ...retired!, deprecated: true }, ...live] });
+  const introduce = vi.spyOn(services.activity, "introduceVocab");
+  renderWithServices(
+    <Routes>
+      <Route path="/lesson/:id" element={<LessonScreen />} />
+    </Routes>,
+    { services, route: "/lesson/l05" },
+  );
+  expect(await screen.findByText(live[0]!.vi)).toBeInTheDocument();
+  expect(screen.queryByText(retired!.vi)).not.toBeInTheDocument();
+  for (let i = 0; i < live.length - 1; i++) await userEvent.click(await screen.findByRole("button", { name: fr.lessons.deck.next }));
+  expect(screen.getByRole("button", { name: fr.lessons.deck.start })).toBeInTheDocument();
+  expect(introduce).not.toHaveBeenCalledWith(expect.arrayContaining([retired!.id]));
+});
+
 test("the last card starts the exercises", async () => {
   setup();
   await skipIntro();

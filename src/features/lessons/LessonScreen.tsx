@@ -6,7 +6,7 @@ import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
 import { Button, ConfirmDialog, EmptyState, FocusHeader, Hearts, ReportSheet, Skeleton } from "@/ui";
-import { LESSON_HEARTS, useLessonRun } from "@/features/lessons/useLessonRun";
+import { LESSON_HEARTS, liveVocab, useLessonRun } from "@/features/lessons/useLessonRun";
 import { VocabDeck } from "@/features/lessons/VocabDeck";
 
 // Hero: the current card or exercise, big, on cream. Header: quit, progress, hearts.
@@ -66,7 +66,7 @@ export function LessonScreen() {
 
       {run.phase === "intro" ? (
         <VocabDeck
-          vocab={lesson.vocab}
+          vocab={liveVocab(lesson)}
           voiceRate={voiceRateOf(settings)}
           ttsEnabled={capabilities.tts}
           onReport={setReportRef}

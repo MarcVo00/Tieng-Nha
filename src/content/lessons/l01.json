@@ -1,6 +1,6 @@
 {
   "id": "l01",
-  "contentVersion": 3,
+  "contentVersion": 4,
   "title": "Les 6 tons & bonjour",
   "description": "Le vietnamien a 6 tons : ngang (plat), huyền (descend doucement), sắc (monte), hỏi (descend puis remonte), ngã (monte avec une cassure) et nặng (bref, qui tombe). Le même son « ma » change de sens selon le ton. Apprends aussi à saluer : au Sud, « chào » suivi de la personne sert à dire bonjour comme au revoir.",
   "emoji": "🎵",
@@ -66,7 +66,8 @@
       "id": "v_cam_on",
       "vi": "cảm ơn",
       "fr": "merci",
-      "dialect": "south"
+      "dialect": "south",
+      "note": "Au Sud, on l'entend souvent prononcé « cám ơn » (ton montant). Après « cảm ơn », on ajoute la personne : « cảm ơn anh », « cảm ơn chị »."
     },
     {
       "id": "v_da_oui",

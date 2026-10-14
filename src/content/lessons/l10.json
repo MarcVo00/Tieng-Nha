@@ -1,6 +1,6 @@
 {
   "id": "l10",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Se présenter",
   "description": "Présente-toi : ton prénom, ton pays, ce que tu apprends. Tu peux enfin dire « enchanté(e) » à une famille vietnamienne !",
   "emoji": "🤝",
@@ -18,7 +18,7 @@
       "vi": "tên là",
       "fr": "s'appeler",
       "dialect": "south",
-      "note": "« Tui tên là Camille » = « Je m'appelle Camille »."
+      "note": "« Tui tên là Camille » = « Je m'appelle Camille ». À l'oral on raccourcit souvent : « Tui tên Camille », « Bạn tên gì ? »."
     },
     {
       "id": "v_phap",
@@ -57,7 +57,15 @@
       "vi": "sống ở",
       "fr": "habiter à, vivre à",
       "dialect": "south",
-      "note": "« Tui sống ở Pháp » = « J'habite en France »."
+      "note": "« Tui sống ở Pháp » = « J'habite en France ».",
+      "deprecated": true
+    },
+    {
+      "id": "v_o_habiter",
+      "vi": "ở",
+      "fr": "habiter, être (quelque part)",
+      "dialect": "south",
+      "note": "À l'oral on dit simplement « ở » : « Tui ở Pháp » = « J'habite en France ». « Sống ở » (vivre à) existe mais sonne plus écrit."
     },
     {
       "id": "v_tuoi",
@@ -83,7 +91,7 @@
       "vi": "rất vui được gặp bạn",
       "fr": "ravi(e) de te rencontrer",
       "dialect": "south",
-      "note": "Expression toute faite pour la première rencontre. En situation réelle, remplace « bạn » par « anh » ou « chị »."
+      "note": "Formule polie pour une première rencontre, un peu cérémonieuse. Entre jeunes, un simple « Vui quá ! » suffit. En situation réelle, remplace « bạn » par la personne (anh, chị, cô, chú…)."
     }
   ],
   "exercises": [
@@ -95,7 +103,7 @@
         "v_ten",
         "v_tuoi",
         "v_hoc",
-        "v_song_o"
+        "v_o_habiter"
       ]
     },
     {
@@ -146,16 +154,16 @@
       "distractorsVi": [
         "Tui là người Pháp.",
         "Tui học tiếng Việt.",
-        "Tui sống ở Pháp."
+        "Tui ở Pháp."
       ]
     },
     {
       "id": "l10_e08",
       "type": "translate_choose",
       "promptFr": "Tu habites en France ?",
-      "answerVi": "Bạn sống ở Pháp không?",
+      "answerVi": "Bạn có ở Pháp không?",
       "distractorsVi": [
-        "Bạn sống ở Việt Nam không?",
+        "Bạn có ở Việt Nam không?",
         "Bạn học tiếng Việt không?",
         "Bạn tên gì?"
       ]
@@ -167,7 +175,7 @@
       "answerVi": "Tui học tiếng Việt.",
       "distractorsVi": [
         "Tui là người Việt.",
-        "Tui sống ở Việt Nam.",
+        "Tui ở Việt Nam.",
         "Tui tên là Camille."
       ]
     },
@@ -177,7 +185,7 @@
       "fr": "J'habite à Sài Gòn.",
       "tokensVi": [
         "Tui",
-        "sống ở",
+        "ở",
         "Sài Gòn"
       ],
       "extraTokens": [

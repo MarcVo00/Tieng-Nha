@@ -1,6 +1,6 @@
 {
   "id": "d08",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Prendre un xe ôm",
   "scene": "Ngã tư — au carrefour",
   "turns": [
@@ -73,13 +73,13 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Dừng lại đây nha.",
+          "vi": "Dừng ở đây nha.",
           "fr": "Arrête-toi ici, hein.",
           "next": "t7"
         },
         {
           "id": "o2",
-          "vi": "Dừng lại gần chợ nha.",
+          "vi": "Dừng gần chợ nha.",
           "fr": "Arrête-toi près du marché, hein.",
           "next": "t7"
         }

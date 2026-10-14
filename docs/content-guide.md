@@ -6,6 +6,7 @@
 1. **Unicode NFC** pour tout texte vietnamien (`str.normalize("NFC")`). `validate-content` rejette le NFD.
 2. **Vocabulaire du Sud** (Sài Gòn) quand il diffère du Nord (tableau §3). Ajouter une `note` FR quand la différence est notable.
 3. **Fréquence avant tout** : uniquement des mots du quotidien très courants. Pas d'expressions idiomatiques, pas de proverbes, pas d'argot, pas de jeux de mots.
+3 bis. **Registre oral** : l'appli apprend à **parler**. Écrire comme on parle à Sài Gòn, pas comme un manuel : `Mấy giờ rồi?` (pas `Bây giờ là mấy giờ?`), `Tui ở Pháp` (pas `Tui sống ở Pháp`), `ba tui` / `gia đình tui` (sans `của` pour la famille), `Bạn tên gì?`, `Dừng ở đây nha` (pas `Dừng lại!`, trop sec). Chaque mot de politesse ou pronom a une `note` qui explique **pourquoi** et **à qui** on le dit.
 4. **Phrases courtes** : ≤ 8 syllabes pour `speak`, ≤ 10 pour `translate_choose` / `word_order`, ≤ 12 pour les répliques de dialogue.
 5. **Traductions françaises naturelles**, tutoiement pour s'adresser à l'apprenant dans les consignes.
 6. **Neutralité de genre** : on ne connaît pas le genre de l'apprenant. Les PNJ s'adressent à lui avec **`bạn`** (et non `anh`/`chị`). Une `note` explique qu'en situation réelle on dit `anh` (homme) / `chị` (femme). Pour parler de soi : **`tui`** (forme du Sud de `tôi`), avec une note la première fois.
@@ -64,9 +65,9 @@ Les **répliques PNJ** des dialogues peuvent contenir quelques mots hors vocabul
 | l05 | Au café | cà phê, cà phê sữa đá, cà phê đen, trà đá, ly, đá, đường, cho tui, tính tiền, ngon | d05 — Commander au café |
 | l06 | Manger | phở, cơm tấm, bánh mì, hủ tiếu, ăn, uống, đói, no, chén, muỗng, đũa, ngon quá | d06 — Au restaurant |
 | l07 | Au marché | bao nhiêu tiền, mắc quá, rẻ, bớt, mua, bán, trái cây, xoài, thơm, chuối, ký | d07 — Marchander des fruits |
-| l08 | Se déplacer | xe ôm, đi, ở đâu, quẹo trái, quẹo phải, đi thẳng, dừng lại, gần, xa, đây, đó | d08 — Prendre un xe ôm |
+| l08 | Se déplacer | xe ôm, đi, ở đâu, quẹo trái, quẹo phải, đi thẳng, dừng, gần, xa, đây, đó | d08 — Prendre un xe ôm |
 | l09 | Le temps | hôm nay, ngày mai, hôm qua, bây giờ, mấy giờ, giờ, sáng, trưa, chiều, tối | d09 — Fixer un rendez-vous |
-| l10 | Se présenter | tên, tên là, người Pháp, người Việt, sống ở, tuổi, học, tiếng Việt, rất vui được gặp bạn | d10 — Se présenter à la famille |
+| l10 | Se présenter | tên, tên là, người Pháp, người Việt, ở (habiter), tuổi, học, tiếng Việt, rất vui được gặp bạn | d10 — Se présenter à la famille |
 
 Composition d'une leçon (8–12 exercices) : ≥ 2 `listen_choose`, ≥ 2 `translate_choose`, ≥ 1 `tone_pick` (≥ 4 pour l01), ≥ 1 `word_order`, ≥ 2 `speak`. Ordre : du plus facile (écoute) au plus difficile (oral).
 

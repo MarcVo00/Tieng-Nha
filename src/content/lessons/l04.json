@@ -1,6 +1,6 @@
 {
   "id": "l04",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "La famille",
   "description": "Présente ta famille : papa, maman, frères et sœurs, enfants. Au Sud, l'aîné de la fratrie s'appelle « hai » (deux).",
   "emoji": "👨‍👩‍👧",
@@ -79,7 +79,8 @@
       "id": "v_gia_dinh",
       "vi": "gia đình",
       "fr": "famille",
-      "dialect": "south"
+      "dialect": "south",
+      "note": "À l'oral, on ne dit pas « của » (de) pour la famille : « gia đình tui » = ma famille, « ba tui » = mon père."
     },
     {
       "id": "v_co_avoir",
@@ -157,11 +158,11 @@
       "id": "l04_e07",
       "type": "translate_choose",
       "promptFr": "Voici ma famille.",
-      "answerVi": "Đây là gia đình của tui.",
+      "answerVi": "Đây là gia đình tui.",
       "distractorsVi": [
-        "Đây là ba của tui.",
-        "Đây là con của tui.",
-        "Đây là chị hai của tui."
+        "Đây là ba tui.",
+        "Đây là con tui.",
+        "Đây là chị hai tui."
       ]
     },
     {
@@ -179,11 +180,11 @@
       "id": "l04_e09",
       "type": "translate_choose",
       "promptFr": "Mon père.",
-      "answerVi": "Ba của tui.",
+      "answerVi": "Ba tui.",
       "distractorsVi": [
-        "Má của tui.",
-        "Ông bà của tui.",
-        "Con của tui."
+        "Má tui.",
+        "Ông bà tui.",
+        "Con tui."
       ]
     },
     {
@@ -204,7 +205,7 @@
     {
       "id": "l04_e11",
       "type": "speak",
-      "vi": "Đây là gia đình của tui.",
+      "vi": "Đây là gia đình tui.",
       "fr": "Voici ma famille.",
       "vocabIds": [
         "v_gia_dinh"
@@ -213,7 +214,7 @@
     {
       "id": "l04_e12",
       "type": "speak",
-      "vi": "Đây là ba má của tui.",
+      "vi": "Đây là ba má tui.",
       "fr": "Voici mon papa et ma maman.",
       "vocabIds": [
         "v_ba_papa",

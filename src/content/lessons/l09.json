@@ -1,6 +1,6 @@
 {
   "id": "l09",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Le temps",
   "description": "Situe-toi dans le temps : aujourd'hui, demain, hier, les moments de la journée, et demande l'heure (jusqu'à dix heures).",
   "emoji": "🕰️",
@@ -48,7 +48,7 @@
       "vi": "mấy giờ",
       "fr": "quelle heure ?",
       "dialect": "south",
-      "note": "« Mấy giờ ? » = « À quelle heure ? / Quelle heure est-il ? »."
+      "note": "Pour demander l'heure, on dit « Mấy giờ rồi ? » (mot à mot : « combien d'heures déjà ? »), et on répond « Ba giờ rồi » (il est trois heures). « Bây giờ là mấy giờ ? » est la forme des manuels."
     },
     {
       "id": "v_sang",
@@ -140,9 +140,9 @@
       "id": "l09_e07",
       "type": "translate_choose",
       "promptFr": "Quelle heure est-il ?",
-      "answerVi": "Bây giờ là mấy giờ?",
+      "answerVi": "Mấy giờ rồi?",
       "distractorsVi": [
-        "Bây giờ là ba giờ.",
+        "Ba giờ rồi.",
         "Ngày mai gặp bạn nha.",
         "Ngày mai mấy giờ?"
       ]
@@ -151,11 +151,11 @@
       "id": "l09_e08",
       "type": "translate_choose",
       "promptFr": "Il est trois heures de l'après-midi.",
-      "answerVi": "Bây giờ là ba giờ chiều.",
+      "answerVi": "Ba giờ chiều rồi.",
       "distractorsVi": [
-        "Bây giờ là ba giờ sáng.",
-        "Bây giờ là năm giờ chiều.",
-        "Bây giờ là tám giờ tối."
+        "Ba giờ sáng rồi.",
+        "Năm giờ chiều rồi.",
+        "Tám giờ tối rồi."
       ]
     },
     {
@@ -174,11 +174,10 @@
       "type": "word_order",
       "fr": "Il est huit heures du matin.",
       "tokensVi": [
-        "Bây giờ",
-        "là",
-        "tám",
+        "Tám",
         "giờ",
-        "sáng"
+        "sáng",
+        "rồi"
       ],
       "extraTokens": [
         "gặp"
@@ -187,10 +186,9 @@
     {
       "id": "l09_e11",
       "type": "speak",
-      "vi": "Bây giờ là mấy giờ?",
+      "vi": "Mấy giờ rồi?",
       "fr": "Quelle heure est-il ?",
       "vocabIds": [
-        "v_bay_gio",
         "v_may_gio"
       ]
     },

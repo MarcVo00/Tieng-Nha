@@ -1,13 +1,13 @@
 {
   "id": "d04",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Montrer une photo de famille",
   "scene": "Chez des amis — Nhà bạn",
   "turns": [
     {
       "id": "t1",
       "speaker": "npc",
-      "vi": "Đây là hình gia đình của tui.",
+      "vi": "Đây là hình gia đình tui.",
       "fr": "Voici la photo de ma famille.",
       "next": "t2"
     },

@@ -1,5 +1,5 @@
 {
-  "contentVersion": 3,
+  "contentVersion": 4,
   "questions": [
     {
       "id": "exam_q001",
@@ -277,9 +277,9 @@
       "exercise": {
         "id": "exam_e019",
         "type": "listen_choose",
-        "vocabId": "v_dung_lai",
+        "vocabId": "v_dung",
         "choices": [
-          "v_dung_lai",
+          "v_dung",
           "v_queo_trai",
           "v_di",
           "v_xe_om"
@@ -342,7 +342,7 @@
           "v_tuoi",
           "v_ten",
           "v_tieng_viet",
-          "v_song_o"
+          "v_o_habiter"
         ]
       }
     },
@@ -620,11 +620,10 @@
         "type": "word_order",
         "fr": "Il est une heure de l'après-midi.",
         "tokensVi": [
-          "Bây giờ",
-          "là",
-          "một",
+          "Một",
           "giờ",
-          "trưa"
+          "trưa",
+          "rồi"
         ],
         "extraTokens": [
           "sáng"
@@ -640,7 +639,7 @@
         "fr": "Comment tu t'appelles ?",
         "tokensVi": [
           "Bạn",
-          "tên là",
+          "tên",
           "gì"
         ],
         "extraTokens": [
@@ -970,11 +969,11 @@
       "exercise": {
         "id": "exam_e069",
         "type": "speak",
-        "vi": "Quẹo phải, dừng lại đó.",
+        "vi": "Quẹo phải, dừng ở đó nha.",
         "fr": "Tourne à droite, arrête-toi là.",
         "vocabIds": [
           "v_queo_phai",
-          "v_dung_lai",
+          "v_dung",
           "v_do"
         ]
       }
@@ -1001,11 +1000,11 @@
       "exercise": {
         "id": "exam_e071",
         "type": "speak",
-        "vi": "Tui sống ở Pháp.",
+        "vi": "Tui ở Pháp.",
         "fr": "J'habite en France.",
         "vocabIds": [
           "v_tui",
-          "v_song_o",
+          "v_o_habiter",
           "v_phap"
         ]
       }
@@ -1016,11 +1015,11 @@
       "exercise": {
         "id": "exam_e072",
         "type": "speak",
-        "vi": "Bạn sống ở Sài Gòn không?",
+        "vi": "Bạn có ở Sài Gòn không?",
         "fr": "Tu habites à Sài Gòn ?",
         "vocabIds": [
           "v_ban",
-          "v_song_o",
+          "v_o_habiter",
           "v_sai_gon"
         ]
       }

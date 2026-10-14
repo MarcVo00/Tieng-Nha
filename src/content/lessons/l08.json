@@ -1,6 +1,6 @@
 {
   "id": "l08",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Se déplacer",
   "description": "Prends un xe ôm (moto-taxi) : demande où se trouve un endroit, indique la direction et dis au chauffeur de s'arrêter.",
   "emoji": "🛵",
@@ -56,7 +56,15 @@
       "id": "v_dung_lai",
       "vi": "dừng lại",
       "fr": "s'arrêter, arrête-toi",
-      "dialect": "south"
+      "dialect": "south",
+      "deprecated": true
+    },
+    {
+      "id": "v_dung",
+      "vi": "dừng",
+      "fr": "s'arrêter",
+      "dialect": "south",
+      "note": "Pour demander au chauffeur de s'arrêter : « Dừng ở đây nha » (arrête-toi ici, s'il te plaît). « Dừng lại ! » sonne comme un ordre sec, du genre « Halte ! »."
     },
     {
       "id": "v_gan",
@@ -114,7 +122,7 @@
         "v_queo_trai",
         "v_queo_phai",
         "v_di_thang",
-        "v_dung_lai"
+        "v_dung"
       ]
     },
     {
@@ -154,14 +162,14 @@
       "distractorsVi": [
         "Quẹo phải.",
         "Đi thẳng.",
-        "Dừng lại."
+        "Dừng ở đây."
       ]
     },
     {
       "id": "l08_e09",
       "type": "translate_choose",
       "promptFr": "Arrête-toi ici.",
-      "answerVi": "Dừng lại đây.",
+      "answerVi": "Dừng ở đây.",
       "distractorsVi": [
         "Đi thẳng.",
         "Quẹo phải.",
@@ -178,16 +186,16 @@
         "bao nhiêu tiền"
       ],
       "extraTokens": [
-        "dừng lại"
+        "dừng"
       ]
     },
     {
       "id": "l08_e11",
       "type": "speak",
-      "vi": "Dừng lại đây nha.",
+      "vi": "Dừng ở đây nha.",
       "fr": "Arrête-toi ici, s'il te plaît.",
       "vocabIds": [
-        "v_dung_lai",
+        "v_dung",
         "v_day"
       ]
     },

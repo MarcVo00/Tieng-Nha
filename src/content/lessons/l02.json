@@ -1,6 +1,6 @@
 {
   "id": "l02",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Politesse & pronoms",
   "description": "En vietnamien, on choisit « je » et « tu » selon l'âge et le lien avec la personne. Apprends les pronoms de base, comment t'excuser et demander des nouvelles.",
   "emoji": "🙏",
@@ -11,7 +11,7 @@
       "vi": "tui",
       "fr": "je, moi",
       "dialect": "south",
-      "note": "« Tui » est la forme du Sud de « tôi » (je). Dans cette appli, tu parles de toi avec « tui »."
+      "note": "« Tui » est la forme du Sud de « tôi » (je), pour parler à des gens de ton âge. Le vietnamien choisit les mots « je » et « tu » selon l'âge : face à quelqu'un de l'âge de tes parents ou grands-parents, on parle plutôt de soi avec « con » (enfant)."
     },
     {
       "id": "v_ban",
@@ -46,26 +46,28 @@
       "vi": "cô",
       "fr": "tante (côté du père) / madame d'âge mûr",
       "dialect": "south",
-      "note": "Aussi utilisé pour une enseignante."
+      "note": "Pour une femme de l'âge de tes parents : on la traite comme une tante, par respect. Aussi utilisé pour une enseignante."
     },
     {
       "id": "v_chu",
       "vi": "chú",
       "fr": "oncle (frère cadet du père) / monsieur d'âge mûr",
-      "dialect": "south"
+      "dialect": "south",
+      "note": "Pour un homme de l'âge de tes parents : on le traite comme un oncle, par respect. Très courant avec un voisin, un chauffeur ou un commerçant plus âgé."
     },
     {
       "id": "v_ong",
       "vi": "ông",
       "fr": "grand-père / monsieur âgé",
-      "dialect": "south"
+      "dialect": "south",
+      "note": "Pour un homme de l'âge de tes grands-parents : le traiter de « grand-père » est une marque de respect."
     },
     {
       "id": "v_ba_grand_mere",
       "vi": "bà",
       "fr": "grand-mère / dame âgée",
       "dialect": "south",
-      "note": "Ton huyền (accent grave), à ne pas confondre avec « ba » (trois, papa) qui est plat."
+      "note": "Pour une femme de l'âge de tes grands-parents, par respect. Ton huyền (accent grave), à ne pas confondre avec « ba » (trois, papa) qui est plat."
     },
     {
       "id": "v_xin_loi",

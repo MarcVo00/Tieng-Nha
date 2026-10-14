@@ -441,6 +441,19 @@ describe("password", () => {
     expect(screen.queryByRole("heading", { name: "Un mot de passe, c'est plus simple" })).not.toBeInTheDocument();
   });
 
+  test("someone who tapped Commencer by mistake can go back, or straight to sign-in with the e-mail kept", async () => {
+    const { user } = setup();
+    await user.click(await screen.findByRole("button", { name: "Commencer" }));
+    await user.click(await screen.findByRole("button", { name: "Retour" }));
+    expect(await screen.findByRole("button", { name: "Commencer" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Commencer" }));
+    await user.type(await screen.findByLabelText("E-mail"), "marc@example.com");
+    await user.click(screen.getByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    expect(await screen.findByRole("heading", { name: "Content de te revoir" })).toBeInTheDocument();
+    expect(screen.getByLabelText("E-mail")).toHaveValue("marc@example.com");
+  });
+
   test("the progress dots appear on the sign-up path only", async () => {
     const { user } = setup();
     expect(screen.getByRole("img", { name: "Étape 1 sur 6" })).toBeInTheDocument();

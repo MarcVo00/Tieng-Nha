@@ -14,6 +14,8 @@ type InviteStepProps = {
   mode?: "signup" | "recovery";
   initialEmail?: string;
   onBack?: () => void;
+  /** Sign-up only: an existing user who tapped "Commencer" by mistake goes to sign-in, keeping the typed e-mail. */
+  onSignIn?: (email: string) => void;
   inviteCode: string;
   inviteError: string | null;
   /** Set when the user already signed in (e.g. sent back from the profile step): no new code is needed. */
@@ -22,7 +24,7 @@ type InviteStepProps = {
   onAuthenticated(session: Session): Promise<void>;
 };
 
-export function InviteStep({ mode = "signup", initialEmail = "", onBack, inviteCode, inviteError, session, onInviteChange, onAuthenticated }: InviteStepProps) {
+export function InviteStep({ mode = "signup", initialEmail = "", onBack, onSignIn, inviteCode, inviteError, session, onInviteChange, onAuthenticated }: InviteStepProps) {
   const { auth } = useServices();
   const t = fr.onboarding.invite;
   const [email, setEmail] = useState(session?.email ?? initialEmail);
@@ -169,6 +171,11 @@ export function InviteStep({ mode = "signup", initialEmail = "", onBack, inviteC
       <Button type="submit" size="lg" fullWidth loading={busy}>
         {t.send}
       </Button>
+      {onSignIn ? (
+        <Button variant="ghost" onClick={() => onSignIn(email.trim())}>
+          {fr.onboarding.welcome.signIn}
+        </Button>
+      ) : null}
       {onBack ? (
         <Button variant="ghost" onClick={onBack}>
           {fr.onboarding.signIn.back}

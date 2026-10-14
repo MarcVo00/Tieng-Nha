@@ -202,6 +202,16 @@ export function WelcomeScreen() {
                 setInviteCode(c);
                 setInviteError(null);
               }}
+              // Already signed in (sent back from the profile step for a bad invite code): only the code can change.
+              {...(session
+                ? {}
+                : {
+                    onBack: () => go("welcome"),
+                    onSignIn: (email: string) => {
+                      setPrefillEmail(email);
+                      go("signin");
+                    },
+                  })}
               onAuthenticated={(s) => authenticated(s, "otp")}
             />
           ) : null}

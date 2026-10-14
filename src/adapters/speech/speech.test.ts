@@ -134,6 +134,7 @@ type FakeRec = {
   onresult: ((e: unknown) => void) | null;
   onerror: ((e: { error: string }) => void) | null;
   onend: (() => void) | null;
+  abort(): void;
 };
 
 function fakeRecognitionWindow(behaviour: (rec: FakeRec) => void) {

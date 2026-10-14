@@ -28,7 +28,8 @@ export class FakeSpeechRecognizer implements SpeechRecognizer {
     return this.available;
   }
 
-  async listen(): Promise<string[]> {
+  async listen(opts?: Parameters<SpeechRecognizer["listen"]>[0]): Promise<string[]> {
+    void opts; // queued answers stand for what the learner said; early acceptance is the real adapter's job
     const next = this.queue.shift();
     if (next === undefined) return ["xin chào"];
     if (next instanceof Error) throw next;

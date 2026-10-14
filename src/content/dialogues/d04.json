@@ -1,13 +1,13 @@
 {
   "id": "d04",
-  "contentVersion": 3,
+  "contentVersion": 4,
   "title": "Montrer une photo de famille",
   "scene": "Chez des amis — Nhà bạn",
   "turns": [
     {
       "id": "t1",
       "speaker": "npc",
-      "vi": "Đây là hình gia đình tui.",
+      "vi": "Đây là hình gia đình mình.",
       "fr": "Voici la photo de ma famille.",
       "next": "t2"
     },
@@ -32,14 +32,14 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Có năm người: ba, má, anh hai, em gái và tui.",
+      "vi": "Có năm người: ba, má, anh hai, em gái và mình.",
       "fr": "Cinq : papa, maman, mon grand frère, ma petite sœur et moi.",
       "next": "t8"
     },
     {
       "id": "t4",
       "speaker": "npc",
-      "vi": "Có, tui có anh hai và em gái.",
+      "vi": "Có, mình có anh hai và em gái.",
       "fr": "Oui, j'ai un grand frère et une petite sœur.",
       "next": "t8"
     },
@@ -56,13 +56,13 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Dạ, tui có em gái.",
-          "fr": "Oui, j'ai une petite sœur.",
+          "vi": "Mình có em gái.",
+          "fr": "J'ai une petite sœur.",
           "next": "t6"
         },
         {
           "id": "o2",
-          "vi": "Dạ, tui không có anh chị em.",
+          "vi": "Mình không có anh chị em.",
           "fr": "Je n'ai ni frères ni sœurs.",
           "next": "t6"
         }
@@ -71,7 +71,7 @@
     {
       "id": "t6",
       "speaker": "npc",
-      "vi": "Vậy hả! Bữa nào cho tui xem hình gia đình bạn nha.",
+      "vi": "Vậy hả! Bữa nào cho mình xem hình gia đình bạn nha.",
       "fr": "Ah bon ! Un jour, montre-moi une photo de ta famille.",
       "next": null
     }

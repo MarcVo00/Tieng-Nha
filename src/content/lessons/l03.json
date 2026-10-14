@@ -1,6 +1,6 @@
 {
   "id": "l03",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Les chiffres",
   "description": "Compte de un à dix, puis découvre « cent » (trăm) et « mille » (ngàn), très utiles pour les prix et les numéros de téléphone.",
   "emoji": "🔢",
@@ -163,7 +163,7 @@
       "id": "l03_e08",
       "type": "translate_choose",
       "promptFr": "Mon numéro.",
-      "answerVi": "Số của tui.",
+      "answerVi": "Số của mình.",
       "distractorsVi": [
         "Số của bạn.",
         "Mười ngàn.",
@@ -188,7 +188,7 @@
       "tokensVi": [
         "Số",
         "của",
-        "tui",
+        "mình",
         "là",
         "bảy"
       ],

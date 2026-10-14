@@ -1,6 +1,6 @@
 {
   "id": "d01",
-  "contentVersion": 3,
+  "contentVersion": 4,
   "title": "Première rencontre",
   "scene": "Dans la rue — Trên đường",
   "turns": [
@@ -32,7 +32,7 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Tui phải đi rồi. Chào bạn nha!",
+      "vi": "Mình phải đi rồi. Chào bạn nha!",
       "fr": "Je dois y aller. Au revoir !",
       "next": "t4"
     },

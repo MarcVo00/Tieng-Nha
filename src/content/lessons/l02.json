@@ -1,6 +1,6 @@
 {
   "id": "l02",
-  "contentVersion": 3,
+  "contentVersion": 4,
   "title": "Politesse & pronoms",
   "description": "En vietnamien, on choisit « je » et « tu » selon l'âge et le lien avec la personne. Apprends les pronoms de base, comment t'excuser et demander des nouvelles.",
   "emoji": "🙏",
@@ -11,35 +11,50 @@
       "vi": "tui",
       "fr": "je, moi",
       "dialect": "south",
-      "note": "« Tui » est la forme du Sud de « tôi » (je), pour parler à des gens de ton âge. Le vietnamien choisit les mots « je » et « tu » selon l'âge : face à quelqu'un de l'âge de tes parents ou grands-parents, on parle plutôt de soi avec « con » (enfant)."
+      "note": "« Tui » est la forme du Sud de « tôi » (je), pour parler à des gens de ton âge. Le vietnamien choisit les mots « je » et « tu » selon l'âge : face à quelqu'un de l'âge de tes parents ou grands-parents, on parle plutôt de soi avec « con » (enfant).",
+      "deprecated": true
+    },
+    {
+      "id": "v_minh",
+      "vi": "mình",
+      "fr": "je, moi (entre ami·e·s)",
+      "dialect": "south",
+      "note": "En vietnamien, on ne dit pas « je » de la même façon à tout le monde : le mot dépend de la personne en face. Avec un·e ami·e ou quelqu'un de ton âge, dis « mình » : neutre et sympa. (« Tui » existe aussi au Sud, mais il sonne familier, voire brut : on l'évite.)"
+    },
+    {
+      "id": "v_con_moi",
+      "vi": "con",
+      "fr": "je, moi (face à quelqu'un de l'âge de tes parents ou grands-parents)",
+      "dialect": "south",
+      "note": "Face à un cô, un chú, un ông ou une bà, on parle de soi comme leur « enfant » : « Dạ, con khỏe » = « Je vais bien ». Eux aussi t'appellent « con ». C'est respectueux et chaleureux."
     },
     {
       "id": "v_ban",
       "vi": "bạn",
       "fr": "toi, ami(e)",
       "dialect": "south",
-      "note": "« Bạn » est neutre. En situation réelle, on dit « anh » à un homme et « chị » à une femme un peu plus âgés."
+      "note": "Pour un·e ami·e ou quelqu'un de ton âge ; tu parles alors de toi avec « mình ». Dans cette appli, certains personnages t'appellent « bạn » car ils ne savent pas si tu es un homme ou une femme."
     },
     {
       "id": "v_anh",
       "vi": "anh",
       "fr": "grand frère / monsieur (jeune)",
       "dialect": "south",
-      "note": "Pour s'adresser à un homme un peu plus âgé que soi."
+      "note": "Pour s'adresser à un homme un peu plus âgé que soi. Face à lui, tu parles de toi avec « em »."
     },
     {
       "id": "v_chi",
       "vi": "chị",
       "fr": "grande sœur / madame (jeune)",
       "dialect": "south",
-      "note": "Pour s'adresser à une femme un peu plus âgée que soi."
+      "note": "Pour s'adresser à une femme un peu plus âgée que soi. Face à elle, tu parles de toi avec « em »."
     },
     {
       "id": "v_em",
       "vi": "em",
       "fr": "petit frère / petite sœur / plus jeune",
       "dialect": "south",
-      "note": "Pour s'adresser à quelqu'un de plus jeune que soi, par exemple un serveur."
+      "note": "Pour s'adresser à quelqu'un de plus jeune que soi, par exemple un serveur. Et quand tu parles à un anh ou une chị, c'est toi qui deviens « em » : « Dạ, em cảm ơn anh » = « Merci »."
     },
     {
       "id": "v_co_tante",
@@ -93,9 +108,9 @@
     {
       "id": "l02_e01",
       "type": "listen_choose",
-      "vocabId": "v_tui",
+      "vocabId": "v_minh",
       "choices": [
-        "v_tui",
+        "v_minh",
         "v_ban",
         "v_anh",
         "v_em"

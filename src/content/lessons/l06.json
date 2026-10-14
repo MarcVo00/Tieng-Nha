@@ -1,6 +1,6 @@
 {
   "id": "l06",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Manger",
   "description": "Parle de nourriture : les plats qu'on mange partout à Sài Gòn (phở, cơm tấm, bánh mì, hủ tiếu), les verbes manger et boire, et les couverts.",
   "emoji": "🍜",
@@ -56,7 +56,8 @@
       "id": "v_doi",
       "vi": "đói",
       "fr": "avoir faim",
-      "dialect": "south"
+      "dialect": "south",
+      "note": "À l'oral, on dit souvent juste « Đói quá ! » (j'ai trop faim), sans « je »."
     },
     {
       "id": "v_no",
@@ -156,22 +157,22 @@
       "id": "l06_e07",
       "type": "translate_choose",
       "promptFr": "J'ai très faim.",
-      "answerVi": "Tui đói quá.",
+      "answerVi": "Đói quá!",
       "distractorsVi": [
-        "Tui no rồi.",
-        "Tui uống nước.",
-        "Tui ăn cơm."
+        "No rồi.",
+        "Ngon quá!",
+        "Uống nước."
       ]
     },
     {
       "id": "l06_e08",
       "type": "translate_choose",
       "promptFr": "Je mange du phở.",
-      "answerVi": "Tui ăn phở.",
+      "answerVi": "Mình ăn phở.",
       "distractorsVi": [
-        "Tui uống phở.",
-        "Tui ăn bánh mì.",
-        "Tui uống trà đá."
+        "Mình uống phở.",
+        "Mình ăn bánh mì.",
+        "Mình uống trà đá."
       ]
     },
     {
@@ -191,9 +192,9 @@
     {
       "id": "l06_e10",
       "type": "word_order",
-      "fr": "Un bol de riz pour moi.",
+      "fr": "Un bol de riz, s'il te plaît.",
       "tokensVi": [
-        "Cho tui",
+        "Cho",
         "một",
         "chén",
         "cơm"
@@ -205,10 +206,11 @@
     {
       "id": "l06_e11",
       "type": "speak",
-      "vi": "Cho tui một dĩa cơm tấm.",
-      "fr": "Une assiette de riz brisé pour moi.",
+      "vi": "Em ơi, cho một dĩa cơm tấm.",
+      "fr": "Une assiette de riz brisé, s'il te plaît.",
       "vocabIds": [
-        "v_cho_tui",
+        "v_em_oi",
+        "v_cho",
         "v_dia",
         "v_com_tam"
       ]

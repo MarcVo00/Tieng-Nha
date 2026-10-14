@@ -1,37 +1,220 @@
 {
   "id": "l05",
-  "contentVersion": 1,
+  "contentVersion": 3,
   "title": "Au café",
   "description": "Commander un café glacé comme à Sài Gòn.",
   "emoji": "☕",
   "dialogueId": "d05",
   "vocab": [
-    { "id": "v_ca_phe", "vi": "cà phê", "fr": "café", "dialect": "south" },
-    { "id": "v_ca_phe_sua_da", "vi": "cà phê sữa đá", "fr": "café au lait glacé", "dialect": "south", "note": "La boisson emblématique de Sài Gòn : café fort et lait concentré sucré sur glace." },
-    { "id": "v_ca_phe_den", "vi": "cà phê đen", "fr": "café noir", "dialect": "south" },
-    { "id": "v_tra_da", "vi": "trà đá", "fr": "thé glacé", "dialect": "south" },
-    { "id": "v_tra", "vi": "trà", "fr": "thé", "dialect": "south" },
-    { "id": "v_ly", "vi": "ly", "fr": "verre", "dialect": "south", "note": "Au Nord on dit « cốc »." },
-    { "id": "v_da", "vi": "đá", "fr": "glace (glaçons)", "dialect": "south" },
-    { "id": "v_duong", "vi": "đường", "fr": "sucre", "dialect": "south" },
-    { "id": "v_sua", "vi": "sữa", "fr": "lait", "dialect": "south" },
-    { "id": "v_nuoc", "vi": "nước", "fr": "eau", "dialect": "south" },
-    { "id": "v_cho_tui", "vi": "cho tui", "fr": "donne-moi / pour moi", "dialect": "south", "note": "« Tui » est la forme du Sud de « tôi » (je)." },
-    { "id": "v_tinh_tien", "vi": "tính tiền", "fr": "l'addition", "dialect": "south" },
-    { "id": "v_ngon", "vi": "ngon", "fr": "bon, délicieux", "dialect": "south" },
-    { "id": "v_em_oi", "vi": "em ơi", "fr": "s'il te plaît ! (pour appeler le serveur)", "dialect": "south", "note": "Pour interpeller un serveur plus jeune que toi, on dit « Em ơi ». C'est l'usage courant." }
+    {
+      "id": "v_ca_phe",
+      "vi": "cà phê",
+      "fr": "café",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ca_phe_sua_da",
+      "vi": "cà phê sữa đá",
+      "fr": "café au lait glacé",
+      "dialect": "south",
+      "note": "La boisson emblématique de Sài Gòn : café fort et lait concentré sucré sur glace."
+    },
+    {
+      "id": "v_ca_phe_den",
+      "vi": "cà phê đen",
+      "fr": "café noir",
+      "dialect": "south"
+    },
+    {
+      "id": "v_tra_da",
+      "vi": "trà đá",
+      "fr": "thé glacé",
+      "dialect": "south"
+    },
+    {
+      "id": "v_tra",
+      "vi": "trà",
+      "fr": "thé",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ly",
+      "vi": "ly",
+      "fr": "verre",
+      "dialect": "south",
+      "note": "Au Nord on dit « cốc »."
+    },
+    {
+      "id": "v_da",
+      "vi": "đá",
+      "fr": "glace (glaçons)",
+      "dialect": "south"
+    },
+    {
+      "id": "v_duong",
+      "vi": "đường",
+      "fr": "sucre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_sua",
+      "vi": "sữa",
+      "fr": "lait",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nuoc",
+      "vi": "nước",
+      "fr": "eau",
+      "dialect": "south"
+    },
+    {
+      "id": "v_cho_tui",
+      "vi": "cho tui",
+      "fr": "donne-moi / pour moi",
+      "dialect": "south",
+      "note": "« Tui » est la forme du Sud de « tôi » (je).",
+      "deprecated": true
+    },
+    {
+      "id": "v_cho",
+      "vi": "cho",
+      "fr": "donner ; « pour moi » quand on commande",
+      "dialect": "south",
+      "note": "Pour commander, pas besoin de « je » : « Em ơi, cho một ly trà đá » = « Un thé glacé, s'il te plaît ». On appelle d'abord le serveur (« Em ơi »), puis on dit ce qu'on veut."
+    },
+    {
+      "id": "v_tinh_tien",
+      "vi": "tính tiền",
+      "fr": "l'addition",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ngon",
+      "vi": "ngon",
+      "fr": "bon, délicieux",
+      "dialect": "south"
+    },
+    {
+      "id": "v_em_oi",
+      "vi": "em ơi",
+      "fr": "s'il te plaît ! (pour appeler le serveur)",
+      "dialect": "south",
+      "note": "Pour interpeller un serveur plus jeune que toi, on dit « Em ơi ». C'est l'usage courant."
+    }
   ],
   "exercises": [
-    { "id": "l05_e01", "type": "listen_choose", "vocabId": "v_ca_phe_sua_da", "choices": ["v_ca_phe_sua_da", "v_ca_phe_den", "v_tra_da", "v_ly"] },
-    { "id": "l05_e02", "type": "listen_choose", "vocabId": "v_nuoc", "choices": ["v_nuoc", "v_duong", "v_sua", "v_da"] },
-    { "id": "l05_e03", "type": "listen_choose", "vocabId": "v_tinh_tien", "choices": ["v_tinh_tien", "v_ngon", "v_cam_on", "v_xin_loi"] },
-    { "id": "l05_e04", "type": "tone_pick", "syllable": "đá", "answerTone": "sac" },
-    { "id": "l05_e05", "type": "tone_pick", "syllable": "sữa", "answerTone": "nga" },
-    { "id": "l05_e06", "type": "tone_pick", "syllable": "trà", "answerTone": "huyen" },
-    { "id": "l05_e07", "type": "translate_choose", "promptFr": "Un café noir, s'il te plaît.", "answerVi": "Cho tui một ly cà phê đen.", "distractorsVi": ["Cho tui một ly trà đá.", "Cho tui một ly cà phê sữa đá.", "Tính tiền."] },
-    { "id": "l05_e08", "type": "translate_choose", "promptFr": "L'addition, s'il te plaît.", "answerVi": "Em ơi, tính tiền.", "distractorsVi": ["Cho tui một ly nước.", "Cho tui một ly trà đá.", "Cảm ơn em."] },
-    { "id": "l05_e09", "type": "word_order", "fr": "Un café au lait glacé pour moi.", "tokensVi": ["Cho", "tui", "một", "ly", "cà phê", "sữa", "đá"], "extraTokens": ["đen"] },
-    { "id": "l05_e10", "type": "speak", "vi": "Cho tui một ly trà đá.", "fr": "Un thé glacé pour moi.", "vocabIds": ["v_cho_tui", "v_ly", "v_tra_da"] },
-    { "id": "l05_e11", "type": "speak", "vi": "Em ơi, tính tiền!", "fr": "S'il te plaît, l'addition !", "vocabIds": ["v_em_oi", "v_tinh_tien"] }
+    {
+      "id": "l05_e01",
+      "type": "listen_choose",
+      "vocabId": "v_ca_phe_sua_da",
+      "choices": [
+        "v_ca_phe_sua_da",
+        "v_ca_phe_den",
+        "v_tra_da",
+        "v_ly"
+      ]
+    },
+    {
+      "id": "l05_e02",
+      "type": "listen_choose",
+      "vocabId": "v_nuoc",
+      "choices": [
+        "v_nuoc",
+        "v_duong",
+        "v_sua",
+        "v_da"
+      ]
+    },
+    {
+      "id": "l05_e03",
+      "type": "listen_choose",
+      "vocabId": "v_tinh_tien",
+      "choices": [
+        "v_tinh_tien",
+        "v_ngon",
+        "v_cam_on",
+        "v_xin_loi"
+      ]
+    },
+    {
+      "id": "l05_e04",
+      "type": "tone_pick",
+      "syllable": "đá",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l05_e05",
+      "type": "tone_pick",
+      "syllable": "sữa",
+      "answerTone": "nga"
+    },
+    {
+      "id": "l05_e06",
+      "type": "tone_pick",
+      "syllable": "trà",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l05_e07",
+      "type": "translate_choose",
+      "promptFr": "Un café noir, s'il te plaît.",
+      "answerVi": "Em ơi, cho một ly cà phê đen.",
+      "distractorsVi": [
+        "Em ơi, cho một ly trà đá.",
+        "Em ơi, cho một ly cà phê sữa đá.",
+        "Em ơi, tính tiền."
+      ]
+    },
+    {
+      "id": "l05_e08",
+      "type": "translate_choose",
+      "promptFr": "L'addition, s'il te plaît.",
+      "answerVi": "Em ơi, tính tiền.",
+      "distractorsVi": [
+        "Em ơi, cho một ly nước.",
+        "Em ơi, cho một ly trà đá.",
+        "Cảm ơn em."
+      ]
+    },
+    {
+      "id": "l05_e09",
+      "type": "word_order",
+      "fr": "Un café au lait glacé, s'il te plaît.",
+      "tokensVi": [
+        "Em ơi",
+        "cho",
+        "một",
+        "ly",
+        "cà phê",
+        "sữa",
+        "đá"
+      ],
+      "extraTokens": [
+        "đen"
+      ]
+    },
+    {
+      "id": "l05_e10",
+      "type": "speak",
+      "vi": "Em ơi, cho một ly trà đá.",
+      "fr": "Un thé glacé, s'il te plaît.",
+      "vocabIds": [
+        "v_em_oi",
+        "v_cho",
+        "v_ly",
+        "v_tra_da"
+      ]
+    },
+    {
+      "id": "l05_e11",
+      "type": "speak",
+      "vi": "Em ơi, tính tiền!",
+      "fr": "S'il te plaît, l'addition !",
+      "vocabIds": [
+        "v_em_oi",
+        "v_tinh_tien"
+      ]
+    }
   ]
 }

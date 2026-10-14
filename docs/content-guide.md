@@ -6,10 +6,15 @@
 1. **Unicode NFC** pour tout texte vietnamien (`str.normalize("NFC")`). `validate-content` rejette le NFD.
 2. **Vocabulaire du Sud** (Sài Gòn) quand il diffère du Nord (tableau §3). Ajouter une `note` FR quand la différence est notable.
 3. **Fréquence avant tout** : uniquement des mots du quotidien très courants. Pas d'expressions idiomatiques, pas de proverbes, pas d'argot, pas de jeux de mots.
-3 bis. **Registre oral** : l'appli apprend à **parler**. Écrire comme on parle à Sài Gòn, pas comme un manuel : `Mấy giờ rồi?` (pas `Bây giờ là mấy giờ?`), `Tui ở Pháp` (pas `Tui sống ở Pháp`), `ba tui` / `gia đình tui` (sans `của` pour la famille), `Bạn tên gì?`, `Dừng ở đây nha` (pas `Dừng lại!`, trop sec). Chaque mot de politesse ou pronom a une `note` qui explique **pourquoi** et **à qui** on le dit.
+3 bis. **Registre oral** : l'appli apprend à **parler**. Écrire comme on parle à Sài Gòn, pas comme un manuel : `Mấy giờ rồi?` (pas `Bây giờ là mấy giờ?`), `Mình ở Pháp` (pas `sống ở Pháp`), `ba mình` / `gia đình mình` (sans `của` pour la famille), `Bạn tên gì?`, `Dừng ở đây nha` (pas `Dừng lại!`, trop sec). Chaque mot de politesse ou pronom a une `note` qui explique **pourquoi** et **à qui** on le dit.
 4. **Phrases courtes** : ≤ 8 syllabes pour `speak`, ≤ 10 pour `translate_choose` / `word_order`, ≤ 12 pour les répliques de dialogue.
 5. **Traductions françaises naturelles**, tutoiement pour s'adresser à l'apprenant dans les consignes.
-6. **Neutralité de genre** : on ne connaît pas le genre de l'apprenant. Les PNJ s'adressent à lui avec **`bạn`** (et non `anh`/`chị`). Une `note` explique qu'en situation réelle on dit `anh` (homme) / `chị` (femme). Pour parler de soi : **`tui`** (forme du Sud de `tôi`), avec une note la première fois.
+6. **Pronoms selon la personne en face** (jamais `tui`, jugé trop familier). L'apprenant parle de lui avec :
+   - **`mình`** face à un·e ami·e ou quelqu'un de son âge (`bạn`) ;
+   - **`em`** face à un `anh` / une `chị` ;
+   - **`con`** face à un `cô`, `chú`, `ông`, `bà` (qui l'appellent aussi `con`) ;
+   - **aucun pronom** quand c'est naturel : `Em ơi, cho một ly trà đá.`, `Đói quá!`.
+   On ne connaît pas le genre de l'apprenant : il ne parle jamais de lui avec `anh`/`chị`, et les PNJ de son âge ou plus jeunes l'appellent `bạn`. Chaque pronom a une `note` qui explique à qui on le dit.
 7. Une leçon n'utilise dans ses exercices **que** son vocabulaire et celui des leçons précédentes (plus les mots-outils listés §4). `validate-content` vérifie que chaque `vocabId` existe.
 8. Aucun contenu sensible : politique, religion, alcool en excès, stéréotypes.
 
@@ -31,7 +36,7 @@
 | Sens | **Sud (à utiliser)** | Nord (ne pas utiliser, citer en note si utile) |
 |---|---|---|
 | bonjour / au revoir | **chào** + la personne (`chào bạn`, `chào anh`, `chào chị`, `chào em`, `chào chú`…), pour saluer comme pour partir | `xin chào`, `tạm biệt` : corrects mais formels, « manuel scolaire » — ne pas les utiliser |
-| je / moi (familier) | tui | tôi |
+| je / moi | `mình` (ami·e), `em` (face à anh/chị), `con` (face à cô/chú/ông/bà) | `tôi` (neutre, distant) ; `tui` (Sud, trop familier : ne pas utiliser) |
 | oui (poli) | dạ | vâng |
 | papa / maman | ba / má | bố / mẹ |
 | aîné(e) de la fratrie | anh hai / chị hai | anh cả / chị cả |
@@ -59,10 +64,10 @@ Les **répliques PNJ** des dialogues peuvent contenir quelques mots hors vocabul
 | Leçon | Thème | Vocabulaire indicatif (12–18 items) | Dialogue |
 |---|---|---|---|
 | l01 | Les 6 tons & saluer | chào, chào bạn, chào anh, chào chị, chào em, chào chú, cảm ơn, dạ, không, vui, ma, mà, má, mả, mã, mạ | d01 — Première rencontre |
-| l02 | Pronoms & politesse | tui, bạn, anh, chị, em, cô, chú, ông, bà, xin lỗi, không sao, khỏe không | d02 — Saluer un voisin |
+| l02 | Pronoms & politesse | mình, con (je), bạn, anh, chị, em, cô, chú, ông, bà, xin lỗi, không sao, khỏe không | d02 — Saluer un voisin |
 | l03 | Chiffres | một … mười, trăm, ngàn, mấy, số | d03 — Donner son numéro |
 | l04 | Famille | ba, má, anh hai, chị hai, em, ông bà, con, gia đình, có, mấy người | d04 — Montrer une photo de famille |
-| l05 | Au café | cà phê, cà phê sữa đá, cà phê đen, trà đá, ly, đá, đường, cho tui, tính tiền, ngon | d05 — Commander au café |
+| l05 | Au café | cà phê, cà phê sữa đá, cà phê đen, trà đá, ly, đá, đường, cho, em ơi, tính tiền, ngon | d05 — Commander au café |
 | l06 | Manger | phở, cơm tấm, bánh mì, hủ tiếu, ăn, uống, đói, no, chén, muỗng, đũa, ngon quá | d06 — Au restaurant |
 | l07 | Au marché | bao nhiêu tiền, mắc quá, rẻ, bớt, mua, bán, trái cây, xoài, thơm, chuối, ký | d07 — Marchander des fruits |
 | l08 | Se déplacer | xe ôm, đi, ở đâu, quẹo trái, quẹo phải, đi thẳng, dừng, gần, xa, đây, đó | d08 — Prendre un xe ôm |
@@ -89,15 +94,15 @@ Examen (`exam.json`) : ≥ 60 questions réparties (≥ 20 `listening` [listen_c
     { "id": "v_tra_da", "vi": "trà đá", "fr": "thé glacé", "dialect": "south" },
     { "id": "v_ly", "vi": "ly", "fr": "verre", "dialect": "south", "note": "Au Nord on dit « cốc »." },
     { "id": "v_da", "vi": "đá", "fr": "glace (glaçons)", "dialect": "south" },
-    { "id": "v_cho_tui", "vi": "cho tui", "fr": "donne-moi / pour moi", "dialect": "south", "note": "« Tui » est la forme du Sud de « tôi » (je)." },
+    { "id": "v_cho", "vi": "cho", "fr": "donner ; « pour moi » quand on commande", "dialect": "south", "note": "Pour commander, pas besoin de « je » : « Em ơi, cho một ly trà đá »." },
     { "id": "v_tinh_tien", "vi": "tính tiền", "fr": "l'addition", "dialect": "south" }
   ],
   "exercises": [
     { "id": "l05_e01", "type": "listen_choose", "vocabId": "v_ca_phe_sua_da", "choices": ["v_ca_phe_sua_da", "v_ca_phe_den", "v_tra_da", "v_ly"] },
     { "id": "l05_e02", "type": "tone_pick", "syllable": "đá", "answerTone": "sac" },
-    { "id": "l05_e03", "type": "translate_choose", "promptFr": "Un café noir, s'il te plaît.", "answerVi": "Cho tui một ly cà phê đen.", "distractorsVi": ["Cho tui một ly trà đá.", "Cho tui một ly cà phê sữa đá.", "Tính tiền."] },
-    { "id": "l05_e04", "type": "word_order", "fr": "Un café au lait glacé pour moi.", "tokensVi": ["Cho", "tui", "một", "ly", "cà phê", "sữa", "đá"], "extraTokens": ["đen"] },
-    { "id": "l05_e05", "type": "speak", "vi": "Cho tui một ly trà đá.", "fr": "Un thé glacé pour moi.", "vocabIds": ["v_cho_tui", "v_ly", "v_tra_da"] },
+    { "id": "l05_e03", "type": "translate_choose", "promptFr": "Un café noir, s'il te plaît.", "answerVi": "Em ơi, cho một ly cà phê đen.", "distractorsVi": ["Em ơi, cho một ly trà đá.", "Em ơi, cho một ly cà phê sữa đá.", "Em ơi, tính tiền."] },
+    { "id": "l05_e04", "type": "word_order", "fr": "Un café au lait glacé, s'il te plaît.", "tokensVi": ["Em ơi", "cho", "một", "ly", "cà phê", "sữa", "đá"], "extraTokens": ["đen"] },
+    { "id": "l05_e05", "type": "speak", "vi": "Em ơi, cho một ly trà đá.", "fr": "Un thé glacé, s'il te plaît.", "vocabIds": ["v_cho", "v_ly", "v_tra_da"] },
     { "id": "l05_e06", "type": "speak", "vi": "Em ơi, tính tiền!", "fr": "S'il te plaît, l'addition !", "vocabIds": ["v_tinh_tien"] }
   ]
 }
@@ -118,8 +123,8 @@ Examen (`exam.json`) : ≥ 60 questions réparties (≥ 20 `listening` [listen_c
   "turns": [
     { "id": "t1", "speaker": "npc", "vi": "Chào bạn! Bạn uống gì?", "fr": "Bonjour ! Tu bois quoi ?", "next": "t2" },
     { "id": "t2", "speaker": "user", "options": [
-      { "id": "o1", "vi": "Cho tui một ly cà phê sữa đá.", "fr": "Un café au lait glacé pour moi.", "next": "t3" },
-      { "id": "o2", "vi": "Cho tui một ly trà đá.", "fr": "Un thé glacé pour moi.", "next": "t3" }
+      { "id": "o1", "vi": "Em ơi, cho một ly cà phê sữa đá.", "fr": "Un café au lait glacé, s'il te plaît.", "next": "t3" },
+      { "id": "o2", "vi": "Em ơi, cho một ly trà đá.", "fr": "Un thé glacé, s'il te plaît.", "next": "t3" }
     ] },
     { "id": "t3", "speaker": "npc", "vi": "Dạ, bạn đợi chút nha.", "fr": "D'accord, attends un instant.", "next": "t4" },
     { "id": "t4", "speaker": "user", "options": [

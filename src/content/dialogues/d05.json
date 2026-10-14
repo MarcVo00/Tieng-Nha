@@ -1,6 +1,6 @@
 {
   "id": "d05",
-  "contentVersion": 1,
+  "contentVersion": 3,
   "title": "Commander au café",
   "scene": "Quán cà phê — un petit café de trottoir à Sài Gòn",
   "turns": [
@@ -17,14 +17,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Cho tui một ly cà phê sữa đá.",
-          "fr": "Un café au lait glacé pour moi.",
+          "vi": "Em ơi, cho một ly cà phê sữa đá.",
+          "fr": "Un café au lait glacé, s'il te plaît.",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Cho tui một ly trà đá.",
-          "fr": "Un thé glacé pour moi.",
+          "vi": "Em ơi, cho một ly trà đá.",
+          "fr": "Un thé glacé, s'il te plaît.",
           "next": "t3"
         }
       ]

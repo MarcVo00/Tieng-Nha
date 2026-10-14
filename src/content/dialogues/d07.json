@@ -1,13 +1,13 @@
 {
   "id": "d07",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Marchander des fruits",
   "scene": "Chợ Bến Thành — le marché Bến Thành à Sài Gòn",
   "turns": [
     {
       "id": "t1",
       "speaker": "npc",
-      "vi": "Chào bạn! Bạn mua trái cây gì?",
+      "vi": "Chào con! Con mua trái cây gì?",
       "fr": "Bonjour ! Tu veux quels fruits ?",
       "next": "t2"
     },
@@ -17,14 +17,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Chuối có rẻ không?",
-          "fr": "Les bananes, c'est bon marché ?",
+          "vi": "Cô ơi, chuối có rẻ không?",
+          "fr": "Madame, les bananes, c'est bon marché ?",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Tui mua xoài. Bao nhiêu tiền?",
-          "fr": "Je prends des mangues. C'est combien ?",
+          "vi": "Cô ơi, xoài bao nhiêu tiền?",
+          "fr": "Madame, les mangues, c'est combien ?",
           "next": "t3"
         }
       ]
@@ -32,7 +32,7 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Dạ, bốn mươi ngàn một ký. Bạn mua mấy ký?",
+      "vi": "Bốn mươi ngàn một ký. Con mua mấy ký?",
       "fr": "Quarante mille le kilo. Tu en prends combien de kilos ?",
       "next": "t4"
     },
@@ -42,14 +42,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Mắc quá! Bớt cho tui nha.",
-          "fr": "Trop cher ! Fais-moi un prix, hein.",
+          "vi": "Mắc quá! Bớt cho con nha cô.",
+          "fr": "Trop cher ! Faites-moi un prix.",
           "next": "t5"
         },
         {
           "id": "o2",
-          "vi": "Rẻ quá! Cho tui hai ký.",
-          "fr": "Pas cher ! Donne-m'en deux kilos.",
+          "vi": "Rẻ quá! Cho con hai ký.",
+          "fr": "Pas cher ! Donnez-m'en deux kilos.",
           "next": "t6"
         }
       ]
@@ -57,14 +57,14 @@
     {
       "id": "t5",
       "speaker": "npc",
-      "vi": "Dạ, bớt cho bạn. Ba mươi lăm ngàn một ký nha.",
+      "vi": "Ừ, bớt cho con. Ba mươi lăm ngàn một ký nha.",
       "fr": "D'accord, je te fais un rabais. Trente-cinq mille le kilo.",
       "next": "t7"
     },
     {
       "id": "t6",
       "speaker": "npc",
-      "vi": "Dạ, hai ký, tám mươi ngàn.",
+      "vi": "Hai ký, tám mươi ngàn nha con.",
       "fr": "D'accord, deux kilos, quatre-vingt mille.",
       "next": "t7"
     },
@@ -74,14 +74,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Cảm ơn bạn nha!",
-          "fr": "Merci, hein !",
+          "vi": "Con cảm ơn cô nha!",
+          "fr": "Merci, madame !",
           "next": "t8"
         },
         {
           "id": "o2",
-          "vi": "Tính tiền nha!",
-          "fr": "Je vais payer, hein !",
+          "vi": "Cô tính tiền nha!",
+          "fr": "Je vais payer, madame.",
           "next": "t8"
         }
       ]
@@ -89,8 +89,8 @@
     {
       "id": "t8",
       "speaker": "npc",
-      "vi": "Dạ, cảm ơn bạn! Ăn ngon nha.",
-      "fr": "Merci à toi ! Bon appétit.",
+      "vi": "Cảm ơn con! Ăn ngon nha.",
+      "fr": "Merci ! Régale-toi.",
       "next": null
     }
   ]

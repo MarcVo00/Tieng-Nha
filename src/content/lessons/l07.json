@@ -1,6 +1,6 @@
 {
   "id": "l07",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Au marché",
   "description": "Fais tes courses au marché : demande le prix, dis que c'est trop cher, demande un petit rabais et achète un kilo de fruits.",
   "emoji": "🥭",
@@ -144,7 +144,7 @@
       "answerVi": "Bao nhiêu tiền?",
       "distractorsVi": [
         "Mắc quá!",
-        "Cho tui một ký.",
+        "Cho một ký.",
         "Tính tiền."
       ]
     },
@@ -163,19 +163,19 @@
       "id": "l07_e09",
       "type": "translate_choose",
       "promptFr": "Un kilo de mangues, s'il te plaît.",
-      "answerVi": "Cho tui một ký xoài.",
+      "answerVi": "Cô ơi, cho một ký xoài.",
       "distractorsVi": [
-        "Cho tui một ký chuối.",
-        "Cho tui một ký thơm.",
-        "Cho tui một ly nước."
+        "Cô ơi, cho một ký chuối.",
+        "Cô ơi, cho một ký thơm.",
+        "Cô ơi, cho một ly nước."
       ]
     },
     {
       "id": "l07_e10",
       "type": "word_order",
-      "fr": "Un kilo de bananes pour moi.",
+      "fr": "Un kilo de bananes, s'il vous plaît.",
       "tokensVi": [
-        "Cho tui",
+        "Cho",
         "một",
         "ký",
         "chuối"

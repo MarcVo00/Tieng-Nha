@@ -1,13 +1,13 @@
 {
   "id": "d08",
-  "contentVersion": 3,
+  "contentVersion": 4,
   "title": "Prendre un xe ôm",
   "scene": "Ngã tư — au carrefour",
   "turns": [
     {
       "id": "t1",
       "speaker": "npc",
-      "vi": "Chào bạn! Bạn đi đâu?",
+      "vi": "Chào con! Con đi đâu?",
       "fr": "Bonjour ! Tu vas où ?",
       "next": "t2"
     },
@@ -17,13 +17,13 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Tui đi ăn phở.",
+          "vi": "Dạ, con đi ăn phở.",
           "fr": "Je vais manger un phở.",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Đi chợ. Có xa không?",
+          "vi": "Dạ, đi chợ. Có xa không chú?",
           "fr": "Au marché. C'est loin ?",
           "next": "t3"
         }
@@ -32,7 +32,7 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Dạ, không xa đâu. Bạn lên xe đi.",
+      "vi": "Không xa đâu. Con lên xe đi.",
       "fr": "Non, ce n'est pas loin. Monte.",
       "next": "t4"
     },
@@ -42,20 +42,20 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Đi thẳng nha.",
-          "fr": "Tout droit, hein.",
+          "vi": "Đi thẳng nha chú.",
+          "fr": "Tout droit, s'il vous plaît.",
           "next": "t5"
         },
         {
           "id": "o2",
-          "vi": "Quẹo trái nha.",
-          "fr": "Tourne à gauche, hein.",
+          "vi": "Quẹo trái nha chú.",
+          "fr": "Tournez à gauche, s'il vous plaît.",
           "next": "t5"
         },
         {
           "id": "o3",
-          "vi": "Quẹo phải nha.",
-          "fr": "Tourne à droite, hein.",
+          "vi": "Quẹo phải nha chú.",
+          "fr": "Tournez à droite, s'il vous plaît.",
           "next": "t5"
         }
       ]
@@ -63,7 +63,7 @@
     {
       "id": "t5",
       "speaker": "npc",
-      "vi": "Dạ. Bạn muốn dừng ở đâu?",
+      "vi": "Con muốn dừng ở đâu?",
       "fr": "D'accord. Où veux-tu t'arrêter ?",
       "next": "t6"
     },
@@ -73,14 +73,14 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Dừng ở đây nha.",
-          "fr": "Arrête-toi ici, hein.",
+          "vi": "Dừng ở đây nha chú.",
+          "fr": "Arrêtez-vous ici, s'il vous plaît.",
           "next": "t7"
         },
         {
           "id": "o2",
-          "vi": "Dừng gần chợ nha.",
-          "fr": "Arrête-toi près du marché, hein.",
+          "vi": "Dừng gần chợ nha chú.",
+          "fr": "Arrêtez-vous près du marché, s'il vous plaît.",
           "next": "t7"
         }
       ]
@@ -88,7 +88,7 @@
     {
       "id": "t7",
       "speaker": "npc",
-      "vi": "Dạ, tới rồi. Mười lăm ngàn nha.",
+      "vi": "Tới rồi. Mười lăm ngàn nha con.",
       "fr": "Voilà, on est arrivés. Quinze mille.",
       "next": null
     }

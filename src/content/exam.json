@@ -1,5 +1,5 @@
 {
-  "contentVersion": 4,
+  "contentVersion": 5,
   "questions": [
     {
       "id": "exam_q001",
@@ -177,7 +177,7 @@
           "v_tinh_tien",
           "v_ngon",
           "v_em_oi",
-          "v_cho_tui"
+          "v_cho"
         ]
       }
     },
@@ -399,7 +399,7 @@
         "type": "word_order",
         "fr": "Je m'excuse, monsieur (homme âgé).",
         "tokensVi": [
-          "Tui",
+          "Con",
           "xin lỗi",
           "ông"
         ],
@@ -445,11 +445,11 @@
         "id": "exam_e030",
         "type": "translate_choose",
         "promptFr": "J'ai une petite sœur.",
-        "answerVi": "Tui có một em gái.",
+        "answerVi": "Mình có một em gái.",
         "distractorsVi": [
-          "Tui có một em trai.",
-          "Tui có một chị hai.",
-          "Tui không có em gái."
+          "Mình có một em trai.",
+          "Mình có một chị hai.",
+          "Mình không có em gái."
         ]
       }
     },
@@ -462,7 +462,7 @@
         "fr": "Mon père a deux fils.",
         "tokensVi": [
           "Ba",
-          "tui",
+          "mình",
           "có",
           "hai",
           "con trai"
@@ -494,11 +494,11 @@
         "id": "exam_e033",
         "type": "translate_choose",
         "promptFr": "De l'eau, s'il te plaît.",
-        "answerVi": "Cho tui một ly nước.",
+        "answerVi": "Em ơi, cho một ly nước.",
         "distractorsVi": [
-          "Cho tui một ly sữa.",
-          "Cho tui một ly trà đá.",
-          "Cho tui một ly cà phê đen."
+          "Em ơi, cho một ly sữa.",
+          "Em ơi, cho một ly trà đá.",
+          "Em ơi, cho một ly cà phê đen."
         ]
       }
     },
@@ -509,11 +509,11 @@
         "id": "exam_e034",
         "type": "translate_choose",
         "promptFr": "Je n'ai pas faim.",
-        "answerVi": "Tui không đói.",
+        "answerVi": "Mình không đói.",
         "distractorsVi": [
-          "Tui đói quá.",
-          "Tui không ăn phở.",
-          "Tui uống trà."
+          "Mình đói quá.",
+          "Mình không ăn phở.",
+          "Mình uống trà."
         ]
       }
     },
@@ -542,11 +542,11 @@
         "id": "exam_e036",
         "type": "translate_choose",
         "promptFr": "J'achète des mangues.",
-        "answerVi": "Tui mua xoài.",
+        "answerVi": "Mình mua xoài.",
         "distractorsVi": [
-          "Tui bán xoài.",
-          "Tui mua chuối.",
-          "Tui mua thơm."
+          "Mình bán xoài.",
+          "Mình mua chuối.",
+          "Mình mua thơm."
         ]
       }
     },
@@ -818,10 +818,10 @@
       "exercise": {
         "id": "exam_e059",
         "type": "speak",
-        "vi": "Tui khỏe, cảm ơn bạn.",
+        "vi": "Mình khỏe, cảm ơn bạn.",
         "fr": "Je vais bien, merci.",
         "vocabIds": [
-          "v_tui",
+          "v_minh",
           "v_khoe_khong",
           "v_cam_on"
         ]
@@ -862,11 +862,11 @@
       "exercise": {
         "id": "exam_e062",
         "type": "speak",
-        "vi": "Gia đình tui có năm người.",
+        "vi": "Gia đình mình có năm người.",
         "fr": "Il y a cinq personnes dans ma famille.",
         "vocabIds": [
           "v_gia_dinh",
-          "v_tui",
+          "v_minh",
           "v_co_avoir",
           "v_nam",
           "v_nguoi"
@@ -879,10 +879,10 @@
       "exercise": {
         "id": "exam_e063",
         "type": "speak",
-        "vi": "Tui có hai em trai.",
+        "vi": "Mình có hai em trai.",
         "fr": "J'ai deux petits frères.",
         "vocabIds": [
-          "v_tui",
+          "v_minh",
           "v_co_avoir",
           "v_hai",
           "v_em_trai"
@@ -909,10 +909,11 @@
       "exercise": {
         "id": "exam_e065",
         "type": "speak",
-        "vi": "Cho tui một ly sữa.",
-        "fr": "Un verre de lait pour moi.",
+        "vi": "Em ơi, cho một ly sữa.",
+        "fr": "Un verre de lait, s'il te plaît.",
         "vocabIds": [
-          "v_cho_tui",
+          "v_em_oi",
+          "v_cho",
           "v_ly",
           "v_sua"
         ]
@@ -924,10 +925,10 @@
       "exercise": {
         "id": "exam_e066",
         "type": "speak",
-        "vi": "Tui ăn hủ tiếu.",
+        "vi": "Mình ăn hủ tiếu.",
         "fr": "Je mange du hủ tiếu.",
         "vocabIds": [
-          "v_tui",
+          "v_minh",
           "v_an",
           "v_hu_tieu"
         ]
@@ -953,11 +954,11 @@
       "exercise": {
         "id": "exam_e068",
         "type": "speak",
-        "vi": "Tui mua một ký thơm.",
-        "fr": "J'achète un kilo d'ananas.",
+        "vi": "Cô ơi, cho một ký thơm.",
+        "fr": "Un kilo d'ananas, s'il vous plaît.",
         "vocabIds": [
-          "v_tui",
-          "v_mua",
+          "v_co_tante",
+          "v_cho",
           "v_ky",
           "v_thom"
         ]
@@ -984,11 +985,11 @@
       "exercise": {
         "id": "exam_e070",
         "type": "speak",
-        "vi": "Hôm qua tui ăn phở.",
+        "vi": "Hôm qua mình ăn phở.",
         "fr": "Hier, j'ai mangé du phở.",
         "vocabIds": [
           "v_hom_qua",
-          "v_tui",
+          "v_minh",
           "v_an",
           "v_pho"
         ]
@@ -1000,10 +1001,10 @@
       "exercise": {
         "id": "exam_e071",
         "type": "speak",
-        "vi": "Tui ở Pháp.",
+        "vi": "Mình ở Pháp.",
         "fr": "J'habite en France.",
         "vocabIds": [
-          "v_tui",
+          "v_minh",
           "v_o_habiter",
           "v_phap"
         ]

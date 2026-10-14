@@ -1,6 +1,6 @@
 {
   "id": "l10",
-  "contentVersion": 3,
+  "contentVersion": 4,
   "title": "Se présenter",
   "description": "Présente-toi : ton prénom, ton pays, ce que tu apprends. Tu peux enfin dire « enchanté(e) » à une famille vietnamienne !",
   "emoji": "🤝",
@@ -18,7 +18,7 @@
       "vi": "tên là",
       "fr": "s'appeler",
       "dialect": "south",
-      "note": "« Tui tên là Camille » = « Je m'appelle Camille ». À l'oral on raccourcit souvent : « Tui tên Camille », « Bạn tên gì ? »."
+      "note": "« Mình tên là Camille » = « Je m'appelle Camille ». À l'oral on raccourcit souvent : « Mình tên Camille », « Bạn tên gì ? ». Face à un aîné : « Con tên là Camille »."
     },
     {
       "id": "v_phap",
@@ -65,7 +65,7 @@
       "vi": "ở",
       "fr": "habiter, être (quelque part)",
       "dialect": "south",
-      "note": "À l'oral on dit simplement « ở » : « Tui ở Pháp » = « J'habite en France ». « Sống ở » (vivre à) existe mais sonne plus écrit."
+      "note": "À l'oral on dit simplement « ở » : « Mình ở Pháp » = « J'habite en France ». « Sống ở » (vivre à) existe mais sonne plus écrit."
     },
     {
       "id": "v_tuoi",
@@ -150,11 +150,11 @@
       "id": "l10_e07",
       "type": "translate_choose",
       "promptFr": "Je m'appelle Camille.",
-      "answerVi": "Tui tên là Camille.",
+      "answerVi": "Mình tên là Camille.",
       "distractorsVi": [
-        "Tui là người Pháp.",
-        "Tui học tiếng Việt.",
-        "Tui ở Pháp."
+        "Mình là người Pháp.",
+        "Mình học tiếng Việt.",
+        "Mình ở Pháp."
       ]
     },
     {
@@ -172,11 +172,11 @@
       "id": "l10_e09",
       "type": "translate_choose",
       "promptFr": "J'apprends le vietnamien.",
-      "answerVi": "Tui học tiếng Việt.",
+      "answerVi": "Mình học tiếng Việt.",
       "distractorsVi": [
-        "Tui là người Việt.",
-        "Tui ở Việt Nam.",
-        "Tui tên là Camille."
+        "Mình là người Việt.",
+        "Mình ở Việt Nam.",
+        "Mình tên là Camille."
       ]
     },
     {
@@ -184,7 +184,7 @@
       "type": "word_order",
       "fr": "J'habite à Sài Gòn.",
       "tokensVi": [
-        "Tui",
+        "Mình",
         "ở",
         "Sài Gòn"
       ],
@@ -195,10 +195,10 @@
     {
       "id": "l10_e11",
       "type": "speak",
-      "vi": "Tui là người Pháp.",
+      "vi": "Mình là người Pháp.",
       "fr": "Je suis français(e).",
       "vocabIds": [
-        "v_tui",
+        "v_minh",
         "v_nguoi_phap"
       ]
     },

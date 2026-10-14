@@ -1,6 +1,6 @@
 {
   "id": "d03",
-  "contentVersion": 3,
+  "contentVersion": 4,
   "title": "Donner son numéro",
   "scene": "Trên đường — on échange nos numéros",
   "turns": [
@@ -17,13 +17,13 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Số của tui là chín bảy ba hai năm sáu.",
+          "vi": "Số của mình là chín bảy ba hai năm sáu.",
           "fr": "Mon numéro est 9 7 3 2 5 6.",
           "next": "t3"
         },
         {
           "id": "o2",
-          "vi": "Số của tui là tám bốn một sáu chín bảy.",
+          "vi": "Số của mình là tám bốn một sáu chín bảy.",
           "fr": "Mon numéro est 8 4 1 6 9 7.",
           "next": "t3"
         }
@@ -32,7 +32,7 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Cảm ơn bạn! Bạn có số của tui không?",
+      "vi": "Cảm ơn bạn! Bạn có số của mình không?",
       "fr": "Merci ! Tu as mon numéro ?",
       "next": "t4"
     },
@@ -57,7 +57,7 @@
     {
       "id": "t5",
       "speaker": "npc",
-      "vi": "Số của tui là tám tám chín ba sáu hai.",
+      "vi": "Số của mình là tám tám chín ba sáu hai.",
       "fr": "Mon numéro est 8 8 9 3 6 2.",
       "next": null
     },

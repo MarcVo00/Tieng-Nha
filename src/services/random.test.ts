@@ -1,4 +1,4 @@
-import { createRng, shuffle, pickN, seedFromString } from "@/services/random";
+import { createRng, shuffle, shuffleWithinGroups, pickN, seedFromString } from "@/services/random";
 
 test("rng is deterministic per seed", () => {
   const a = createRng(42),
@@ -25,4 +25,22 @@ test("pickN returns n distinct items", () => {
 test("seedFromString is stable", () => {
   expect(seedFromString("l05_e01")).toBe(seedFromString("l05_e01"));
   expect(seedFromString("a")).not.toBe(seedFromString("b"));
+});
+
+test("shuffleWithinGroups keeps the groups in order and only mixes items inside each group", () => {
+  const items = ["a1", "a2", "a3", "a4", "b1", "b2", "b3", "c1", "c2", "c3", "c4"];
+  const group = (s: string) => s[0] ?? "";
+  const seen = new Set<string>();
+  for (let seed = 1; seed <= 40; seed++) {
+    const out = shuffleWithinGroups(items, group, createRng(seed));
+    expect([...out].sort()).toEqual([...items].sort());
+    expect(out.map(group).join("")).toBe("aaaabbbcccc");
+    seen.add(out.join(","));
+  }
+  expect(seen.size).toBeGreaterThan(10); // the order really changes from one run to the next
+});
+
+test("shuffleWithinGroups orders groups by their first appearance", () => {
+  const out = shuffleWithinGroups(["b1", "a1", "b2", "a2"], (s) => s[0] ?? "", createRng(3));
+  expect(out.map((s) => s[0]).join("")).toBe("bbaa");
 });

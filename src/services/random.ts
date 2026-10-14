@@ -29,3 +29,14 @@ export function seedFromString(s: string): number {
   }
   return h >>> 0;
 }
+/** Shuffles items inside each group; groups keep the order of their first appearance (e.g. exercise types). */
+export function shuffleWithinGroups<T>(items: readonly T[], groupOf: (item: T) => string, rng: () => number): T[] {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const key = groupOf(item);
+    const list = groups.get(key);
+    if (list) list.push(item);
+    else groups.set(key, [item]);
+  }
+  return [...groups.values()].flatMap((list) => shuffle(list, rng));
+}

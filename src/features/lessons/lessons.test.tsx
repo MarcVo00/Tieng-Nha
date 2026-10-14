@@ -6,6 +6,7 @@ import { useAppState } from "@/app/appState";
 import type { Exercise } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { LessonDoneScreen, LessonScreen } from "@/features/lessons";
+import { orderExercises } from "@/features/lessons/useLessonRun";
 import { lessonFixture } from "@/test/fixtures/lessonFixture";
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -27,13 +28,18 @@ function renderWithServices(ui: ReactElement, opts: { services?: Services; route
 }
 
 const TEST_TIMEOUT = 30_000;
+const NOW = "2026-10-14T08:00:00.000Z";
+// The lesson shuffles its exercises from the clock: with a fixed clock, this is the order the screen shows.
+const ORDER = orderExercises(lessonFixture, NOW);
+let currentStt: FakeSpeechRecognizer | null = null;
 const HOME = "page d'accueil";
 
 function setup() {
   const stt = new FakeSpeechRecognizer();
   const tts = new FakeSpeechSynthesizer();
   const reporter = new FakeContentReporter();
-  const services = createFakeServices({ stt, tts, reporter });
+  currentStt = stt;
+  const services = createFakeServices({ stt, tts, reporter, clock: () => NOW });
   const completeLesson = vi.spyOn(services.activity, "completeLesson");
   const view = renderWithServices(
     <Routes>
@@ -78,6 +84,9 @@ async function pressContinue(double = false) {
 
 /** Plays one exercise of the fixture lesson, right or wrong, and taps Continuer. */
 async function play(ex: Exercise, correct: boolean, doubleContinue = false) {
+  // Two exercises of the same type can follow each other: wait until this one has replaced the previous one.
+  await waitFor(() => expect(document.querySelectorAll("[data-exercise-id]")).toHaveLength(1), { timeout: 4000 });
+  await waitFor(() => expect(document.querySelector(`[data-exercise-id="${ex.id}"]`)).not.toBeNull(), { timeout: 4000 });
   await screen.findByText(PROMPT[ex.type], {}, { timeout: 4000 });
   const verify = () => userEvent.click(screen.getByRole("button", { name: fr.exercises.verify }));
   switch (ex.type) {
@@ -103,6 +112,7 @@ async function play(ex: Exercise, correct: boolean, doubleContinue = false) {
       break;
     }
     case "speak":
+      if (correct && currentStt) currentStt.queue = [[ex.vi]];
       await userEvent.click(screen.getByRole("button", { name: /parler/i }));
       break;
   }
@@ -156,12 +166,11 @@ test("the last card starts the exercises", async () => {
 test(
   "answering every exercise correctly lands on the done screen with +15 XP, saved exactly once",
   async () => {
-    const { stt, services, completeLesson } = setup();
-    stt.queue = [["cho tui một ly trà đá"], ["ngon quá"]];
+    const { services, completeLesson } = setup();
     await skipIntro();
-    const last = lessonFixture.exercises.length - 1;
+    const last = ORDER.length - 1;
     // A double tap on the final Continuer must not report the last exercise twice.
-    for (const [i, ex] of lessonFixture.exercises.entries()) await play(ex, true, i === last);
+    for (const [i, ex] of ORDER.entries()) await play(ex, true, i === last);
 
     expect(await screen.findByRole("heading", { name: "Giỏi quá!" })).toBeInTheDocument();
     expect(await screen.findByText("+15")).toBeInTheDocument();
@@ -182,10 +191,9 @@ test(
 test(
   "a wrong answer is presented again at the end and costs the perfect bonus",
   async () => {
-    const { stt, completeLesson } = setup();
-    stt.queue = [["cho tui một ly trà đá"], ["ngon quá"]];
+    const { completeLesson } = setup();
     await skipIntro();
-    const [first, ...rest] = lessonFixture.exercises;
+    const [first, ...rest] = ORDER;
     await play(first!, false);
     for (const ex of rest) await play(ex, true);
     await play(first!, true);
@@ -205,7 +213,7 @@ test(
   async () => {
     const { services, completeLesson } = setup();
     await skipIntro();
-    for (const ex of lessonFixture.exercises.slice(0, 3)) await play(ex, false);
+    for (const ex of ORDER.slice(0, 3)) await play(ex, false);
 
     expect(await screen.findByRole("heading", { name: fr.lessons.failed.title })).toBeInTheDocument();
     expect(screen.getByText(fr.lessons.failed.body)).toBeInTheDocument();
@@ -260,4 +268,17 @@ test("the done screen without a result redirects home", async () => {
     { route: "/lesson/l05/done" },
   );
   expect(await screen.findByText(HOME)).toBeInTheDocument();
+});
+
+test("each start of a lesson draws a new exercise order, still grouped by type", () => {
+  // "listen,tone,…": the types in order of appearance, each block counted once.
+  const blocks = (list: readonly Exercise[]) => list.map((e) => e.type).filter((t, i, all) => t !== all[i - 1]).join(",");
+  const typesInOrder = [...new Set(lessonFixture.exercises.map((e) => e.type))].join(",");
+  const orders = new Set<string>();
+  for (let minute = 0; minute < 20; minute++) {
+    const order = orderExercises(lessonFixture, `2026-10-14T08:${String(minute).padStart(2, "0")}:00.000Z`);
+    expect(blocks(order)).toBe(typesInOrder); // one contiguous block per type, in the content's type order
+    orders.add(order.map((e) => e.id).join(","));
+  }
+  expect(orders.size).toBeGreaterThan(1);
 });

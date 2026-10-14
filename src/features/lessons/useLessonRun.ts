@@ -5,6 +5,7 @@ import { useServices } from "@/app/ServicesProvider";
 import type { Exercise, Lesson, VocabId, VocabItem } from "@/domain/types";
 import type { GradeResult } from "@/exercises/types";
 import type { ActivityResult } from "@/services/activity";
+import { createRng, seedFromString, shuffleWithinGroups } from "@/services/random";
 import {
   accuracyOf,
   applyResult,
@@ -26,6 +27,13 @@ export type LessonLoad =
   | { status: "ready"; lesson: Lesson; vocabIndex: ReadonlyMap<VocabId, VocabItem> };
 
 const liveExercises = (lesson: Lesson): Exercise[] => lesson.exercises.filter((e) => !e.deprecated);
+
+/**
+ * A new order on every start, so the learner cannot replay a lesson from memory. Exercises stay grouped by type
+ * (listening first, speaking last, as the content orders them); only the order inside each group changes.
+ */
+export const orderExercises = (lesson: Lesson, now: string): Exercise[] =>
+  shuffleWithinGroups(liveExercises(lesson), (e) => e.type, createRng(seedFromString(`${lesson.id}:${now}`)));
 /** Retired words stay in the content (ids are immutable) but are no longer taught nor added to the reviews. */
 export const liveVocab = (lesson: Lesson): VocabItem[] => lesson.vocab.filter((v) => !v.deprecated);
 
@@ -60,7 +68,7 @@ export function useLessonRun(lessonId: string | undefined) {
   }, []);
 
   const begin = useCallback((lesson: Lesson) => {
-    const fresh = createSession(liveExercises(lesson), OPTIONS);
+    const fresh = createSession(orderExercises(lesson, clock()), OPTIONS);
     sessionRef.current = fresh;
     setSession(fresh);
     completing.current = false;

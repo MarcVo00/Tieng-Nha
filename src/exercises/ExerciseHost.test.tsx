@@ -127,3 +127,16 @@ test("a word_order exercise (layout-animated tiles) leaves so the next exercise 
   expect(await screen.findByRole("button", { name: /^cho tui một ly cà phê đen\.$/i })).toBeInTheDocument();
   expect(screen.queryByRole("group", { name: /mots disponibles/i })).not.toBeInTheDocument();
 });
+
+test("answer positions are drawn again for each run, so they cannot be learnt by heart", () => {
+  if (translate.type !== "translate_choose") throw new Error("fixture changed");
+  const choices = [translate.answerVi, ...translate.distractorsVi];
+  const orders = new Set<string>();
+  for (let run = 0; run < 12; run++) {
+    const view = renderWithServices(<ExerciseHost {...base} exercise={translate} mode="practice" onResult={() => undefined} />);
+    const shown = screen.getAllByRole("button").map((b) => b.textContent ?? "");
+    orders.add(choices.map((vi) => shown.findIndex((t) => t.includes(vi))).join(","));
+    view.unmount();
+  }
+  expect(orders.size).toBeGreaterThan(1);
+});

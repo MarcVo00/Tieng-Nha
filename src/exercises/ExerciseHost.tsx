@@ -30,7 +30,9 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
   const result = state?.presentation === presentation ? state.result : null;
   const answered = useRef<string | null>(null);
   const emitted = useRef<string | null>(null); // the exiting sheet keeps its old onContinue: emit once per presentation
-  const seed = useMemo(() => seedFromString(exercise.id), [exercise.id]);
+  // Answer positions are drawn again for every run and every presentation: they cannot be learnt by heart.
+  const [runSalt] = useState(() => Math.random().toString(36).slice(2));
+  const seed = useMemo(() => seedFromString(`${presentation}:${runSalt}`), [presentation, runSalt]);
 
   const handleAnswer = (answer: unknown) => {
     if (answered.current === presentation) return; // one answer per presentation
@@ -46,6 +48,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
       <AnimatePresence mode="wait">
         <motion.div
           key={presentation}
+          data-exercise-id={exercise.id}
           initial={{ x: 24, opacity: 0 }}
           animate={{ x: 0, opacity: 1, transition: { duration: duration.base, ease: ease.out } }}
           exit={{ x: -24, opacity: 0, transition: { duration: duration.fast * EXIT_RATIO, ease: ease.in } }}

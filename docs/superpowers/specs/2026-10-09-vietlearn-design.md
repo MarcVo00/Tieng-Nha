@@ -363,6 +363,14 @@ Navigation : barre d'onglets en bas (Apprendre `/`, Révision `/review`, Classem
 4. **Test de l'appareil** — bouton « Écouter » (TTS « Xin chào ») + « Parler » (STT) ; résultat stocké dans `settings.capabilities = { tts: boolean, stt: boolean, recorder: boolean }` ; textes d'aide si une capacité manque (installer la voix vietnamienne : iOS Réglages → Accessibilité → Contenu énoncé → Voix → Tiếng Việt ; Android : Paramètres → Synthèse vocale → Google → Installer données vocales → Vietnamien).
 5. **Installer l'app** — détection plateforme ; iOS : illustration Partager → « Sur l'écran d'accueil » ; autres : `beforeinstallprompt`. Bouton « Plus tard ».
 
+**Addendum (connexion par mot de passe, 2026-10-14)** — l'OTP reste le chemin d'inscription et de récupération, un mot de passe Supabase (e-mail + mot de passe) sert aux connexions suivantes.
+- Port `AuthService` : `signInWithPassword`, `setPassword`, `hasPassword` (drapeau `has_password` dans `user_metadata`, posé par `updateUser({ password, data: { has_password: true } })`). Erreurs `InvalidCredentialsError`, `WeakPasswordError` (minimum 8 caractères, aussi vérifié côté client).
+- Inscription : après `verifyOtp` d'un utilisateur sans profil, étape « mot de passe » (création) avant le profil (6 points de progression : bienvenue, invitation, mot de passe, profil, appareil, installation).
+- Bienvenue : lien « Déjà un compte ? Se connecter » → e-mail + mot de passe (sans points de progression). Succès : profil chargé, accueil si l'onboarding est fait sur l'appareil, sinon test de l'appareil. Sans profil (cas limite) : l'étape profil demande alors le code d'invitation.
+- « Mot de passe oublié ? » : e-mail → code à 6 chiffres → nouveau mot de passe → même suite que la connexion.
+- Connexion par code d'un compte sans mot de passe : proposition d'en choisir un (« Plus tard » possible).
+- Moi → Réglages → « Changer mon mot de passe » (feuille, toast « Mot de passe mis à jour »).
+
 ### 6.2 Accueil (`features/home`)
 - Header : avatar, XP total (compteur animé), streak 🔥 N, indicateur de sync.
 - Carte « Révision du jour (N mots) » si N > 0.

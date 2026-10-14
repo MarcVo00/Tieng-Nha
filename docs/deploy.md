@@ -95,12 +95,13 @@ Pour arrêter la base locale ensuite : `npx supabase stop`.
 
 ## Étape 3 : paramètres d'authentification (dashboard Supabase)
 
-L'application utilise la connexion par **code à 6 chiffres reçu par e-mail** (OTP), sans mot de passe.
+L'application utilise le **code à 6 chiffres reçu par e-mail** (OTP) pour l'inscription et le mot de passe oublié, puis un **mot de passe** (e-mail + mot de passe) pour les connexions suivantes.
 
 1. **Authentication → Providers → Email** :
    - Email : **activé** ;
    - **Confirm email : désactivé** ;
-   - **Email OTP Length : 6**.
+   - **Email OTP Length : 6** ;
+   - **Minimum password length : 8** (même minimum que l'application, qui affiche « Mot de passe trop faible (8 caractères minimum) » si le serveur refuse). La connexion par mot de passe est active par défaut avec le fournisseur Email ; aucune migration n'est nécessaire.
 2. **Authentication → Email Templates** : modifie **les deux** modèles :
    - **Magic Link** ;
    - **Confirm signup**.

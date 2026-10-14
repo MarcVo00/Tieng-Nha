@@ -1,6 +1,7 @@
 # Progression V2 — Arbre de compétences, boss, énergie, pièces
 
 > Statut : **design validé** par Marc le 2026-10-14 (brainstorming). Implémentation **après** la correction de l'oral (reconnaissance vocale), dans l'ordre du §8.
+> Étapes 1–2 (arbre, boss) **implémentées** le 2026-10-14 — plan [`2026-10-14-tree-and-boss.md`](../plans/2026-10-14-tree-and-boss.md).
 > Complète la [spec V1](2026-10-09-vietlearn-design.md) ; en cas de conflit, ce document l'emporte pour les sujets qu'il couvre.
 > Langue des docs : français. Langue du code : anglais.
 

@@ -2,6 +2,7 @@
 
 > Statut : **design validé** par Marc le 2026-10-14 (brainstorming). Implémentation **après** la correction de l'oral (reconnaissance vocale), dans l'ordre du §8.
 > Étapes 1–2 (arbre, boss) **implémentées** le 2026-10-14 — plan [`2026-10-14-tree-and-boss.md`](../plans/2026-10-14-tree-and-boss.md).
+> Étape 3 (énergie) **implémentée** le 2026-10-14 — plan [`2026-10-14-energy.md`](../plans/2026-10-14-energy.md).
 > Complète la [spec V1](2026-10-09-vietlearn-design.md) ; en cas de conflit, ce document l'emporte pour les sujets qu'il couvre.
 > Langue des docs : français. Langue du code : anglais.
 
@@ -128,7 +129,7 @@ Mode focus (sans barre d'onglets). En haut : le boss (illustration, nom, barre d
 
 - **Jamais bloqué** : révision, classement, profil, réglages. Refaire une leçon déjà faite coûte aussi 1 ⚡.
 - Calcul : `energyAt(events, now)` rejoue les événements dans l'ordre (dépenses, gains, recharges, achats) en ajoutant la recharge temporelle, plafonné à 5. Pur et déterministe → testable.
-- Événement nouveau : `session_started` `{ kind: "lesson" | "dialogue" | "boss", refId }` (xp 0). Le gain de révision vient de `review_session_completed` existant ; la recharge achetée vient de `item_purchased`.
+- Événement nouveau : `session_started` `{ kind }` (xp 0), **local uniquement** : enregistré dans le journal de l'appareil, jamais synchronisé (la base n'accepte pas ce type ; l'énergie n'est pas vérifiée côté serveur). Le gain de révision vient de `review_session_completed` existant ; la recharge achetée vient de `item_purchased`.
 - Écran sans énergie : « Plus d'énergie ! Fais une révision (+1 ⚡) ou reviens dans 2 h 14. » + bouton « Réviser » (+ « Recharger (30 xu) » si le solde le permet).
 - Affichage : jauge ⚡ dans l'en-tête, à côté de la série et de l'XP.
 

@@ -3,6 +3,7 @@
 | Document | Pour qui | Contenu |
 |---|---|---|
 | [Spec V1](superpowers/specs/2026-10-09-vietlearn-design.md) | tous | le *quoi* : fonctionnalités, données, backend, écrans, erreurs, tests |
+| [Spec Progression V2](superpowers/specs/2026-10-14-progression-boss-energy-design.md) | tous | arbre de compétences, boss, énergie, xu et boutique (à implémenter après l'oral) |
 | [Plan d'implémentation](superpowers/plans/2026-10-09-vietlearn-v1.md) | orchestrateur + sous-agents | le *comment* : tâches ordonnées, fichiers, critères, vérifications |
 | [ADR](adr/) | tous | le *pourquoi* des décisions d'architecture |
 | [Conventions](conventions.md) | sous-agents | règles de code, Definition of Done |

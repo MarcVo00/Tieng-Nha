@@ -4,6 +4,7 @@ import { mapError } from "@/adapters/supabase/errors";
 import { NotAuthenticatedError } from "@/domain/errors";
 import type { AppEvent } from "@/domain/types";
 import type { EventSink } from "@/ports";
+import { LOCAL_ONLY_EVENT_TYPES } from "@/services/energy";
 
 /** FK violation: the profile row is missing (not created yet, or account deleted). Events must stay queued. */
 function isMissingProfile(err: { code?: string | undefined } | null): boolean {
@@ -21,11 +22,14 @@ export class SupabaseEventSink implements EventSink {
 
   async push(events: AppEvent[]): Promise<{ accepted: string[] }> {
     if (events.length === 0) return { accepted: [] };
+    const local = events.filter((e) => LOCAL_ONLY_EVENT_TYPES.includes(e.type)).map((e) => e.clientId);
+    const remote = events.filter((e) => !LOCAL_ONLY_EVENT_TYPES.includes(e.type));
+    if (remote.length === 0) return { accepted: local };
     const { data, error: sessionError } = await this.db.auth.getSession();
     if (sessionError) throw mapError(sessionError);
     if (!data.session) throw new NotAuthenticatedError();
     const uid = data.session.user.id;
-    const rows = events.map((e) => ({
+    const rows = remote.map((e) => ({
       client_id: e.clientId,
       user_id: uid,
       schema_version: e.schemaVersion,
@@ -38,12 +42,12 @@ export class SupabaseEventSink implements EventSink {
     const opts = { onConflict: "client_id", ignoreDuplicates: true } as const;
 
     const batch = await this.db.from("events").upsert(rows, opts);
-    if (!batch.error) return { accepted: events.map((e) => e.clientId) };
+    if (!batch.error) return { accepted: [...local, ...remote.map((e) => e.clientId)] };
     if (isMissingProfile(batch.error)) throw new NotAuthenticatedError();
     if (!isDataError(batch.error)) throw mapError(batch.error);
 
     // Batch rejected because of a corrupt row: isolate it so it cannot block the outbox forever.
-    const accepted: string[] = [];
+    const accepted: string[] = [...local];
     for (const row of rows) {
       const one = await this.db.from("events").upsert([row], opts);
       if (!one.error) {

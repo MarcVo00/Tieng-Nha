@@ -34,7 +34,8 @@ export type AppEventType =
   | "dialogue_completed"
   | "review_session_completed"
   | "exam_finished"
-  | "badge_unlocked";
+  | "badge_unlocked"
+  | "session_started";
 
 /** Payload shapes by event type (stored as JSON). */
 export type EventPayload = {
@@ -43,7 +44,12 @@ export type EventPayload = {
   review_session_completed: { correctCount: number; total: number };
   exam_finished: { score: number; attemptId: string; noSpeaking: boolean; bossId?: string; won?: boolean; livesLeft?: number; bossHpLeft?: number };
   badge_unlocked: Record<string, never>;
+  session_started: { kind: SessionKind };
 };
+
+export type SessionKind = "lesson" | "dialogue" | "boss";
+/** `nextAt`: ISO time of the next +1, null when full. */
+export type EnergyState = { current: number; max: number; nextAt: string | null };
 
 export type AppEvent = {
   clientId: string; // uuid v4, idempotency key

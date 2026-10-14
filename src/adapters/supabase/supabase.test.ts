@@ -37,6 +37,19 @@ test("event sink upserts with ignoreDuplicates and maps columns", async () => {
   expect(upsert).toHaveBeenCalledWith([row("c1")], OPTS);
 });
 
+test("event sink keeps local-only events off the server but reports them accepted", async () => {
+  const upsert = vi.fn().mockResolvedValue({ error: null });
+  const db = { from: vi.fn(() => ({ upsert })), ...user };
+  const local: AppEvent = { ...ev("s1"), type: "session_started", payload: { kind: "lesson" } };
+  const out = await new SupabaseEventSink(db as never).push([local, ev("c1")]);
+  expect(upsert).toHaveBeenCalledTimes(1);
+  expect(upsert).toHaveBeenCalledWith([row("c1")], OPTS);
+  expect(out.accepted.sort()).toEqual(["c1", "s1"]);
+  const only = await new SupabaseEventSink(db as never).push([local]);
+  expect(only).toEqual({ accepted: ["s1"] });
+  expect(upsert).toHaveBeenCalledTimes(1);
+});
+
 test("event sink falls back to per-event inserts and drops a corrupt event with a warning", async () => {
   const upsert = vi.fn(async (rows: { client_id: string }[]) => {
     const bad = rows.some((r) => r.client_id === "bad");

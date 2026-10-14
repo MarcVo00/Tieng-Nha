@@ -12,6 +12,7 @@ const readFile = (f: string) => (existsSync(join(root, f)) ? (JSON.parse(readFil
 const strict = process.argv.includes("--strict") || process.env.CONTENT_STRICT === "1";
 const errors = checkContent(
   { lessons: readDir("lessons"), dialogues: readDir("dialogues"), exam: readFile("exam.json"), badges: readFile("badges.json"),
+    bosses: existsSync(join(root, "bosses.json")) ? (JSON.parse(readFileSync(join(root, "bosses.json"), "utf8")) as unknown) : undefined,
     tree: existsSync(join(root, "tree.json")) ? (JSON.parse(readFileSync(join(root, "tree.json"), "utf8")) as unknown) : undefined,
   },
   { strict },

@@ -1,0 +1,15 @@
+{
+  "contentVersion": 1,
+  "bosses": [
+    {
+      "id": "boss_thuy_tinh",
+      "name": "Thủy Tinh",
+      "title": "Le dieu des eaux",
+      "legend": "Thủy Tinh voulait épouser la princesse Mỵ Nương. Battu par Sơn Tinh, le génie des montagnes, il fait monter les eaux chaque année. Repousse-les avec ton vietnamien !",
+      "illustration": "boss_thuy_tinh",
+      "hp": 15,
+      "playerLives": 5,
+      "pool": "exam"
+    }
+  ]
+}

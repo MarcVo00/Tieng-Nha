@@ -2,7 +2,7 @@ import type { z } from "zod";
 import type {
   VocabItemSchema, ExerciseSchema, ListenChooseSchema, TranslateChooseSchema, TonePickSchema, WordOrderSchema,
   SpeakSchema, LessonSchema, TurnSchema, NpcTurnSchema, UserTurnSchema, DialogueSchema, ExamSectionSchema,
-  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema,
+  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema,
 } from "@/content/schema";
 
 export type { Tone } from "@/domain/tones";
@@ -129,3 +129,4 @@ export type ProgressSnapshot = {
 };
 export type TreeNode = z.infer<typeof TreeNodeSchema>;
 export type Tree = z.infer<typeof TreeFileSchema>;
+export type Boss = z.infer<typeof BossSchema>;

@@ -105,6 +105,20 @@ export const TreeNodeSchema = z
   .strict();
 export const TreeFileSchema = z.object({ contentVersion: z.number().int().min(1), nodes: z.array(TreeNodeSchema).min(1) }).strict();
 
+export const BossSchema = z
+  .object({
+    id: z.string().regex(/^boss_[a-z0-9_]+$/),
+    name: ViTextSchema,
+    title: z.string().min(1),
+    legend: z.string().min(1),
+    illustration: z.string().min(1),
+    hp: z.number().int().min(1).max(50),
+    playerLives: z.number().int().min(1).max(10),
+    pool: z.literal("exam"),
+  })
+  .strict();
+export const BossesFileSchema = z.object({ contentVersion: z.number().int().min(1), bosses: z.array(BossSchema).min(1) }).strict();
+
 export const BadgeRuleSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("lessons_done"), gte: z.number().int().min(1) }).strict(),
   z.object({ kind: z.literal("streak"), gte: z.number().int().min(1) }).strict(),

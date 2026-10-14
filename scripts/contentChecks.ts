@@ -1,10 +1,10 @@
 import {
-  BadgesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema,
+  BadgesFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema,
 } from "../src/content/schema";
 import { toneOfSyllable } from "../src/domain/tones";
 import type { Dialogue, Exercise, Lesson } from "../src/domain/types";
 
-export type ContentBundle = { lessons: unknown[]; dialogues: unknown[]; exam: unknown; badges: unknown; tree?: unknown };
+export type ContentBundle = { lessons: unknown[]; dialogues: unknown[]; exam: unknown; badges: unknown; tree?: unknown; bosses?: unknown };
 
 const EXAM_MIN = { total: 60, listening: 20, translation: 16, tones: 12, speaking: 12 } as const;
 
@@ -31,6 +31,9 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   const tree = input.tree === undefined ? undefined : TreeFileSchema.safeParse(input.tree);
   if (tree && !tree.success) errors.push(`tree: ${tree.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
   if (opts.strict && input.tree === undefined) errors.push("tree: missing");
+
+  const bosses = input.bosses === undefined ? undefined : BossesFileSchema.safeParse(input.bosses);
+  if (bosses && !bosses.success) errors.push(`bosses: ${bosses.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
 
   // Unique ids
   const seen = new Map<string, string>();
@@ -154,6 +157,22 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
     if (opts.strict) {
       const treeLessons = new Set(nodes.filter((n) => n.kind === "lesson").map((n) => n.id));
       for (const l of lessons) if (!treeLessons.has(l.id)) errors.push(`tree: lesson ${l.id} missing from the tree`);
+    }
+  }
+
+  // Boss sheets: each is a boss node of the tree; strict mode also needs a sheet per node and enough exam questions
+  if (bosses?.success && tree?.success) {
+    const bossNodes = new Set(tree.data.nodes.filter((n) => n.kind === "boss").map((n) => n.id));
+    for (const b of bosses.data.bosses) if (!bossNodes.has(b.id)) errors.push(`bosses: ${b.id} is not a boss node of the tree`);
+    if (opts.strict) {
+      const sheets = new Set(bosses.data.bosses.map((b) => b.id));
+      for (const id of bossNodes) if (!sheets.has(id)) errors.push(`tree: boss node ${id} has no boss sheet`);
+    }
+  }
+  if (opts.strict && bosses?.success && exam.success) {
+    for (const b of bosses.data.bosses) {
+      const need = b.hp + b.playerLives - 1;
+      if (need > exam.data.questions.length) errors.push(`bosses: ${b.id} needs ${need} questions, the exam pool has ${exam.data.questions.length}`);
     }
   }
 

@@ -393,6 +393,10 @@ export const fr = {
   },
   // --- exam ---
   exam: {
+    boss: {
+      aria: (name: string, title: string, defeated: boolean) =>
+        `${name}, ${title.charAt(0).toLowerCase()}${title.slice(1)}${defeated ? " — vaincu" : ""}`,
+    },
     sections: {
       listening: { vi: "Nghe", fr: "Écoute" },
       translation: { vi: "Dịch", fr: "Traduction" },

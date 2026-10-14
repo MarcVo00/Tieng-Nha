@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
+  <title>Boss — Thủy Tinh, le dieu des eaux (Đông Hồ simplifié)</title>
+  <!-- Gabarit boss : 200×200, silhouette massive (2 fois la largeur du héros), une couleur signature
+       (xanh chàm pour l'eau), un motif d'élément (vagues), une arme ou un attribut lisible de loin. -->
+  <defs>
+    <pattern id="hatch-boss" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="64" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#2B4E6E" stroke-width="3" stroke-linecap="round" opacity="0.55">
+    <!-- l'eau qui monte autour de lui -->
+    <path d="M16 150 Q28 138 40 150 Q52 162 64 150"/>
+    <path d="M136 150 Q148 138 160 150 Q172 162 184 150"/>
+    <path d="M10 126 Q20 116 30 126"/>
+    <path d="M170 126 Q180 116 190 126"/>
+  </g>
+
+  <g id="layer-body" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- robe en cloche (xanh chàm) -->
+    <path d="M56 184 Q50 132 70 104 Q100 92 130 104 Q150 132 144 184 Z" fill="#2B4E6E"/>
+    <!-- bas de robe en vagues : la seule zone à motif -->
+    <path d="M56 184 L56 164 Q68 154 80 164 Q92 174 104 164 Q116 154 128 164 Q140 174 144 164 L144 184 Z" fill="#F4E4C4"/>
+    <path d="M56 184 L56 164 Q68 154 80 164 Q92 174 104 164 Q116 154 128 164 Q140 174 144 164 L144 184 Z" fill="url(#hatch-boss)" stroke="none"/>
+    <!-- ceinture or -->
+    <path d="M66 128 Q100 136 134 128 L136 140 Q100 148 64 140 Z" fill="#D9A93A"/>
+    <!-- bras et mains -->
+    <path d="M74 104 Q56 114 42 132 L54 144 Q68 130 82 120 Z" fill="#2B4E6E"/>
+    <circle cx="48" cy="138" r="7" fill="#9CC3BB"/>
+    <path d="M126 104 Q144 112 156 124 L146 138 Q134 128 118 120 Z" fill="#2B4E6E"/>
+    <circle cx="150" cy="130" r="7" fill="#9CC3BB"/>
+  </g>
+
+  <g id="layer-weapon" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- trident d'eau tenu à droite -->
+    <path d="M160 186 L160 70" fill="none"/>
+    <path d="M146 84 Q146 66 160 62 Q174 66 174 84 M160 62 L160 52" fill="none"/>
+    <path d="M154 52 L160 42 L166 52 Z" fill="#D9A93A"/>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- visage bleu-vert (peau d'esprit des eaux) -->
+    <circle cx="100" cy="76" r="28" fill="#9CC3BB"/>
+    <!-- barbe en vagues -->
+    <path d="M78 86 Q84 110 100 112 Q116 110 122 86 Q114 96 100 96 Q86 96 78 86 Z" fill="#F4E4C4"/>
+    <path d="M86 100 Q92 96 98 100 M102 100 Q108 96 114 100" fill="none" stroke-width="1.5"/>
+    <!-- sourcils froncés, yeux ronds : il est en colère -->
+    <path d="M82 66 L96 70 M118 66 L104 70" fill="none"/>
+    <circle cx="90" cy="76" r="3.2" fill="#1F1A17" stroke="none"/>
+    <circle cx="110" cy="76" r="3.2" fill="#1F1A17" stroke="none"/>
+    <path d="M94 88 L106 88" fill="none" stroke-width="2"/>
+    <!-- couronne or à pointes -->
+    <path d="M76 56 L80 32 L90 48 L100 26 L110 48 L120 32 L124 56 Q100 62 76 56 Z" fill="#D9A93A"/>
+    <circle cx="100" cy="44" r="3" fill="#B23A2A" stroke-width="1.5"/>
+  </g>
+</svg>

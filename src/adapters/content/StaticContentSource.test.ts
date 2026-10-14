@@ -3,7 +3,7 @@ import { lessonFixture } from "@/test/fixtures/lessonFixture";
 import { dialogueFixture } from "@/test/fixtures/dialogueFixture";
 import { examPoolFixture } from "@/test/fixtures/examFixture";
 import badges from "@/content/badges.json";
-import { treeFixture } from "@/adapters/fakes/seed/tree";
+import { treeFixture, bossFixture } from "@/adapters/fakes/seed/tree";
 import { ContentNotFoundError } from "@/domain/errors";
 
 const l01 = { ...structuredClone(lessonFixture), id: "l01", dialogueId: "d01" };
@@ -13,6 +13,7 @@ const src = new StaticContentSource({
   exam: async () => ({ contentVersion: 1, questions: examPoolFixture }),
   badges: async () => badges,
   tree: async () => treeFixture,
+  bosses: async () => ({ contentVersion: 1, bosses: [bossFixture] }),
 });
 
 test("lists lessons ordered by id with order numbers", async () => {

@@ -1,6 +1,6 @@
 import type { ContentSource } from "@/ports";
-import type { BadgeDef, Dialogue, ExamQuestion, Lesson, LessonSummary, Tree, VocabItem } from "@/domain/types";
-import { BadgesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema } from "@/content/schema";
+import type { BadgeDef, Boss, Dialogue, ExamQuestion, Lesson, LessonSummary, Tree, VocabItem } from "@/domain/types";
+import { BadgesFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema } from "@/content/schema";
 import { ContentNotFoundError } from "@/domain/errors";
 
 export type ContentLoaders = {
@@ -9,6 +9,7 @@ export type ContentLoaders = {
   exam: () => Promise<unknown>;
   badges: () => Promise<unknown>;
   tree: () => Promise<unknown>;
+  bosses: () => Promise<unknown>;
 };
 
 const idFromPath = (p: string): string => (p.split("/").pop() ?? p).replace(/\.json$/, "");
@@ -64,6 +65,12 @@ export class StaticContentSource implements ContentSource {
     return TreeFileSchema.parse(await this.loaders.tree());
   }
 
+  async getBoss(id: string): Promise<Boss> {
+    const b = BossesFileSchema.parse(await this.loaders.bosses()).bosses.find((x) => x.id === id);
+    if (!b) throw new ContentNotFoundError(id);
+    return b;
+  }
+
   async getVocabIndex(): Promise<ReadonlyMap<string, VocabItem>> {
     const lessons = await Promise.all(this.lessonPaths().map((p) => this.getLesson(idFromPath(p))));
     return new Map(lessons.flatMap((l) => l.vocab.map((v) => [v.id, v] as const)));
@@ -76,6 +83,7 @@ export function createStaticContentSource(): StaticContentSource {
   const exam = import.meta.glob("/src/content/exam.json", { import: "default" });
   const badges = import.meta.glob("/src/content/badges.json", { import: "default", eager: true });
   const tree = import.meta.glob("/src/content/tree.json", { import: "default", eager: true });
+  const bosses = import.meta.glob("/src/content/bosses.json", { import: "default", eager: true });
   return new StaticContentSource({
     lessons,
     dialogues,
@@ -85,5 +93,6 @@ export function createStaticContentSource(): StaticContentSource {
     },
     badges: async () => badges["/src/content/badges.json"],
     tree: async () => tree["/src/content/tree.json"],
+    bosses: async () => bosses["/src/content/bosses.json"],
   });
 }

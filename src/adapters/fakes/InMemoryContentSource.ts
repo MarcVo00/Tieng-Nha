@@ -1,5 +1,5 @@
 import { ContentNotFoundError } from "@/domain/errors";
-import type { BadgeDef, Dialogue, DialogueId, ExamQuestion, Lesson, LessonId, LessonSummary, Tree, VocabId, VocabItem } from "@/domain/types";
+import type { BadgeDef, Boss, Dialogue, DialogueId, ExamQuestion, Lesson, LessonId, LessonSummary, Tree, VocabId, VocabItem } from "@/domain/types";
 import type { ContentSource } from "@/ports";
 
 export class InMemoryContentSource implements ContentSource {
@@ -9,6 +9,7 @@ export class InMemoryContentSource implements ContentSource {
     private readonly exam: ExamQuestion[],
     private readonly badges: BadgeDef[],
     private readonly tree: Tree,
+    private readonly bosses: Boss[],
   ) {}
 
   async listLessons(): Promise<LessonSummary[]> {
@@ -46,6 +47,12 @@ export class InMemoryContentSource implements ContentSource {
 
   async getTree(): Promise<Tree> {
     return this.tree;
+  }
+
+  async getBoss(id: string): Promise<Boss> {
+    const b = this.bosses.find((x) => x.id === id);
+    if (!b) throw new ContentNotFoundError(id);
+    return b;
   }
 
   async getVocabIndex(): Promise<ReadonlyMap<VocabId, VocabItem>> {

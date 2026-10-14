@@ -2,19 +2,14 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import type { Tree } from "@/domain/types";
+import type { Boss, Tree } from "@/domain/types";
+import { livesFromScore } from "@/services/bossFight";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
-import { Button, Card, EmptyState, Icon, Motif, ProgressBar, Skeleton, type IconName } from "@/ui";
-import { isInterruptedState, markAttempt, SECTION_ORDER, type RunState } from "@/features/exam/examState";
-
-const SECTION_ICON: Record<(typeof SECTION_ORDER)[number], IconName> = {
-  listening: "speaker",
-  translation: "chat",
-  tones: "flag",
-  speaking: "mic",
-};
+import { Button, Card, EmptyState, Icon, Motif, ProgressBar, Skeleton } from "@/ui";
+import { BossPortrait } from "@/features/exam/BossPortrait";
+import { isInterruptedState, markAttempt, type RunState } from "@/features/exam/examState";
 
 function useOnline(): boolean {
   const [online, setOnline] = useState(() => (typeof navigator === "undefined" ? true : navigator.onLine));
@@ -31,7 +26,7 @@ function useOnline(): boolean {
   return online;
 }
 
-// Hero: the test title (or the lock while the skill tree keeps it locked). One action: Commencer.
+// Hero: the boss portrait (or the lock while the skill tree keeps it locked). One action: Commencer.
 export function ExamIntroScreen() {
   const { exam, content } = useServices();
   const navigate = useNavigate();
@@ -41,15 +36,18 @@ export function ExamIntroScreen() {
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tree, setTree] = useState<Tree | null>(null);
+  const [boss, setBoss] = useState<Boss | null>(null);
   const [treeFailed, setTreeFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     setTreeFailed(false);
-    content.getTree().then(
-      (t) => {
-        if (!cancelled) setTree(t);
+    Promise.all([content.getTree(), content.getBoss(FINAL_BOSS_ID)]).then(
+      ([t, b]) => {
+        if (cancelled) return;
+        setTree(t);
+        setBoss(b);
       },
       () => {
         if (!cancelled) setTreeFailed(true);
@@ -71,7 +69,7 @@ export function ExamIntroScreen() {
     );
   }
 
-  if (!snapshot || !tree) {
+  if (!snapshot || !tree || !boss) {
     return (
       <div className="pt-6">
         <Skeleton lines={4} />
@@ -83,6 +81,7 @@ export function ExamIntroScreen() {
   const trunkLessons = tree.nodes.filter((n) => n.kind === "lesson");
   const done = trunkLessons.filter((n) => progress.lessonsDone.includes(n.id)).length;
   const total = trunkLessons.length;
+  const bestLives = snapshot.examBest === null ? null : livesFromScore(snapshot.examBest, boss.playerLives);
 
   const start = async () => {
     if (starting) return;
@@ -106,19 +105,27 @@ export function ExamIntroScreen() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-4 h-40 text-gold [mask-image:linear-gradient(to_bottom,black,transparent)]">
         <Motif kind="waves" />
       </div>
-      <header className="relative flex flex-col gap-1">
-        <p className="text-caption text-gold-ink" lang="vi">
-          {fr.exam.intro.kicker}
-        </p>
-        <h1 className="text-title text-ink">{fr.exam.intro.title}</h1>
-        <p className="text-body text-ink-muted">{fr.exam.intro.lead}</p>
+      <header className="relative flex flex-col items-center gap-2 text-center">
+        <p className="text-caption text-gold-ink">{fr.exam.intro.kicker}</p>
+        {unlocked ? (
+          <>
+            <BossPortrait boss={boss} size={176} hits={0} defeated={false} />
+            <h1 lang="vi" className="text-title text-ink">
+              {boss.name}
+            </h1>
+            <p className="text-body-strong text-ink-muted">{boss.title}</p>
+            <p className="text-body text-ink">{boss.legend}</p>
+          </>
+        ) : null}
         {interrupted ? (
           <p role="status" className="pt-1 text-body-strong text-error">
             {fr.exam.intro.interrupted}
           </p>
         ) : null}
-        {unlocked && snapshot.examBest !== null ? (
-          <p className="pt-1 text-body-strong text-gold-ink tabular">{fr.exam.intro.best(snapshot.examBest)}</p>
+        {unlocked && bestLives !== null ? (
+          <p className="pt-1 text-body-strong text-gold-ink tabular">
+            {fr.exam.intro.won(boss.name, bestLives, boss.playerLives)}
+          </p>
         ) : null}
       </header>
 
@@ -127,31 +134,13 @@ export function ExamIntroScreen() {
           <section aria-label={fr.exam.intro.rulesLabel} className="flex flex-col gap-3">
             <h2 className="text-heading text-ink">{fr.exam.intro.rulesLabel}</h2>
             <ul className="flex flex-col gap-2 text-body text-ink">
-              {fr.exam.intro.rules.map((rule) => (
+              {fr.exam.intro.rules(boss.hp, boss.playerLives).map((rule) => (
                 <li key={rule} className="flex gap-3">
                   <span aria-hidden="true" className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
                   {rule}
                 </li>
               ))}
             </ul>
-          </section>
-
-          <section aria-label={fr.exam.intro.partsLabel}>
-            <ol className="divide-y divide-line">
-              {SECTION_ORDER.map((s, i) => (
-                <li key={s} className="flex items-center gap-3 py-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-surface-2 text-ink-muted">
-                    <Icon name={SECTION_ICON[s]} size={24} />
-                  </span>
-                  <span className="flex flex-col">
-                    <span className="text-caption text-ink-muted">{fr.exam.part(i + 1, fr.exam.sections[s].fr)}</span>
-                    <span className="text-body-strong text-ink" lang="vi">
-                      {fr.exam.sections[s].vi}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ol>
           </section>
 
           <div className="flex flex-col gap-2">

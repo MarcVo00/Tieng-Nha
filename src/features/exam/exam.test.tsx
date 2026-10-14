@@ -86,12 +86,20 @@ describe("intro", () => {
     expect(await screen.findByRole("button", { name: fr.exam.intro.start })).toBeEnabled();
   });
 
-  test("lists the rules and the best score once unlocked", async () => {
-    useAppState.setState({ snapshot: snapshotWith(10, 84) });
+  test("presents the boss, its legend and the fight rules once unlocked", async () => {
+    useAppState.setState({ snapshot: snapshotWith(1, null) });
     renderExam({ entry: "/exam" });
-    expect(await screen.findByText("Meilleur score : 84 / 100")).toBeInTheDocument();
-    expect(screen.getByText(fr.exam.intro.rules[0])).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Thủy Tinh, le dieu des eaux" })).toBeInTheDocument();
+    expect(screen.getByText(/Mỵ Nương/)).toBeInTheDocument();
+    for (const rule of fr.exam.intro.rules(15, 5)) expect(screen.getByText(rule)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: fr.exam.intro.start })).toBeEnabled();
+  });
+
+  test("shows the best victory as the lives kept", async () => {
+    useAppState.setState({ snapshot: snapshotWith(1, 92) });
+    renderExam({ entry: "/exam" });
+    expect(await screen.findByText(fr.exam.intro.won("Thủy Tinh", 4, 5))).toBeInTheDocument();
   });
 
   test("offline disables the start button", async () => {
@@ -146,19 +154,19 @@ describe("run", () => {
     expect(await screen.findByRole("button", { name: /Partie 1/ })).toBeInTheDocument();
     first.unmount();
     renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
-    expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Essai interrompu — il est compté.");
   });
 
   test("a run page without a started attempt goes back to the intro", async () => {
     renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
-    expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   test("redirects to the intro without an attempt", async () => {
     renderExam({ entry: "/exam/run" });
-    expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
   });
 
   test("quitting asks for confirmation and counts the attempt", async () => {
@@ -170,7 +178,7 @@ describe("run", () => {
     await waitFor(() => expect(screen.queryByText(fr.exam.run.quit.body)).not.toBeInTheDocument());
     await userEvent.click(screen.getByRole("button", { name: fr.exam.run.quit.aria }));
     await userEvent.click(await screen.findByRole("button", { name: fr.exam.run.quit.confirm }));
-    expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
   });
 
   async function answerAll(questions: ExamQuestion[], stt: FakeSpeechRecognizer) {
@@ -293,7 +301,7 @@ describe("result", () => {
 
   test("redirects to the intro without a result", async () => {
     renderExam({ entry: "/exam/result" });
-    expect(await screen.findByRole("heading", { name: fr.exam.intro.title })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
   });
 
   test("below 70: no certificate, retry shows the remaining attempts, review goes to /review", async () => {

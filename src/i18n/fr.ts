@@ -276,6 +276,7 @@ export const fr = {
       kicker: "Boss final",
       lockedToast: "Termine d'abord les leçons pour affronter Thủy Tinh",
       lockedHint: "Après les 10 leçons",
+      won: "Vaincu ✓",
       aria: (name: string, locked: boolean) => `${name}, boss final${locked ? ", verrouillé" : ""}`,
     },
   },
@@ -395,7 +396,6 @@ export const fr = {
       aria: (name: string, title: string, defeated: boolean) =>
         `${name}, ${title.charAt(0).toLowerCase()}${title.slice(1)}${defeated ? " — vaincu" : ""}`,
     },
-    part: (n: number, name: string) => `Partie ${n} · ${name}`,
     intro: {
       kicker: "Boss final",
       loadError: { title: "Le test n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
@@ -419,10 +419,9 @@ export const fr = {
       error: "Impossible de lancer le test pour le moment. Réessaie dans un instant.",
     },
     run: {
-      counter: (n: number, total: number) => `Question ${n} sur ${total}`,
       bossHp: (name: string, hp: number, max: number) => `PV de ${name} : ${hp} sur ${max}`,
-      hit: "Touché !",
-      miss: "Aïe !",
+      hit: (hpLeft: number) => `Touché ! Il lui reste ${hpLeft} PV`,
+      miss: (livesLeft: number) => `Aïe ! Il te reste ${livesLeft} vie${livesLeft > 1 ? "s" : ""}`,
       quit: {
         aria: "Quitter le test",
         title: "Quitter le test ?",
@@ -502,6 +501,7 @@ export const fr = {
     badgesTitle: "Badges",
     examTitle: "Boss final",
     bossWon: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
+    bossWonNoLives: "Boss final vaincu ✓",
     examNone: "Pas encore vaincu",
     offline: { title: "Profil indisponible hors ligne", body: "Reconnecte-toi pour voir ce profil." },
     notFound: { title: "Profil introuvable", body: "Cette personne n'est pas (ou plus) au classement." },
@@ -516,7 +516,8 @@ export const fr = {
       streak: "Série en cours",
       exam: "Boss final",
       bossWon: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
-      examNone: "Pas encore vaincu",
+      bossWonNoLives: "Boss final vaincu ✓",
+    examNone: "Pas encore vaincu",
     },
     certificate: { open: "Voir mon certificat", sheet: "Mon certificat", download: "Télécharger", error: "Le certificat n'a pas pu être créé." },
     edit: {

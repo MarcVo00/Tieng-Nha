@@ -1,4 +1,5 @@
 import type { Boss, LessonSummary, ProgressSnapshot, Tree } from "@/domain/types";
+import { EXAM_PASS } from "@/services/exam";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 
 export const PATH_WIDTH = 320;
@@ -57,7 +58,7 @@ export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: Pro
       drafts.push({ kind: "dialogue", key: `${lesson.id}-dialogue`, lesson, done: dialoguesDone.has(lesson.dialogueId), offset: dOffset, height: ROW_HEIGHT.dialogue, size: 48 });
     }
   });
-  drafts.push({ kind: "exam", key: "exam", boss: { name: boss.name, illustration: boss.illustration }, locked: examLocked, best: snapshot.examBest, next: nextIndex === -1 && !examLocked, offset: mainOffset(mainCount), height: ROW_HEIGHT.exam, size: 64 });
+  drafts.push({ kind: "exam", key: "exam", boss: { name: boss.name, illustration: boss.illustration }, locked: examLocked, best: snapshot.examBest, next: nextIndex === -1 && !examLocked && !(snapshot.examBest !== null && snapshot.examBest >= EXAM_PASS), offset: mainOffset(mainCount), height: ROW_HEIGHT.exam, size: 64 });
 
   let y = PAD;
   const nodes = drafts.map((n) => {

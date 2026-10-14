@@ -42,4 +42,7 @@ test("mention and lives read back from a score", () => {
   expect([100, 92, 85, 78, 70, 36].map(bossMention)).toEqual(["excellent", "excellent", "tres_bien", "bien", "bien", "presque"]);
   expect([100, 92, 85, 78, 70].map((s) => livesFromScore(s, 5))).toEqual([5, 4, 3, 2, 1]);
   expect(livesFromScore(36, 5)).toBeNull();
+  expect(livesFromScore(69, 5)).toBeNull();
+  // Legacy scores from the old 30-question test map to the largest lives count they reach.
+  expect([84, 96, 75].map((s) => livesFromScore(s, 5))).toEqual([2, 4, 1]);
 });

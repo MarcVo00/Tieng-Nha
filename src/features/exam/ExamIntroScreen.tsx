@@ -4,6 +4,7 @@ import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Boss, Tree } from "@/domain/types";
 import { livesFromScore } from "@/services/bossFight";
+import { EXAM_PASS } from "@/services/exam";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
@@ -81,7 +82,7 @@ export function ExamIntroScreen() {
   const trunkLessons = tree.nodes.filter((n) => n.kind === "lesson");
   const done = trunkLessons.filter((n) => progress.lessonsDone.includes(n.id)).length;
   const total = trunkLessons.length;
-  const bestLives = snapshot.examBest === null ? null : livesFromScore(snapshot.examBest, boss.playerLives);
+  const bestLives = snapshot.examBest !== null && snapshot.examBest >= EXAM_PASS ? livesFromScore(snapshot.examBest, boss.playerLives) : null;
 
   const start = async () => {
     if (starting) return;
@@ -116,7 +117,11 @@ export function ExamIntroScreen() {
             <p className="text-body-strong text-ink-muted">{boss.title}</p>
             <p className="text-body text-ink">{boss.legend}</p>
           </>
-        ) : null}
+        ) : (
+          <h1 lang="vi" className="text-title text-ink">
+            {boss.name}
+          </h1>
+        )}
         {interrupted ? (
           <p role="status" className="pt-1 text-body-strong text-error">
             {fr.exam.intro.interrupted}

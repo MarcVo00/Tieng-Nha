@@ -197,12 +197,17 @@ function ExamRun({ run }: { run: RunState }) {
 
   return (
     <div className="pb-8">
-      <FocusHeader
-        progress={hits / boss.hp}
-        onClose={() => setQuitting(true)}
-        closeLabel={fr.exam.run.quit.aria}
-        right={<Hearts count={fight.lives} max={boss.playerLives} />}
-      />
+      {saving ? (
+        <div className="flex items-center justify-end px-5 py-3">
+          <Hearts count={fight.lives} max={boss.playerLives} />
+        </div>
+      ) : (
+        <FocusHeader
+          onClose={() => setQuitting(true)}
+          closeLabel={fr.exam.run.quit.aria}
+          right={<Hearts count={fight.lives} max={boss.playerLives} />}
+        />
+      )}
 
       <div className="flex items-center gap-4 px-5 pt-2">
         <BossPortrait boss={boss} size={88} hits={hits} defeated={fight.status === "won"} />
@@ -230,7 +235,7 @@ function ExamRun({ run }: { run: RunState }) {
       ) : (
         <div className="px-5 pt-4">
           <p aria-live="polite" className="h-5 pb-2 text-caption text-ink-muted">
-            {last ? (last.correct ? fr.exam.run.hit : fr.exam.run.miss) : ""}
+            {last ? (last.correct ? fr.exam.run.hit(fight.bossHp) : fr.exam.run.miss(fight.lives)) : ""}
           </p>
           {question ? (
             <ExerciseHost

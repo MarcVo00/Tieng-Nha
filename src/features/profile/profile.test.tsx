@@ -148,10 +148,17 @@ test("the stats show the boss victory with the lives left, or not defeated yet",
   expect(await screen.findByText(fr.profile.stats.bossWon("Thủy Tinh", 4, 5))).toBeInTheDocument();
 });
 
+test("a legacy passing score (old 30-question test) still reads as a victory", async () => {
+  useAppState.setState({ snapshot: snapshot({ examBest: 84 }) });
+  await setup();
+  expect(await screen.findByText(fr.profile.stats.bossWon("Thủy Tinh", 2, 5))).toBeInTheDocument();
+  expect(screen.queryByText(fr.profile.stats.examNone)).toBeNull();
+});
+
 test("a score that is not a victory reads as not defeated yet", async () => {
   useAppState.setState({ snapshot: snapshot({ examBest: 36 }) });
   await setup();
-  expect(screen.getByText(fr.profile.stats.examNone)).toBeInTheDocument();
+  expect(await screen.findByText(fr.profile.stats.examNone)).toBeInTheDocument();
 });
 
 test("no certificate button below 70", async () => {

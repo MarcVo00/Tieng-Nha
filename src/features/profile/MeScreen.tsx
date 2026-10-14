@@ -4,12 +4,12 @@ import { motion } from "motion/react";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { THEME_KEY } from "@/domain/storageKeys";
 import { OfflineError } from "@/domain/errors";
-import type { BadgeDef } from "@/domain/types";
 import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import type { Boss } from "@/domain/types";
+import type { BadgeDef, Boss } from "@/domain/types";
 import { FINAL_BOSS_ID } from "@/services/tree";
 import { bossMention, livesFromScore } from "@/services/bossFight";
+import { EXAM_PASS } from "@/services/exam";
 import { fr } from "@/i18n/fr";
 import {
   Avatar, BadgeMedal, Button, Card, Certificate, ConfirmDialog, Icon, Sheet, StreakFlame, downloadCertificate, tap, useToast,
@@ -18,8 +18,6 @@ import {
 import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
 import { ReportProblemSheet } from "@/features/profile/ReportProblemSheet";
 import { SettingsSection } from "@/features/profile/SettingsSection";
-
-const PASS = 70;
 
 function removeKey(key: string): void {
   try {
@@ -100,6 +98,7 @@ export function MeScreen() {
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
   const [boss, setBoss] = useState<Boss | null>(null);
+  const [bossFailed, setBossFailed] = useState(false);
   const [badges, setBadges] = useState<BadgeDef[] | null>(null);
   const [badgesFailed, setBadgesFailed] = useState(false);
   const [bestDate, setBestDate] = useState<{ dateIso: string; noSpeaking: boolean } | null>(null);
@@ -112,7 +111,7 @@ export function MeScreen() {
   const leaving = useRef(false);
 
   const examBest = snapshot?.examBest ?? null;
-  const passed = examBest !== null && examBest >= PASS;
+  const passed = examBest !== null && examBest >= EXAM_PASS;
 
   useEffect(() => {
     let cancelled = false;
@@ -130,7 +129,7 @@ export function MeScreen() {
     content
       .getBoss(FINAL_BOSS_ID)
       .then((b) => !cancelled && setBoss(b))
-      .catch(() => undefined); // The stat falls back to a plain label.
+      .catch(() => !cancelled && setBossFailed(true)); // The stat falls back to a plain label.
     return () => {
       cancelled = true;
     };
@@ -157,8 +156,18 @@ export function MeScreen() {
     };
   }, [passed, progress]);
 
-  const lives = examBest !== null && boss ? livesFromScore(examBest, boss.playerLives) : null;
-  const bossStat = boss && lives !== null ? fr.profile.stats.bossWon(boss.name, lives, boss.playerLives) : fr.profile.stats.examNone;
+  const lives = passed && boss && examBest !== null ? livesFromScore(examBest, boss.playerLives) : null;
+  // Won is decided by the score alone; the boss sheet only adds the name and the lives. Nothing is claimed while it loads.
+  const bossStat =
+    passed && bossFailed
+      ? fr.profile.stats.bossWonNoLives
+      : passed
+        ? boss && lives !== null
+          ? fr.profile.stats.bossWon(boss.name, lives, boss.playerLives)
+          : null
+        : boss || examBest === null || bossFailed
+          ? fr.profile.stats.examNone
+          : null;
   const mention = examBest === null ? "presque" : bossMention(examBest);
   const certificate: CertificateProps | null =
     passed && examBest !== null && mention !== "presque" && profile && bestDate
@@ -238,7 +247,7 @@ export function MeScreen() {
           </div>
           <div>
             <dt className="text-caption text-ink-muted">{fr.profile.stats.exam}</dt>
-            <dd className="tabular text-body-strong text-ink">{bossStat}</dd>
+            <dd className="tabular text-body-strong text-ink">{bossStat ?? "…"}</dd>
           </div>
         </dl>
         {certificate ? (

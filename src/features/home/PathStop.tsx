@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
+import { EXAM_PASS } from "@/services/exam";
 import { Icon, tap, useToast, duration, spring } from "@/ui";
 import { bossArtUrl } from "@/features/home/bossArt";
 import { PATH_WIDTH, type PathNode } from "@/features/home/pathLayout";
@@ -60,7 +61,7 @@ function visualOf(node: PathNode): Visual {
         {node.boss.name}
       </span>
     ),
-    sub: <span className="text-caption text-ink-muted">{node.locked ? fr.home.exam.lockedHint : fr.home.exam.kicker}</span>,
+    sub: <span className="text-caption text-ink-muted">{node.locked ? fr.home.exam.lockedHint : node.best !== null && node.best >= EXAM_PASS ? fr.home.exam.won : fr.home.exam.kicker}</span>,
     chip: node.next,
     to: node.locked ? null : "/exam",
     lockedToast: fr.home.exam.lockedToast,

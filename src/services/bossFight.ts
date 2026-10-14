@@ -1,5 +1,5 @@
 import type { Boss, ExamQuestion, ExamSection } from "@/domain/types";
-import type { ExamMention } from "@/services/exam";
+import { EXAM_PASS, type ExamMention } from "@/services/exam";
 import { createRng, shuffle } from "@/services/random";
 
 const ROTATION: readonly ExamSection[] = ["listening", "translation", "tones", "speaking"];
@@ -57,8 +57,11 @@ export function bossMention(score: number): ExamMention {
   return "presque";
 }
 
-/** Lives left behind a victory score (profile: "4/5 ❤️"); null for a defeat score. */
+/**
+ * Lives shown behind a victory score (profile: "4/5 ❤️"): the largest lives count whose win score is <= score
+ * (so legacy 30-question scores such as 84 still read as a win); null below the pass mark.
+ */
 export function livesFromScore(score: number, playerLives: number): number | null {
-  for (let lives = playerLives; lives >= 1; lives--) if (winScore(lives, playerLives) === score) return lives;
+  for (let lives = playerLives; lives >= 1; lives--) if (winScore(lives, playerLives) <= score && score >= EXAM_PASS) return lives;
   return null;
 }

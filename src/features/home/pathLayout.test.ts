@@ -58,6 +58,15 @@ test("the boss stop is locked until the tree says so", () => {
   expect(exam(lessons.map((l) => l.id))).toMatchObject({ locked: false });
 });
 
+test("a beaten boss keeps its best score and is no longer the next step", () => {
+  const all = lessons.map((l) => l.id);
+  const exam = (best: number | null) =>
+    buildPathLayout(lessons, { ...snapshot(all), examBest: best }, tree, boss).nodes.find((n) => n.kind === "exam");
+  expect(exam(null)).toMatchObject({ next: true, best: null });
+  expect(exam(69)).toMatchObject({ next: true });
+  expect(exam(84)).toMatchObject({ next: false, best: 84 });
+});
+
 test("the exam node carries the boss name and illustration", () => {
   const node = buildPathLayout(lessons, snapshot([]), tree, boss).nodes.find((n) => n.kind === "exam");
   expect(node).toMatchObject({ kind: "exam", boss: { name: "Thủy Tinh", illustration: "boss_thuy_tinh" } });

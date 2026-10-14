@@ -186,6 +186,20 @@ test("a profile shows its lesson count and boss victory", async () => {
   expect(screen.getAllByText(fr.ui.badge.locked, { exact: false }).length).toBeGreaterThan(0);
 });
 
+test("a profile with a legacy passing score reads as a victory", async () => {
+  const base = createFakeServices({ clock });
+  const leaderboard: Services["leaderboard"] = {
+    list: (period) => base.leaderboard.list(period),
+    getPublicProfile: async () => ({
+      userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
+      lessonsDone: ["l01"], dialoguesDone: [], badges: [], examBest: 84,
+    }),
+  };
+  setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
+  expect(await screen.findByText(fr.publicProfile.bossWon("Thủy Tinh", 2, 5))).toBeInTheDocument();
+  expect(screen.queryByText(fr.publicProfile.examNone)).toBeNull();
+});
+
 test("my own session id redirects to /me", async () => {
   useAppState.setState({ session: { userId: "uid-1", email: "a@b.c" } });
   setup("/u/uid-1");

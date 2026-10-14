@@ -7,6 +7,7 @@ import { ContentNotFoundError, OfflineError } from "@/domain/errors";
 import type { BadgeDef, Boss, PublicProfile } from "@/domain/types";
 import { FINAL_BOSS_ID } from "@/services/tree";
 import { livesFromScore } from "@/services/bossFight";
+import { EXAM_PASS } from "@/services/exam";
 import { fr } from "@/i18n/fr";
 import { Avatar, BadgeMedal, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
 
@@ -31,9 +32,14 @@ function BackLink() {
   );
 }
 
-function bossStat(examBest: number | null, boss: Boss | null): string {
-  const lives = examBest !== null && boss ? livesFromScore(examBest, boss.playerLives) : null;
-  return boss && lives !== null ? fr.publicProfile.bossWon(boss.name, lives, boss.playerLives) : fr.publicProfile.examNone;
+// Won is decided by the score alone; the boss sheet only adds the name and the lives. Nothing is claimed while it loads.
+function bossStat(examBest: number | null, boss: Boss | null, bossFailed: boolean): string {
+  if (examBest !== null && examBest >= EXAM_PASS) {
+    if (bossFailed) return fr.publicProfile.bossWonNoLives;
+    const lives = boss ? livesFromScore(examBest, boss.playerLives) : null;
+    return boss && lives !== null ? fr.publicProfile.bossWon(boss.name, lives, boss.playerLives) : "…";
+  }
+  return boss || examBest === null || bossFailed ? fr.publicProfile.examNone : "…";
 }
 
 export function PublicProfileScreen() {
@@ -43,13 +49,14 @@ export function PublicProfileScreen() {
   const [state, setState] = useState<State>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
   const [boss, setBoss] = useState<Boss | null>(null);
+  const [bossFailed, setBossFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     content
       .getBoss(FINAL_BOSS_ID)
       .then((b) => !cancelled && setBoss(b))
-      .catch(() => undefined); // The stat falls back to a plain label.
+      .catch(() => !cancelled && setBossFailed(true)); // The stat falls back to a plain label.
     return () => {
       cancelled = true;
     };
@@ -169,7 +176,7 @@ export function PublicProfileScreen() {
       <Card className="mt-8 p-4">
         <p className="text-caption text-ink-muted">{fr.publicProfile.examTitle}</p>
         <p className="tabular text-heading text-ink">
-          {bossStat(profile.examBest, boss)}
+          {bossStat(profile.examBest, boss, bossFailed)}
         </p>
       </Card>
     </motion.div>

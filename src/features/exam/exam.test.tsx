@@ -73,6 +73,7 @@ describe("intro", () => {
     useAppState.setState({ snapshot: snapshotWith(0) });
     renderExam({ entry: "/exam" });
     expect(await screen.findByRole("heading", { name: fr.exam.intro.locked.title })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Thủy Tinh" })).toBeInTheDocument();
     expect(screen.getByText(fr.exam.intro.locked.progress(0, 1))).toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
     expect(screen.queryByRole("button", { name: fr.exam.intro.start })).not.toBeInTheDocument();
@@ -101,6 +102,12 @@ describe("intro", () => {
     useAppState.setState({ snapshot: snapshotWith(1, 92) });
     renderExam({ entry: "/exam" });
     expect(await screen.findByText(fr.exam.intro.won("Thủy Tinh", 4, 5))).toBeInTheDocument();
+  });
+
+  test("shows a legacy winning score as a victory", async () => {
+    useAppState.setState({ snapshot: snapshotWith(1, 84) });
+    renderExam({ entry: "/exam" });
+    expect(await screen.findByText(fr.exam.intro.won("Thủy Tinh", 2, 5))).toBeInTheDocument();
   });
 
   test("offline disables the start button", async () => {

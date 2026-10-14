@@ -85,7 +85,7 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
         switchToRecorder();
         return;
       }
-      setMessage(fr.exercises.speak.notHeard);
+      setMessage(fr.exercises.speak.failed[code]);
       setFailures((n) => n + 1);
     }
   };

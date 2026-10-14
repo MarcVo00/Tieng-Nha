@@ -108,6 +108,13 @@ export const fr = {
       micLabel: "Parler",
       micStop: "Arrêter l'enregistrement",
       notHeard: "Je n'ai rien entendu, réessaie",
+      // One message per recognition failure, so a learner can tell us which one they see.
+      failed: {
+        "no-speech": "Je n'ai rien entendu. Touche le micro, attends le petit signal, puis parle.",
+        timeout: "L'écoute n'a rien renvoyé à temps. Réessaie en parlant juste après avoir touché le micro.",
+        network: "La reconnaissance vocale n'a pas pu joindre son service. Vérifie ta connexion et réessaie.",
+        aborted: "L'écoute a été coupée avant la fin. Réessaie.",
+      },
       micDenied: "Le micro est refusé. Pas de souci, on continue autrement.",
       unsupported: "La reconnaissance vocale n'existe pas sur cet appareil. On continue autrement.",
       selfAssess: "M'auto-évaluer",

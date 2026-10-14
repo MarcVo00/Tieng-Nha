@@ -104,3 +104,17 @@ test("a recorder that keeps failing for a non-permission reason still offers ski
   expect(onCapabilityLost).not.toHaveBeenCalled();
   expect(onResult).toHaveBeenCalledWith(expect.objectContaining({ skipped: true, correct: false }));
 });
+
+test("each recognition failure has its own message", async () => {
+  const { stt } = setup();
+  const mic = () => screen.getByRole("button", { name: /parler/i });
+  for (const [code, text] of [
+    ["network", /n'a pas pu joindre son service/],
+    ["timeout", /n'a rien renvoyé à temps/],
+    ["aborted", /coupée avant la fin/],
+  ] as const) {
+    stt.queue = [new RecognitionError(code)];
+    await userEvent.click(mic());
+    expect(await screen.findByText(text)).toBeInTheDocument();
+  }
+});

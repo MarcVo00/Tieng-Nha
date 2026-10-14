@@ -1,5 +1,22 @@
 // All user-facing French strings. Each feature appends its own block: `// --- <feature> ---`.
 export const fr = {
+  // --- energy ---
+  energy: {
+    label: (n: number, max: number) => `Énergie : ${n} sur ${max}`,
+    title: "Ton énergie",
+    explain: "Commencer une leçon ou un dialogue coûte 1 ⚡, défier le boss en coûte 3. Une révision terminée rend 1 ⚡, et l'énergie remonte toute seule de 1 toutes les 3 h.",
+    full: "Énergie au maximum",
+    next: (h: number, m: number) => `+1 ⚡ dans ${h > 0 ? `${h} h ` : ""}${m} min`,
+    review: "Réviser (+1 ⚡)",
+    close: "Fermer",
+    empty: {
+      title: "Plus d'énergie !",
+      body: (h: number, m: number) => `Fais une révision pour récupérer 1 ⚡, ou reviens dans ${h > 0 ? `${h} h ` : ""}${m} min.`,
+      bodyNoWait: "Fais une révision pour récupérer 1 ⚡.",
+      back: "Retour",
+    },
+    gained: (n: number) => `+${n} ⚡`,
+  },
   // --- app ---
   app: {
     name: "Tiếng Nhà",

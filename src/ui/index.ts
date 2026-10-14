@@ -19,6 +19,7 @@ export { TabBar } from "@/ui/TabBar";
 export { PageTransition, MotionRoot } from "@/ui/PageTransition";
 export { FocusHeader } from "@/ui/FocusHeader";
 export { EmptyState } from "@/ui/EmptyState";
+export { NoEnergy } from "@/ui/NoEnergy";
 export { ConfirmDialog } from "@/ui/ConfirmDialog";
 export { SpeakerButton } from "@/ui/SpeakerButton";
 export { MicButton } from "@/ui/MicButton";

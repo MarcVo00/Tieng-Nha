@@ -1,6 +1,7 @@
 import { AnimatePresence } from "motion/react";
 import { Link, useLocation, useOutlet } from "react-router-dom";
 import { useAppState } from "@/app/appState";
+import { EnergyIndicator } from "@/app/EnergyIndicator";
 import { SyncIndicator } from "@/app/SyncIndicator";
 import { fr } from "@/i18n/fr";
 import { InAppBrowserNotice } from "@/features/onboarding";
@@ -19,8 +20,9 @@ export function TabLayout() {
         <Link to="/me" aria-label={fr.app.header.profile} className="flex h-11 w-11 items-center justify-center rounded-full">
           <Avatar emoji={profile?.avatarEmoji ?? ""} size="sm" />
         </Link>
-        <div className="ml-auto flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-3">
           <SyncIndicator />
+          <EnergyIndicator />
           <StreakFlame days={snapshot?.streak ?? 0} size="sm" />
           <XpCounter value={snapshot?.xpTotal ?? 0} />
         </div>

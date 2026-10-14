@@ -41,7 +41,7 @@ export type EventPayload = {
   lesson_completed: { mistakes: number; durationMs: number; perfect: boolean };
   dialogue_completed: { durationMs: number };
   review_session_completed: { correctCount: number; total: number };
-  exam_finished: { score: number; attemptId: string; noSpeaking: boolean };
+  exam_finished: { score: number; attemptId: string; noSpeaking: boolean; bossId?: string; won?: boolean; livesLeft?: number; bossHpLeft?: number };
   badge_unlocked: Record<string, never>;
 };
 

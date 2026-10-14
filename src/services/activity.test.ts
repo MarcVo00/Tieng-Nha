@@ -55,3 +55,10 @@ test("review xp", async () => {
   const { svc } = setup();
   expect((await svc.completeReview({ correctCount: 5, total: 6 })).xpGained).toBe(10);
 });
+
+test("finishExam records the boss outcome in the event payload", async () => {
+  const { svc, progress } = setup();
+  await svc.finishExam({ attemptId: "a1", score: 92, noSpeaking: false, boss: { bossId: "boss_thuy_tinh", won: true, livesLeft: 4, bossHpLeft: 0 } });
+  const ev = (await progress.listEvents()).find((e) => e.type === "exam_finished");
+  expect(ev?.payload).toEqual({ score: 92, attemptId: "a1", noSpeaking: false, bossId: "boss_thuy_tinh", won: true, livesLeft: 4, bossHpLeft: 0 });
+});

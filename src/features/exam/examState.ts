@@ -2,7 +2,6 @@ import type { BadgeDef, Exercise, ExamQuestion, ExamSection } from "@/domain/typ
 import { fr } from "@/i18n/fr";
 import type { ExamMention } from "@/services/exam";
 
-export const EXAM_TOTAL = 30;
 export const SECTION_ORDER: readonly ExamSection[] = ["listening", "translation", "tones", "speaking"];
 
 /** Router state handed from the intro to the run screen. */
@@ -21,6 +20,17 @@ export type ResultState = {
   newBadges: BadgeDef[];
   remainingToday: number;
   dateIso: string;
+  boss: {
+    id: string;
+    name: string;
+    title: string;
+    illustration: string;
+    hp: number;
+    playerLives: number;
+    won: boolean;
+    livesLeft: number;
+    bossHpLeft: number;
+  };
 };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
@@ -41,7 +51,9 @@ export function isResultState(v: unknown): v is ResultState {
     Array.isArray(v["newBadges"]) &&
     Array.isArray(v["results"]) &&
     Array.isArray(v["questions"]) &&
-    v["results"].length === v["questions"].length
+    v["results"].length === v["questions"].length &&
+    isRecord(v["boss"]) &&
+    typeof v["boss"]["won"] === "boolean"
   );
 }
 
@@ -64,11 +76,6 @@ export function describeQuestion(ex: Exercise): { prompt: string; subject?: stri
     case "speak":
       return { prompt: fr.exercises.speak.prompt, subject: ex.fr };
   }
-}
-
-export function formatElapsed(totalSeconds: number): string {
-  const s = Math.max(0, Math.floor(totalSeconds));
-  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 }
 
 /** Router state of the intro after an attempt was abandoned (reload of the run page). */

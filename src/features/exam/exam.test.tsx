@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { createFakeServices, FakeSpeechRecognizer } from "@/adapters/fakes";
 import { examPoolFixture } from "@/adapters/fakes/seed/exam";
+import { bossFixture } from "@/adapters/fakes/seed/tree";
 import { useAppState } from "@/app/appState";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import type { Services } from "@/app/services";
@@ -10,10 +11,10 @@ import { OfflineError } from "@/domain/errors";
 import type { ExamQuestion, ProgressSnapshot, Settings } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { fr } from "@/i18n/fr";
-import { drawExam } from "@/services/exam";
+import { buildDeck } from "@/services/bossFight";
 import { seedFromString } from "@/services/random";
 import { ExamIntroScreen, ExamResultScreen, ExamRunScreen } from "@/features/exam";
-import { EXAM_TOTAL, markAttempt, type ResultState, type RunState } from "@/features/exam/examState";
+import { markAttempt, type ResultState, type RunState } from "@/features/exam/examState";
 import { PRINT_CSS } from "@/ui/Certificate";
 
 const TEST_TIMEOUT = 90_000;
@@ -122,7 +123,7 @@ describe("intro", () => {
     vi.spyOn(services.exam, "startAttempt").mockResolvedValue(ATTEMPT);
     renderExam({ services, entry: "/exam" });
     await userEvent.click(await screen.findByRole("button", { name: fr.exam.intro.start }));
-    expect(await screen.findByRole("button", { name: /Partie 1/ })).toBeInTheDocument();
+    expect(await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) })).toBeInTheDocument();
   });
 
   test("an unexpected failure shows the generic message", async () => {
@@ -151,7 +152,7 @@ describe("run", () => {
   test("a reload of the run page abandons the attempt and says so", async () => {
     markAttempt("pending", ATTEMPT.attemptId);
     const first = renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
-    expect(await screen.findByRole("button", { name: /Partie 1/ })).toBeInTheDocument();
+    expect(await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) })).toBeInTheDocument();
     first.unmount();
     renderExam({ entry: { pathname: "/exam/run", state: ATTEMPT } });
     expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
@@ -181,112 +182,92 @@ describe("run", () => {
     expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
   });
 
-  async function answerAll(questions: ExamQuestion[], stt: FakeSpeechRecognizer) {
-    let previous: string | null = null;
-    // The previous question slides out before the next one mounts: wait for its last button to leave.
-    const last: { el: HTMLElement | null } = { el: null };
-    const press = async (el: HTMLElement) => {
-      last.el = el;
-      await userEvent.click(el);
-    };
-    for (const [i, q] of questions.entries()) {
-      if (q.section !== previous) {
-        await userEvent.click(await screen.findByRole("button", { name: /Partie \d/ }));
-        previous = q.section;
-      }
+  async function fight(deck: ExamQuestion[], rightUntil: number, stt: FakeSpeechRecognizer) {
+    // Answers right for the first `rightUntil` questions, wrong afterwards, until the result page shows up.
+    for (const [i, q] of deck.entries()) {
+      // Either the next question is up, or the fight ended and the result page took over.
+      await waitFor(() => {
+        if (screen.queryByRole("heading", { level: 1 })) return;
+        expect(document.querySelectorAll("[data-exercise-id]")).toHaveLength(1);
+      }, { timeout: 8000 });
+      if (screen.queryByRole("heading", { level: 1 })) return;
+      await waitFor(() => expect(document.querySelector(`[data-exercise-id="${q.exercise.id}"]`)).not.toBeNull());
+      const right = i < rightUntil;
       const ex = q.exercise;
-      const leaving = last.el;
-      if (leaving) await waitFor(() => expect(leaving.isConnected).toBe(false));
-      await screen.findByText(fr.exam.run.counter(i + 1, EXAM_TOTAL));
-      const verify = () => press(screen.getByRole("button", { name: fr.exercises.verify }));
+      const verify = () => userEvent.click(screen.getByRole("button", { name: fr.exercises.verify }));
       switch (ex.type) {
         case "listen_choose": {
-          const right = ex.vocabId === "v_ca_phe_sua_da" ? /café au lait glacé/ : /thé glacé/;
-          await userEvent.click(await screen.findByRole("button", { name: right }));
+          const label = (ex.vocabId === "v_ca_phe_sua_da") === right ? /café au lait glacé/ : /thé glacé/;
+          await userEvent.click(await screen.findByRole("button", { name: label }));
           await verify();
           break;
         }
         case "tone_pick":
-          await userEvent.click(await screen.findByRole("button", { name: fr.ui.tones[ex.answerTone] }));
+          await userEvent.click(await screen.findByRole("button", { name: right ? fr.ui.tones[ex.answerTone] : fr.ui.tones[ex.answerTone === "ngang" ? "sac" : "ngang"] }));
           await verify();
           break;
         case "translate_choose":
-          await userEvent.click(await screen.findByRole("button", { name: ex.answerVi }));
+          await userEvent.click(await screen.findByRole("button", { name: right ? ex.answerVi : (ex.distractorsVi[0] ?? "") }));
           await verify();
           break;
         case "word_order": {
           const bank = within(await screen.findByRole("group", { name: fr.exercises.wordOrder.bank }));
-          for (const token of ex.tokensVi) await userEvent.click(bank.getByRole("button", { name: token }));
+          const tokens = right ? ex.tokensVi : [...ex.tokensVi].reverse();
+          for (const token of tokens) await userEvent.click(bank.getByRole("button", { name: token }));
           await verify();
           break;
         }
         case "speak":
-          stt.queue = [[ex.vi.replace(/[.!?]/g, "").toLowerCase()]];
-          await press(await screen.findByRole("button", { name: /parler/i }));
+          stt.queue = [[right ? ex.vi : "không"]];
+          await userEvent.click(await screen.findByRole("button", { name: /parler/i }));
           break;
       }
     }
   }
 
-  function setupRun(stt: boolean) {
+  function setupFight(stt: boolean) {
     useAppState.setState({ settings: withCapabilities(stt) });
     markAttempt("pending", ATTEMPT.attemptId);
     const recognizer = new FakeSpeechRecognizer();
     const services = createFakeServices({ stt: recognizer });
     const finishExam = vi.spyOn(services.activity, "finishExam");
     const submit = vi.spyOn(services.exam, "submitAttempt");
-    const questions = drawExam(examPoolFixture, seedFromString(ATTEMPT.attemptId), stt);
+    const deck = buildDeck(examPoolFixture, bossFixture, seedFromString(ATTEMPT.attemptId), stt);
     renderExam({ services, entry: { pathname: "/exam/run", state: ATTEMPT } });
-    return { services, recognizer, finishExam, submit, questions };
+    return { recognizer, finishExam, submit, deck };
   }
 
   test(
-    "30 right answers give 100, one saved finish, and the certificate",
+    "15 right answers beat Thủy Tinh with 5 lives: score 100, one saved finish",
     async () => {
-      const { services, recognizer, finishExam, submit, questions } = setupRun(true);
-      expect(questions).toHaveLength(EXAM_TOTAL);
-      expect(questions.filter((q) => q.section === "speaking")).toHaveLength(6);
-      await answerAll(questions, recognizer);
-
-      expect(await screen.findByText(fr.exam.result.scoreLabel(100), {}, { timeout: 8000 })).toBeInTheDocument();
-      expect(screen.getByRole("img", { name: fr.exam.certificate.aria("Linh", 100) })).toBeInTheDocument();
-      expect(within(screen.getByRole("img", { name: /Certificat/ })).getByText("100 / 100")).toBeInTheDocument();
-      expect(screen.queryByText(fr.exam.certificate.noSpeaking)).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: fr.exam.result.download })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: fr.exam.result.print })).toBeInTheDocument();
-
-      expect(finishExam).toHaveBeenCalledTimes(1);
-      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 100, noSpeaking: false });
+      const { recognizer, finishExam, submit, deck } = setupFight(true);
+      expect(await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) })).toBeInTheDocument();
+      expect(screen.getByRole("img", { name: fr.ui.hearts(5, 5) })).toBeInTheDocument();
+      await fight(deck, 99, recognizer);
+      await waitFor(() => expect(finishExam).toHaveBeenCalledTimes(1), { timeout: 8000 });
+      expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 100, noSpeaking: false, boss: { bossId: "boss_thuy_tinh", won: true, livesLeft: 5, bossHpLeft: 0 } });
       expect(submit).toHaveBeenCalledWith(ATTEMPT.attemptId, 100);
-      const events = await services.progress.listEvents();
-      const finished = events.filter((e) => e.type === "exam_finished");
-      expect(finished).toHaveLength(1);
-      expect(finished[0]?.payload).toEqual({ score: 100, attemptId: ATTEMPT.attemptId, noSpeaking: false });
-      expect(useAppState.getState().snapshot?.examBest).toBe(100);
     },
     TEST_TIMEOUT,
   );
 
   test(
-    "without speech recognition no speaking question is drawn and the certificate says so",
+    "five mistakes in a row lose the fight with the damage dealt so far",
     async () => {
-      const { recognizer, finishExam, questions } = setupRun(false);
-      expect(questions).toHaveLength(EXAM_TOTAL);
-      expect(questions.some((q) => q.section === "speaking")).toBe(false);
-      await answerAll(questions, recognizer);
-
-      expect(await screen.findByText(fr.exam.result.scoreLabel(100), {}, { timeout: 8000 })).toBeInTheDocument();
-      expect(screen.queryByText(fr.exercises.speak.prompt)).not.toBeInTheDocument();
-      expect(within(screen.getByRole("img", { name: /Certificat/ })).getByText(fr.exam.certificate.noSpeaking)).toBeInTheDocument();
-      expect(finishExam).toHaveBeenCalledTimes(1);
-      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 100, noSpeaking: true });
+      const { recognizer, finishExam, deck } = setupFight(false);
+      expect(deck.some((q) => q.section === "speaking")).toBe(false);
+      await fight(deck, 3, recognizer); // 3 hits, then wrong until 0 lives
+      await waitFor(() => expect(finishExam).toHaveBeenCalledTimes(1), { timeout: 8000 });
+      expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 12, noSpeaking: true, boss: { bossId: "boss_thuy_tinh", won: false, livesLeft: 0, bossHpLeft: 12 } });
     },
     TEST_TIMEOUT,
   );
 });
 
 describe("result", () => {
-  const questions = drawExam(examPoolFixture, 7, true);
+  const questions = buildDeck(examPoolFixture, bossFixture, 7, true);
   const failedState = (remainingToday: number): ResultState => ({
     score: 40,
     mention: "presque",
@@ -297,6 +278,7 @@ describe("result", () => {
     newBadges: [],
     remainingToday,
     dateIso: "2026-11-09T10:00:00.000Z",
+    boss: { id: "boss_thuy_tinh", name: "Thủy Tinh", title: "Le dieu des eaux", illustration: "boss_thuy_tinh", hp: 15, playerLives: 5, won: false, livesLeft: 0, bossHpLeft: 9 },
   });
 
   test("redirects to the intro without a result", async () => {
@@ -328,7 +310,7 @@ describe("result", () => {
     await userEvent.click(toggle);
     expect(screen.getByRole("button", { name: fr.exam.result.hideCorrection })).toHaveAttribute("aria-expanded", "true");
     expect(screen.getAllByRole("img", { name: fr.exam.result.right })).toHaveLength(12);
-    expect(screen.getAllByRole("img", { name: fr.exam.result.wrong })).toHaveLength(18);
+    expect(screen.getAllByRole("img", { name: fr.exam.result.wrong })).toHaveLength(questions.length - 12);
     expect(screen.getByText("réponse 0")).toHaveAttribute("lang", "vi");
   });
 
@@ -352,7 +334,7 @@ describe("result", () => {
 
 describe("certificate on the result page", () => {
   const passed = (): ResultState => {
-    const qs = drawExam(examPoolFixture, 7, true);
+    const qs = buildDeck(examPoolFixture, bossFixture, 7, true);
     return {
       score: 90,
       mention: "tres_bien",
@@ -363,6 +345,7 @@ describe("certificate on the result page", () => {
       newBadges: [],
       remainingToday: 1,
       dateIso: "2026-11-09T10:00:00.000Z",
+      boss: { id: "boss_thuy_tinh", name: "Thủy Tinh", title: "Le dieu des eaux", illustration: "boss_thuy_tinh", hp: 15, playerLives: 5, won: true, livesLeft: 3, bossHpLeft: 0 },
     };
   };
 

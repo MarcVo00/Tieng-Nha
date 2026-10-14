@@ -7,7 +7,7 @@ import { OfflineError } from "@/domain/errors";
 import type { BadgeDef } from "@/domain/types";
 import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import { examMention } from "@/services/exam";
+import { bossMention } from "@/services/bossFight";
 import { fr } from "@/i18n/fr";
 import {
   Avatar, BadgeMedal, Button, Card, Certificate, ConfirmDialog, Icon, Sheet, StreakFlame, downloadCertificate, tap, useToast,
@@ -143,7 +143,7 @@ export function MeScreen() {
     };
   }, [passed, progress]);
 
-  const mention = examBest === null ? "presque" : examMention(examBest);
+  const mention = examBest === null ? "presque" : bossMention(examBest);
   const certificate: CertificateProps | null =
     passed && examBest !== null && mention !== "presque" && profile && bestDate
       ? { pseudo: profile.pseudo, score: examBest, mention, dateIso: bestDate.dateIso, noSpeaking: bestDate.noSpeaking }

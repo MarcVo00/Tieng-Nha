@@ -428,8 +428,9 @@ export const fr = {
     },
     run: {
       counter: (n: number, total: number) => `Question ${n} sur ${total}`,
-      elapsed: (time: string) => `Temps écoulé : ${time}`,
-      skipIntro: "Touche pour continuer",
+      bossHp: (name: string, hp: number, max: number) => `PV de ${name} : ${hp} sur ${max}`,
+      hit: "Touché !",
+      miss: "Aïe !",
       quit: {
         aria: "Quitter le test",
         title: "Quitter le test ?",
@@ -444,7 +445,11 @@ export const fr = {
     result: {
       scoreLabel: (n: number) => `Score : ${n} sur 100`,
       outOf: "/ 100",
-      mention: { excellent: "Excellent", tres_bien: "Très bien", bien: "Bien", presque: "Presque !" },
+      mention: { excellent: "Excellent", tres_bien: "Très bien", bien: "Réussi", presque: "Presque !" },
+      won: (name: string) => `${name} est vaincu !`,
+      lost: (name: string) => `${name} a gagné cette fois`,
+      damage: (dealt: number, hp: number) => `Tu lui as infligé ${dealt} dégâts sur ${hp}`,
+      livesLeft: (n: number, max: number) => `${n} vie${n > 1 ? "s" : ""} sur ${max} gardée${n > 1 ? "s" : ""}`,
       passed: "Test réussi",
       failed: "Pas encore, mais tu y es presque",
       sectionsLabel: "Par partie",
@@ -474,7 +479,7 @@ export const fr = {
       noSpeaking: "Sans épreuve orale",
       seal: "Tiếng Nhà",
       aria: (pseudo: string, score: number) => `Certificat de réussite de ${pseudo}, ${score} sur 100`,
-      mention: { excellent: "Excellent", tres_bien: "Très bien", bien: "Bien" },
+      mention: { excellent: "Excellent", tres_bien: "Très bien", bien: "Réussi" },
     },
   },
   // --- leaderboard ---

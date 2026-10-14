@@ -13,8 +13,10 @@ export type ActivityService = {
   completeLesson(i: { lessonId: LessonId; mistakes: number; durationMs: number; vocabIds: readonly VocabId[] }): Promise<ActivityResult>;
   completeDialogue(i: { dialogueId: DialogueId; durationMs: number }): Promise<ActivityResult>;
   completeReview(i: { correctCount: number; total: number }): Promise<ActivityResult>;
-  finishExam(i: { attemptId: string; score: number; noSpeaking: boolean }): Promise<ActivityResult>;
+  finishExam(i: { attemptId: string; score: number; noSpeaking: boolean; boss?: BossOutcome }): Promise<ActivityResult>;
 };
+
+export type BossOutcome = { bossId: string; won: boolean; livesLeft: number; bossHpLeft: number };
 
 export function createActivityService(deps: {
   progress: ProgressRepository; outbox: Outbox; content: ContentSource; clock: () => string; onEventAppended?: () => void;
@@ -69,9 +71,9 @@ export function createActivityService(deps: {
     async completeReview({ correctCount, total }) {
       return commit(ev("review_session_completed", "review", reviewXp(correctCount), { correctCount, total }), false);
     },
-    async finishExam({ attemptId, score, noSpeaking }) {
+    async finishExam({ attemptId, score, noSpeaking, boss }) {
       const best = (await snapshot()).examBest;
-      return commit(ev("exam_finished", "exam", examXpDelta(score, best), { score, attemptId, noSpeaking }), best === null);
+      return commit(ev("exam_finished", "exam", examXpDelta(score, best), { score, attemptId, noSpeaking, ...(boss ?? {}) }), best === null);
     },
   };
 }

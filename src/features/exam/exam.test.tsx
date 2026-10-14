@@ -77,6 +77,15 @@ describe("intro", () => {
     expect(screen.queryByRole("button", { name: fr.exam.intro.start })).not.toBeInTheDocument();
   });
 
+  test("a failed tree load shows a retry that brings the intro back", async () => {
+    const services = createFakeServices();
+    vi.spyOn(services.content, "getTree").mockRejectedValueOnce(new Error("offline"));
+    renderExam({ services, entry: "/exam" });
+    expect(await screen.findByText(fr.exam.intro.loadError.title)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: fr.app.error.retry }));
+    expect(await screen.findByRole("button", { name: fr.exam.intro.start })).toBeEnabled();
+  });
+
   test("lists the rules and the best score once unlocked", async () => {
     useAppState.setState({ snapshot: snapshotWith(10, 84) });
     renderExam({ entry: "/exam" });

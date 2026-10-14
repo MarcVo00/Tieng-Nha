@@ -402,6 +402,7 @@ export const fr = {
     part: (n: number, name: string) => `Partie ${n} · ${name}`,
     intro: {
       kicker: "Bài kiểm tra",
+      loadError: { title: "Le test n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
       title: "Le test final",
       lead: "Montre ce que tu sais faire, sans filet.",
       rulesLabel: "Comment ça se passe",

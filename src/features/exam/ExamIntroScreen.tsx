@@ -6,7 +6,7 @@ import type { Tree } from "@/domain/types";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
-import { Button, Card, Icon, Motif, ProgressBar, Skeleton, type IconName } from "@/ui";
+import { Button, Card, EmptyState, Icon, Motif, ProgressBar, Skeleton, type IconName } from "@/ui";
 import { isInterruptedState, markAttempt, SECTION_ORDER, type RunState } from "@/features/exam/examState";
 
 const SECTION_ICON: Record<(typeof SECTION_ORDER)[number], IconName> = {
@@ -41,19 +41,35 @@ export function ExamIntroScreen() {
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tree, setTree] = useState<Tree | null>(null);
+  const [treeFailed, setTreeFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+    setTreeFailed(false);
     content.getTree().then(
       (t) => {
         if (!cancelled) setTree(t);
       },
-      () => {},
+      () => {
+        if (!cancelled) setTreeFailed(true);
+      },
     );
     return () => {
       cancelled = true;
     };
-  }, [content]);
+  }, [content, attempt]);
+
+  if (treeFailed) {
+    return (
+      <EmptyState
+        title={fr.exam.intro.loadError.title}
+        body={fr.exam.intro.loadError.body}
+        illustration="boat"
+        action={<Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>{fr.app.error.retry}</Button>}
+      />
+    );
+  }
 
   if (!snapshot || !tree) {
     return (
@@ -157,7 +173,7 @@ export function ExamIntroScreen() {
             <h2 className="text-heading text-ink">{fr.exam.intro.locked.title}</h2>
           </div>
           <p className="text-body text-ink-muted">{fr.exam.intro.locked.body}</p>
-          <ProgressBar value={done / total} label={fr.exam.intro.locked.progress(done, total)} />
+          <ProgressBar value={done / Math.max(1, total)} label={fr.exam.intro.locked.progress(done, total)} />
           <p className="text-caption text-ink-muted tabular">{fr.exam.intro.locked.progress(done, total)}</p>
         </Card>
       )}

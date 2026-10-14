@@ -84,7 +84,7 @@ test("previewing a voice speaks the sample with that voice without saving it", a
   const { services, user } = await setup();
   const speak = vi.spyOn(services.tts, "speak");
   await user.click(screen.getByRole("button", { name: fr.profile.settings.voicePack.preview("Nord · Đoan Trang (femme)") }));
-  expect(speak).toHaveBeenCalledWith("Xin chào bạn!", { rate: 1, voice: "north-f" });
+  expect(speak).toHaveBeenCalledWith("Chào bạn!", { rate: 1, voice: "north-f" });
   expect(useAppState.getState().settings.voice).toBe("south-f");
   expect((await services.progress.getSettings()).voice).toBe("south-f");
 });

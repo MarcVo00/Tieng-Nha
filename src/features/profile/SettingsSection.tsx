@@ -33,7 +33,7 @@ function Segmented<T extends string>({ label, value, options, onChange }: Segmen
   );
 }
 
-const PREVIEW_TEXT = "Xin chào bạn!"; // also listed in scripts/tts/extract_texts.mjs so every voice pack has it
+const PREVIEW_TEXT = "Chào bạn!"; // also listed in scripts/tts/extract_texts.mjs so every voice pack has it
 
 function voiceLabel(id: VoiceId): string {
   const o = fr.profile.settings.voicePack.options[id];

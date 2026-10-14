@@ -1,6 +1,6 @@
 {
   "id": "d09",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Fixer un rendez-vous",
   "scene": "Au téléphone — Gọi điện thoại",
   "turns": [
@@ -73,7 +73,7 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Dạ, tạm biệt bạn!",
+          "vi": "Dạ, chào bạn nha!",
           "fr": "D'accord, au revoir !",
           "next": "t7"
         },
@@ -88,7 +88,7 @@
     {
       "id": "t7",
       "speaker": "npc",
-      "vi": "Tạm biệt bạn!",
+      "vi": "Chào bạn nha!",
       "fr": "Au revoir !",
       "next": null
     }

@@ -1,6 +1,6 @@
 {
   "id": "d10",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Se présenter à la famille",
   "scene": "Bữa cơm gia đình — un repas de famille",
   "turns": [
@@ -23,7 +23,7 @@
         },
         {
           "id": "o2",
-          "vi": "Xin chào! Tui là người Pháp.",
+          "vi": "Chào bạn! Tui là người Pháp.",
           "fr": "Bonjour ! Je suis français(e).",
           "next": "t3"
         }

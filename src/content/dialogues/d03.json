@@ -1,6 +1,6 @@
 {
   "id": "d03",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Donner son numéro",
   "scene": "Trên đường — on échange nos numéros",
   "turns": [
@@ -64,7 +64,7 @@
     {
       "id": "t6",
       "speaker": "npc",
-      "vi": "Tốt quá! Tạm biệt bạn nha.",
+      "vi": "Tốt quá! Chào bạn nha.",
       "fr": "Parfait ! Au revoir.",
       "next": null
     }

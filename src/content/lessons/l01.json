@@ -1,29 +1,66 @@
 {
   "id": "l01",
-  "contentVersion": 2,
+  "contentVersion": 3,
   "title": "Les 6 tons & bonjour",
-  "description": "Le vietnamien a 6 tons : ngang (plat), huyền (descend doucement), sắc (monte), hỏi (descend puis remonte), ngã (monte avec une cassure) et nặng (bref, qui tombe). Le même son « ma » change de sens selon le ton. Apprends aussi à dire bonjour, merci et au revoir.",
+  "description": "Le vietnamien a 6 tons : ngang (plat), huyền (descend doucement), sắc (monte), hỏi (descend puis remonte), ngã (monte avec une cassure) et nặng (bref, qui tombe). Le même son « ma » change de sens selon le ton. Apprends aussi à saluer : au Sud, « chào » suivi de la personne sert à dire bonjour comme au revoir.",
   "emoji": "🎵",
   "dialogueId": "d01",
   "vocab": [
     {
+      "id": "v_chao",
+      "vi": "chào",
+      "fr": "bonjour / au revoir",
+      "dialect": "south",
+      "note": "Au Sud, on dit simplement « chào » suivi de la personne à qui on parle, aussi bien pour dire bonjour qu'au revoir : « chào anh », « chào chị »… « Xin chào » et « tạm biệt » existent, mais sonnent formels, presque « manuel scolaire »."
+    },
+    {
       "id": "v_xin_chao",
       "vi": "xin chào",
       "fr": "bonjour",
-      "dialect": "south"
+      "dialect": "south",
+      "deprecated": true
     },
     {
       "id": "v_chao_ban",
       "vi": "chào bạn",
-      "fr": "salut (à toi)",
+      "fr": "salut, bonjour / au revoir (à un·e ami·e)",
       "dialect": "south",
-      "note": "Forme amicale et neutre. Dans la vie courante, on remplace « bạn » par « anh » (homme) ou « chị » (femme) selon la personne."
+      "note": "Entre ami·e·s ou personnes du même âge. Avec quelqu'un d'autre, on remplace « bạn » par la personne : anh, chị, em, chú…"
+    },
+    {
+      "id": "v_chao_anh",
+      "vi": "chào anh",
+      "fr": "bonjour / au revoir (à un homme un peu plus âgé)",
+      "dialect": "south",
+      "note": "« Anh » = grand frère : pour un homme un peu plus âgé que toi."
+    },
+    {
+      "id": "v_chao_chi",
+      "vi": "chào chị",
+      "fr": "bonjour / au revoir (à une femme un peu plus âgée)",
+      "dialect": "south",
+      "note": "« Chị » = grande sœur : pour une femme un peu plus âgée que toi."
+    },
+    {
+      "id": "v_chao_em",
+      "vi": "chào em",
+      "fr": "bonjour / au revoir (à quelqu'un de plus jeune)",
+      "dialect": "south",
+      "note": "« Em » = petit frère ou petite sœur : pour quelqu'un de plus jeune que toi, homme ou femme."
+    },
+    {
+      "id": "v_chao_chu",
+      "vi": "chào chú",
+      "fr": "bonjour / au revoir (à un homme de l'âge de tes parents)",
+      "dialect": "south",
+      "note": "« Chú » = oncle : pour un homme de l'âge de tes parents."
     },
     {
       "id": "v_tam_biet",
       "vi": "tạm biệt",
       "fr": "au revoir",
-      "dialect": "south"
+      "dialect": "south",
+      "deprecated": true
     },
     {
       "id": "v_cam_on",
@@ -98,10 +135,10 @@
     {
       "id": "l01_e01",
       "type": "listen_choose",
-      "vocabId": "v_xin_chao",
+      "vocabId": "v_chao_anh",
       "choices": [
-        "v_xin_chao",
-        "v_tam_biet",
+        "v_chao_anh",
+        "v_chao_em",
         "v_cam_on",
         "v_da_oui"
       ]
@@ -158,20 +195,20 @@
       "promptFr": "Merci.",
       "answerVi": "Cảm ơn.",
       "distractorsVi": [
-        "Tạm biệt.",
-        "Xin chào.",
+        "Chào anh.",
+        "Chào em.",
         "Không."
       ]
     },
     {
       "id": "l01_e09",
       "type": "translate_choose",
-      "promptFr": "Au revoir.",
-      "answerVi": "Tạm biệt.",
+      "promptFr": "Au revoir ! (à une femme un peu plus âgée)",
+      "answerVi": "Chào chị!",
       "distractorsVi": [
-        "Cảm ơn.",
-        "Dạ.",
-        "Không."
+        "Chào em!",
+        "Chào chú!",
+        "Cảm ơn!"
       ]
     },
     {
@@ -184,26 +221,26 @@
       ],
       "extraTokens": [
         "không",
-        "tạm biệt"
+        "chào"
       ]
     },
     {
       "id": "l01_e11",
       "type": "speak",
-      "vi": "Xin chào!",
-      "fr": "Bonjour !",
+      "vi": "Chào anh!",
+      "fr": "Bonjour ! (à un homme un peu plus âgé)",
       "vocabIds": [
-        "v_xin_chao"
+        "v_chao_anh"
       ]
     },
     {
       "id": "l01_e12",
       "type": "speak",
-      "vi": "Cảm ơn, tạm biệt!",
-      "fr": "Merci, au revoir !",
+      "vi": "Cảm ơn, chào chú!",
+      "fr": "Merci, au revoir ! (à un monsieur de l'âge de tes parents)",
       "vocabIds": [
         "v_cam_on",
-        "v_tam_biet"
+        "v_chao_chu"
       ]
     }
   ]

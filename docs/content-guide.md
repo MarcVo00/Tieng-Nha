@@ -29,6 +29,7 @@
 ## 3. Lexique Sud ↔ Nord (utiliser la colonne Sud)
 | Sens | **Sud (à utiliser)** | Nord (ne pas utiliser, citer en note si utile) |
 |---|---|---|
+| bonjour / au revoir | **chào** + la personne (`chào bạn`, `chào anh`, `chào chị`, `chào em`, `chào chú`…), pour saluer comme pour partir | `xin chào`, `tạm biệt` : corrects mais formels, « manuel scolaire » — ne pas les utiliser |
 | je / moi (familier) | tui | tôi |
 | oui (poli) | dạ | vâng |
 | papa / maman | ba / má | bố / mẹ |
@@ -56,7 +57,7 @@ Les **répliques PNJ** des dialogues peuvent contenir quelques mots hors vocabul
 ## 5. Curriculum V1
 | Leçon | Thème | Vocabulaire indicatif (12–18 items) | Dialogue |
 |---|---|---|---|
-| l01 | Les 6 tons & bonjour | xin chào, chào bạn, tạm biệt, cảm ơn, dạ, không, ma, mà, má, mả, mã, mạ | d01 — Première rencontre |
+| l01 | Les 6 tons & saluer | chào, chào bạn, chào anh, chào chị, chào em, chào chú, cảm ơn, dạ, không, vui, ma, mà, má, mả, mã, mạ | d01 — Première rencontre |
 | l02 | Pronoms & politesse | tui, bạn, anh, chị, em, cô, chú, ông, bà, xin lỗi, không sao, khỏe không | d02 — Saluer un voisin |
 | l03 | Chiffres | một … mười, trăm, ngàn, mấy, số | d03 — Donner son numéro |
 | l04 | Famille | ba, má, anh hai, chị hai, em, ông bà, con, gia đình, có, mấy người | d04 — Montrer une photo de famille |

@@ -35,4 +35,4 @@ The full run synthesises ~380 texts x 4 voices; it is resumable (existing MP3s a
 ## After changing content
 Edit lessons/dialogues/exam, then re-run both commands above: only the new texts are generated, the manifest is rewritten from the files on disk.
 Commit `public/audio/**` together with the content change. Texts without a pack file are spoken by the device voice.
-The preview and device-test phrases (`Xin chào bạn!`, `Xin chào!`) are listed in `extract_texts.mjs` (`EXTRA_TEXTS`); add any new hard-coded spoken string there.
+The preview and device-test phrase (`Chào bạn!`) is listed in `extract_texts.mjs` (`EXTRA_TEXTS`); add any new hard-coded spoken string there.

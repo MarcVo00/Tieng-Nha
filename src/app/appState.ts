@@ -90,7 +90,7 @@ export function useDeviceTest() {
   const testVoice = useCallback(async (): Promise<void> => {
     setBusy("voice");
     try {
-      await tts.speak("Xin chào!", { rate: 1 });
+      await tts.speak("Chào bạn!", { rate: 1 });
     } catch {
       // A failed test voice is reported by the detection below.
     }

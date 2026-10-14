@@ -98,7 +98,7 @@ test("the test voice button speaks Vietnamese and stores capabilities", async ()
   await user.click(await screen.findByRole("button", { name: "Écouter" }));
   await waitFor(() => expect(useAppState.getState().settings.capabilities).toEqual({ tts: true, stt: true, recorder: true }));
   const tts = services.tts as unknown as { spoken: string[] };
-  expect(tts.spoken).toEqual(["Xin chào!"]);
+  expect(tts.spoken).toEqual(["Chào bạn!"]);
 });
 
 test("a wrong code shows an error and stays on the code step", async () => {

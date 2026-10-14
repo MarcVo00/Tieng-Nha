@@ -11,7 +11,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const normalizeSpeechText = (s) => s.normalize("NFC").trim();
 
 // Spoken by the app outside the lesson content (settings voice preview, device test).
-const EXTRA_TEXTS = ["Xin chào bạn!", "Xin chào!"];
+const EXTRA_TEXTS = ["Chào bạn!"];
 
 const readJson = (path) => JSON.parse(readFileSync(path, "utf8"));
 const jsonFiles = (dir) =>

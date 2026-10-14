@@ -1,5 +1,5 @@
 {
-  "contentVersion": 2,
+  "contentVersion": 3,
   "questions": [
     {
       "id": "exam_q001",
@@ -10,8 +10,8 @@
         "vocabId": "v_cam_on",
         "choices": [
           "v_cam_on",
-          "v_tam_biet",
-          "v_xin_chao",
+          "v_chao_em",
+          "v_chao_chi",
           "v_khong"
         ]
       }
@@ -39,7 +39,7 @@
         "type": "listen_choose",
         "vocabId": "v_chao_ban",
         "choices": [
-          "v_xin_chao",
+          "v_chao_anh",
           "v_chao_ban",
           "v_cam_on",
           "v_vui"
@@ -372,7 +372,7 @@
         "distractorsVi": [
           "Dạ, cảm ơn.",
           "Không sao.",
-          "Tạm biệt."
+          "Chào em."
         ]
       }
     },
@@ -834,10 +834,10 @@
       "exercise": {
         "id": "exam_e060",
         "type": "speak",
-        "vi": "Xin chào ông.",
+        "vi": "Chào ông.",
         "fr": "Bonjour, monsieur.",
         "vocabIds": [
-          "v_xin_chao",
+          "v_chao",
           "v_ong"
         ]
       }

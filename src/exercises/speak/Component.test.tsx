@@ -118,3 +118,13 @@ test("each recognition failure has its own message", async () => {
     expect(await screen.findByText(text)).toBeInTheDocument();
   }
 });
+
+test("listening accepts the sentence as soon as it is said perfectly, and only then", async () => {
+  const { stt } = setup();
+  const listen = vi.spyOn(stt, "listen");
+  stt.queue = [["cho tui một ly trà đá"]];
+  await userEvent.click(screen.getByRole("button", { name: /parler/i }));
+  const acceptEarly = listen.mock.calls[0]?.[0].acceptEarly;
+  expect(acceptEarly?.(["cho tui một ly trà"])).toBe(false);
+  expect(acceptEarly?.(["Cho tui một ly trà đá"])).toBe(true);
+});

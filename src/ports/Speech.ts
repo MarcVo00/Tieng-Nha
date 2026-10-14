@@ -18,7 +18,11 @@ export class RecognitionError extends Error {
 }
 export interface SpeechRecognizer {
   isAvailable(): boolean;
-  listen(opts: { lang: "vi-VN"; timeoutMs: number }): Promise<string[]>; // alternatives, best first; throws RecognitionError
+  /**
+   * Alternatives, best first; throws RecognitionError. `acceptEarly` is asked about results heard while the learner is
+   * still speaking: returning true resolves with them at once instead of waiting for the end-of-speech silence.
+   */
+  listen(opts: { lang: "vi-VN"; timeoutMs: number; acceptEarly?: (alternatives: string[]) => boolean }): Promise<string[]>;
   abort(): void;
 }
 export interface VoiceRecorder {

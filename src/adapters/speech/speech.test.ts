@@ -320,3 +320,33 @@ describe("MediaRecorderVoiceRecorder.record", () => {
     expect(created).toHaveLength(0);
   });
 });
+
+const interim = (transcript: string) => ({ results: [Object.assign([{ transcript, confidence: 0 }], { isFinal: false })] });
+
+test("an interim result the caller accepts resolves at once, without waiting for the end-of-speech silence", async () => {
+  let aborted = false;
+  const win = fakeRecognitionWindow((rec) => {
+    const abort = rec.abort.bind(rec);
+    rec.abort = () => {
+      aborted = true;
+      abort();
+    };
+    rec.onresult?.(interim("chào"));
+    rec.onresult?.(interim("chào anh"));
+    // No final result, no onend: the browser would still be waiting for silence here.
+  });
+  const stt = new WebSpeechRecognizer(win as never);
+  const heard = await stt.listen({ lang: "vi-VN", timeoutMs: 8000, acceptEarly: (alts) => alts.includes("chào anh") });
+  expect(heard).toEqual(["chào anh"]);
+  expect(aborted).toBe(true);
+});
+
+test("interim results the caller does not accept wait for the final result", async () => {
+  const win = fakeRecognitionWindow((rec) => {
+    rec.onresult?.(interim("chào"));
+    rec.onresult?.({ results: [Object.assign([{ transcript: "chào em", confidence: 0.9 }], { isFinal: true })] });
+    rec.onend?.();
+  });
+  const stt = new WebSpeechRecognizer(win as never);
+  await expect(stt.listen({ lang: "vi-VN", timeoutMs: 8000, acceptEarly: (alts) => alts.includes("chào anh") })).resolves.toEqual(["chào em"]);
+});

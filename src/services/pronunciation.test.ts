@@ -1,4 +1,4 @@
-import { normalizeVi, stripTones, scorePronunciation, PASS_THRESHOLD } from "@/services/pronunciation";
+import { normalizeVi, stripTones, scorePronunciation, PASS_THRESHOLD, saidExactly } from "@/services/pronunciation";
 
 test("normalizeVi", () => {
   expect(normalizeVi("  Cho tui một ly Cà Phê, nha!  ")).toBe("cho tui một ly cà phê nha");
@@ -42,4 +42,11 @@ test("normalizeVi spells out long digit runs digit by digit", () => {
 });
 test("scorePronunciation matches a recognised digit run", () => {
   expect(scorePronunciation("Số của tui là tám tám chín ba sáu hai.", ["số của tui là 889362"]).score).toBe(1);
+});
+
+test("saidExactly accepts only the whole sentence, every tone right (early acceptance must never cut a sentence short)", () => {
+  expect(saidExactly("Em ơi, cho một ly trà đá.", ["em ơi cho một ly trà đá"])).toBe(true);
+  expect(saidExactly("Em ơi, cho một ly trà đá.", ["em ơi cho một ly trà"])).toBe(false); // still speaking
+  expect(saidExactly("Chào anh!", ["chào ánh"])).toBe(false); // wrong tone: let the normal grading decide
+  expect(saidExactly("Chào anh!", ["chào em", "chào anh"])).toBe(true); // any alternative
 });

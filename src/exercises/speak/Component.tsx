@@ -3,6 +3,7 @@ import type { Exercise } from "@/domain/types";
 import { SLOW_VOICE_RATE, type ExerciseProps } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import { RecognitionError } from "@/ports";
+import { saidExactly } from "@/services/pronunciation";
 import { Button, MicButton, SpeakerButton } from "@/ui";
 
 type Speak = Extract<Exercise, { type: "speak" }>;
@@ -71,7 +72,11 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
     setMessage(null);
     setPhase("listening");
     try {
-      const alternatives = await services.stt.listen({ lang: "vi-VN", timeoutMs: LISTEN_TIMEOUT_MS });
+      const alternatives = await services.stt.listen({
+        lang: "vi-VN",
+        timeoutMs: LISTEN_TIMEOUT_MS,
+        acceptEarly: (heard) => saidExactly(exercise.vi, heard), // the whole sentence, perfectly: no need to wait
+      });
       if (!mounted.current) return;
       setPhase("processing");
       onAnswer({ kind: "speech", alternatives });

@@ -6,7 +6,7 @@ type RecInstance = {
   maxAlternatives: number;
   interimResults: boolean;
   continuous: boolean;
-  onresult: ((e: { results: ArrayLike<ArrayLike<Alt>> }) => void) | null;
+  onresult: ((e: { results: ArrayLike<ArrayLike<Alt> & { isFinal?: boolean }> }) => void) | null;
   onerror: ((e: { error: string }) => void) | null;
   onend: (() => void) | null;
   start(): void;
@@ -38,7 +38,7 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
     return this.ctor() !== undefined;
   }
 
-  listen({ lang, timeoutMs }: { lang: "vi-VN"; timeoutMs: number }): Promise<string[]> {
+  listen({ lang, timeoutMs, acceptEarly }: { lang: "vi-VN"; timeoutMs: number; acceptEarly?: (alternatives: string[]) => boolean }): Promise<string[]> {
     const Ctor = this.ctor();
     if (!Ctor) return Promise.reject(new RecognitionError("unsupported"));
     this.abort();
@@ -46,7 +46,7 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
     this.current = rec;
     rec.lang = lang;
     rec.maxAlternatives = 5;
-    rec.interimResults = false;
+    rec.interimResults = acceptEarly !== undefined; // partial results let a correct sentence pass without the silence
     rec.continuous = false;
     return new Promise<string[]>((resolve, reject) => {
       let settled = false;
@@ -56,20 +56,34 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
         error = "timeout";
         rec.abort();
       }, timeoutMs);
+      const finish = (outcome: () => void) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (this.current === rec) this.current = null;
+        outcome();
+      };
       rec.onresult = (e) => {
         const first = e.results[0];
+        if (first && first.isFinal === false) {
+          // Still speaking: the transcript so far, all segments joined (interim results carry one alternative).
+          const sofar = Array.from(e.results).map((r) => r[0]?.transcript ?? "").join(" ").trim();
+          if (sofar && acceptEarly?.([sofar])) {
+            finish(() => resolve([sofar]));
+            rec.abort();
+          }
+          return;
+        }
         result = first ? Array.from(first).sort((a, b) => b.confidence - a.confidence).map((a) => a.transcript) : [];
       };
       rec.onerror = (e) => {
         error ??= MAP[e.error] ?? "aborted";
       };
       rec.onend = () => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        if (this.current === rec) this.current = null;
-        if (result && result.length) resolve(result);
-        else reject(new RecognitionError(error ?? "no-speech"));
+        finish(() => {
+          if (result && result.length) resolve(result);
+          else reject(new RecognitionError(error ?? "no-speech"));
+        });
       };
       rec.start();
     });

@@ -91,3 +91,13 @@ export function scorePronunciation(expected: string, heardAlternatives: readonly
   }
   return best;
 }
+
+/**
+ * True when one alternative is the whole expected sentence, every syllable and tone right. Used to accept speech
+ * before the browser's end-of-speech silence: anything less waits for the final result and the normal grading,
+ * so a learner is never cut off mid-sentence.
+ */
+export function saidExactly(expected: string, heardAlternatives: readonly string[]): boolean {
+  const exp = syllables(expected).join(" ");
+  return exp !== "" && heardAlternatives.some((alt) => syllables(alt).join(" ") === exp);
+}

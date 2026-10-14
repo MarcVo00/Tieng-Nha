@@ -4,6 +4,7 @@ import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities, ConversationState, Dialogue, UserTurn } from "@/domain/types";
 import { RecognitionError, type ConversationInput } from "@/ports";
 import type { ActivityResult } from "@/services/activity";
+import { saidExactly } from "@/services/pronunciation";
 
 export const TYPING_MS = 600;
 const LISTEN_TIMEOUT_MS = 8000;
@@ -237,7 +238,12 @@ export function useDialogue(dialogueId: string | undefined) {
     setMic("listening");
     let alternatives: string[];
     try {
-      alternatives = await stt.listen({ lang: "vi-VN", timeoutMs: LISTEN_TIMEOUT_MS });
+      const spoken = options;
+      alternatives = await stt.listen({
+        lang: "vi-VN",
+        timeoutMs: LISTEN_TIMEOUT_MS,
+        acceptEarly: (heard) => spoken.some((o) => saidExactly(o.vi, heard)), // one reply said perfectly: answer at once
+      });
     } catch (e) {
       if (!mounted.current || epoch.current !== run) return;
       setMic("idle");
@@ -254,7 +260,7 @@ export function useDialogue(dialogueId: string | undefined) {
     if (!mounted.current || epoch.current !== run) return;
     setMic("idle");
     await submit({ kind: "speech", alternatives });
-  }, [mic, stt, submit, updateSettings]);
+  }, [mic, options, stt, submit, updateSettings]);
 
   const restart = useCallback(() => {
     if (phase === "saving" && !saveError) return;

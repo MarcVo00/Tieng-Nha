@@ -1,6 +1,6 @@
 import type { ContentSource } from "@/ports";
-import type { BadgeDef, Dialogue, ExamQuestion, Lesson, LessonSummary, VocabItem } from "@/domain/types";
-import { BadgesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema } from "@/content/schema";
+import type { BadgeDef, Dialogue, ExamQuestion, Lesson, LessonSummary, Tree, VocabItem } from "@/domain/types";
+import { BadgesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema } from "@/content/schema";
 import { ContentNotFoundError } from "@/domain/errors";
 
 export type ContentLoaders = {
@@ -8,6 +8,7 @@ export type ContentLoaders = {
   dialogues: Record<string, () => Promise<unknown>>;
   exam: () => Promise<unknown>;
   badges: () => Promise<unknown>;
+  tree: () => Promise<unknown>;
 };
 
 const idFromPath = (p: string): string => (p.split("/").pop() ?? p).replace(/\.json$/, "");
@@ -59,6 +60,10 @@ export class StaticContentSource implements ContentSource {
     return BadgesFileSchema.parse(await this.loaders.badges()).badges;
   }
 
+  async getTree(): Promise<Tree> {
+    return TreeFileSchema.parse(await this.loaders.tree());
+  }
+
   async getVocabIndex(): Promise<ReadonlyMap<string, VocabItem>> {
     const lessons = await Promise.all(this.lessonPaths().map((p) => this.getLesson(idFromPath(p))));
     return new Map(lessons.flatMap((l) => l.vocab.map((v) => [v.id, v] as const)));
@@ -70,6 +75,7 @@ export function createStaticContentSource(): StaticContentSource {
   const dialogues = import.meta.glob("/src/content/dialogues/*.json", { import: "default" });
   const exam = import.meta.glob("/src/content/exam.json", { import: "default" });
   const badges = import.meta.glob("/src/content/badges.json", { import: "default", eager: true });
+  const tree = import.meta.glob("/src/content/tree.json", { import: "default", eager: true });
   return new StaticContentSource({
     lessons,
     dialogues,
@@ -78,5 +84,6 @@ export function createStaticContentSource(): StaticContentSource {
       return load ? load() : { contentVersion: 1, questions: [] };
     },
     badges: async () => badges["/src/content/badges.json"],
+    tree: async () => tree["/src/content/tree.json"],
   });
 }

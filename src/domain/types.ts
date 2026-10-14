@@ -2,7 +2,7 @@ import type { z } from "zod";
 import type {
   VocabItemSchema, ExerciseSchema, ListenChooseSchema, TranslateChooseSchema, TonePickSchema, WordOrderSchema,
   SpeakSchema, LessonSchema, TurnSchema, NpcTurnSchema, UserTurnSchema, DialogueSchema, ExamSectionSchema,
-  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema,
+  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema,
 } from "@/content/schema";
 
 export type { Tone } from "@/domain/tones";
@@ -127,3 +127,5 @@ export type ProgressSnapshot = {
   badges: string[];
   activeDays: string[]; // YYYY-MM-DD, Europe/Paris, sorted asc
 };
+export type TreeNode = z.infer<typeof TreeNodeSchema>;
+export type Tree = z.infer<typeof TreeFileSchema>;

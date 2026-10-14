@@ -1,10 +1,10 @@
 import {
-  BadgesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema,
+  BadgesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema,
 } from "../src/content/schema";
 import { toneOfSyllable } from "../src/domain/tones";
 import type { Dialogue, Exercise, Lesson } from "../src/domain/types";
 
-export type ContentBundle = { lessons: unknown[]; dialogues: unknown[]; exam: unknown; badges: unknown };
+export type ContentBundle = { lessons: unknown[]; dialogues: unknown[]; exam: unknown; badges: unknown; tree?: unknown };
 
 const EXAM_MIN = { total: 60, listening: 20, translation: 16, tones: 12, speaking: 12 } as const;
 
@@ -27,6 +27,10 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   if (!exam.success) errors.push(`exam: ${exam.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
   const badges = BadgesFileSchema.safeParse(input.badges);
   if (!badges.success) errors.push(`badges: ${badges.error.message}`);
+
+  const tree = input.tree === undefined ? undefined : TreeFileSchema.safeParse(input.tree);
+  if (tree && !tree.success) errors.push(`tree: ${tree.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
+  if (opts.strict && input.tree === undefined) errors.push("tree: missing");
 
   // Unique ids
   const seen = new Map<string, string>();
@@ -122,6 +126,36 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   // Lesson → dialogue references
   const dialogueIds = new Set(dialogues.map((d) => d.id));
   if (opts.strict) for (const l of lessons) if (!dialogueIds.has(l.dialogueId)) errors.push(`${l.id}: dialogue ${l.dialogueId} missing`);
+
+  // Skill tree: unique ids, known prerequisites, no cycle, lesson nodes match lesson files
+  if (tree?.success) {
+    const nodes = tree.data.nodes;
+    const nodeIds = new Set<string>();
+    for (const n of nodes) {
+      if (nodeIds.has(n.id)) errors.push(`tree: duplicate node ${n.id}`);
+      nodeIds.add(n.id);
+    }
+    for (const n of nodes) for (const r of n.requires) if (!nodeIds.has(r)) errors.push(`tree: ${n.id} requires unknown ${r}`);
+    const requires = new Map(nodes.map((n) => [n.id, n.requires] as const));
+    const visiting = new Set<string>();
+    const done = new Set<string>();
+    const cyclic = (id: string): boolean => {
+      if (visiting.has(id)) return true;
+      if (done.has(id)) return false;
+      visiting.add(id);
+      const found = (requires.get(id) ?? []).some(cyclic);
+      visiting.delete(id);
+      done.add(id);
+      return found;
+    };
+    for (const n of nodes) if (cyclic(n.id)) { errors.push(`tree: cycle through ${n.id}`); break; }
+    const lessonIds = new Set(lessons.map((l) => l.id));
+    for (const n of nodes) if (n.kind === "lesson" && !lessonIds.has(n.id)) errors.push(`tree: lesson ${n.id} has no lesson file`);
+    if (opts.strict) {
+      const treeLessons = new Set(nodes.filter((n) => n.kind === "lesson").map((n) => n.id));
+      for (const l of lessons) if (!treeLessons.has(l.id)) errors.push(`tree: lesson ${l.id} missing from the tree`);
+    }
+  }
 
   if (opts.strict) {
     if (lessons.length !== 10) errors.push(`expected 10 lessons, found ${lessons.length}`);

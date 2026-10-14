@@ -86,3 +86,16 @@ test("strict mode flags an exam section below its quota", () => {
   expect(errors).toMatch(/section tones needs >= 12, found 0/);
   expect(errors).toMatch(/expected >= 60 questions/);
 });
+
+test("the tree must reference existing nodes and be acyclic", () => {
+  const tree = {
+    contentVersion: 1,
+    nodes: [
+      { id: "a", kind: "boss", requires: ["b"], branch: "trunk" },
+      { id: "b", kind: "boss", requires: ["a", "ghost"], branch: "trunk" },
+    ],
+  };
+  const errors = checkContent({ ...ok, lessons: [], dialogues: [], tree }, { strict: false });
+  expect(errors).toContain("tree: b requires unknown ghost");
+  expect(errors.some((e) => e.startsWith("tree: cycle through"))).toBe(true);
+});

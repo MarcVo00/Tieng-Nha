@@ -100,6 +100,11 @@ export const ExamQuestionSchema = z
   .strict();
 export const ExamPoolSchema = z.object({ contentVersion: z.number().int().min(1), questions: z.array(ExamQuestionSchema) }).strict();
 
+export const TreeNodeSchema = z
+  .object({ id: z.string().min(1), kind: z.enum(["lesson", "boss"]), requires: z.array(z.string().min(1)), branch: z.string().min(1) })
+  .strict();
+export const TreeFileSchema = z.object({ contentVersion: z.number().int().min(1), nodes: z.array(TreeNodeSchema).min(1) }).strict();
+
 export const BadgeRuleSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("lessons_done"), gte: z.number().int().min(1) }).strict(),
   z.object({ kind: z.literal("streak"), gte: z.number().int().min(1) }).strict(),

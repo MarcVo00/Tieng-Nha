@@ -1,0 +1,16 @@
+{
+  "contentVersion": 1,
+  "nodes": [
+    { "id": "l01", "kind": "lesson", "requires": [], "branch": "trunk" },
+    { "id": "l02", "kind": "lesson", "requires": ["l01"], "branch": "trunk" },
+    { "id": "l03", "kind": "lesson", "requires": ["l02"], "branch": "trunk" },
+    { "id": "l04", "kind": "lesson", "requires": ["l03"], "branch": "trunk" },
+    { "id": "l05", "kind": "lesson", "requires": ["l04"], "branch": "trunk" },
+    { "id": "l06", "kind": "lesson", "requires": ["l05"], "branch": "trunk" },
+    { "id": "l07", "kind": "lesson", "requires": ["l06"], "branch": "trunk" },
+    { "id": "l08", "kind": "lesson", "requires": ["l07"], "branch": "trunk" },
+    { "id": "l09", "kind": "lesson", "requires": ["l08"], "branch": "trunk" },
+    { "id": "l10", "kind": "lesson", "requires": ["l09"], "branch": "trunk" },
+    { "id": "boss_thuy_tinh", "kind": "boss", "requires": ["l10"], "branch": "trunk" }
+  ]
+}

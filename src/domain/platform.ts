@@ -22,3 +22,14 @@ export function chromeIntentUrl(href: string): string {
   const url = new URL(href);
   return `intent://${url.host}${url.pathname}${url.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(href)};end`;
 }
+
+/**
+ * Why installing from this browser would fail. Samsung Internet packages installed web apps itself with an old Android
+ * target, which Google Play Protect blocks on Android 14+; nothing in the manifest changes that, so the user is sent
+ * to Chrome. Messaging-app browsers fail the same way.
+ */
+export function installBlocker(ua: string): "in-app" | "samsung" | null {
+  if (isInAppBrowser(ua)) return "in-app";
+  if (/SamsungBrowser/.test(ua)) return "samsung";
+  return null;
+}

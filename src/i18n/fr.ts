@@ -225,10 +225,13 @@ export const fr = {
       unavailable: "Ton navigateur ne propose pas l'installation pour le moment. Tu pourras le faire plus tard depuis son menu.",
     },
     inApp: {
-      title: "Ouvre Tiếng Nhà dans ton navigateur",
+      title: "Pour installer Tiếng Nhà, passe par Chrome",
+      titleIos: "Pour installer Tiếng Nhà, passe par Safari",
       android: "Tu es dans le navigateur d'une appli de messagerie : l'installation y est bloquée. Ouvre le lien dans Chrome pour installer Tiếng Nhà.",
       ios: "Tu es dans le navigateur d'une appli de messagerie : l'installation n'y est pas possible. Touche ⋯ puis « Ouvrir dans le navigateur » pour passer sur Safari.",
+      samsung: "Samsung Internet installe l'app dans un format que Google Play Protect bloque. Ouvre le lien dans Chrome pour l'installer : tu retrouveras ton compte avec ton e-mail et ton mot de passe.",
       open: "Ouvrir dans Chrome",
+      later: "Plus tard",
     },
     callback: {
       title: "Connexion réussie !",

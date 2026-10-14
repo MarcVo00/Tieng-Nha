@@ -1,4 +1,4 @@
-import { chromeIntentUrl, detectPlatform, isInAppBrowser } from "@/domain/platform";
+import { chromeIntentUrl, detectPlatform, installBlocker, isInAppBrowser } from "@/domain/platform";
 
 test("detects iOS, Android, iPadOS and others", () => {
   expect(detectPlatform("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)", 5)).toBe("ios");
@@ -27,4 +27,11 @@ test("builds an Android intent that reopens the same page in Chrome", () => {
   expect(chromeIntentUrl("https://tieng-nha.netlify.app/leaderboard?x=1")).toBe(
     "intent://tieng-nha.netlify.app/leaderboard?x=1#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Ftieng-nha.netlify.app%2Fleaderboard%3Fx%3D1;end",
   );
+});
+
+test("names what blocks a proper install: a messaging app's browser, or Samsung Internet", () => {
+  expect(installBlocker("Mozilla/5.0 (Linux; Android 14; SM-S911B; wv) Chrome/129.0 Mobile Safari/537.36 Instagram 350.0")).toBe("in-app");
+  expect(installBlocker("Mozilla/5.0 (Linux; Android 14; SM-S911B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/27.0 Chrome/125.0 Mobile Safari/537.36")).toBe("samsung");
+  expect(installBlocker("Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Mobile Safari/537.36")).toBeNull();
+  expect(installBlocker("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1")).toBeNull();
 });

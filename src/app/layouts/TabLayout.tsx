@@ -25,7 +25,7 @@ export function TabLayout() {
           <XpCounter value={snapshot?.xpTotal ?? 0} />
         </div>
       </header>
-      <InAppBrowserNotice className="mb-4" />
+      <InAppBrowserNotice className="mb-4" dismissible />
       <main>
         <AnimatePresence mode="wait">
         <PageTransition key={pathname} variant="tab">

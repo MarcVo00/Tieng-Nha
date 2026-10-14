@@ -503,7 +503,7 @@ describe("install step", () => {
     signedIn();
     const { user } = setup();
     await toInstallStep(user);
-    expect(await screen.findByText("Ouvre Tiếng Nhà dans ton navigateur")).toBeInTheDocument();
+    expect(await screen.findByText("Pour installer Tiếng Nhà, passe par Chrome")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ouvrir dans Chrome" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Installer l'application" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "C'est parti !" })).toBeInTheDocument();

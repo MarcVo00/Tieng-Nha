@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { fr } from "@/i18n/fr";
 import { Button, Icon } from "@/ui";
-import { detectPlatform, isInAppBrowser } from "@/domain/platform";
+import { detectPlatform, installBlocker } from "@/domain/platform";
 import { InAppBrowserNotice } from "@/features/onboarding/InAppBrowserNotice";
 import { getInstallPrompt, promptInstall, subscribeInstallPrompt } from "@/features/onboarding/installPrompt";
 
@@ -39,7 +39,7 @@ export function InstallStep({ onFinish }: InstallStepProps) {
   const t = fr.onboarding.install;
   const canPrompt = useSyncExternalStore(subscribeInstallPrompt, () => getInstallPrompt() !== null);
   const ios = detectPlatform(navigator.userAgent, navigator.maxTouchPoints) === "ios";
-  const inApp = isInAppBrowser(navigator.userAgent);
+  const inApp = installBlocker(navigator.userAgent) !== null;
 
   async function install() {
     try {

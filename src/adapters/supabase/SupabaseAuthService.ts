@@ -1,7 +1,7 @@
 import type { Session as SbSession } from "@supabase/supabase-js";
 import type { Db } from "@/adapters/supabase/client";
 import { mapError } from "@/adapters/supabase/errors";
-import { NotAuthenticatedError, OfflineError } from "@/domain/errors";
+import { InvalidCredentialsError, NotAuthenticatedError, OfflineError } from "@/domain/errors";
 import type { Session } from "@/domain/types";
 import type { AuthEvent, AuthService } from "@/ports";
 import { clearCachedSession, readCachedSession, writeCachedSession } from "@/domain/sessionCache";
@@ -62,6 +62,27 @@ export class SupabaseAuthService implements AuthService {
     if (!session) throw new Error("invalid_otp");
     writeCachedSession(session);
     return session;
+  }
+
+  async signInWithPassword(email: string, password: string): Promise<Session> {
+    const { data, error } = await this.db.auth.signInWithPassword({ email, password });
+    if (error) throw mapError(error);
+    const session = toSession(data.session);
+    if (!session) throw new InvalidCredentialsError();
+    writeCachedSession(session);
+    return session;
+  }
+
+  async setPassword(password: string): Promise<void> {
+    const { error } = await this.db.auth.updateUser({ password, data: { has_password: true } });
+    if (error) throw mapError(error);
+  }
+
+  async hasPassword(): Promise<boolean> {
+    const { data, error } = await this.db.auth.getUser();
+    if (error) throw mapError(error);
+    if (!data.user) throw new NotAuthenticatedError();
+    return data.user.user_metadata?.["has_password"] === true;
   }
 
   private async uid(): Promise<string> {

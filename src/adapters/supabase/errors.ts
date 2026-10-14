@@ -1,4 +1,4 @@
-import { ExamLimitError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, PseudoTakenError } from "@/domain/errors";
+import { ExamLimitError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, WeakPasswordError, NotAuthenticatedError, OfflineError, PseudoTakenError } from "@/domain/errors";
 
 /** Maps Supabase/PostgREST/network errors to domain errors. */
 export function mapError(
@@ -10,6 +10,8 @@ export function mapError(
   if (err?.name === "AuthRetryableFetchError") return (err.status ?? 0) === 0 ? new OfflineError() : new Error("server_error");
   if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(msg)) return new OfflineError();
   if (err?.name === "AuthSessionMissingError" || /auth session missing/i.test(msg)) return new NotAuthenticatedError();
+  if (err?.code === "invalid_credentials" || /Invalid login credentials/i.test(msg)) return new InvalidCredentialsError();
+  if (err?.code === "weak_password" || /Password should be/i.test(msg)) return new WeakPasswordError();
   if (msg.includes("invalid_profile")) return new InvalidProfileError();
   if (msg.includes("invalid_invite")) return new InvalidInviteError();
   if (msg.includes("pseudo_taken") || err?.code === "23505") return new PseudoTakenError();

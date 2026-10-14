@@ -1,4 +1,4 @@
-import { InvalidInviteError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
+import { InvalidCredentialsError, InvalidInviteError, WeakPasswordError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
 import type { Session } from "@/domain/types";
 import type { AuthEvent, AuthService } from "@/ports";
 
@@ -18,6 +18,7 @@ export class FakeAuthService implements AuthService {
   otpRequests: string[] = [];
   private session: Session | null = null;
   private profile: Profile | null = null;
+  private passwords: Record<string, string> = {};
   private listeners = new Set<(s: Session | null, event?: AuthEvent) => void>();
 
   /** `persist` keeps session and profile in sessionStorage so a reload or deep link stays signed in (app runtime only). */
@@ -25,9 +26,10 @@ export class FakeAuthService implements AuthService {
     const raw = persist ? storage()?.getItem(STORAGE_KEY) : null;
     if (!raw) return;
     try {
-      const saved = JSON.parse(raw) as { session: Session | null; profile: Profile | null };
+      const saved = JSON.parse(raw) as { session: Session | null; profile: Profile | null; passwords?: Record<string, string> };
       this.session = saved.session;
       this.profile = saved.profile;
+      this.passwords = saved.passwords ?? {};
     } catch {
       // Corrupt entry: start signed out.
     }
@@ -36,7 +38,7 @@ export class FakeAuthService implements AuthService {
   private save(): void {
     if (!this.persist) return;
     try {
-      storage()?.setItem(STORAGE_KEY, JSON.stringify({ session: this.session, profile: this.profile }));
+      storage()?.setItem(STORAGE_KEY, JSON.stringify({ session: this.session, profile: this.profile, passwords: this.passwords }));
     } catch {
       // Storage unavailable: the fake simply stays in-memory.
     }
@@ -73,6 +75,24 @@ export class FakeAuthService implements AuthService {
     const s: Session = { userId: "me", email };
     this.setSession(s);
     return s;
+  }
+
+  async signInWithPassword(email: string, password: string): Promise<Session> {
+    if (this.passwords[email] !== password) throw new InvalidCredentialsError();
+    const s: Session = { userId: "me", email };
+    this.setSession(s);
+    return s;
+  }
+
+  async setPassword(password: string): Promise<void> {
+    const s = this.requireSession();
+    if (password.length < 8) throw new WeakPasswordError();
+    this.passwords[s.email] = password;
+    this.save();
+  }
+
+  async hasPassword(): Promise<boolean> {
+    return this.passwords[this.requireSession().email] !== undefined;
   }
 
   async hasProfile(): Promise<boolean> {

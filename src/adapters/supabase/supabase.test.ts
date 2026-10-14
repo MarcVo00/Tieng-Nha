@@ -2,7 +2,7 @@ import { SupabaseAuthService } from "@/adapters/supabase/SupabaseAuthService";
 import { mapError } from "@/adapters/supabase/errors";
 import { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
 import { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
-import { ExamLimitError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError } from "@/domain/errors";
+import { ExamLimitError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, WeakPasswordError } from "@/domain/errors";
 import type { AppEvent } from "@/domain/types";
 import type { ExamGateway } from "@/ports";
 
@@ -136,4 +136,43 @@ test("AuthRetryableFetchError with HTTP 5xx is a server error, not offline", () 
 
 test("AuthRetryableFetchError maps to OfflineError", () => {
   expect(mapError({ name: "AuthRetryableFetchError", message: "x" })).toBeInstanceOf(OfflineError);
+});
+
+describe("SupabaseAuthService password sign-in", () => {
+  const sbSession = { user: { id: "u1", email: "m@x.fr" } };
+  const svc = (auth: Record<string, unknown>) => new SupabaseAuthService({ auth } as never);
+
+  test("maps invalid credentials by code or message", () => {
+    expect(mapError({ code: "invalid_credentials", message: "x" })).toBeInstanceOf(InvalidCredentialsError);
+    expect(mapError({ message: "Invalid login credentials" })).toBeInstanceOf(InvalidCredentialsError);
+  });
+
+  test("maps weak password by code or message", () => {
+    expect(mapError({ code: "weak_password", message: "x" })).toBeInstanceOf(WeakPasswordError);
+    expect(mapError({ message: "Password should be at least 8 characters." })).toBeInstanceOf(WeakPasswordError);
+  });
+
+  test("signInWithPassword maps the session and rejects bad credentials", async () => {
+    const ok = svc({ signInWithPassword: vi.fn().mockResolvedValue({ data: { session: sbSession }, error: null }) });
+    await expect(ok.signInWithPassword("m@x.fr", "secret123")).resolves.toEqual({ userId: "u1", email: "m@x.fr" });
+    const bad = svc({ signInWithPassword: vi.fn().mockResolvedValue({ data: { session: null }, error: { code: "invalid_credentials", message: "Invalid login credentials" } }) });
+    await expect(bad.signInWithPassword("m@x.fr", "nope")).rejects.toBeInstanceOf(InvalidCredentialsError);
+  });
+
+  test("setPassword stores the has_password flag and maps a weak password", async () => {
+    const updateUser = vi.fn().mockResolvedValue({ data: {}, error: null });
+    await svc({ updateUser }).setPassword("secret123");
+    expect(updateUser).toHaveBeenCalledWith({ password: "secret123", data: { has_password: true } });
+    const weak = svc({ updateUser: vi.fn().mockResolvedValue({ data: {}, error: { code: "weak_password", message: "Password should be at least 8 characters" } }) });
+    await expect(weak.setPassword("abc")).rejects.toBeInstanceOf(WeakPasswordError);
+  });
+
+  test("hasPassword reads the metadata flag", async () => {
+    const withFlag = svc({ getUser: vi.fn().mockResolvedValue({ data: { user: { id: "u1", user_metadata: { has_password: true } } }, error: null }) });
+    await expect(withFlag.hasPassword()).resolves.toBe(true);
+    const without = svc({ getUser: vi.fn().mockResolvedValue({ data: { user: { id: "u1", user_metadata: {} } }, error: null }) });
+    await expect(without.hasPassword()).resolves.toBe(false);
+    const signedOut = svc({ getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) });
+    await expect(signedOut.hasPassword()).rejects.toBeInstanceOf(NotAuthenticatedError);
+  });
 });

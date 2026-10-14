@@ -6,6 +6,9 @@ export interface AuthService {
   onChange(cb: (s: Session | null, event?: AuthEvent) => void): () => void; // returns unsubscribe
   requestOtp(email: string): Promise<void>;
   verifyOtp(email: string, token: string): Promise<Session>; // throws Error("invalid_otp")
+  signInWithPassword(email: string, password: string): Promise<Session>; // InvalidCredentialsError | OfflineError
+  setPassword(password: string): Promise<void>; // WeakPasswordError | OfflineError | NotAuthenticatedError
+  hasPassword(): Promise<boolean>; // true once setPassword succeeded (flag kept in user metadata)
   hasProfile(): Promise<boolean>;
   joinGroup(inviteCode: string, pseudo: string, avatarEmoji: string): Promise<void>; // InvalidInviteError | PseudoTakenError
   getMyProfile(): Promise<{ pseudo: string; avatarEmoji: string } | null>;

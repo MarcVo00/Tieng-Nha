@@ -164,7 +164,7 @@ Pas de plafond quotidien (l'énergie limite déjà le rythme). Le trigger ignore
 ## 6. Données et backend
 
 ### 6.1 Migration Supabase (une seule)
-- `events.type` : ajouter `session_started`, `item_purchased`, `item_equipped`.
+- `events.type` : ajouter `item_purchased`, `item_equipped`.
 - `user_stats` : `coins int not null default 0`, `inventory text[] not null default '{}'`, `equipped jsonb not null default '{}'`, `streak_freezes int not null default 0`, `boss_wins text[] not null default '{}'`.
 - `apply_event` : barème de xu, achats (catalogue en table `shop_items` ou en `case` SQL, prix côté serveur), équipement (seulement un objet possédé), gel de série dans le calcul de la série, `boss_wins`.
 - Vue `leaderboard` : ajouter `equipped->>'frame'`.
@@ -184,7 +184,7 @@ Pas de plafond quotidien (l'énergie limite déjà le rythme). Le trigger ignore
 ## 8. Ordre d'implémentation (après l'oral)
 1. **Arbre** : `tree.json`, `services/tree.ts`, remplacement de `EXAM_UNLOCK_LESSONS`.
 2. **Boss** : `bosses.json`, `services/bossFight.ts`, écran de combat, résultat et certificat.
-3. **Énergie** : événement `session_started`, `services/energy.ts`, jauge, écran sans énergie.
+3. **Énergie** : événement `session_started` (local uniquement : journal de l'appareil, jamais synchronisé), `services/energy.ts`, jauge, écran sans énergie.
 4. **Xu et boutique** : migration, `services/wallet.ts`, boutique, cadres au classement, gel de série.
 
 Chaque étape : plan dans `docs/superpowers/plans/`, TDD, `npm run verify` vert, E2E vert.

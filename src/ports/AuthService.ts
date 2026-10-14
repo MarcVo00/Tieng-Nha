@@ -4,10 +4,11 @@ export type AuthEvent = "SIGNED_IN" | "SIGNED_OUT" | "TOKEN_REFRESHED" | "INITIA
 export interface AuthService {
   getSession(): Promise<Session | null>;
   onChange(cb: (s: Session | null, event?: AuthEvent) => void): () => void; // returns unsubscribe
-  requestOtp(email: string): Promise<void>;
+  /** `createUser: false` (password recovery) never creates an account and never reveals whether the e-mail exists. */
+  requestOtp(email: string, opts?: { createUser?: boolean }): Promise<void>;
   verifyOtp(email: string, token: string): Promise<Session>; // throws Error("invalid_otp")
   signInWithPassword(email: string, password: string): Promise<Session>; // InvalidCredentialsError | OfflineError
-  setPassword(password: string): Promise<void>; // WeakPasswordError | OfflineError | NotAuthenticatedError
+  setPassword(password: string): Promise<void>; // WeakPasswordError | SamePasswordError | OfflineError | NotAuthenticatedError
   hasPassword(): Promise<boolean>; // true once setPassword succeeded (flag kept in user metadata)
   hasProfile(): Promise<boolean>;
   joinGroup(inviteCode: string, pseudo: string, avatarEmoji: string): Promise<void>; // InvalidInviteError | PseudoTakenError

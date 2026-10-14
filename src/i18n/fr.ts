@@ -151,6 +151,7 @@ export const fr = {
       title: "Mot de passe oublié ?",
       lead: "Donne-nous ton e-mail : on t'envoie un code à 6 chiffres pour en choisir un nouveau.",
       codeTitle: "Regarde ta boîte mail",
+      codeLead: "Si un compte existe, un code t'a été envoyé.",
     },
     password: {
       create: { title: "Choisis ton mot de passe", lead: "La prochaine fois, plus besoin d'attendre un code par e-mail." },
@@ -239,7 +240,7 @@ export const fr = {
     tooShort: "Mot de passe trop faible (8 caractères minimum)",
     mismatch: "Les deux mots de passe ne sont pas identiques",
     show: "Afficher le mot de passe",
-    hide: "Masquer le mot de passe",
+    same: "Choisis un mot de passe différent de l'ancien",
   },
   // --- home ---
   home: {

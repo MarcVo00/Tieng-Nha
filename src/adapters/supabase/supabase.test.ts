@@ -2,7 +2,7 @@ import { SupabaseAuthService } from "@/adapters/supabase/SupabaseAuthService";
 import { mapError } from "@/adapters/supabase/errors";
 import { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
 import { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
-import { ExamLimitError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, WeakPasswordError } from "@/domain/errors";
+import { ExamLimitError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
 import type { AppEvent } from "@/domain/types";
 import type { ExamGateway } from "@/ports";
 
@@ -150,6 +150,28 @@ describe("SupabaseAuthService password sign-in", () => {
   test("maps weak password by code or message", () => {
     expect(mapError({ code: "weak_password", message: "x" })).toBeInstanceOf(WeakPasswordError);
     expect(mapError({ message: "Password should be at least 8 characters." })).toBeInstanceOf(WeakPasswordError);
+  });
+
+  test("same password maps by code or message, and the weak regex is anchored", () => {
+    expect(mapError({ code: "same_password", message: "x" })).toBeInstanceOf(SamePasswordError);
+    expect(mapError({ message: "New password should be different from the old password." })).toBeInstanceOf(SamePasswordError);
+    expect(mapError({ message: "Password should contain at least one character of each: abc" })).toBeInstanceOf(WeakPasswordError);
+    expect(mapError({ message: "New password should be different from the old password." })).not.toBeInstanceOf(WeakPasswordError);
+  });
+
+  test("a code wins over a misleading message", () => {
+    expect(mapError({ code: "weak_password", message: "Invalid login credentials" })).toBeInstanceOf(WeakPasswordError);
+  });
+
+  test("requestOtp passes shouldCreateUser and stays silent for an unknown e-mail on recovery", async () => {
+    const signInWithOtp = vi.fn().mockResolvedValue({ data: {}, error: null });
+    await svc({ signInWithOtp }).requestOtp("m@x.fr");
+    expect(signInWithOtp).toHaveBeenLastCalledWith({ email: "m@x.fr", options: { shouldCreateUser: true } });
+    await svc({ signInWithOtp }).requestOtp("m@x.fr", { createUser: false });
+    expect(signInWithOtp).toHaveBeenLastCalledWith({ email: "m@x.fr", options: { shouldCreateUser: false } });
+    const unknown = vi.fn().mockResolvedValue({ data: {}, error: { code: "otp_disabled", message: "Signups not allowed for otp" } });
+    await expect(svc({ signInWithOtp: unknown }).requestOtp("ghost@x.fr", { createUser: false })).resolves.toBeUndefined();
+    await expect(svc({ signInWithOtp: unknown }).requestOtp("ghost@x.fr")).rejects.toBeDefined();
   });
 
   test("signInWithPassword maps the session and rejects bad credentials", async () => {

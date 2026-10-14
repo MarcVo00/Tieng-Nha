@@ -65,7 +65,7 @@ export function InviteStep({ mode = "signup", initialEmail = "", onBack, inviteC
         await onAuthenticated(session);
         return;
       }
-      await auth.requestOtp(trimmed);
+      await auth.requestOtp(trimmed, { createUser: mode !== "recovery" });
       setPhase("code");
       setWait(RESEND_DELAY_S);
     } catch (e) {
@@ -98,7 +98,7 @@ export function InviteStep({ mode = "signup", initialEmail = "", onBack, inviteC
     setCodeError(null);
     setResent(false);
     try {
-      await auth.requestOtp(email.trim());
+      await auth.requestOtp(email.trim(), { createUser: mode !== "recovery" });
       setResent(true);
       setWait(RESEND_DELAY_S);
     } catch (e) {
@@ -112,7 +112,7 @@ export function InviteStep({ mode = "signup", initialEmail = "", onBack, inviteC
     return (
       <form onSubmit={(ev) => void submitCode(ev)} className="flex flex-col gap-5">
         <h1 className="text-title text-ink">{mode === "recovery" ? fr.onboarding.recovery.codeTitle : t.codeTitle}</h1>
-        <p className="text-body text-ink-muted">{t.codeLead(email.trim())}</p>
+        <p className="text-body text-ink-muted">{mode === "recovery" ? fr.onboarding.recovery.codeLead : t.codeLead(email.trim())}</p>
         <TextField
           label={t.codeLabel}
           value={code}

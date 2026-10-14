@@ -36,7 +36,7 @@ export function PasswordField({ label, error, hint, ...rest }: PasswordFieldProp
         <motion.button
           type="button"
           whileTap={tap}
-          aria-label={shown ? fr.password.hide : fr.password.show}
+          aria-label={fr.password.show}
           aria-pressed={shown}
           onClick={() => setShown((v) => !v)}
           className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-md text-ink-muted"

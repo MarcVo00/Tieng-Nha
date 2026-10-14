@@ -1,4 +1,4 @@
-import { InvalidCredentialsError, InvalidInviteError, WeakPasswordError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
+import { InvalidCredentialsError, InvalidInviteError, SamePasswordError, WeakPasswordError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
 import type { Session } from "@/domain/types";
 import type { AuthEvent, AuthService } from "@/ports";
 
@@ -19,6 +19,7 @@ export class FakeAuthService implements AuthService {
   private session: Session | null = null;
   private profile: Profile | null = null;
   private passwords: Record<string, string> = {};
+  private knownEmails = new Set<string>();
   private listeners = new Set<(s: Session | null, event?: AuthEvent) => void>();
 
   /** `persist` keeps session and profile in sessionStorage so a reload or deep link stays signed in (app runtime only). */
@@ -26,10 +27,11 @@ export class FakeAuthService implements AuthService {
     const raw = persist ? storage()?.getItem(STORAGE_KEY) : null;
     if (!raw) return;
     try {
-      const saved = JSON.parse(raw) as { session: Session | null; profile: Profile | null; passwords?: Record<string, string> };
+      const saved = JSON.parse(raw) as { session: Session | null; profile: Profile | null; passwords?: Record<string, string>; knownEmails?: string[] };
       this.session = saved.session;
       this.profile = saved.profile;
       this.passwords = saved.passwords ?? {};
+      this.knownEmails = new Set(saved.knownEmails ?? []);
     } catch {
       // Corrupt entry: start signed out.
     }
@@ -38,7 +40,7 @@ export class FakeAuthService implements AuthService {
   private save(): void {
     if (!this.persist) return;
     try {
-      storage()?.setItem(STORAGE_KEY, JSON.stringify({ session: this.session, profile: this.profile, passwords: this.passwords }));
+      storage()?.setItem(STORAGE_KEY, JSON.stringify({ session: this.session, profile: this.profile, passwords: this.passwords, knownEmails: [...this.knownEmails] }));
     } catch {
       // Storage unavailable: the fake simply stays in-memory.
     }
@@ -66,13 +68,15 @@ export class FakeAuthService implements AuthService {
     };
   }
 
-  async requestOtp(email: string): Promise<void> {
+  async requestOtp(email: string, opts: { createUser?: boolean } = {}): Promise<void> {
+    if (opts.createUser === false && !this.knownEmails.has(email)) return; // unknown e-mail: silent, like the real backend
     this.otpRequests.push(email);
   }
 
   async verifyOtp(email: string, token: string): Promise<Session> {
     if (token !== "123456") throw new Error("invalid_otp");
     const s: Session = { userId: "me", email };
+    this.knownEmails.add(email);
     this.setSession(s);
     return s;
   }
@@ -87,6 +91,7 @@ export class FakeAuthService implements AuthService {
   async setPassword(password: string): Promise<void> {
     const s = this.requireSession();
     if (password.length < 8) throw new WeakPasswordError();
+    if (this.passwords[s.email] === password) throw new SamePasswordError();
     this.passwords[s.email] = password;
     this.save();
   }

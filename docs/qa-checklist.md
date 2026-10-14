@@ -28,11 +28,11 @@ Dans chaque case : ✓ (OK), ✗ (problème, avec une note) ou n/a.
 | 10 | Nouveau déploiement → bannière « Nouvelle version disponible » → la mise à jour fonctionne | | | |
 | 11 | Examen verrouillé avant 10 leçons (tester l'examen complet sur un compte de test en finissant les leçons, ou passer) | | | |
 | 12 | Téléchargement du certificat PNG (si examen réussi) | | | |
+| 13 | App installée fermée depuis plus d'1 h, rouverte en mode avion → écran d'accueil normal, progression visible | | | |
 | 14 | Inscription : après le code reçu par e-mail, choisir un mot de passe (8 caractères minimum) puis créer le profil | | | |
 | 15 | Se déconnecter puis « Déjà un compte ? Se connecter » avec e-mail + mot de passe → retour à l'accueil sans nouveau code ; mauvais mot de passe → « E-mail ou mot de passe incorrect » | | | |
 | 16 | « Mot de passe oublié ? » → code par e-mail → nouveau mot de passe → connexion avec le nouveau mot de passe | | | |
 | 17 | Moi → Réglages → « Changer mon mot de passe » → toast « Mot de passe mis à jour » ; gestionnaire de mots de passe du téléphone propose d'enregistrer | | | |
-| 13 | App installée fermée depuis plus d'1 h, rouverte en mode avion → écran d'accueil normal, progression visible | | | |
 
 Conseils :
 - Ligne 6 : ouvre la leçon 2 une fois en ligne avant de couper le réseau, et note si le contenu était déjà en cache.

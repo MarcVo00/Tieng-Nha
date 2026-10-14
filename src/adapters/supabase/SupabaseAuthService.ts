@@ -46,8 +46,11 @@ export class SupabaseAuthService implements AuthService {
     return () => data.subscription.unsubscribe();
   }
 
-  async requestOtp(email: string): Promise<void> {
-    const { error } = await this.db.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  async requestOtp(email: string, opts: { createUser?: boolean } = {}): Promise<void> {
+    const createUser = opts.createUser ?? true;
+    const { error } = await this.db.auth.signInWithOtp({ email, options: { shouldCreateUser: createUser } });
+    // Recovery for an unknown e-mail: Supabase refuses to sign up; stay silent so existence is not leaked.
+    if (error && !createUser && (error.code === "otp_disabled" || /signups? not allowed/i.test(error.message))) return;
     if (error) throw mapError(error);
   }
 

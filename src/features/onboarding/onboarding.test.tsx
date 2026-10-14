@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { createFakeServices, FakeAuthService } from "@/adapters/fakes";
-import { InvalidCredentialsError, OfflineError, WeakPasswordError } from "@/domain/errors";
+import { InvalidCredentialsError, OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
 import { useAppState } from "@/app/appState";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { AuthCallbackScreen, WelcomeScreen } from "@/features/onboarding";
@@ -189,12 +189,12 @@ test("a user who already has a profile skips the profile step after the code", a
   const auth = new FakeAuthService();
   await auth.verifyOtp("marc@example.com", "123456");
   await auth.joinGroup("TEST-CODE", "Marc", "🐯");
-  const { user } = setup({ auth });
+  const { router, user } = setup({ auth });
   await toOtpStep(user);
   await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
   await user.click(screen.getByRole("button", { name: "Valider mon code" }));
   await user.click(await screen.findByRole("button", { name: "Plus tard" }));
-  expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+  await waitFor(() => expect(router.state.location.pathname).toBe("/"));
   expect(useAppState.getState().profile).toEqual({ pseudo: "Marc", avatarEmoji: "🐯" });
 });
 
@@ -268,31 +268,64 @@ describe("password", () => {
     expect(await screen.findByText("Mot de passe trop faible (8 caractères minimum)")).toBeInTheDocument();
   });
 
+  test("a new password equal to the old one shows the different-password message", async () => {
+    const auth = new FakeAuthService();
+    auth.setPassword = async () => {
+      throw new SamePasswordError();
+    };
+    const { user } = setup({ auth });
+    await toOtpStep(user);
+    await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
+    await user.click(screen.getByRole("button", { name: "Valider mon code" }));
+    await choosePassword(user);
+    expect(await screen.findByText("Choisis un mot de passe différent de l'ancien")).toBeInTheDocument();
+  });
+
   test("the eye button reveals the password", async () => {
     const { user } = setup();
     await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
     const field = await screen.findByLabelText("Mot de passe");
     expect(field).toHaveAttribute("type", "password");
     expect(field).toHaveAttribute("autocomplete", "current-password");
-    await user.click(screen.getByRole("button", { name: "Afficher le mot de passe" }));
+    const eye = screen.getByRole("button", { name: "Afficher le mot de passe" });
+    expect(eye).toHaveAttribute("aria-pressed", "false");
+    await user.click(eye);
     expect(field).toHaveAttribute("type", "text");
+    expect(eye).toHaveAttribute("aria-pressed", "true");
+    await user.click(eye);
+    expect(field).toHaveAttribute("type", "password");
+    expect(eye).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("signing in with a password sends an onboarded user straight home", async () => {
+  test("signing in with a password skips device and install: capabilities saved, onboarding done, home", async () => {
     const auth = await existingAccount(true);
-    useAppState.setState({ settings: { ...DEFAULT_SETTINGS, onboardingDone: true } });
-    const { router, user } = setup({ auth });
+    const { services, router, user } = setup({ auth }); // beforeEach state = right after sign-out: onboardingDone false
+    expect(useAppState.getState().settings.onboardingDone).toBe(false);
     await passwordSignIn(user);
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    expect(useAppState.getState().settings.onboardingDone).toBe(true);
+    expect(useAppState.getState().settings.capabilities).toEqual({ tts: true, stt: true, recorder: true });
+    expect((await services.progress.getSettings()).onboardingDone).toBe(true);
     expect(useAppState.getState().profile).toEqual({ pseudo: "Marc", avatarEmoji: "🐯" });
     expect(JSON.parse(localStorage.getItem("tn-profile") ?? "null")).toEqual({ pseudo: "Marc", avatarEmoji: "🐯" });
   });
 
-  test("signing in with a password on a device not yet onboarded goes to the device test", async () => {
+  test("a failing settings save on a password sign-in shows the retry banner, and retry goes home", async () => {
     const auth = await existingAccount(true);
-    const { user } = setup({ auth });
+    const progress = createFakeServices().progress;
+    const original = progress.saveSettings.bind(progress);
+    let failOnce = true;
+    vi.spyOn(progress, "saveSettings").mockImplementation(async (next) => {
+      if (next.onboardingDone && failOnce) {
+        failOnce = false;
+        throw new Error("disk");
+      }
+      await original(next);
+    });
+    const { router, user } = setup({ auth, progress });
     await passwordSignIn(user);
-    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: "Réessayer" }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
   });
 
   test("a wrong password shows the incorrect message", async () => {
@@ -332,7 +365,6 @@ describe("password", () => {
 
   test("forgot password: code, new password, then home", async () => {
     const auth = await existingAccount(true);
-    useAppState.setState({ settings: { ...DEFAULT_SETTINGS, onboardingDone: true } });
     const { services, router, user } = setup({ auth });
     await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
     await user.type(await screen.findByLabelText("E-mail"), "marc@example.com");
@@ -346,42 +378,67 @@ describe("password", () => {
     expect(await screen.findByRole("heading", { name: "Nouveau mot de passe" })).toBeInTheDocument();
     await choosePassword(user, "brand-new-pass");
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    expect(useAppState.getState().settings.onboardingDone).toBe(true);
     expect((services.auth as FakeAuthService).otpRequests).toEqual(["marc@example.com"]);
     await services.auth.signOut();
     await expect(services.auth.signInWithPassword("marc@example.com", "secret123")).rejects.toBeInstanceOf(InvalidCredentialsError);
     await expect(services.auth.signInWithPassword("marc@example.com", "brand-new-pass")).resolves.toBeDefined();
   });
 
+  test("forgot password for an unknown e-mail shows the neutral message and sends no code", async () => {
+    const { services, user } = setup();
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.type(await screen.findByLabelText("E-mail"), "ghost@example.com");
+    await user.click(screen.getByRole("button", { name: "Mot de passe oublié ?" }));
+    await user.click(await screen.findByRole("button", { name: "Recevoir mon code" }));
+    expect(await screen.findByText("Si un compte existe, un code t'a été envoyé.")).toBeInTheDocument();
+    expect((services.auth as FakeAuthService).otpRequests).toEqual([]);
+    expect(await services.auth.getSession()).toBeNull();
+  });
+
+  test("forgot password asks for the code without creating accounts", async () => {
+    const auth = await existingAccount(true);
+    const spy = vi.spyOn(auth, "requestOtp");
+    const { user } = setup({ auth });
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.type(await screen.findByLabelText("E-mail"), "marc@example.com");
+    await user.click(screen.getByRole("button", { name: "Mot de passe oublié ?" }));
+    await user.click(await screen.findByRole("button", { name: "Recevoir mon code" }));
+    await screen.findByLabelText("Code à 6 chiffres");
+    expect(spy).toHaveBeenCalledWith("marc@example.com", { createUser: false });
+  });
+
   test("an existing user signing in by code without a password gets the upgrade prompt, and Plus tard skips it", async () => {
     const auth = await existingAccount(false);
-    const { services, user } = setup({ auth });
+    const { services, router, user } = setup({ auth });
     await toOtpStep(user);
     await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
     await user.click(screen.getByRole("button", { name: "Valider mon code" }));
     expect(await screen.findByRole("heading", { name: "Un mot de passe, c'est plus simple" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Plus tard" }));
-    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
     expect(await services.auth.hasPassword()).toBe(false);
   });
 
   test("the upgrade prompt saves a password and continues", async () => {
     const auth = await existingAccount(false);
-    const { services, user } = setup({ auth });
+    const { services, router, user } = setup({ auth });
     await toOtpStep(user);
     await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
     await user.click(screen.getByRole("button", { name: "Valider mon code" }));
     await choosePassword(user);
-    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
     expect(await services.auth.hasPassword()).toBe(true);
   });
 
   test("an existing user who already has a password is not prompted after the code", async () => {
     const auth = await existingAccount(true);
-    const { user } = setup({ auth });
+    const { router, user } = setup({ auth });
     await toOtpStep(user);
     await user.type(screen.getByLabelText("Code à 6 chiffres"), "123456");
     await user.click(screen.getByRole("button", { name: "Valider mon code" }));
-    expect(await screen.findByRole("button", { name: "Écouter" })).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    expect(screen.queryByRole("heading", { name: "Un mot de passe, c'est plus simple" })).not.toBeInTheDocument();
   });
 
   test("the progress dots appear on the sign-up path only", async () => {

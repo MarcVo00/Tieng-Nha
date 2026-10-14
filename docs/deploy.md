@@ -101,7 +101,7 @@ L'application utilise le **code à 6 chiffres reçu par e-mail** (OTP) pour l'in
    - Email : **activé** ;
    - **Confirm email : désactivé** ;
    - **Email OTP Length : 6** ;
-   - **Minimum password length : 8** (même minimum que l'application, qui affiche « Mot de passe trop faible (8 caractères minimum) » si le serveur refuse). La connexion par mot de passe est active par défaut avec le fournisseur Email ; aucune migration n'est nécessaire.
+   - **Minimum password length : 8** (même minimum que l'application, qui affiche « Mot de passe trop faible (8 caractères minimum) » si le serveur refuse). La connexion par mot de passe est active par défaut avec le fournisseur Email ; aucune migration n'est nécessaire. Laisse **Secure password change** désactivé (sinon le changement de mot de passe échoue au bout de 24 h de session). Si tu actives la protection contre les mots de passe compromis (leaked password protection), un mot de passe connu comme fuité affichera le message « Mot de passe trop faible (8 caractères minimum) ».
 2. **Authentication → Email Templates** : modifie **les deux** modèles :
    - **Magic Link** ;
    - **Confirm signup**.

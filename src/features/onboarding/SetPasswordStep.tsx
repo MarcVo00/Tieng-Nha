@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { OfflineError, WeakPasswordError } from "@/domain/errors";
+import { OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
 import { passwordProblem } from "@/domain/password";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
@@ -42,7 +42,7 @@ export function SetPasswordStep({ mode, onDone, onSkip }: SetPasswordStepProps) 
     try {
       await auth.setPassword(password);
     } catch (e) {
-      setPasswordError(e instanceof WeakPasswordError ? p.tooShort : e instanceof OfflineError ? fr.onboarding.invite.offline : fr.onboarding.invite.generic);
+      setPasswordError(e instanceof WeakPasswordError ? p.tooShort : e instanceof SamePasswordError ? p.same : e instanceof OfflineError ? fr.onboarding.invite.offline : fr.onboarding.invite.generic);
       setBusy(false);
       return;
     }

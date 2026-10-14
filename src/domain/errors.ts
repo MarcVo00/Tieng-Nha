@@ -11,6 +11,7 @@ export class ExamLimitError extends DomainError { constructor() { super("exam_li
 export class OfflineError extends DomainError { constructor() { super("offline"); } }
 export class InvalidCredentialsError extends DomainError { constructor() { super("invalid_credentials"); } }
 export class WeakPasswordError extends DomainError { constructor() { super("weak_password"); } }
+export class SamePasswordError extends DomainError { constructor() { super("same_password"); } }
 export class NotAuthenticatedError extends DomainError { constructor() { super("not_authenticated"); } }
 export class ContentNotFoundError extends DomainError {
   constructor(public readonly refId: string) { super("content_not_found", `Content not found: ${refId}`); }

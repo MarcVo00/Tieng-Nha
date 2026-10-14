@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import type { Session } from "@/domain/types";
-import { useAppState, useSettings, writeCachedProfile, type AppProfile } from "@/app/appState";
+import { useAppState, useDeviceTest, useSettings, writeCachedProfile, type AppProfile } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { Button, duration, ease, EXIT_RATIO } from "@/ui";
@@ -25,7 +25,7 @@ const ORDER: readonly Step[] = ["welcome", "signin", "recovery", "invite", "pass
 
 function Dots({ step }: { step: Step }) {
   const index = DOT_STEPS.indexOf(step);
-  if (index < 0) return <div className="h-8" aria-hidden="true" />;
+  if (index < 0) return <div className="h-10" aria-hidden="true" />;
   return (
     <div role="img" aria-label={fr.onboarding.stepLabel(index + 1, DOT_STEPS.length)} className="flex justify-center gap-2 py-4">
       {DOT_STEPS.map((s, i) => (
@@ -45,6 +45,7 @@ export function WelcomeScreen() {
   const { env, auth } = useServices();
   const navigate = useNavigate();
   const { updateSettings } = useSettings();
+  const { refresh: detectDevice } = useDeviceTest();
   const [step, setStep] = useState<Step>(() => {
     const s = useAppState.getState();
     return s.session && s.profile ? "device" : "welcome";
@@ -90,14 +91,14 @@ export function WelcomeScreen() {
     navigate("/", { replace: true });
   }
 
-  // Existing account: already onboarded on this device means straight home, otherwise the device test.
-  function continueExisting() {
-    if (useAppState.getState().settings.onboardingDone) navigate("/", { replace: true });
-    else go("device");
+  // Existing account: no device test or install step. Capabilities are detected silently, then straight home.
+  async function continueExisting() {
+    await detectDevice(); // best-effort, never throws
+    await finish();
   }
 
-  function continueAfterPassword(next: Next) {
-    if (next === "existing") continueExisting();
+  async function continueAfterPassword(next: Next) {
+    if (next === "existing") await continueExisting();
     else go("profile");
   }
 
@@ -141,7 +142,7 @@ export function WelcomeScreen() {
       go("password");
       return;
     }
-    continueAfterPassword(next);
+    await continueAfterPassword(next);
   }
 
   async function joined(profile: AppProfile) {
@@ -207,8 +208,8 @@ export function WelcomeScreen() {
           {step === "password" ? (
             <SetPasswordStep
               mode={passwordMode}
-              onDone={async () => continueAfterPassword(afterPassword)}
-              onSkip={() => continueAfterPassword(afterPassword)}
+              onDone={() => continueAfterPassword(afterPassword)}
+              onSkip={() => void continueAfterPassword(afterPassword)}
             />
           ) : null}
           {step === "profile" ? (

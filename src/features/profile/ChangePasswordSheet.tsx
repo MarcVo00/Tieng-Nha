@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { OfflineError, WeakPasswordError } from "@/domain/errors";
+import { OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
 import { passwordProblem } from "@/domain/password";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
@@ -36,7 +36,7 @@ function Form({ onClose }: Omit<Props, "open">) {
     try {
       await auth.setPassword(password);
     } catch (e) {
-      setPasswordError(e instanceof WeakPasswordError ? p.tooShort : e instanceof OfflineError ? fr.profile.edit.offline : fr.profile.edit.generic);
+      setPasswordError(e instanceof WeakPasswordError ? p.tooShort : e instanceof SamePasswordError ? p.same : e instanceof OfflineError ? fr.profile.edit.offline : fr.profile.edit.generic);
       setBusy(false);
       return;
     }

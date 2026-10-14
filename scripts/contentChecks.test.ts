@@ -99,3 +99,46 @@ test("the tree must reference existing nodes and be acyclic", () => {
   expect(errors).toContain("tree: b requires unknown ghost");
   expect(errors.some((e) => e.startsWith("tree: cycle through"))).toBe(true);
 });
+
+const treeWithBoss = {
+  contentVersion: 1,
+  nodes: [
+    { id: "l05", kind: "lesson", requires: [], branch: "trunk" },
+    { id: "boss_a", kind: "boss", requires: ["l05"], branch: "trunk" },
+  ],
+};
+const sheet = (id: string, hp = 15, playerLives = 5) => ({
+  id, name: "Thủy Tinh", title: "Le dieu des eaux", legend: "x", illustration: "boss_a", hp, playerLives, pool: "exam",
+});
+const withBosses = (bosses: unknown[], tree: unknown = treeWithBoss) => ({
+  ...ok,
+  tree,
+  bosses: { contentVersion: 1, bosses },
+});
+
+test("a boss sheet must match a boss node of the tree", () => {
+  const errors = checkContent(withBosses([sheet("boss_a"), sheet("boss_b")]), { strict: false });
+  expect(errors).toContain("bosses: boss_b is not a boss node of the tree");
+  expect(errors).not.toContain("bosses: boss_a is not a boss node of the tree");
+});
+
+test("duplicate boss sheet ids are reported", () => {
+  expect(checkContent(withBosses([sheet("boss_a"), sheet("boss_a")]), { strict: false }).join("\n")).toMatch(/duplicate id "boss_a"/);
+});
+
+test("strict mode requires a boss sheet for every boss node", () => {
+  const withOther = withBosses([sheet("boss_b")]);
+  expect(checkContent(withOther, { strict: true })).toContain("tree: boss node boss_a has no boss sheet");
+});
+
+test("strict mode flags a missing bosses file and still reports unsheeted boss nodes", () => {
+  const errors = checkContent({ ...ok, tree: treeWithBoss }, { strict: true });
+  expect(errors).toContain("bosses: missing");
+  expect(errors).toContain("tree: boss node boss_a has no boss sheet");
+  expect(checkContent({ ...ok, tree: treeWithBoss }, { strict: false })).not.toContain("bosses: missing");
+});
+
+test("strict mode checks the exam pool is large enough for the boss", () => {
+  const small = { ...withBosses([sheet("boss_a")]), exam: { contentVersion: 1, questions: examPoolFixture.slice(0, 10) } };
+  expect(checkContent(small, { strict: true })).toContain("bosses: boss_a needs 19 questions, the exam pool has 10");
+});

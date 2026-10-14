@@ -26,7 +26,7 @@ export function BossPortrait({ boss, size, hits, defeated }: { boss: Boss; size:
       className="flex items-center justify-center overflow-hidden rounded-lg border-2 border-gold bg-paper shadow-card"
       style={{ width: size, height: size }}
     >
-      {url ? <img src={url} alt="" width={size * 0.86} height={size * 0.86} draggable={false} /> : null}
+      {url ? <img src={url} alt="" width={Math.round(size * 0.86)} height={Math.round(size * 0.86)} draggable={false} /> : null}
     </motion.div>
   );
 }

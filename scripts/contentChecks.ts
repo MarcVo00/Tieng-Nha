@@ -31,6 +31,7 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   const tree = input.tree === undefined ? undefined : TreeFileSchema.safeParse(input.tree);
   if (tree && !tree.success) errors.push(`tree: ${tree.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
   if (opts.strict && input.tree === undefined) errors.push("tree: missing");
+  if (opts.strict && input.bosses === undefined) errors.push("bosses: missing");
 
   const bosses = input.bosses === undefined ? undefined : BossesFileSchema.safeParse(input.bosses);
   if (bosses && !bosses.success) errors.push(`bosses: ${bosses.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
@@ -54,6 +55,8 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
       claim(q.exercise.id, `exam.${q.id}.exercise`);
     }
   }
+
+  if (bosses?.success) for (const b of bosses.data.bosses) claim(b.id, "bosses");
 
   const vocabIds = new Set(lessons.flatMap((l) => l.vocab.map((v) => v.id)));
   const checkExercise = (e: Exercise, where: string) => {
@@ -161,11 +164,12 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   }
 
   // Boss sheets: each is a boss node of the tree; strict mode also needs a sheet per node and enough exam questions
-  if (bosses?.success && tree?.success) {
+  if (tree?.success) {
     const bossNodes = new Set(tree.data.nodes.filter((n) => n.kind === "boss").map((n) => n.id));
-    for (const b of bosses.data.bosses) if (!bossNodes.has(b.id)) errors.push(`bosses: ${b.id} is not a boss node of the tree`);
+    const sheetList = bosses?.success ? bosses.data.bosses : [];
+    for (const b of sheetList) if (!bossNodes.has(b.id)) errors.push(`bosses: ${b.id} is not a boss node of the tree`);
     if (opts.strict) {
-      const sheets = new Set(bosses.data.bosses.map((b) => b.id));
+      const sheets = new Set(sheetList.map((b) => b.id));
       for (const id of bossNodes) if (!sheets.has(id)) errors.push(`tree: boss node ${id} has no boss sheet`);
     }
   }

@@ -62,3 +62,25 @@ test("finishExam records the boss outcome in the event payload", async () => {
   const ev = (await progress.listEvents()).find((e) => e.type === "exam_finished");
   expect(ev?.payload).toEqual({ score: 92, attemptId: "a1", noSpeaking: false, bossId: "boss_thuy_tinh", won: true, livesLeft: 4, bossHpLeft: 0 });
 });
+
+test("startSession spends energy in the local journal only, and refuses when there is not enough", async () => {
+  const s = createFakeServices({ clock: () => "2026-10-14T08:00:00.000Z" });
+  expect(await s.activity.getEnergy()).toEqual({ current: 5, max: 5, nextAt: null });
+  const boss = await s.activity.startSession("boss", "boss_thuy_tinh");
+  expect(boss).toEqual({ ok: true, energy: { current: 2, max: 5, nextAt: "2026-10-14T11:00:00.000Z" } });
+  await s.activity.startSession("lesson", "l05");
+  await s.activity.startSession("lesson", "l05");
+  const refused = await s.activity.startSession("lesson", "l05");
+  expect(refused.ok).toBe(false);
+  expect(refused.energy.current).toBe(0);
+  const events = await s.progress.listEvents();
+  expect(events.filter((e) => e.type === "session_started")).toHaveLength(3);
+  expect((await s.outbox.peek(100)).some((e) => e.type === "session_started")).toBe(false);
+});
+
+test("a finished review reports the energy it gave back", async () => {
+  const s = createFakeServices({ clock: () => "2026-10-14T08:00:00.000Z" });
+  await s.activity.startSession("lesson", "l05");
+  expect((await s.activity.completeReview({ correctCount: 3, total: 4 })).energyGained).toBe(1);
+  expect((await s.activity.completeReview({ correctCount: 3, total: 4 })).energyGained).toBe(0);
+});

@@ -1,13 +1,16 @@
-import type { AppEventType, BadgeDef, DialogueId, LessonId, NewEvent, ProgressSnapshot, VocabId } from "@/domain/types";
+import type { AppEventType, BadgeDef, DialogueId, EnergyState, LessonId, NewEvent, ProgressSnapshot, SessionKind, VocabId } from "@/domain/types";
 import type { ContentSource, Outbox, ProgressRepository } from "@/ports";
 import { computeProgress } from "@/services/progress";
 import { evaluateBadges } from "@/services/badges";
 import { dialogueXp, examXpDelta, lessonXp, reviewXp } from "@/services/xp";
 import { introduce, record } from "@/services/leitner";
+import { ENERGY, energyAt } from "@/services/energy";
 
-export type ActivityResult = { xpGained: number; newBadges: BadgeDef[]; snapshot: ProgressSnapshot; firstTime: boolean };
+export type ActivityResult = { xpGained: number; newBadges: BadgeDef[]; snapshot: ProgressSnapshot; firstTime: boolean; energyGained?: number };
 export type ActivityService = {
   getSnapshot(): Promise<ProgressSnapshot>;
+  getEnergy(): Promise<EnergyState>;
+  startSession(kind: SessionKind, refId: string): Promise<{ ok: boolean; energy: EnergyState }>;
   introduceVocab(vocabIds: readonly VocabId[]): Promise<void>;
   recordAnswer(vocabIds: readonly VocabId[], correct: boolean): Promise<void>;
   completeLesson(i: { lessonId: LessonId; mistakes: number; durationMs: number; vocabIds: readonly VocabId[] }): Promise<ActivityResult>;
@@ -23,6 +26,7 @@ export function createActivityService(deps: {
 }): ActivityService {
   const { progress, outbox, content, clock } = deps;
   const snapshot = async () => computeProgress(await progress.listEvents(), clock());
+  const energy = async () => energyAt(await progress.listEvents(), clock());
 
   async function append(e: NewEvent) {
     const saved = await progress.appendEvent(e, clock());
@@ -50,6 +54,15 @@ export function createActivityService(deps: {
 
   return {
     getSnapshot: snapshot,
+    async getEnergy() {
+      return energy();
+    },
+    async startSession(kind, refId) {
+      const before = await energy();
+      if (before.current < ENERGY.cost[kind]) return { ok: false, energy: before };
+      await progress.appendEvent({ type: "session_started", refId, xp: 0, payload: { kind } }, clock()); // local only: never enqueued
+      return { ok: true, energy: await energy() };
+    },
     introduceVocab,
     async recordAnswer(ids, correct) {
       const now = clock();
@@ -69,7 +82,9 @@ export function createActivityService(deps: {
       return commit(ev("dialogue_completed", dialogueId, dialogueXp({ firstTime }), { durationMs }), firstTime);
     },
     async completeReview({ correctCount, total }) {
-      return commit(ev("review_session_completed", "review", reviewXp(correctCount), { correctCount, total }), false);
+      const before = (await energy()).current;
+      const result = await commit(ev("review_session_completed", "review", reviewXp(correctCount), { correctCount, total }), false);
+      return { ...result, energyGained: (await energy()).current - before };
     },
     async finishExam({ attemptId, score, noSpeaking, boss }) {
       const best = (await snapshot()).examBest;

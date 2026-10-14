@@ -9,6 +9,8 @@ L'app doit ressembler à un **objet artisanal vietnamien**, pas à un SaaS gén�
 
 Trois mots : **chaleureux · artisanal · vivant**.
 
+Les **personnages** (héros, skins, boss) ont leur propre guide : [direction artistique « Đông Hồ simplifié »](art-direction.md).
+
 ## 2. Couleurs
 
 Toutes les paires ci-dessous ont été vérifiées (WCAG 2.1) : texte normal ≥ 4.5:1, sauf mention.

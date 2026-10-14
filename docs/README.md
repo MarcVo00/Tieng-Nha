@@ -8,6 +8,7 @@
 | [ADR](adr/) | tous | le *pourquoi* des décisions d'architecture |
 | [Conventions](conventions.md) | sous-agents | règles de code, Definition of Done |
 | [Design system](design-system.md) | tâches UI | thème « Sơn mài », typographie, motion |
+| [Direction artistique des personnages](art-direction.md) | tâches illustration | héros et boss « Đông Hồ simplifié », palette, calques des skins, galerie de boss |
 | Skill `vietlearn-design` (`.claude/skills/`) | tâches UI | direction artistique anti « look IA » + checklist |
 | [Guide de contenu](content-guide.md) | tâches contenu | règles du vietnamien du Sud, curriculum, exemples JSON |
 | [Brief agent](agents/AGENT_BRIEF.md) | chaque sous-agent | contrat de travail, pièges connus, format de rapport |

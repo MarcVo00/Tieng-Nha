@@ -1,11 +1,16 @@
 import { useMatch } from "react-router-dom";
 import { useRegisterSW } from "virtual:pwa-register/react";
+import { watchForUpdates } from "@/app/swUpdates";
 import { fr } from "@/i18n/fr";
 import { Button } from "@/ui";
 
 /** Never reloads on its own: the user chooses when to take the new version. Hidden during focus flows. */
 export function UpdatePrompt() {
-  const { needRefresh, updateServiceWorker } = useRegisterSW();
+  const { needRefresh, updateServiceWorker } = useRegisterSW({
+    onRegisteredSW(_url, registration) {
+      if (registration) watchForUpdates(registration); // Lives as long as the page: never disposed.
+    },
+  });
   const inLesson = useMatch("/lesson/*");
   const inExam = useMatch("/exam/run");
   const inDialogue = useMatch("/dialogue/*");

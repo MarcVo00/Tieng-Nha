@@ -430,6 +430,7 @@ export const fr = {
         progress: (n: number, total: number) => `${n} / ${total} leçons terminées`,
       },
       start: "Commencer",
+      noEnergy: (cost: number) => `Il te faut ${cost} ⚡ pour défier le boss.`,
       offline: "Le test nécessite une connexion",
       interrupted: "Essai interrompu — il est compté.",
       limit: "Tu as utilisé tes 3 essais aujourd'hui. Reviens demain !",

@@ -5,7 +5,7 @@ import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
-import { BadgeMedal, Button, Confetti, ConfirmDialog, EmptyState, FocusHeader, Motif, Skeleton, XpCounter } from "@/ui";
+import { BadgeMedal, Button, Confetti, ConfirmDialog, EmptyState, FocusHeader, Icon, Motif, Skeleton, XpCounter } from "@/ui";
 import { useReviewRun, type ReviewDone } from "@/features/review/useReviewRun";
 
 const BADGE_STAGGER_MS = 280;
@@ -39,6 +39,12 @@ function DonePanel({ result, finishing, onFinish }: { result: ReviewDone; finish
         </div>
         <div className="pt-2">
           <XpCounter value={counted ? total : total - result.xpGained} {...(counted ? { delta: result.xpGained } : {})} />
+          {result.energyGained && result.energyGained > 0 ? (
+            <p className="mt-3 flex items-center gap-1 text-body-strong text-gold-ink tabular">
+              <Icon name="bolt" size={20} />
+              {fr.energy.gained(result.energyGained)}
+            </p>
+          ) : null}
         </div>
         {result.newBadges.length > 0 ? (
           <section aria-label={fr.review.done.badges} className="flex flex-col gap-3">

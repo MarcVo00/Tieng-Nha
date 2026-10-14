@@ -59,6 +59,7 @@ beforeEach(() => {
     snapshot: snapshotWith(10),
     settings: withCapabilities(true),
     profile: { pseudo: "Linh", avatarEmoji: "🐉" },
+    energy: null,
   });
 });
 
@@ -131,6 +132,28 @@ describe("intro", () => {
     renderExam({ services, entry: "/exam" });
     await userEvent.click(await screen.findByRole("button", { name: fr.exam.intro.start }));
     expect(await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) })).toBeInTheDocument();
+  });
+
+  test("starting the boss spends 3 energy", async () => {
+    const services = createFakeServices();
+    vi.spyOn(services.exam, "startAttempt").mockResolvedValue(ATTEMPT);
+    renderExam({ services, entry: "/exam" });
+    await userEvent.click(await screen.findByRole("button", { name: fr.exam.intro.start }));
+    expect(await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) })).toBeInTheDocument();
+    expect((await services.activity.getEnergy()).current).toBe(2);
+  });
+
+  test("with less than 3 energy the start is disabled and points to the reviews", async () => {
+    const services = createFakeServices();
+    const startAttempt = vi.spyOn(services.exam, "startAttempt");
+    for (let i = 0; i < 3; i++) await services.activity.startSession("lesson", "l05");
+    useAppState.setState({ energy: await services.activity.getEnergy() });
+    renderExam({ services, entry: "/exam" });
+    expect(await screen.findByRole("button", { name: fr.exam.intro.start })).toBeDisabled();
+    expect(screen.getByText(fr.exam.intro.noEnergy(3))).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("link", { name: fr.energy.review }));
+    expect(await screen.findByText("page de révision")).toBeInTheDocument();
+    expect(startAttempt).not.toHaveBeenCalled();
   });
 
   test("an unexpected failure shows the generic message", async () => {

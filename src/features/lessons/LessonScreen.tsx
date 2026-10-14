@@ -5,7 +5,8 @@ import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
-import { Button, ConfirmDialog, EmptyState, FocusHeader, Hearts, ReportSheet, Skeleton } from "@/ui";
+import { waitParts } from "@/services/energy";
+import { Button, ConfirmDialog, EmptyState, FocusHeader, Hearts, NoEnergy, ReportSheet, Skeleton } from "@/ui";
 import { LESSON_HEARTS, liveVocab, useLessonRun } from "@/features/lessons/useLessonRun";
 import { VocabDeck } from "@/features/lessons/VocabDeck";
 
@@ -14,7 +15,7 @@ import { VocabDeck } from "@/features/lessons/VocabDeck";
 export function LessonScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { tts, stt, recorder, reporter } = useServices();
+  const { tts, stt, recorder, reporter, clock } = useServices();
   const { settings, updateSettings } = useSettings();
   const run = useLessonRun(id);
   const [quitting, setQuitting] = useState(false);
@@ -48,6 +49,16 @@ export function LessonScreen() {
     return (
       <div className="px-5 pt-6">
         <Skeleton lines={4} />
+      </div>
+    );
+  }
+
+  if (run.load.status === "no-energy") {
+    const { nextAt } = run.load;
+    return (
+      <div className="pb-8">
+        <FocusHeader progress={0} onClose={goHome} closeLabel={fr.lessons.quit.aria} />
+        <NoEnergy wait={nextAt ? waitParts(clock(), nextAt) : null} onReview={() => navigate("/review")} onBack={goHome} />
       </div>
     );
   }
@@ -98,7 +109,7 @@ export function LessonScreen() {
           illustration="bowl"
           action={
             <div className="flex gap-2">
-              <Button onClick={run.restart} disabled={run.failPending}>
+              <Button onClick={() => void run.restart()} disabled={run.failPending}>
                 {fr.lessons.failed.retry}
               </Button>
               <Button variant="secondary" onClick={goHome} disabled={run.failPending}>

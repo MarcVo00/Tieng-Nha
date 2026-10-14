@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAppState } from "@/app/appState";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Boss, Tree } from "@/domain/types";
+import { ENERGY } from "@/services/energy";
 import { livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS } from "@/services/exam";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
@@ -29,10 +30,13 @@ function useOnline(): boolean {
 
 // Hero: the boss portrait (or the lock while the skill tree keeps it locked). One action: Commencer.
 export function ExamIntroScreen() {
-  const { exam, content } = useServices();
+  const { exam, content, activity } = useServices();
+  const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
   const interrupted = isInterruptedState((useLocation() as { state: unknown }).state);
   const snapshot = useAppState((s) => s.snapshot);
+  const energy = useAppState((s) => s.energy);
+  const [spendRefused, setSpendRefused] = useState(false);
   const online = useOnline();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,12 +88,23 @@ export function ExamIntroScreen() {
   const total = trunkLessons.length;
   const bestLives = snapshot.examBest !== null && snapshot.examBest >= EXAM_PASS ? livesFromScore(snapshot.examBest, boss.playerLives) : null;
 
+  const canFight = !spendRefused && (energy === null || energy.current >= ENERGY.cost.boss);
+
   const start = async () => {
-    if (starting) return;
+    if (starting || !canFight) return;
     setStarting(true);
     setError(null);
     try {
       const { attemptId, remainingToday } = await exam.startAttempt();
+      const spent = await activity.startSession("boss", FINAL_BOSS_ID);
+      if (!spent.ok) {
+        // Lost a race with another tab: the energy is gone, the attempt stays unused.
+        setSpendRefused(true);
+        setStarting(false);
+        void refreshProgress().catch(() => undefined);
+        return;
+      }
+      void refreshProgress().catch(() => undefined);
       const state: RunState = { attemptId, remainingToday };
       markAttempt("pending", attemptId);
       navigate("/exam/run", { state });
@@ -149,9 +164,22 @@ export function ExamIntroScreen() {
           </section>
 
           <div className="flex flex-col gap-2">
-            <Button size="lg" fullWidth loading={starting} disabled={!online} onClick={() => void start()}>
+            <Button size="lg" fullWidth loading={starting} disabled={!online || !canFight} onClick={() => void start()}>
               {fr.exam.intro.start}
             </Button>
+            {!canFight ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-body-strong text-ink-muted">
+                  {fr.exam.intro.noEnergy(ENERGY.cost.boss)}
+                </p>
+                <Link
+                  to="/review"
+                  className="inline-flex min-h-11 items-center justify-center rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
+                >
+                  {fr.energy.review}
+                </Link>
+              </div>
+            ) : null}
             {!online ? <p className="text-caption text-ink-muted">{fr.exam.intro.offline}</p> : null}
             {error ? (
               <p role="alert" className="text-body-strong text-error">

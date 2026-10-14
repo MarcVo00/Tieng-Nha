@@ -32,6 +32,9 @@ export function useDialogue(dialogueId: string | undefined) {
   const [result, setResult] = useState<ActivityResult | null>(null);
   const [saveError, setSaveError] = useState(false);
   const [attempt, setAttempt] = useState(0); // bumps to (re)start a run
+  const [noEnergy, setNoEnergy] = useState<{ nextAt: string | null } | null>(null);
+  const refreshRef = useRef(refreshProgress); // read inside the load effect without making it re-run (and re-spend)
+  refreshRef.current = refreshProgress;
 
   const capabilities: Capabilities = settings.capabilities ?? { tts: tts.isAvailable(), stt: stt.isAvailable(), recorder: false };
   const latest = useRef({ capabilities, rate: voiceRateOf(settings) });
@@ -166,24 +169,32 @@ export function useDialogue(dialogueId: string | undefined) {
     setMic("idle");
     setResult(null);
     setSaveError(false);
+    setNoEnergy(null);
     if (!dialogueId) {
       setPhase("error");
       return;
     }
     setPhase("loading");
-    Promise.all([content.getDialogue(dialogueId), conversation.start(dialogueId)]).then(
-      ([d, state]) => {
+    Promise.all([content.getDialogue(dialogueId), conversation.start(dialogueId)])
+      .then(async ([d, state]) => {
         if (!mounted.current || epoch.current !== run) return;
+        // Spend only once the content is here and this run is still the live one (StrictMode double-runs effects).
+        const spent = await activity.startSession("dialogue", d.id);
+        if (!mounted.current || epoch.current !== run) return;
+        if (!spent.ok) {
+          setNoEnergy({ nextAt: spent.energy.nextAt });
+          return;
+        }
         dialogueRef.current = d;
         setDialogue(d);
         startedAt.current = Date.parse(clock());
+        void refreshRef.current().catch(() => undefined);
         void play(state, 0, run, false);
-      },
-      () => {
+      })
+      .catch(() => {
         if (mounted.current && epoch.current === run) setPhase("error");
-      },
-    );
-  }, [dialogueId, attempt, content, conversation, clock, cancel, play]);
+      });
+  }, [dialogueId, attempt, content, conversation, activity, clock, cancel, play]);
 
   const submit = useCallback(
     async (input: ConversationInput) => {
@@ -280,6 +291,7 @@ export function useDialogue(dialogueId: string | undefined) {
   return {
     dialogue,
     phase,
+    noEnergy,
     lines,
     typing,
     options,

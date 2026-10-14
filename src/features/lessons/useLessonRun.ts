@@ -24,6 +24,7 @@ export type LessonDoneState = ActivityResult & { accuracy: number; perfect: bool
 export type LessonLoad =
   | { status: "loading" }
   | { status: "error" }
+  | { status: "no-energy"; nextAt: string | null }
   | { status: "ready"; lesson: Lesson; vocabIndex: ReadonlyMap<VocabId, VocabItem> };
 
 const liveExercises = (lesson: Lesson): Exercise[] => lesson.exercises.filter((e) => !e.deprecated);
@@ -58,6 +59,9 @@ export function useLessonRun(lessonId: string | undefined) {
   const handledKey = useRef<string | null>(null); // one result per exercise presentation
   const answers = useRef<Promise<void>>(Promise.resolve()); // recordAnswer calls, strictly sequential
   const mounted = useRef(true);
+  const refreshRef = useRef(refreshProgress); // read inside the load effect without making it re-run (and re-spend)
+  refreshRef.current = refreshProgress;
+  const restarting = useRef(false); // one « Réessayer » spend at a time
   const prefetched = useRef<string | null>(null);
 
   useEffect(() => {
@@ -86,22 +90,29 @@ export function useLessonRun(lessonId: string | undefined) {
     }
     let cancelled = false;
     setLoad({ status: "loading" });
-    Promise.all([content.getLesson(lessonId), content.getVocabIndex()]).then(
-      ([lesson, vocabIndex]) => {
+    Promise.all([content.getLesson(lessonId), content.getVocabIndex()])
+      .then(async ([lesson, vocabIndex]) => {
         if (cancelled) return;
+        // Spend only once the content is here and this run is still the live one (StrictMode double-runs effects).
+        const spent = await activity.startSession("lesson", lesson.id);
+        if (cancelled) return;
+        if (!spent.ok) {
+          setLoad({ status: "no-energy", nextAt: spent.energy.nextAt });
+          return;
+        }
         lessonRef.current = lesson;
         begin(lesson);
         setPhase("intro");
         setLoad({ status: "ready", lesson, vocabIndex });
-      },
-      () => {
+        void refreshRef.current().catch(() => undefined);
+      })
+      .catch(() => {
         if (!cancelled) setLoad({ status: "error" });
-      },
-    );
+      });
     return () => {
       cancelled = true;
     };
-  }, [content, lessonId, begin, loadAttempt]);
+  }, [content, activity, lessonId, begin, loadAttempt]);
 
   // Prefetch the next lesson while the learner is busy with exercises (ADR 0010).
   useEffect(() => {
@@ -184,12 +195,26 @@ export function useLessonRun(lessonId: string | undefined) {
 
   const startExercises = useCallback(() => setPhase("exercises"), []);
 
-  const restart = useCallback(() => {
+  const restart = useCallback(async () => {
     const lesson = lessonRef.current;
-    if (!lesson || failPending) return;
-    begin(lesson);
-    setPhase("exercises");
-  }, [begin, failPending]);
+    if (!lesson || failPending || restarting.current) return;
+    restarting.current = true;
+    try {
+      const spent = await activity.startSession("lesson", lesson.id);
+      if (!mounted.current) return;
+      if (!spent.ok) {
+        setLoad({ status: "no-energy", nextAt: spent.energy.nextAt });
+        return;
+      }
+      begin(lesson);
+      setPhase("exercises");
+      void refreshProgress().catch(() => undefined);
+    } catch {
+      // The journal write failed: stay on the failed panel, the learner can tap again.
+    } finally {
+      restarting.current = false;
+    }
+  }, [activity, begin, failPending, refreshProgress]);
 
   const retrySave = useCallback(() => {
     const s = sessionRef.current;

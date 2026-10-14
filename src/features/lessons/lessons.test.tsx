@@ -224,13 +224,41 @@ test(
     expect(await services.progress.getVocabProgress("v_ly")).toBeDefined();
     expect(completeLesson).not.toHaveBeenCalled();
 
+    expect((await services.activity.getEnergy()).current).toBe(4);
     await userEvent.click(retry);
     expect(await screen.findByText(fr.exercises.listenChoose.prompt)).toBeInTheDocument();
+    expect((await services.activity.getEnergy()).current).toBe(3);
     expect(screen.getByRole("img", { name: fr.ui.hearts(3, 3) })).toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
   },
   TEST_TIMEOUT,
 );
+
+describe("energy", () => {
+  test("opening the lesson spends 1 energy", async () => {
+    const { services } = setup();
+    await screen.findByRole("button", { name: fr.lessons.deck.next });
+    expect((await services.activity.getEnergy()).current).toBe(4);
+  });
+
+  test("with no energy left the lesson does not open and offers the reviews", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    for (let i = 0; i < 5; i++) await services.activity.startSession("lesson", "l05");
+    renderWithServices(
+      <Routes>
+        <Route path="/" element={<p>{HOME}</p>} />
+        <Route path="/review" element={<p>page de révision</p>} />
+        <Route path="/lesson/:id" element={<LessonScreen />} />
+      </Routes>,
+      { services, route: "/lesson/l05" },
+    );
+    expect(await screen.findByText(fr.energy.empty.title)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: fr.lessons.deck.next })).not.toBeInTheDocument();
+    expect((await services.activity.getEnergy()).current).toBe(0);
+    await userEvent.click(screen.getByRole("button", { name: fr.energy.review }));
+    expect(await screen.findByText("page de révision")).toBeInTheDocument();
+  });
+});
 
 test("quitting asks for confirmation first", async () => {
   setup();

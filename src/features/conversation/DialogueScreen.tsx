@@ -3,10 +3,11 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Dialogue } from "@/domain/types";
 import { fr } from "@/i18n/fr";
+import { waitParts } from "@/services/energy";
 import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bubble";
 import { useServices } from "@/app/ServicesProvider";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
-import { BadgeMedal, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, MicButton, Motif, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
+import { BadgeMedal, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
 
 const BADGE_STAGGER_MS = 280;
@@ -95,7 +96,7 @@ function ResultCard({ result, onHome, onReplay }: { result: ActivityResult; onHo
 export function DialogueScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { reporter } = useServices();
+  const { reporter, clock } = useServices();
   const reduced = useReducedMotion();
   const d = useDialogue(id);
   const [quitting, setQuitting] = useState(false);
@@ -124,6 +125,18 @@ export function DialogueScreen() {
           </div>
         }
       />
+    );
+  }
+  if (d.noEnergy) {
+    return (
+      <div className="flex min-h-dvh flex-col">
+        <FocusHeader progress={0} onClose={goHome} closeLabel={fr.conversation.quit.aria} />
+        <NoEnergy
+          wait={d.noEnergy.nextAt ? waitParts(clock(), d.noEnergy.nextAt) : null}
+          onReview={() => navigate("/review")}
+          onBack={goHome}
+        />
+      </div>
     );
   }
   if (d.phase === "loading" || !d.dialogue) {

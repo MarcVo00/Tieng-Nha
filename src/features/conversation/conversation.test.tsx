@@ -35,6 +35,31 @@ beforeEach(() => {
   useAppState.setState({ snapshot: null });
 });
 
+describe("energy", () => {
+  it("opening a dialogue spends 1 energy", async () => {
+    const { services } = setup();
+    await screen.findByText("Commander au café");
+    expect((await services.activity.getEnergy()).current).toBe(4);
+  });
+
+  it("with no energy left it shows the empty panel and no conversation", async () => {
+    const services = createFakeServices({ stt: new FakeSpeechRecognizer(), tts: new FakeSpeechSynthesizer() });
+    for (let i = 0; i < 5; i++) await services.activity.startSession("lesson", "l05");
+    render(
+      <ServicesProvider services={services}>
+        <MemoryRouter initialEntries={["/dialogue/d05"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route path="/dialogue/:id" element={<DialogueScreen />} />
+          </Routes>
+        </MemoryRouter>
+      </ServicesProvider>,
+    );
+    expect(await screen.findByText(fr.energy.empty.title)).toBeInTheDocument();
+    expect(screen.queryByText("Commander au café")).not.toBeInTheDocument();
+    expect((await services.activity.getEnergy()).current).toBe(0);
+  });
+});
+
 describe("DialogueScreen", () => {
   it("shows the scene, then plays the opening line after the typing indicator", async () => {
     const { tts } = setup();

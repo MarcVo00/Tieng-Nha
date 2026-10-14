@@ -166,3 +166,30 @@ test(
   },
   TEST_TIMEOUT,
 );
+
+test(
+  "the done screen shows the energy given back by a finished review",
+  async () => {
+    const { ui, services } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await services.activity.startSession("lesson", "l05");
+    await playOneWord(ui);
+    await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    expect(await screen.findByText(fr.review.done.title, {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(screen.getByText(fr.energy.gained(1))).toBeInTheDocument();
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  "the done screen shows no energy line when the gauge was already full",
+  async () => {
+    const { ui, services } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await playOneWord(ui);
+    await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    expect(await screen.findByText(fr.review.done.title, {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(screen.queryByText(/⚡/)).not.toBeInTheDocument();
+  },
+  TEST_TIMEOUT,
+);

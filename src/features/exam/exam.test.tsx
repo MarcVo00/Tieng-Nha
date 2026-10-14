@@ -11,7 +11,7 @@ import { OfflineError } from "@/domain/errors";
 import type { ExamQuestion, ProgressSnapshot, Settings } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { fr } from "@/i18n/fr";
-import { buildDeck } from "@/services/bossFight";
+import { bossMention, buildDeck } from "@/services/bossFight";
 import { seedFromString } from "@/services/random";
 import { ExamIntroScreen, ExamResultScreen, ExamRunScreen } from "@/features/exam";
 import { markAttempt, type ResultState, type RunState } from "@/features/exam/examState";
@@ -286,13 +286,33 @@ describe("result", () => {
     expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
   });
 
-  test("below 70: no certificate, retry shows the remaining attempts, review goes to /review", async () => {
-    renderExam({ entry: { pathname: "/exam/result", state: failedState(2) } });
-    expect(await screen.findByText(fr.exam.result.scoreLabel(40))).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Presque !" })).toBeInTheDocument();
+  const result = (over: { score: number; won: boolean; livesLeft: number; bossHpLeft: number; remainingToday?: number }): ResultState => {
+    const base = failedState(over.remainingToday ?? 2);
+    return {
+      ...base,
+      score: over.score,
+      mention: bossMention(over.score),
+      boss: { ...base.boss, won: over.won, livesLeft: over.livesLeft, bossHpLeft: over.bossHpLeft },
+    };
+  };
+
+  test("a victory shows the defeated boss, the lives kept and the certificate", async () => {
+    renderExam({ entry: { pathname: "/exam/result", state: result({ score: 92, won: true, livesLeft: 4, bossHpLeft: 0 }) } });
+    const headline = await screen.findByRole("heading", { name: fr.exam.result.won("Thủy Tinh") });
+    expect(headline).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Thủy Tinh, le dieu des eaux — vaincu" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: fr.ui.hearts(4, 5) })).toBeInTheDocument();
+    expect(within(headline.closest("header") as HTMLElement).getByText(fr.exam.result.mention.excellent)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: fr.exam.result.download })).toBeInTheDocument();
+  });
+
+  test("a defeat shows the damage dealt, a retry and the review, no certificate", async () => {
+    renderExam({ entry: { pathname: "/exam/result", state: result({ score: 36, won: false, livesLeft: 0, bossHpLeft: 6 }) } });
+    expect(await screen.findByRole("heading", { name: fr.exam.result.lost("Thủy Tinh") })).toBeInTheDocument();
+    expect(screen.getByText(fr.exam.result.damage(9, 15))).toBeInTheDocument();
     expect(screen.queryByRole("img", { name: /Certificat/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Réessayer (2 essais restants aujourd'hui)" })).toBeEnabled();
-    expect(screen.getAllByRole("progressbar")).toHaveLength(4);
+    expect(screen.getByRole("button", { name: fr.exam.result.retry(2) })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: fr.exam.result.download })).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: fr.exam.result.review }));
     expect(await screen.findByText("page de révision")).toBeInTheDocument();
@@ -314,8 +334,8 @@ describe("result", () => {
     expect(screen.getByText("réponse 0")).toHaveAttribute("lang", "vi");
   });
 
-  test("above 70 the certificate downloads as a PNG and prints", async () => {
-    const state: ResultState = { ...failedState(2), score: 88, mention: "tres_bien" };
+  test("a victory's certificate downloads as a PNG and prints", async () => {
+    const state = result({ score: 88, won: true, livesLeft: 3, bossHpLeft: 0 });
     const { ctxCalls } = mockCanvas();
     const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
     const print = vi.spyOn(window, "print").mockImplementation(() => undefined);
@@ -372,7 +392,7 @@ describe("certificate on the result page", () => {
   test("no certificate is offered without a pseudo", async () => {
     useAppState.setState({ profile: null });
     renderExam({ entry: { pathname: "/exam/result", state: passed() } });
-    await screen.findByText(fr.exam.result.scoreLabel(90));
+    await screen.findByRole("heading", { name: fr.exam.result.won("Thủy Tinh") });
     expect(screen.queryByRole("img", { name: /Certificat/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: fr.exam.result.download })).not.toBeInTheDocument();
   });

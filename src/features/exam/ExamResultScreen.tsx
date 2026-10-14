@@ -1,55 +1,27 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { animate, motion, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import type { Boss } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { EXAM_PASS } from "@/services/exam";
 import {
   BadgeMedal,
   Button,
   Certificate,
   Confetti,
   downloadCertificate,
+  Hearts,
   Icon,
   Motif,
-  ProgressBar,
   SpeakerButton,
   XpCounter,
 } from "@/ui";
+import { BossPortrait } from "@/features/exam/BossPortrait";
 import {
   describeQuestion,
   isResultState,
-  sectionsOf,
   type ResultState,
 } from "@/features/exam/examState";
-
-const COUNT_UP_SECONDS = 1;
-
-function CountUp({ score }: { score: number }) {
-  const reduced = useReducedMotion();
-  const mv = useMotionValue(reduced ? score : 0);
-  const rounded = useTransform(mv, (v) => Math.round(v));
-  useEffect(() => {
-    if (reduced) {
-      mv.set(score);
-      return;
-    }
-    const controls = animate(mv, score, { duration: COUNT_UP_SECONDS, ease: "easeOut" });
-    return () => controls.stop();
-  }, [mv, score, reduced]);
-  return (
-    <p className="flex items-baseline gap-2">
-      <span className="sr-only">{fr.exam.result.scoreLabel(score)}</span>
-      <motion.span aria-hidden="true" className="text-display text-ink tabular">
-        {rounded}
-      </motion.span>
-      <span aria-hidden="true" className="text-heading text-ink-muted">
-        {fr.exam.result.outOf}
-      </span>
-    </p>
-  );
-}
 
 function Corrections({ state }: { state: ResultState }) {
   const { tts } = useServices();
@@ -108,21 +80,20 @@ function Corrections({ state }: { state: ResultState }) {
   );
 }
 
-// Hero: the score counting up. Passed: the certificate and its download; failed: try again or review.
+// Hero: the boss portrait and the won/lost headline. Victory is the earned-gold moment (mention, confetti, certificate);
+// defeat shows the damage dealt, then retry or review.
 function ResultContent({ state }: { state: ResultState }) {
   const navigate = useNavigate();
   const profile = useAppState((s) => s.profile);
   const xpTotal = useAppState((s) => s.snapshot?.xpTotal);
   const [downloadFailed, setDownloadFailed] = useState(false);
-  const passed = state.score >= EXAM_PASS;
+  const { boss } = state;
+  const won = boss.won;
   const pseudo = profile?.pseudo ?? "";
   const mention = state.mention === "presque" ? null : state.mention;
-  const sections = sectionsOf(state.questions).map((s) => {
-    const idx = state.questions.flatMap((q, i) => (q.section === s ? [i] : []));
-    const sum = idx.reduce((acc, i) => acc + (state.results[i]?.skipped ? 0 : (state.results[i]?.score ?? 0)), 0);
-    return { section: s, pct: idx.length === 0 ? 0 : Math.round((100 * sum) / idx.length) };
-  });
-  const certificate = passed && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking } : null;
+  const certificate = won && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking } : null;
+  // The result state carries no legend/pool: the portrait only needs the identity and the art.
+  const portraitBoss: Boss = { id: boss.id, name: boss.name, title: boss.title, legend: "", illustration: boss.illustration, hp: boss.hp, playerLives: boss.playerLives, pool: "exam" };
 
   const download = async () => {
     if (!certificate) return;
@@ -136,19 +107,25 @@ function ResultContent({ state }: { state: ResultState }) {
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-56 text-gold [mask-image:linear-gradient(to_bottom,black,transparent)]">
         <Motif kind="scales" />
       </div>
-      <Confetti fire={passed} />
+      <Confetti fire={won} />
 
-      <header className="relative flex flex-col gap-1">
-        <p className="text-caption text-ink-muted">{passed ? fr.exam.result.passed : fr.exam.result.failed}</p>
-        <CountUp score={state.score} />
-        <h1 className="text-title text-ink">{fr.exam.result.mention[state.mention]}</h1>
-        {state.xpGained > 0 ? (
-          <div className="pt-2">
-            <XpCounter value={xpTotal ?? state.xpGained} delta={state.xpGained} />
-          </div>
-        ) : null}
+      <header className="relative flex flex-col items-center gap-4 text-center">
+        <BossPortrait boss={portraitBoss} size={160} hits={0} defeated={won} />
+        <h1 className="text-title text-ink">{won ? fr.exam.result.won(boss.name) : fr.exam.result.lost(boss.name)}</h1>
+        {won ? (
+          <>
+            {mention !== null ? <p className="text-heading text-gold-ink">{fr.exam.result.mention[mention]}</p> : null}
+            <div className="flex flex-col items-center gap-1">
+              <Hearts count={boss.livesLeft} max={boss.playerLives} />
+              <p className="text-caption text-ink-muted">{fr.exam.result.livesLeft(boss.livesLeft, boss.playerLives)}</p>
+            </div>
+          </>
+        ) : (
+          <p className="text-body text-ink-muted">{fr.exam.result.damage(boss.hp - boss.bossHpLeft, boss.hp)}</p>
+        )}
+        {state.xpGained > 0 ? <XpCounter value={xpTotal ?? state.xpGained} delta={state.xpGained} /> : null}
         {state.newBadges.length > 0 ? (
-          <ul className="flex flex-wrap gap-5 pt-4">
+          <ul className="flex flex-wrap justify-center gap-5 pt-2">
             {state.newBadges.map((b) => (
               <li key={b.id}>
                 <BadgeMedal icon={b.icon} title={b.title} unlocked />
@@ -186,19 +163,6 @@ function ResultContent({ state }: { state: ResultState }) {
           </Button>
         </div>
       )}
-
-      <section aria-label={fr.exam.result.sectionsLabel} className="flex flex-col gap-4">
-        <h2 className="text-heading text-ink">{fr.exam.result.sectionsLabel}</h2>
-        {sections.map(({ section, pct }) => (
-          <div key={section} className="flex flex-col gap-1.5">
-            <div className="flex items-baseline justify-between">
-              <span className="text-body-strong text-ink">{fr.exam.sections[section].fr}</span>
-              <span className="text-caption text-ink-muted tabular">{pct} %</span>
-            </div>
-            <ProgressBar value={pct / 100} label={fr.exam.result.sectionAccuracy(fr.exam.sections[section].fr, pct)} />
-          </div>
-        ))}
-      </section>
 
       <Corrections state={state} />
 

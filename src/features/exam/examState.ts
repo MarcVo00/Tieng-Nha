@@ -1,8 +1,6 @@
-import type { BadgeDef, Exercise, ExamQuestion, ExamSection } from "@/domain/types";
+import type { BadgeDef, Exercise, ExamQuestion } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import type { ExamMention } from "@/services/exam";
-
-export const SECTION_ORDER: readonly ExamSection[] = ["listening", "translation", "tones", "speaking"];
 
 /** Router state handed from the intro to the run screen. */
 export type RunState = { attemptId: string; remainingToday: number };
@@ -55,11 +53,6 @@ export function isResultState(v: unknown): v is ResultState {
     isRecord(v["boss"]) &&
     typeof v["boss"]["won"] === "boolean"
   );
-}
-
-/** Distinct sections of a draw, in exam order (the "Partie n" numbering). */
-export function sectionsOf(questions: readonly ExamQuestion[]): ExamSection[] {
-  return SECTION_ORDER.filter((s) => questions.some((q) => q.section === s));
 }
 
 /** Short French description of a question, for the correction list. */

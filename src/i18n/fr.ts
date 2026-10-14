@@ -397,12 +397,6 @@ export const fr = {
       aria: (name: string, title: string, defeated: boolean) =>
         `${name}, ${title.charAt(0).toLowerCase()}${title.slice(1)}${defeated ? " — vaincu" : ""}`,
     },
-    sections: {
-      listening: { vi: "Nghe", fr: "Écoute" },
-      translation: { vi: "Dịch", fr: "Traduction" },
-      tones: { vi: "Thanh điệu", fr: "Tons" },
-      speaking: { vi: "Nói", fr: "Oral" },
-    },
     part: (n: number, name: string) => `Partie ${n} · ${name}`,
     intro: {
       kicker: "Boss final",
@@ -443,17 +437,11 @@ export const fr = {
       saveError: { title: "Ton résultat n'a pas pu être enregistré", body: "Rien n'est perdu. Réessaie dans un instant." },
     },
     result: {
-      scoreLabel: (n: number) => `Score : ${n} sur 100`,
-      outOf: "/ 100",
       mention: { excellent: "Excellent", tres_bien: "Très bien", bien: "Réussi", presque: "Presque !" },
       won: (name: string) => `${name} est vaincu !`,
       lost: (name: string) => `${name} a gagné cette fois`,
       damage: (dealt: number, hp: number) => `Tu lui as infligé ${dealt} dégâts sur ${hp}`,
       livesLeft: (n: number, max: number) => `${n} vie${n > 1 ? "s" : ""} sur ${max} gardée${n > 1 ? "s" : ""}`,
-      passed: "Test réussi",
-      failed: "Pas encore, mais tu y es presque",
-      sectionsLabel: "Par partie",
-      sectionAccuracy: (name: string, pct: number) => `${name} : ${pct} % de réussite`,
       correctionLabel: "Correction",
       showCorrection: "Voir la correction",
       hideCorrection: "Masquer la correction",

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
-import { BadgeMedal, Button, Confetti, Motif, XpCounter } from "@/ui";
+import { BadgeMedal, Button, Confetti, Icon, Motif, XpCounter } from "@/ui";
 import type { LessonDoneState } from "@/features/lessons/useLessonRun";
 
 const BADGE_STAGGER_MS = 280;
@@ -22,7 +22,8 @@ function isDoneState(v: unknown): v is LessonDoneState {
 
 // Hero: the title and the XP counting up. Celebration is brief and never blocks "Continuer".
 // Actions: "Continuer" (home) and, when the lesson has one, the dialogue as the primary next step.
-function DoneContent({ state, lessonId }: { state: LessonDoneState; lessonId: string }) {
+function DoneContent({ state: given, lessonId }: { state: LessonDoneState; lessonId: string }) {
+  const state = { ...given, coinsGained: typeof given.coinsGained === "number" ? given.coinsGained : 0 };
   const { content } = useServices();
   const navigate = useNavigate();
   const total = state.snapshot.xpTotal;
@@ -71,6 +72,12 @@ function DoneContent({ state, lessonId }: { state: LessonDoneState; lessonId: st
 
         <div className="pt-2">
           <XpCounter value={counted ? total : total - state.xpGained} {...(counted ? { delta: state.xpGained } : {})} />
+          {state.coinsGained > 0 ? (
+            <p className="mt-3 flex items-center gap-1 text-body-strong text-gold-ink tabular">
+              <Icon name="coin" size={20} />
+              {fr.shop.gained(state.coinsGained)}
+            </p>
+          ) : null}
         </div>
 
         {state.newBadges.length > 0 ? (

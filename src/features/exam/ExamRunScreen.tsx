@@ -109,6 +109,7 @@ function ExamRun({ run }: { run: RunState }) {
           questions: deck.slice(0, f.answers.length),
           noSpeaking,
           xpGained: result.xpGained,
+          coinsGained: result.coinsGained,
           newBadges: result.newBadges,
           remainingToday: run.remainingToday,
           dateIso: clock(),

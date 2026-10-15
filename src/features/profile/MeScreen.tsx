@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { THEME_KEY } from "@/domain/storageKeys";
@@ -97,6 +97,7 @@ export function MeScreen() {
   const toast = useToast();
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
+  const coins = useAppState((s) => s.wallet?.coins ?? null);
   const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
   const [boss, setBoss] = useState<Boss | null>(null);
   const [bossFailed, setBossFailed] = useState(false);
@@ -257,6 +258,17 @@ export function MeScreen() {
           </Button>
         ) : null}
       </Card>
+
+      <Link
+        to="/shop"
+        className="flex min-h-11 items-center justify-between gap-3 rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
+      >
+        <span className="flex items-center gap-2">
+          <Icon name="coin" size={24} className="text-gold" />
+          {fr.shop.open}
+        </span>
+        {coins !== null ? <span className="tabular text-gold-ink">{fr.shop.balance(coins)}</span> : null}
+      </Link>
 
       <section aria-labelledby="me-badges">
         <div className="flex items-baseline justify-between">

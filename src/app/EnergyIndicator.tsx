@@ -5,7 +5,7 @@ import { useRefreshProgress, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { waitParts } from "@/services/energy";
-import { Button, Icon, Sheet, tap } from "@/ui";
+import { Button, ConfirmDialog, Icon, Sheet, tap, useToast } from "@/ui";
 
 const MINUTE_MS = 60_000;
 
@@ -14,8 +14,13 @@ const MINUTE_MS = 60_000;
 export function EnergyIndicator() {
   const energy = useAppState((s) => s.energy);
   const dueCount = useAppState((s) => s.dueCount);
-  const { clock } = useServices();
   const refreshProgress = useRefreshProgress();
+  const { clock, content, activity } = useServices();
+  const toast = useToast();
+  const coins = useAppState((s) => s.wallet?.coins ?? null);
+  const [refillPrice, setRefillPrice] = useState<number | null>(null);
+  const [asking, setAsking] = useState(false);
+  const [buying, setBuying] = useState(false);
   const [open, setOpen] = useState(false);
   const [, setTick] = useState(0);
   const nextAt = energy?.nextAt ?? null;
@@ -28,6 +33,37 @@ export function EnergyIndicator() {
     return () => clearTimeout(timer);
   }, [nextAt, clock, refreshProgress]);
 
+  // The price comes from the catalogue, read once when the sheet first opens.
+  useEffect(() => {
+    if (!open || refillPrice !== null) return;
+    let cancelled = false;
+    content
+      .getShop()
+      .then((shop) => {
+        const price = shop.find((i) => i.id === "energy_refill")?.price;
+        if (!cancelled && price !== undefined) setRefillPrice(price);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [open, refillPrice, content]);
+
+  async function refill(): Promise<void> {
+    if (buying) return;
+    setBuying(true);
+    try {
+      const r = await activity.purchase("energy_refill");
+      await refreshProgress().catch(() => undefined);
+      toast.show({ title: r.ok ? fr.shop.bought : fr.shop.error });
+    } catch {
+      toast.show({ title: fr.shop.error });
+    } finally {
+      setBuying(false);
+      setAsking(false);
+    }
+  }
+
   // Keep the countdown honest while the sheet is open.
   useEffect(() => {
     if (!open) return;
@@ -37,6 +73,8 @@ export function EnergyIndicator() {
 
   if (energy === null) return null;
   const wait = nextAt === null ? null : waitParts(clock(), nextAt);
+
+  const canRefill = energy.current < energy.max && refillPrice !== null && coins !== null && coins >= refillPrice;
 
   return (
     <>
@@ -72,12 +110,27 @@ export function EnergyIndicator() {
                 {fr.energy.review}
               </Link>
             ) : null}
+            {canRefill ? (
+              <Button variant="secondary" disabled={buying} onClick={() => setAsking(true)}>
+                <Icon name="coin" size={20} className="text-gold" />
+                {fr.shop.refill(refillPrice ?? 0)}
+              </Button>
+            ) : null}
             <Button variant="ghost" onClick={() => setOpen(false)}>
               {fr.energy.close}
             </Button>
           </div>
         </div>
       </Sheet>
+      <ConfirmDialog
+        open={asking && refillPrice !== null}
+        title={fr.shop.confirm.title(fr.shop.items["energy_refill"]?.confirmName ?? "", refillPrice ?? 0)}
+        confirmLabel={fr.shop.confirm.confirm}
+        cancelLabel={fr.shop.confirm.cancel}
+        busy={buying}
+        onConfirm={() => void refill()}
+        onCancel={() => !buying && setAsking(false)}
+      />
     </>
   );
 }

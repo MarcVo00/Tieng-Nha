@@ -8,7 +8,7 @@ import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bu
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
-import { BadgeMedal, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
+import { BadgeMedal, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
 
 const BADGE_STAGGER_MS = 280;
@@ -69,7 +69,15 @@ function ResultCard({ result, onHome, onReplay }: { result: ActivityResult; onHo
         </h2>
         <p className="text-body text-ink-muted">{fr.conversation.done.body}</p>
       </div>
-      <XpCounter value={counted ? total : total - result.xpGained} {...(counted ? { delta: result.xpGained } : {})} />
+      <div>
+        <XpCounter value={counted ? total : total - result.xpGained} {...(counted ? { delta: result.xpGained } : {})} />
+        {result.coinsGained > 0 ? (
+            <p className="mt-3 flex items-center gap-1 text-body-strong text-gold-ink tabular">
+              <Icon name="coin" size={20} />
+              {fr.shop.gained(result.coinsGained)}
+            </p>
+          ) : null}
+      </div>
       {result.newBadges.length > 0 ? (
         <section aria-label={fr.conversation.done.badges} className="flex flex-col gap-3">
           <h3 className="text-caption text-ink-muted">{fr.conversation.done.badges}</h3>

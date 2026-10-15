@@ -15,6 +15,7 @@ export type ResultState = {
   questions: ExamQuestion[];
   noSpeaking: boolean;
   xpGained: number;
+  coinsGained: number;
   newBadges: BadgeDef[];
   remainingToday: number;
   dateIso: string;
@@ -44,6 +45,7 @@ export function isResultState(v: unknown): v is ResultState {
     typeof v["mention"] === "string" &&
     typeof v["noSpeaking"] === "boolean" &&
     typeof v["xpGained"] === "number" &&
+    typeof v["coinsGained"] === "number" &&
     typeof v["remainingToday"] === "number" &&
     typeof v["dateIso"] === "string" &&
     Array.isArray(v["newBadges"]) &&

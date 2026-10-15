@@ -59,3 +59,15 @@ test("waitParts rounds up to the minute and never goes negative", () => {
 test("an event dated in the future (clock moved back) is treated as happening now", () => {
   expect(energyAt([start("lesson", 2 * H)], at(0))).toEqual({ current: 4, max: 5, nextAt: at(3 * H) });
 });
+
+test("a bought refill restores the maximum and the timer stops", () => {
+  const events = [start("boss", 0), start("boss", 1)];
+  expect(energyAt(events, at(2 * H), [at(H)])).toEqual({ current: 5, max: 5, nextAt: null });
+});
+
+test("spending after a refill restarts the timer from that spend", () => {
+  const events = [start("boss", 0), start("lesson", 2 * H)];
+  const e = energyAt(events, at(2 * H + 1), [at(H)]);
+  expect(e.current).toBe(4);
+  expect(e.nextAt).toBe(at(5 * H));
+});

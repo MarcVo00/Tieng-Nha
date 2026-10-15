@@ -7,7 +7,7 @@ export const STREAK_EVENT_TYPES: readonly AppEventType[] = ["lesson_completed", 
 
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
-export function computeProgress(events: readonly AppEvent[], nowIso: string): ProgressSnapshot {
+export function computeProgress(events: readonly AppEvent[], nowIso: string, freezeDays: readonly string[] = []): ProgressSnapshot {
   const today = parisDay(nowIso);
   const week = startOfParisWeek(nowIso);
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
@@ -48,7 +48,7 @@ export function computeProgress(events: readonly AppEvent[], nowIso: string): Pr
   const activeDays = [...active].sort();
   return {
     xpTotal, xpWeek, xpToday,
-    streak: computeStreak(activeDays, today),
+    streak: computeStreak(activeDays, today, freezeDays),
     lessonsDone: [...lessons], perfectLessons: [...perfect], dialoguesDone: [...dialogues],
     vocabReviewed, examBest, badges: [...badges], activeDays,
   };

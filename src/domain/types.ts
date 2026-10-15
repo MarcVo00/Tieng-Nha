@@ -145,3 +145,16 @@ export type ShopItem = z.infer<typeof ShopItemSchema>;
 export type Shop = ShopItem[];
 /** Equipment slots; grows later with the character (hat, outfit...). */
 export type ItemSlot = "frame";
+
+/** Coins and purchases replayed from the journal (same rules as the server). */
+export type Wallet = {
+  coins: number;
+  inventory: string[];
+  equipped: Partial<Record<ItemSlot, string>>;
+  /** Streak freezes in stock: accepted purchases minus those the streak has consumed. */
+  freezes: number;
+  /** ISO times of accepted energy_refill purchases. */
+  refills: string[];
+  /** Paris day of each accepted streak_freeze purchase (the streak replays consumption from these). */
+  freezeDays: string[];
+};

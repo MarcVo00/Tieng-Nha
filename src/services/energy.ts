@@ -9,9 +9,10 @@ const isKind = (v: unknown): v is SessionKind => v === "lesson" || v === "dialog
 
 /**
  * Replays the journal: session starts spend, finished reviews give, and +1 comes back every 3 h counted from the
- * moment energy dropped below the maximum (the timer stops while full). Pure: `nowIso` is injected.
+ * moment energy dropped below the maximum (the timer stops while full). Each bought refill (`refills`, ISO times)
+ * puts energy back to the maximum. Pure: `nowIso` is injected.
  */
-export function energyAt(events: readonly AppEvent[], nowIso: string): EnergyState {
+export function energyAt(events: readonly AppEvent[], nowIso: string, refills: readonly string[] = []): EnergyState {
   let current: number = ENERGY.max;
   let anchor = 0; // start of the running refill period (ms), meaningful only below the maximum
   const regen = (t: number) => {
@@ -22,12 +23,20 @@ export function energyAt(events: readonly AppEvent[], nowIso: string): EnergySta
     anchor += gained * ENERGY.refillMs;
   };
   const now = Date.parse(nowIso);
-  const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  for (const e of sorted) {
+  type Step = { at: string; event: AppEvent | null };
+  const sorted: Step[] = [
+    ...events.map((event) => ({ at: event.createdAt, event })),
+    ...refills.map((at) => ({ at, event: null })),
+  ].sort((a, b) => a.at.localeCompare(b.at));
+  for (const { at, event: e } of sorted) {
     // A future or unparseable date (device clock moved back) counts as now, so a spend cannot freeze the gauge.
-    const parsed = Date.parse(e.createdAt);
+    const parsed = Date.parse(at);
     const t = Number.isNaN(parsed) ? now : Math.min(parsed, now);
     regen(t);
+    if (e === null) {
+      current = ENERGY.max;
+      continue;
+    }
     const wasFull = current >= ENERGY.max;
     const kind = e.payload["kind"];
     if (e.type === "session_started" && isKind(kind)) {

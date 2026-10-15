@@ -50,3 +50,12 @@ test("badge_unlocked does not count as an active day", () => {
   const s = computeProgress([ev({ type: "badge_unlocked", refId: "x", xp: 0, createdAt: NOW })], NOW);
   expect(s.activeDays).toEqual([]);
 });
+
+test("freeze days keep the streak alive across a missed day", () => {
+  const events = [
+    ev({ type: "lesson_completed", refId: "l01", xp: 10, createdAt: "2026-10-10T10:00:00.000Z" }),
+    ev({ type: "lesson_completed", refId: "l02", xp: 10, createdAt: "2026-10-12T10:00:00.000Z" }),
+  ];
+  expect(computeProgress(events, "2026-10-12T12:00:00.000Z").streak).toBe(1);
+  expect(computeProgress(events, "2026-10-12T12:00:00.000Z", ["2026-10-09"]).streak).toBe(2);
+});

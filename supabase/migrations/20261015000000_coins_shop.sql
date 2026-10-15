@@ -1,7 +1,7 @@
 -- Coins and shop (spec Progression V2 §5–6). Never edit after it is applied to prod: add a new migration.
 
 -- 1. New synced event types (session_started stays local-only and is never sent).
-alter table public.events drop constraint if exists events_type_check;
+alter table public.events drop constraint events_type_check;
 alter table public.events add constraint events_type_check check (type in (
   'lesson_completed','dialogue_completed','review_session_completed','exam_finished','badge_unlocked',
   'item_purchased','item_equipped'));
@@ -15,7 +15,7 @@ alter table public.user_stats
 
 -- 3. Catalogue (must match src/content/shop.json).
 create or replace function public.shop_item(p_id text) returns table(price int, kind text, slot text)
-language sql immutable as $$
+language sql immutable set search_path = '' as $$
   select v.price, v.kind, v.slot from (values
     ('energy_refill', 30, 'consumable', null::text),
     ('streak_freeze', 50, 'consumable', null::text),
@@ -27,19 +27,24 @@ $$;
 
 -- 4. Coin earning rule for one event, given the best exam score BEFORE it (null = none).
 create or replace function public.coins_for_event(p_type text, p_payload jsonb, p_best_before int) returns int
-language sql immutable as $$
+language sql immutable set search_path = '' as $$
   select case p_type
     when 'lesson_completed' then 10 + case when (p_payload->'perfect') = 'true'::jsonb then 5 else 0 end
     when 'dialogue_completed' then 5
     when 'review_session_completed' then 3
     when 'badge_unlocked' then 10
     when 'exam_finished' then case
+      -- same normalisation as exam_best (v_score in apply_event): rounded, clamped to 0..100.
       -- never raise inside the trigger: a non-numeric score counts as 0
-      when (case when p_payload->>'score' ~ '^[0-9]+(\.[0-9]+)?$' then (p_payload->>'score')::numeric else 0 end) < 70 then 0
+      when (case when p_payload->>'score' ~ '^[0-9]+(\.[0-9]+)?$'
+            then least(100, greatest(0, round((p_payload->>'score')::numeric))) else 0 end) < 70 then 0
       when coalesce(p_best_before, 0) < 70 then 50
       else 20 end
     else 0 end
 $$;
+
+revoke execute on function public.shop_item(text) from public, anon, authenticated;
+revoke execute on function public.coins_for_event(text, jsonb, int) from public, anon, authenticated;
 
 -- 5. Event projection with coins, shop, equipment and streak freezes.
 create or replace function public.apply_event() returns trigger
@@ -85,7 +90,10 @@ begin
     v_credit := 0;
   else
     v_credit := new.xp;
-    s.coins := s.coins + public.coins_for_event(new.type, new.payload, v_best_before);
+    -- a badge pays only the first time it is unlocked
+    if not (new.type = 'badge_unlocked' and new.ref_id = any(s.badges)) then
+      s.coins := s.coins + public.coins_for_event(new.type, new.payload, v_best_before);
+    end if;
   end if;
   v_credit := least(v_credit, greatest(0, 200 - s.xp_today));
   s.xp_total := s.xp_total + v_credit;
@@ -155,14 +163,18 @@ begin
 end $$;
 
 -- 6. Back-fill: credit events stored before this migration, in time order, with the same rule.
--- (Past exam wins are credited without checking the attempt; the trigger checks attempts from now on.)
+-- (Past exam wins are credited without checking the attempt; the trigger checks attempts from now on.
+-- A badge counts once per (user, ref_id).)
 update public.user_stats us set coins = coalesce(b.total, 0)
 from (
-  select user_id, sum(public.coins_for_event(type, payload, best_before)) as total
+  select user_id, sum(case when badge_rank > 1 then 0 else public.coins_for_event(type, payload, best_before) end) as total
   from (
     select e.user_id, e.type, e.payload,
-      max(case when e.type = 'exam_finished' and e.payload->>'score' ~ '^[0-9]+(\.[0-9]+)?$' then (e.payload->>'score')::numeric end)
-        over (partition by e.user_id order by e.client_created_at, e.id rows between unbounded preceding and 1 preceding)::int as best_before
+      max(case when e.type = 'exam_finished' and e.payload->>'score' ~ '^[0-9]+(\.[0-9]+)?$'
+            then least(100, greatest(0, round((e.payload->>'score')::numeric))) end)
+        over (partition by e.user_id order by e.client_created_at, e.id rows between unbounded preceding and 1 preceding)::int as best_before,
+      case when e.type = 'badge_unlocked'
+        then row_number() over (partition by e.user_id, e.type, e.ref_id order by e.client_created_at, e.id) else 1 end as badge_rank
     from public.events e
   ) x
   group by user_id

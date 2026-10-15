@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(52);
+select plan(59);
 
 -- fixtures (as postgres)
 insert into auth.users (id, email) values
@@ -149,6 +149,23 @@ select pg_temp.ev('lesson_completed', '{}', now() - interval '1 day', 'l02');
 select is((select streak from public.user_stats where user_id = auth.uid()), 2, 'one missed day + one freeze: streak continues');
 select is((select streak_freezes from public.user_stats where user_id = auth.uid()), 0, 'the freeze is consumed');
 
+-- ---------- bob: score rounding, badge once, item xp ignored ----------
+select set_config('t.c0', pg_temp.coins()::text, true);
+select is(pg_temp.start_attempt('b1'), 2, 'bob attempt 1');
+select pg_temp.ev('exam_finished', jsonb_build_object('score', 69.6, 'attemptId', current_setting('t.b1')));
+select is((select exam_best from public.user_stats where user_id = auth.uid()), 70, '69.6 rounds to 70 for exam_best');
+select is(pg_temp.coins(), current_setting('t.c0')::int + 50, '69.6 (rounded 70) is a first win: +50');
+select is(pg_temp.start_attempt('b2'), 1, 'bob attempt 2');
+select pg_temp.ev('exam_finished', jsonb_build_object('score', 75, 'attemptId', current_setting('t.b2')));
+select is(pg_temp.coins(), current_setting('t.c0')::int + 70, 'next win: +20');
+select pg_temp.ev('badge_unlocked', '{}', now(), 'bx');
+select pg_temp.ev('badge_unlocked', '{}', now(), 'bx');
+select is(pg_temp.coins(), current_setting('t.c0')::int + 80, 'a duplicate badge_unlocked credits 0 coins');
+select set_config('t.xp0', (select xp_total from public.user_stats where user_id = auth.uid())::text, true);
+insert into public.events (client_id, user_id, type, ref_id, xp, payload, client_created_at)
+values (gen_random_uuid(), auth.uid(), 'item_purchased', 'x', 50, '{"itemId": "frame_bronze"}', now());
+select is((select xp_total from public.user_stats where user_id = auth.uid()), current_setting('t.xp0')::int, 'item_purchased with xp > 0 leaves xp_total unchanged');
+
 -- ---------- carol: no freeze, a gap resets ----------
 select pg_temp.login('33333333-3333-3333-3333-333333333333');
 select public.join_group('FAM', 'Carol', '🐼');
@@ -183,29 +200,34 @@ insert into public.events (client_id, user_id, type, ref_id, xp, payload, client
   (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'badge_unlocked', 'b01', 10, '{}', now() - interval '4 days'),
   (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'dialogue_completed', 'd01', 10, '{}', now() - interval '3 days'),
   (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'review_session_completed', 'r', 10, '{}', now() - interval '2 days'),
-  (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'exam_finished', 'exam', 0, '{"score": "abc"}', now() - interval '1 day');
+  (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'exam_finished', 'exam', 0, '{"score": "abc"}', now() - interval '1 day'),
+  (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'exam_finished', 'exam', 0, '{"score": "99999999999"}', now() - interval '12 hours'),
+  (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'badge_unlocked', 'b01', 10, '{}', now() - interval '3 days 12 hours');
 alter table public.events enable trigger events_apply;
 select is((select coins from public.user_stats where user_id = '55555555-5555-5555-5555-555555555555'), 0, 'trigger disabled: no coins yet');
 
 -- same statement as the migration
 update public.user_stats us set coins = coalesce(b.total, 0)
 from (
-  select user_id, sum(public.coins_for_event(type, payload, best_before)) as total
+  select user_id, sum(case when badge_rank > 1 then 0 else public.coins_for_event(type, payload, best_before) end) as total
   from (
     select e.user_id, e.type, e.payload,
-      max(case when e.type = 'exam_finished' and e.payload->>'score' ~ '^[0-9]+(\.[0-9]+)?$' then (e.payload->>'score')::numeric end)
-        over (partition by e.user_id order by e.client_created_at, e.id rows between unbounded preceding and 1 preceding)::int as best_before
+      max(case when e.type = 'exam_finished' and e.payload->>'score' ~ '^[0-9]+(\.[0-9]+)?$'
+            then least(100, greatest(0, round((e.payload->>'score')::numeric))) end)
+        over (partition by e.user_id order by e.client_created_at, e.id rows between unbounded preceding and 1 preceding)::int as best_before,
+      case when e.type = 'badge_unlocked'
+        then row_number() over (partition by e.user_id, e.type, e.ref_id order by e.client_created_at, e.id) else 1 end as badge_rank
     from public.events e
   ) x
   group by user_id
 ) b
 where b.user_id = us.user_id;
--- 15 (perfect lesson) + 50 (first win) + 0 (lost) + 20 (second win) + 10 (badge) + 5 (dialogue) + 3 (review) + 0 (bad score)
-select is((select coins from public.user_stats where user_id = '55555555-5555-5555-5555-555555555555'), 103, 'back-fill totals past events');
+-- 15 (perfect lesson) + 50 (first win) + 0 (lost) + 20 (second win) + 10 (badge) + 5 (dialogue) + 3 (review) + 0 (bad score) + 20 (huge score clamps to 100, a win) + 0 (duplicate badge)
+select is((select coins from public.user_stats where user_id = '55555555-5555-5555-5555-555555555555'), 123, 'back-fill totals (huge score does not overflow) past events');
 
 select pg_temp.login('55555555-5555-5555-5555-555555555555');
 select pg_temp.ev('lesson_completed', '{}', now(), 'l02');
-select is(pg_temp.coins(), 113, 'new events add on top of the back-fill (no double count)');
+select is(pg_temp.coins(), 133, 'new events add on top of the back-fill (no double count)');
 
 select * from finish();
 rollback;

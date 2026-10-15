@@ -5,10 +5,10 @@ import type { LeaderboardRepository } from "@/ports";
 type Me = { userId: string; pseudo: string; avatarEmoji: string };
 
 const BOTS: Array<Omit<LeaderboardRow, "isMe">> = [
-  { userId: "bot_ba_ngoai", pseudo: "Bà Ngoại", avatarEmoji: "🐢", xp: 120, streak: 5, lessonsDone: 3 },
-  { userId: "bot_chu_tu", pseudo: "Chú Tư", avatarEmoji: "🛵", xp: 85, streak: 2, lessonsDone: 2 },
-  { userId: "bot_be_na", pseudo: "Bé Na", avatarEmoji: "🌸", xp: 40, streak: 1, lessonsDone: 1 },
-  { userId: "bot_anh_hai", pseudo: "Anh Hai", avatarEmoji: "🐯", xp: 15, streak: 0, lessonsDone: 1 },
+  { userId: "bot_ba_ngoai", pseudo: "Bà Ngoại", avatarEmoji: "🐢", xp: 120, streak: 5, lessonsDone: 3, frame: null },
+  { userId: "bot_chu_tu", pseudo: "Chú Tư", avatarEmoji: "🛵", xp: 85, streak: 2, lessonsDone: 2, frame: null },
+  { userId: "bot_be_na", pseudo: "Bé Na", avatarEmoji: "🌸", xp: 40, streak: 1, lessonsDone: 1, frame: null },
+  { userId: "bot_anh_hai", pseudo: "Anh Hai", avatarEmoji: "🐯", xp: 15, streak: 0, lessonsDone: 1, frame: null },
 ];
 
 const PARIS_PARTS = new Intl.DateTimeFormat("en-CA", {
@@ -55,7 +55,7 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
     const myXp = mine.reduce((sum, e) => sum + e.xp, 0);
     const lessonsDone = new Set(events.filter((e) => e.type === "lesson_completed").map((e) => e.refId)).size;
     const me = typeof this.me === "function" ? await this.me() : this.me;
-    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, isMe: true };
+    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, frame: null, isMe: true };
     return [...BOTS.map((b) => ({ ...b, isMe: false })), meRow].sort((a, b) => b.xp - a.xp);
   }
 

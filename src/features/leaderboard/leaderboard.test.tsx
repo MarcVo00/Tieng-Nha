@@ -38,7 +38,7 @@ function setup(route = "/leaderboard", services: Services = createFakeServices({
 }
 
 const row = (userId: string, pseudo: string, xp: number, isMe = false): LeaderboardRow => ({
-  userId, pseudo, avatarEmoji: "🌸", xp, streak: 0, lessonsDone: 1, isMe,
+  userId, pseudo, avatarEmoji: "🌸", xp, streak: 0, lessonsDone: 1, frame: null, isMe,
 });
 
 beforeEach(() => {

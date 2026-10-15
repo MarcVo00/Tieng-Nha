@@ -1,10 +1,10 @@
 import {
-  BadgesFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema,
+  BadgesFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, ShopFileSchema, TreeFileSchema,
 } from "../src/content/schema";
 import { toneOfSyllable } from "../src/domain/tones";
 import type { Dialogue, Exercise, Lesson } from "../src/domain/types";
 
-export type ContentBundle = { lessons: unknown[]; dialogues: unknown[]; exam: unknown; badges: unknown; tree?: unknown; bosses?: unknown };
+export type ContentBundle = { lessons: unknown[]; dialogues: unknown[]; exam: unknown; badges: unknown; tree?: unknown; bosses?: unknown; shop?: unknown };
 
 const EXAM_MIN = { total: 60, listening: 20, translation: 16, tones: 12, speaking: 12 } as const;
 
@@ -32,6 +32,9 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   if (tree && !tree.success) errors.push(`tree: ${tree.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
   if (opts.strict && input.tree === undefined) errors.push("tree: missing");
   if (opts.strict && input.bosses === undefined) errors.push("bosses: missing");
+  if (opts.strict && input.shop === undefined) errors.push("shop: missing");
+  const shop = input.shop === undefined ? undefined : ShopFileSchema.safeParse(input.shop);
+  if (shop && !shop.success) errors.push(`shop: ${shop.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
 
   const bosses = input.bosses === undefined ? undefined : BossesFileSchema.safeParse(input.bosses);
   if (bosses && !bosses.success) errors.push(`bosses: ${bosses.error.issues.map((x) => `${x.path.join(".")} ${x.message}`).join("; ")}`);
@@ -57,6 +60,13 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
   }
 
   if (bosses?.success) for (const b of bosses.data.bosses) claim(b.id, "bosses");
+
+  if (shop?.success) {
+    for (const it of shop.data.items) {
+      claim(it.id, "shop");
+      if ((it.kind === "cosmetic") !== (it.slot !== null)) errors.push(`shop: ${it.id} slot mismatch`);
+    }
+  }
 
   const vocabIds = new Set(lessons.flatMap((l) => l.vocab.map((v) => v.id)));
   const checkExercise = (e: Exercise, where: string) => {

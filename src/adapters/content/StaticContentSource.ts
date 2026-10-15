@@ -1,6 +1,6 @@
 import type { ContentSource } from "@/ports";
-import type { BadgeDef, Boss, Dialogue, ExamQuestion, Lesson, LessonSummary, Tree, VocabItem } from "@/domain/types";
-import { BadgesFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, TreeFileSchema } from "@/content/schema";
+import type { BadgeDef, Boss, Dialogue, ExamQuestion, Lesson, LessonSummary, ShopItem, Tree, VocabItem } from "@/domain/types";
+import { BadgesFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, ShopFileSchema, TreeFileSchema } from "@/content/schema";
 import { ContentNotFoundError } from "@/domain/errors";
 
 export type ContentLoaders = {
@@ -10,6 +10,7 @@ export type ContentLoaders = {
   badges: () => Promise<unknown>;
   tree: () => Promise<unknown>;
   bosses: () => Promise<unknown>;
+  shop: () => Promise<unknown>;
 };
 
 const idFromPath = (p: string): string => (p.split("/").pop() ?? p).replace(/\.json$/, "");
@@ -71,6 +72,10 @@ export class StaticContentSource implements ContentSource {
     return b;
   }
 
+  async getShop(): Promise<ShopItem[]> {
+    return ShopFileSchema.parse(await this.loaders.shop()).items;
+  }
+
   async getVocabIndex(): Promise<ReadonlyMap<string, VocabItem>> {
     const lessons = await Promise.all(this.lessonPaths().map((p) => this.getLesson(idFromPath(p))));
     return new Map(lessons.flatMap((l) => l.vocab.map((v) => [v.id, v] as const)));
@@ -84,6 +89,7 @@ export function createStaticContentSource(): StaticContentSource {
   const badges = import.meta.glob("/src/content/badges.json", { import: "default", eager: true });
   const tree = import.meta.glob("/src/content/tree.json", { import: "default", eager: true });
   const bosses = import.meta.glob("/src/content/bosses.json", { import: "default", eager: true });
+  const shop = import.meta.glob("/src/content/shop.json", { import: "default", eager: true });
   return new StaticContentSource({
     lessons,
     dialogues,
@@ -94,5 +100,6 @@ export function createStaticContentSource(): StaticContentSource {
     badges: async () => badges["/src/content/badges.json"],
     tree: async () => tree["/src/content/tree.json"],
     bosses: async () => bosses["/src/content/bosses.json"],
+    shop: async () => shop["/src/content/shop.json"],
   });
 }

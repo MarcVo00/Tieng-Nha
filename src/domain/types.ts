@@ -2,7 +2,7 @@ import type { z } from "zod";
 import type {
   VocabItemSchema, ExerciseSchema, ListenChooseSchema, TranslateChooseSchema, TonePickSchema, WordOrderSchema,
   SpeakSchema, LessonSchema, TurnSchema, NpcTurnSchema, UserTurnSchema, DialogueSchema, ExamSectionSchema,
-  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema,
+  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema, ShopItemSchema,
 } from "@/content/schema";
 
 export type { Tone } from "@/domain/tones";
@@ -35,7 +35,9 @@ export type AppEventType =
   | "review_session_completed"
   | "exam_finished"
   | "badge_unlocked"
-  | "session_started";
+  | "session_started"
+  | "item_purchased"
+  | "item_equipped";
 
 /** Payload shapes by event type (stored as JSON). */
 export type EventPayload = {
@@ -45,6 +47,8 @@ export type EventPayload = {
   exam_finished: { score: number; attemptId: string; noSpeaking: boolean; bossId?: string; won?: boolean; livesLeft?: number; bossHpLeft?: number };
   badge_unlocked: Record<string, never>;
   session_started: { kind: SessionKind };
+  item_purchased: { itemId: string };
+  item_equipped: { slot: ItemSlot; itemId: string | null };
 };
 
 export type SessionKind = "lesson" | "dialogue" | "boss";
@@ -93,6 +97,7 @@ export type LeaderboardRow = {
   xp: number; // xp_week or xp_total depending on period
   streak: number;
   lessonsDone: number;
+  frame: string | null; // equipped frame item id
   isMe: boolean;
 };
 
@@ -136,3 +141,7 @@ export type ProgressSnapshot = {
 export type TreeNode = z.infer<typeof TreeNodeSchema>;
 export type Tree = z.infer<typeof TreeFileSchema>;
 export type Boss = z.infer<typeof BossSchema>;
+export type ShopItem = z.infer<typeof ShopItemSchema>;
+export type Shop = ShopItem[];
+/** Equipment slots; grows later with the character (hat, outfit...). */
+export type ItemSlot = "frame";

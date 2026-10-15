@@ -131,3 +131,14 @@ export const BadgeDefSchema = z
   .object({ id: z.string().regex(/^[a-z0-9_]+$/), title: z.string().min(1), description: z.string().min(1), icon: z.string().min(1), rule: BadgeRuleSchema })
   .strict();
 export const BadgesFileSchema = z.object({ badges: z.array(BadgeDefSchema).min(1) }).strict();
+
+export const ShopItemSchema = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    kind: z.enum(["consumable", "cosmetic"]),
+    slot: z.enum(["frame"]).nullable(),
+    price: z.number().int().min(1),
+    maxStock: z.number().int().min(1).optional(),
+  })
+  .strict();
+export const ShopFileSchema = z.object({ contentVersion: z.number().int().min(1), items: z.array(ShopItemSchema).min(1) }).strict();

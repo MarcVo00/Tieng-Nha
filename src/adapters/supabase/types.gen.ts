@@ -201,12 +201,16 @@ export type Database = {
       user_stats: {
         Row: {
           badges: string[]
+          coins: number
           dialogues_done: string[]
+          equipped: Json
           exam_best: number | null
           group_id: string
+          inventory: string[]
           last_active_day: string | null
           lessons_done: string[]
           streak: number
+          streak_freezes: number
           today: string
           updated_at: string
           user_id: string
@@ -217,12 +221,16 @@ export type Database = {
         }
         Insert: {
           badges?: string[]
+          coins?: number
           dialogues_done?: string[]
+          equipped?: Json
           exam_best?: number | null
           group_id: string
+          inventory?: string[]
           last_active_day?: string | null
           lessons_done?: string[]
           streak?: number
+          streak_freezes?: number
           today?: string
           updated_at?: string
           user_id: string
@@ -233,12 +241,16 @@ export type Database = {
         }
         Update: {
           badges?: string[]
+          coins?: number
           dialogues_done?: string[]
+          equipped?: Json
           exam_best?: number | null
           group_id?: string
+          inventory?: string[]
           last_active_day?: string | null
           lessons_done?: string[]
           streak?: number
+          streak_freezes?: number
           today?: string
           updated_at?: string
           user_id?: string
@@ -270,7 +282,9 @@ export type Database = {
         Row: {
           avatar_emoji: string | null
           badges: string[] | null
+          coins: number | null
           dialogues_done: string[] | null
+          equipped_frame: string | null
           exam_best: number | null
           group_id: string | null
           lessons_done: string[] | null

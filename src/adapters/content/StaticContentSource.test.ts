@@ -3,6 +3,7 @@ import { lessonFixture } from "@/test/fixtures/lessonFixture";
 import { dialogueFixture } from "@/test/fixtures/dialogueFixture";
 import { examPoolFixture } from "@/test/fixtures/examFixture";
 import badges from "@/content/badges.json";
+import { shopFixture } from "@/adapters/fakes/seed/shop";
 import { treeFixture, bossFixture } from "@/adapters/fakes/seed/tree";
 import { ContentNotFoundError } from "@/domain/errors";
 
@@ -14,6 +15,7 @@ const src = new StaticContentSource({
   badges: async () => badges,
   tree: async () => treeFixture,
   bosses: async () => ({ contentVersion: 1, bosses: [bossFixture] }),
+  shop: async () => ({ contentVersion: 1, items: shopFixture }),
 });
 
 test("lists lessons ordered by id with order numbers", async () => {
@@ -44,4 +46,8 @@ test("createStaticContentSource lists real lessons in order and loads the real e
   expect(count("tones")).toBeGreaterThanOrEqual(12);
   expect(count("speaking")).toBeGreaterThanOrEqual(12);
   expect((await real.getBadges()).length).toBe(12);
+});
+
+test("the real shop catalogue matches the fakes fixture", async () => {
+  expect(await createStaticContentSource().getShop()).toEqual(shopFixture);
 });

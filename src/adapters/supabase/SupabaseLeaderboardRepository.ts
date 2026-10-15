@@ -27,6 +27,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
         xp: (period === "week" ? r.xp_week : r.xp_total) ?? 0,
         streak: r.streak ?? 0,
         lessonsDone: r.lessons_done_count ?? 0,
+        frame: null, // TODO(task 5): map r.equipped_frame
         isMe: r.user_id === me,
       });
     }

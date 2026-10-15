@@ -142,3 +142,26 @@ test("strict mode checks the exam pool is large enough for the boss", () => {
   const small = { ...withBosses([sheet("boss_a")]), exam: { contentVersion: 1, questions: examPoolFixture.slice(0, 10) } };
   expect(checkContent(small, { strict: true })).toContain("bosses: boss_a needs 19 questions, the exam pool has 10");
 });
+
+const shopOk = { contentVersion: 1, items: [{ id: "frame_a", kind: "cosmetic", slot: "frame", price: 10 }, { id: "boost", kind: "consumable", slot: null, price: 5 }] };
+
+test("a valid shop has no errors and strict mode flags a missing shop", () => {
+  expect(checkContent({ ...ok, shop: shopOk }, { strict: false })).toEqual([]);
+  expect(checkContent(ok, { strict: true })).toContain("shop: missing");
+  expect(checkContent(ok, { strict: false })).not.toContain("shop: missing");
+});
+
+test("shop ids are unique", () => {
+  const dup = { contentVersion: 1, items: [shopOk.items[0], shopOk.items[0]] };
+  expect(checkContent({ ...ok, shop: dup }, { strict: false }).join("\n")).toMatch(/duplicate id "frame_a"/);
+});
+
+test("cosmetics need a slot and consumables must not have one", () => {
+  const bad = {
+    contentVersion: 1,
+    items: [{ id: "frame_x", kind: "cosmetic", slot: null, price: 10 }, { id: "boost", kind: "consumable", slot: "frame", price: 5 }],
+  };
+  const errors = checkContent({ ...ok, shop: bad }, { strict: false });
+  expect(errors).toContain("shop: frame_x slot mismatch");
+  expect(errors).toContain("shop: boost slot mismatch");
+});

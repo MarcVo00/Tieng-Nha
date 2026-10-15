@@ -97,6 +97,7 @@ export function MeScreen() {
   const toast = useToast();
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
+  const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
   const [boss, setBoss] = useState<Boss | null>(null);
   const [bossFailed, setBossFailed] = useState(false);
   const [badges, setBadges] = useState<BadgeDef[] | null>(null);
@@ -230,7 +231,7 @@ export function MeScreen() {
       <Card raised className="flex flex-col gap-4 p-5">
         <div className="flex items-center gap-4">
           <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className="rounded-full">
-            <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" />
+            <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" frame={frame} />
           </motion.button>
           <div className="min-w-0 flex-1">
             <p className="truncate text-title text-ink">{profile?.pseudo ?? ""}</p>

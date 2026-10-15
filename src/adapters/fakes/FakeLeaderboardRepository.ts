@@ -45,6 +45,8 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
     private readonly getMyEvents: () => Promise<AppEvent[]>,
     private readonly me: Me | (() => Promise<Me>),
     private readonly now: () => string = () => new Date().toISOString(),
+    /** Frame item id the player has equipped (derived from the local journal by the composition root). */
+    private readonly getMyFrame: () => Promise<string | null> = async () => null,
   ) {}
 
   async list(period: "week" | "all"): Promise<LeaderboardRow[]> {
@@ -55,7 +57,7 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
     const myXp = mine.reduce((sum, e) => sum + e.xp, 0);
     const lessonsDone = new Set(events.filter((e) => e.type === "lesson_completed").map((e) => e.refId)).size;
     const me = typeof this.me === "function" ? await this.me() : this.me;
-    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, frame: null, isMe: true };
+    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, frame: await this.getMyFrame(), isMe: true };
     return [...BOTS.map((b) => ({ ...b, isMe: false })), meRow].sort((a, b) => b.xp - a.xp);
   }
 
@@ -74,6 +76,7 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
       dialoguesDone: [],
       badges: [],
       examBest: null,
+      frame: bot.frame,
     };
   }
 }

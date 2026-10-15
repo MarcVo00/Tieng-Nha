@@ -19,7 +19,7 @@ function Body({ row, rank }: { row: Row; rank: number }) {
   return (
     <>
       <span className="tabular w-7 shrink-0 text-center text-body-strong text-ink-muted">{rank}</span>
-      <Avatar emoji={row.avatarEmoji} size="md" />
+      <Avatar emoji={row.avatarEmoji} size="md" frame={row.frame} />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-body-strong text-ink">{row.pseudo}</span>
         <span className="flex items-center gap-2 text-caption text-ink-muted">

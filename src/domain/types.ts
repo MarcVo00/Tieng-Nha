@@ -112,6 +112,8 @@ export type PublicProfile = {
   dialoguesDone: DialogueId[];
   badges: string[];
   examBest: number | null;
+  /** Equipped avatar frame item id (`frame_*`), or null. */
+  frame: string | null;
 };
 
 export type ConversationEntry = { turnId: string; speaker: "npc" | "user"; vi: string; fr: string };

@@ -37,6 +37,9 @@ Toutes les paires ci-dessous ont été vérifiées (WCAG 2.1) : texte normal ≥
 | `--color-streak` | `#D9531E` | flamme du streak (icône uniquement) | décoratif |
 | `--color-scrim` | `rgb(31 26 23 / 0.35)` | voile derrière feuilles et dialogues | décoratif |
 | `--color-paper` | `#F4E4C4` | papier « giấy điệp » : médaillon des personnages (identique en sombre), voir [direction artistique](art-direction.md) | — |
+| `--frame-bronze` | `#9A6A3A` (sombre `#C79563`) | cadre d'avatar bronze (anneau 3 px), boutique | décoratif |
+| `--frame-jade` | `#2E7D6B` (sombre `#5DBB9E`) | cadre d'avatar jade (anneau 3 px) | décoratif |
+| `--frame-son-mai` | `var(--color-gold)` | cadre d'avatar « sơn mài » : anneau or + filet intérieur encre 1 px (l'or reste une récompense : on l'a acheté) | décoratif |
 
 ### 2.2 Thème sombre — « Laque noire »
 | Token CSS | Hex | Contraste |
@@ -91,6 +94,7 @@ colors: {
   success: { DEFAULT: 'var(--color-success)', soft: 'var(--color-success-soft)' },
   error: { DEFAULT: 'var(--color-error)', soft: 'var(--color-error-soft)' },
   info: 'var(--color-info)', streak: 'var(--color-streak)', scrim: 'var(--color-scrim)',
+  frame: { bronze: 'var(--frame-bronze)', jade: 'var(--frame-jade)', sonmai: 'var(--frame-son-mai)' },
   tone: { ngang: 'var(--tone-ngang)', huyen: 'var(--tone-huyen)', sac: 'var(--tone-sac)', hoi: 'var(--tone-hoi)', nga: 'var(--tone-nga)', nang: 'var(--tone-nang)' },
 }
 ```

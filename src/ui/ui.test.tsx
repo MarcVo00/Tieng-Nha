@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
+import { Avatar, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
 
 test("Button shows loading state and is disabled", () => {
   render(<Button loading>Valider</Button>);
@@ -92,5 +92,42 @@ describe("modal focus", () => {
     expect(screen.getByRole("button", { name: "b" })).toHaveFocus();
     await userEvent.keyboard("{Escape}");
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe("Avatar frames", () => {
+  const ringOf = (el: HTMLElement) => el.className;
+  test("each known frame renders a 3 px ring in its colour", () => {
+    const { container } = render(
+      <>
+        <Avatar emoji="🐯" frame="frame_bronze" />
+        <Avatar emoji="🐯" frame="frame_jade" />
+        <Avatar emoji="🐯" frame="frame_son_mai" />
+      </>,
+    );
+    const [bronze, jade, sonMai] = Array.from(container.querySelectorAll<HTMLElement>("span"));
+    expect(ringOf(bronze!)).toContain("ring-frame-bronze");
+    expect(ringOf(bronze!)).toContain("ring-[3px]");
+    expect(ringOf(jade!)).toContain("ring-frame-jade");
+    expect(ringOf(sonMai!)).toContain("ring-frame-sonmai");
+    expect(ringOf(sonMai!)).toContain("border-ink");
+    expect(bronze).toHaveAttribute("aria-hidden", "true");
+  });
+  test("a frame wins over the ring prop", () => {
+    const { container } = render(<Avatar emoji="🐯" ring="gold" frame="frame_jade" />);
+    expect(ringOf(container.firstElementChild as HTMLElement)).not.toContain("ring-gold");
+  });
+  test("null or unknown frames leave the avatar unchanged", () => {
+    const { container } = render(
+      <>
+        <Avatar emoji="🐯" ring="gold" frame={null} />
+        <Avatar emoji="🐯" ring="gold" frame="frame_unknown" />
+        <Avatar emoji="🐯" ring="gold" />
+      </>,
+    );
+    const [a, b, c] = Array.from(container.querySelectorAll<HTMLElement>("span"));
+    expect(ringOf(a!)).toBe(ringOf(c!));
+    expect(ringOf(b!)).toBe(ringOf(c!));
+    expect(ringOf(a!)).toContain("ring-gold");
   });
 });

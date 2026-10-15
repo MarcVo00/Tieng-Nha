@@ -1,3 +1,4 @@
+import { SupabaseLeaderboardRepository } from "@/adapters/supabase/SupabaseLeaderboardRepository";
 import { SupabaseAuthService } from "@/adapters/supabase/SupabaseAuthService";
 import { mapError } from "@/adapters/supabase/errors";
 import { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
@@ -210,4 +211,17 @@ describe("SupabaseAuthService password sign-in", () => {
     const signedOut = svc({ getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) });
     await expect(signedOut.hasPassword()).rejects.toBeInstanceOf(NotAuthenticatedError);
   });
+});
+
+test("leaderboard repository selects and maps equipped_frame", async () => {
+  const rows = [
+    { user_id: "u1", pseudo: "A", avatar_emoji: "🐯", xp_week: 5, xp_total: 9, streak: 1, lessons_done_count: 2, equipped_frame: "frame_jade" },
+    { user_id: "u2", pseudo: "B", avatar_emoji: "🌸", xp_week: 3, xp_total: 4, streak: 0, lessons_done_count: 1, equipped_frame: null },
+  ];
+  const limit = vi.fn().mockResolvedValue({ data: rows, error: null });
+  const select = vi.fn((cols: string) => ({ cols, order: () => ({ limit }) }));
+  const db = { from: vi.fn(() => ({ select })), auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "u1" } } }) } };
+  const out = await new SupabaseLeaderboardRepository(db as never).list("all");
+  expect(select.mock.calls[0]?.[0]).toContain("equipped_frame");
+  expect(out.map((r) => r.frame)).toEqual(["frame_jade", null]);
 });

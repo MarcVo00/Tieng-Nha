@@ -18,6 +18,7 @@ import { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
+import { walletAt } from "@/services/wallet";
 
 export function createFakeServices(overrides: Partial<Services> = {}): Services {
   // Dependent fakes are built from the overridden instances so callers can inject e.g. a Dexie-backed progress repo.
@@ -35,6 +36,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     const profile = await auth.getMyProfile();
     return { userId: "me", pseudo: profile?.pseudo ?? "Moi", avatarEmoji: profile?.avatarEmoji ?? "🐉" };
   };
+  const myFrame = async () => walletAt(await progress.listEvents(), await content.getShop()).equipped.frame ?? null;
   const base: Services = {
     env: { VITE_WELCOME_MESSAGE: "", VITE_USE_FAKES: true, VITE_FAKE_SPEECH: true },
     flags: { aiConversation: false, streakFreeze: false, humanAudio: false },
@@ -43,7 +45,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     progress,
     outbox,
     sink,
-    leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), me, clock),
+    leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), me, clock, myFrame),
     auth,
     exam: new FakeExamGateway(clock),
     tts: new FakeSpeechSynthesizer(),

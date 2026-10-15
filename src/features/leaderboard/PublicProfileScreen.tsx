@@ -126,7 +126,7 @@ export function PublicProfileScreen() {
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.base, ease: ease.out }} className="pb-8">
       <BackLink />
       <div className="flex items-center gap-4 pt-2">
-        <Avatar emoji={profile.avatarEmoji} size="lg" />
+        <Avatar emoji={profile.avatarEmoji} size="lg" frame={profile.frame} />
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-title text-ink">{profile.pseudo}</h1>
           <p className="tabular text-heading text-gold-ink">{fr.leaderboard.xp(profile.xpTotal)}</p>

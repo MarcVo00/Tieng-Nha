@@ -20,6 +20,7 @@ export default {
       streak: "var(--color-streak)",
       scrim: "var(--color-scrim)",
       paper: "var(--color-paper)",
+      frame: { bronze: "var(--frame-bronze)", jade: "var(--frame-jade)", sonmai: "var(--frame-son-mai)" },
       tone: {
         ngang: "var(--tone-ngang)", huyen: "var(--tone-huyen)", sac: "var(--tone-sac)",
         hoi: "var(--tone-hoi)", nga: "var(--tone-nga)", nang: "var(--tone-nang)",

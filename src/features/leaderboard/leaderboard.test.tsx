@@ -176,7 +176,7 @@ test("a profile shows its lesson count and boss victory", async () => {
     list: (period) => base.leaderboard.list(period),
     getPublicProfile: async () => ({
       userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
-      lessonsDone: ["l01", "l02"], dialoguesDone: [], badges: ["first_lesson"], examBest: 92,
+      lessonsDone: ["l01", "l02"], dialoguesDone: [], badges: ["first_lesson"], examBest: 92, frame: null,
     }),
   };
   setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
@@ -192,7 +192,7 @@ test("a profile with a legacy passing score reads as a victory", async () => {
     list: (period) => base.leaderboard.list(period),
     getPublicProfile: async () => ({
       userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
-      lessonsDone: ["l01"], dialoguesDone: [], badges: [], examBest: 84,
+      lessonsDone: ["l01"], dialoguesDone: [], badges: [], examBest: 84, frame: null,
     }),
   };
   setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));

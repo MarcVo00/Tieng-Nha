@@ -187,7 +187,7 @@ select
   us.user_id, us.group_id, p.pseudo, p.avatar_emoji,
   us.xp_total,
   case when us.week_start = public.paris_week_start(public.paris_today()) then us.xp_week else 0 end as xp_week,
-  case when us.last_active_day >= public.paris_today() - 1 then us.streak else 0 end as streak,
+  case when us.last_active_day >= public.paris_today() - 1 - us.streak_freezes then us.streak else 0 end as streak,
   coalesce(array_length(us.lessons_done, 1), 0) as lessons_done_count,
   us.lessons_done, us.dialogues_done, us.badges, us.exam_best,
   us.coins, us.equipped->>'frame' as equipped_frame

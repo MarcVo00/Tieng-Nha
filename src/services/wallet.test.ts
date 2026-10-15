@@ -1,4 +1,5 @@
 import type { AppEvent, ShopItem } from "@/domain/types";
+import { streakAtDay } from "@/services/streak";
 import { COINS, walletAt } from "@/services/wallet";
 
 const shop: ShopItem[] = [
@@ -112,4 +113,34 @@ describe("equipment", () => {
     expect(walletAt([...owned(), equip("frame", "frame_bronze", 4), equip("frame", null, 5)], shop).equipped).toEqual({}));
   test("a consumable cannot be equipped", () =>
     expect(walletAt([...owned(), equip("frame", "energy_refill", 4)], shop).equipped).toEqual({}));
+});
+
+describe("streak replay", () => {
+  const funds = (): AppEvent[] => Array.from({ length: 3 }, (_, i) => ev("exam_finished", { score: 90 }, "exam", 1, i)); // 90 coins on day 1
+  const lesson = (day: number, hour: number, id: string) => ev("lesson_completed", {}, id, day, hour);
+  test("counts consecutive days and restarts after an uncovered gap", () => {
+    const w = walletAt([lesson(11, 10, "a"), lesson(12, 10, "b"), lesson(15, 10, "c")], shop);
+    expect(w.streak).toBe(1);
+    expect(w.lastActiveDay).toBe("2026-10-15");
+  });
+  test("a freeze bought after the gap-ending activity does not rescue it (server event order)", () => {
+    const events = [...funds(), lesson(1, 9, "a"), lesson(3, 9, "b"), buy("streak_freeze", 10, 3)];
+    const w = walletAt(events, shop);
+    expect(w.streak).toBe(1);
+    expect(w.freezes).toBe(1);
+    // one more missed day: the freeze now bridges it
+    const w2 = walletAt([...events, lesson(5, 9, "c")], shop);
+    expect(w2.streak).toBe(2);
+    expect(w2.freezes).toBe(0);
+  });
+  test("a freeze bought before the activity bridges the gap", () => {
+    const w = walletAt([...funds(), lesson(11, 10, "a"), buy("streak_freeze", 3, 11), lesson(13, 10, "b")], shop);
+    expect(w.streak).toBe(2);
+    expect(w.freezes).toBe(0);
+  });
+  test("the current value at today follows the freezes left", () => {
+    const w = walletAt([...funds(), lesson(11, 10, "a"), buy("streak_freeze", 3, 11)], shop);
+    expect(streakAtDay(w.streak, w.lastActiveDay, w.freezes, "2026-10-13")).toBe(1);
+    expect(streakAtDay(w.streak, w.lastActiveDay, w.freezes, "2026-10-14")).toBe(0);
+  });
 });

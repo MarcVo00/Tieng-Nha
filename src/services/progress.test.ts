@@ -51,11 +51,12 @@ test("badge_unlocked does not count as an active day", () => {
   expect(s.activeDays).toEqual([]);
 });
 
-test("freeze days keep the streak alive across a missed day", () => {
+test("a wallet streak state keeps the streak alive across missed days", () => {
   const events = [
     ev({ type: "lesson_completed", refId: "l01", xp: 10, createdAt: "2026-10-10T10:00:00.000Z" }),
     ev({ type: "lesson_completed", refId: "l02", xp: 10, createdAt: "2026-10-12T10:00:00.000Z" }),
   ];
   expect(computeProgress(events, "2026-10-12T12:00:00.000Z").streak).toBe(1);
-  expect(computeProgress(events, "2026-10-12T12:00:00.000Z", ["2026-10-09"]).streak).toBe(2);
+  expect(computeProgress(events, "2026-10-14T12:00:00.000Z", { streak: 2, lastActiveDay: "2026-10-12", freezes: 1 }).streak).toBe(2);
+  expect(computeProgress(events, "2026-10-14T12:00:00.000Z", { streak: 2, lastActiveDay: "2026-10-12", freezes: 0 }).streak).toBe(0);
 });

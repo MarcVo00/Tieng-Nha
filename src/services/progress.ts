@@ -1,13 +1,16 @@
 import type { AppEvent, AppEventType, ProgressSnapshot } from "@/domain/types";
 import { parisDay, startOfParisWeek } from "@/services/time";
-import { computeStreak } from "@/services/streak";
+import { computeStreak, streakAtDay } from "@/services/streak";
 import { XP } from "@/services/xp";
 
 export const STREAK_EVENT_TYPES: readonly AppEventType[] = ["lesson_completed", "dialogue_completed", "review_session_completed"];
 
+/** Streak state replayed by `walletAt` (time-ordered, identical to the server); when given it replaces the day-based streak. */
+export type StreakState = { streak: number; lastActiveDay: string | null; freezes: number };
+
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
-export function computeProgress(events: readonly AppEvent[], nowIso: string, freezeDays: readonly string[] = []): ProgressSnapshot {
+export function computeProgress(events: readonly AppEvent[], nowIso: string, streakState?: StreakState): ProgressSnapshot {
   const today = parisDay(nowIso);
   const week = startOfParisWeek(nowIso);
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
@@ -48,7 +51,7 @@ export function computeProgress(events: readonly AppEvent[], nowIso: string, fre
   const activeDays = [...active].sort();
   return {
     xpTotal, xpWeek, xpToday,
-    streak: computeStreak(activeDays, today, freezeDays),
+    streak: streakState ? streakAtDay(streakState.streak, streakState.lastActiveDay, streakState.freezes, today) : computeStreak(activeDays, today),
     lessonsDone: [...lessons], perfectLessons: [...perfect], dialoguesDone: [...dialogues],
     vocabReviewed, examBest, badges: [...badges], activeDays,
   };

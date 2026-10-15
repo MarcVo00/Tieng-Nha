@@ -27,7 +27,7 @@ export function energyAt(events: readonly AppEvent[], nowIso: string, refills: r
   const sorted: Step[] = [
     ...events.map((event) => ({ at: event.createdAt, event })),
     ...refills.map((at) => ({ at, event: null })),
-  ].sort((a, b) => a.at.localeCompare(b.at));
+  ].sort((a, b) => a.at.localeCompare(b.at)); // stable: on a tie an event goes before a refill (events are listed first)
   for (const { at, event: e } of sorted) {
     // A future or unparseable date (device clock moved back) counts as now, so a spend cannot freeze the gauge.
     const parsed = Date.parse(at);

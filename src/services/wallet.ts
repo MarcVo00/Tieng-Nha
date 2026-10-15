@@ -1,9 +1,9 @@
 import type { AppEvent, ItemSlot, ShopItem, Wallet } from "@/domain/types";
+import { STREAK_EVENT_TYPES } from "@/services/progress";
 import { daysBetween, parisDay } from "@/services/time";
 
 export const COINS = { lesson: 10, perfectBonus: 5, dialogue: 5, review: 3, badge: 10, firstBossWin: 50, bossWin: 20, bossPass: 70 } as const;
 
-const STREAK_TYPES = ["lesson_completed", "dialogue_completed", "review_session_completed"];
 const MAX_FREEZES = 2;
 
 /** Same normalisation as the server: rounded, clamped to 0..100, anything non-numeric counts as 0. */
@@ -34,10 +34,9 @@ export function coinsForEvent(e: AppEvent, bestBefore: number | null): number {
 /** Replays the journal in time order with the server rules (earning, purchase acceptance, equipment). */
 export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[]): Wallet {
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  const w: Wallet = { coins: 0, inventory: [], equipped: {}, freezes: 0, refills: [], freezeDays: [] };
+  const w: Wallet = { coins: 0, inventory: [], equipped: {}, freezes: 0, refills: [], freezeDays: [], streak: 0, lastActiveDay: null };
   const badges = new Set<string>();
   let best: number | null = null;
-  let lastActive: string | null = null;
 
   for (const e of sorted) {
     if (e.type === "item_purchased") {
@@ -71,15 +70,17 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[])
       w.coins += coinsForEvent(e, best);
     }
     if (e.type === "exam_finished") best = Math.max(best ?? 0, normalisedScore(e.payload["score"]));
-    if (STREAK_TYPES.includes(e.type)) {
-      // A new active day after g missed days consumes g freezes when the stock allows (else the streak restarts).
+    if (STREAK_EVENT_TYPES.includes(e.type)) {
+      // Same as the server: consecutive day +1; g missed days <= stock consume g and +1; else restart at 1.
       const day = parisDay(e.createdAt);
-      if (lastActive === null || day > lastActive) {
-        if (lastActive !== null) {
-          const missed = daysBetween(lastActive, day) - 1;
-          if (missed >= 1 && missed <= w.freezes) w.freezes -= missed;
-        }
-        lastActive = day;
+      if (w.lastActiveDay === null || day > w.lastActiveDay) {
+        const missed = w.lastActiveDay === null ? 0 : daysBetween(w.lastActiveDay, day) - 1;
+        if (w.lastActiveDay !== null && missed === 0) w.streak += 1;
+        else if (w.lastActiveDay !== null && missed <= w.freezes) {
+          w.freezes -= missed;
+          w.streak += 1;
+        } else w.streak = 1;
+        w.lastActiveDay = day;
       }
     }
   }

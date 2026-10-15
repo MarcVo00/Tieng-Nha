@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(59);
+select plan(61);
 
 -- fixtures (as postgres)
 insert into auth.users (id, email) values
@@ -228,6 +228,17 @@ select is((select coins from public.user_stats where user_id = '55555555-5555-55
 select pg_temp.login('55555555-5555-5555-5555-555555555555');
 select pg_temp.ev('lesson_completed', '{}', now(), 'l02');
 select is(pg_temp.coins(), 133, 'new events add on top of the back-fill (no double count)');
+
+-- leaderboard streak honours the freezes left (bob is in the group, so he has a profile)
+reset role;
+update public.user_stats set streak = 4, last_active_day = public.paris_today() - 2, streak_freezes = 1
+  where user_id = '22222222-2222-2222-2222-222222222222';
+select pg_temp.login('22222222-2222-2222-2222-222222222222');
+select is((select streak from public.leaderboard where user_id = auth.uid()), 4, 'leaderboard keeps the streak while a freeze covers the missed day');
+reset role;
+update public.user_stats set streak_freezes = 0 where user_id = '22222222-2222-2222-2222-222222222222';
+select pg_temp.login('22222222-2222-2222-2222-222222222222');
+select is((select streak from public.leaderboard where user_id = auth.uid()), 0, 'leaderboard streak is 0 without a freeze after 2 days away');
 
 select * from finish();
 rollback;

@@ -31,36 +31,45 @@ export function coinsForEvent(e: AppEvent, bestBefore: number | null): number {
   }
 }
 
+/** The catalogue item a purchase would buy, or null when the server rules refuse it. */
+export function purchasable(w: Wallet, shop: readonly ShopItem[], itemId: unknown): ShopItem | null {
+  const item = typeof itemId === "string" ? shop.find((i) => i.id === itemId) : undefined;
+  if (!item || w.coins < item.price) return null;
+  if (item.kind === "cosmetic" && w.inventory.includes(item.id)) return null;
+  if (item.id === "streak_freeze" && w.freezes >= MAX_FREEZES) return null;
+  return item;
+}
+
+/** True when equipping `itemId` (null = remove) in `slot` is accepted. */
+export function equippable(w: Wallet, shop: readonly ShopItem[], slot: unknown, itemId: unknown): boolean {
+  if (typeof slot !== "string") return false;
+  if (itemId === null || itemId === undefined) return true;
+  return typeof itemId === "string" && w.inventory.includes(itemId) && shop.find((i) => i.id === itemId)?.slot === slot;
+}
+
 /** Replays the journal in time order with the server rules (earning, purchase acceptance, equipment). */
 export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[]): Wallet {
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  const w: Wallet = { coins: 0, inventory: [], equipped: {}, freezes: 0, refills: [], freezeDays: [], streak: 0, lastActiveDay: null };
+  const w: Wallet = { coins: 0, inventory: [], equipped: {}, freezes: 0, refills: [], streak: 0, lastActiveDay: null };
   const badges = new Set<string>();
   let best: number | null = null;
 
   for (const e of sorted) {
     if (e.type === "item_purchased") {
-      const id = e.payload["itemId"];
-      const item = typeof id === "string" ? shop.find((i) => i.id === id) : undefined;
-      if (!item || w.coins < item.price) continue;
-      if (item.kind === "cosmetic" && w.inventory.includes(item.id)) continue;
-      if (item.id === "streak_freeze" && w.freezes >= MAX_FREEZES) continue;
+      const item = purchasable(w, shop, e.payload["itemId"]);
+      if (!item) continue;
       w.coins -= item.price;
-      if (item.id === "streak_freeze") {
-        w.freezes += 1;
-        w.freezeDays.push(parisDay(e.createdAt));
-      } else if (item.kind === "cosmetic") w.inventory.push(item.id);
+      if (item.id === "streak_freeze") w.freezes += 1;
+      else if (item.kind === "cosmetic") w.inventory.push(item.id);
       else if (item.id === "energy_refill") w.refills.push(e.createdAt);
       continue;
     }
     if (e.type === "item_equipped") {
       const slot = e.payload["slot"];
       const id = e.payload["itemId"];
-      if (typeof slot !== "string") continue;
-      if (id === null || id === undefined) w.equipped = Object.fromEntries(Object.entries(w.equipped).filter(([k]) => k !== slot)) as Wallet["equipped"];
-      else if (typeof id === "string" && w.inventory.includes(id) && shop.find((i) => i.id === id)?.slot === slot) {
-        w.equipped[slot as ItemSlot] = id;
-      }
+      if (!equippable(w, shop, slot, id)) continue;
+      if (typeof id === "string") w.equipped[slot as ItemSlot] = id;
+      else w.equipped = Object.fromEntries(Object.entries(w.equipped).filter(([k]) => k !== slot)) as Wallet["equipped"];
       continue;
     }
     if (e.type === "badge_unlocked") {

@@ -1,15 +1,19 @@
-import type { AppEventType, BadgeDef, DialogueId, EnergyState, LessonId, NewEvent, ProgressSnapshot, SessionKind, VocabId } from "@/domain/types";
+import type { AppEvent, AppEventType, BadgeDef, DialogueId, EnergyState, ItemSlot, LessonId, NewEvent, ProgressSnapshot, SessionKind, VocabId, Wallet } from "@/domain/types";
 import type { ContentSource, Outbox, ProgressRepository } from "@/ports";
 import { computeProgress } from "@/services/progress";
 import { evaluateBadges } from "@/services/badges";
 import { dialogueXp, examXpDelta, lessonXp, reviewXp } from "@/services/xp";
 import { introduce, record } from "@/services/leitner";
 import { ENERGY, energyAt } from "@/services/energy";
+import { equippable, purchasable, walletAt } from "@/services/wallet";
 
-export type ActivityResult = { xpGained: number; newBadges: BadgeDef[]; snapshot: ProgressSnapshot; firstTime: boolean; energyGained?: number };
+export type ActivityResult = { xpGained: number; newBadges: BadgeDef[]; snapshot: ProgressSnapshot; firstTime: boolean; energyGained?: number; coinsGained: number };
 export type ActivityService = {
   getSnapshot(): Promise<ProgressSnapshot>;
   getEnergy(): Promise<EnergyState>;
+  getWallet(): Promise<Wallet>;
+  purchase(itemId: string): Promise<{ ok: boolean; wallet: Wallet }>;
+  equip(slot: ItemSlot, itemId: string | null): Promise<{ ok: boolean; wallet: Wallet }>;
   startSession(kind: SessionKind, refId: string): Promise<{ ok: boolean; energy: EnergyState }>;
   introduceVocab(vocabIds: readonly VocabId[]): Promise<void>;
   recordAnswer(vocabIds: readonly VocabId[], correct: boolean): Promise<void>;
@@ -25,8 +29,19 @@ export function createActivityService(deps: {
   progress: ProgressRepository; outbox: Outbox; content: ContentSource; clock: () => string; onEventAppended?: () => void;
 }): ActivityService {
   const { progress, outbox, content, clock } = deps;
-  const snapshot = async () => computeProgress(await progress.listEvents(), clock());
-  const energy = async () => energyAt(await progress.listEvents(), clock());
+  const load = async (): Promise<{ events: AppEvent[]; wallet: Wallet }> => {
+    const [events, shop] = await Promise.all([progress.listEvents(), content.getShop()]);
+    return { events, wallet: walletAt(events, shop) };
+  };
+  const snapshot = async () => {
+    const { events, wallet } = await load();
+    return computeProgress(events, clock(), { streak: wallet.streak, lastActiveDay: wallet.lastActiveDay, freezes: wallet.freezes });
+  };
+  const energy = async () => {
+    const { events, wallet } = await load();
+    return energyAt(events, clock(), wallet.refills);
+  };
+  const wallet = async () => (await load()).wallet;
 
   async function append(e: NewEvent) {
     const saved = await progress.appendEvent(e, clock());
@@ -35,6 +50,7 @@ export function createActivityService(deps: {
 
   async function commit(e: NewEvent, firstTime: boolean): Promise<ActivityResult> {
     const before = await snapshot();
+    const coinsBefore = (await wallet()).coins;
     await append(e);
     const mid = await snapshot();
     const defs = await content.getBadges();
@@ -42,7 +58,8 @@ export function createActivityService(deps: {
     for (const id of newIds) await append({ type: "badge_unlocked", refId: id, xp: 0, payload: {} });
     deps.onEventAppended?.();
     const after = newIds.length ? await snapshot() : mid;
-    return { xpGained: after.xpTotal - before.xpTotal, newBadges: defs.filter((d) => newIds.includes(d.id)), snapshot: after, firstTime };
+    const coinsGained = (await wallet()).coins - coinsBefore;
+    return { xpGained: after.xpTotal - before.xpTotal, newBadges: defs.filter((d) => newIds.includes(d.id)), snapshot: after, firstTime, coinsGained };
   }
 
   const ev = (type: AppEventType, refId: string, xp: number, payload: Record<string, unknown>): NewEvent => ({ type, refId, xp, payload });
@@ -56,6 +73,21 @@ export function createActivityService(deps: {
     getSnapshot: snapshot,
     async getEnergy() {
       return energy();
+    },
+    getWallet: wallet,
+    async purchase(itemId) {
+      const { wallet: w } = await load();
+      if (!purchasable(w, await content.getShop(), itemId)) return { ok: false, wallet: w };
+      await append(ev("item_purchased", itemId, 0, { itemId }));
+      deps.onEventAppended?.();
+      return { ok: true, wallet: await wallet() };
+    },
+    async equip(slot, itemId) {
+      const { wallet: w } = await load();
+      if (!equippable(w, await content.getShop(), slot, itemId)) return { ok: false, wallet: w };
+      await append(ev("item_equipped", slot, 0, { slot, itemId }));
+      deps.onEventAppended?.();
+      return { ok: true, wallet: await wallet() };
     },
     async startSession(kind, refId) {
       const before = await energy();

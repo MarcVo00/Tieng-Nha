@@ -155,8 +155,6 @@ export type Wallet = {
   freezes: number;
   /** ISO times of accepted energy_refill purchases. */
   refills: string[];
-  /** Paris day of each accepted streak_freeze purchase (the streak replays consumption from these). */
-  freezeDays: string[];
   /** Streak value right after the last active day (time-ordered replay, identical to the server). */
   streak: number;
   lastActiveDay: string | null;

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { z } from "zod";
 import { useCallback, useEffect, useState } from "react";
-import type { Capabilities, EnergyState, ProgressSnapshot, Session, Settings } from "@/domain/types";
+import type { Capabilities, EnergyState, ProgressSnapshot, Session, Settings, Wallet } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { PROFILE_KEY } from "@/domain/storageKeys";
 import { useServices } from "@/app/ServicesProvider";
@@ -40,10 +40,10 @@ export function clearCachedProfile(): void {
 type Fields = {
   ready: boolean; session: Session | null; profile: AppProfile | null; settings: Settings;
   snapshot: ProgressSnapshot | null; dueCount: number; pendingSync: number;
-  energy: EnergyState | null;
+  energy: EnergyState | null; wallet: Wallet | null;
 };
 export const useAppState = create<Fields & { set(p: Partial<Fields>): void }>((set) => ({
-  ready: false, session: null, profile: null, settings: { ...DEFAULT_SETTINGS }, snapshot: null, dueCount: 0, pendingSync: 0, energy: null,
+  ready: false, session: null, profile: null, settings: { ...DEFAULT_SETTINGS }, snapshot: null, dueCount: 0, pendingSync: 0, energy: null, wallet: null,
   set: (p) => set(p),
 }));
 
@@ -65,8 +65,8 @@ export function useSettings() {
 export function useRefreshProgress() {
   const { activity, progress, clock } = useServices();
   return useCallback(async () => {
-    const [snapshot, dueCount, energy] = await Promise.all([activity.getSnapshot(), progress.countDueVocab(clock()), activity.getEnergy()]);
-    useAppState.getState().set({ snapshot, dueCount, energy });
+    const [snapshot, dueCount, energy, wallet] = await Promise.all([activity.getSnapshot(), progress.countDueVocab(clock()), activity.getEnergy(), activity.getWallet()]);
+    useAppState.getState().set({ snapshot, dueCount, energy, wallet });
   }, [activity, progress, clock]);
 }
 

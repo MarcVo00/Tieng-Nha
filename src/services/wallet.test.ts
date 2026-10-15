@@ -81,7 +81,6 @@ describe("purchases", () => {
     const w = walletAt([...funds(), buy("streak_freeze", 9), buy("streak_freeze", 10), buy("streak_freeze", 11)], shop);
     expect(w.freezes).toBe(2);
     expect(w.coins).toBe(110);
-    expect(w.freezeDays).toEqual(["2026-10-10", "2026-10-10"]);
   });
   test("freezes consumed by the streak free room for a new purchase", () => {
     const events = [
@@ -93,7 +92,6 @@ describe("purchases", () => {
     ];
     const w = walletAt(events, shop);
     expect(w.freezes).toBe(1);
-    expect(w.freezeDays).toHaveLength(3);
   });
   test("a gap larger than the stock consumes nothing", () => {
     const events = [...funds(), buy("streak_freeze", 9), ev("lesson_completed", {}, "a", 11), ev("lesson_completed", {}, "b", 15)];

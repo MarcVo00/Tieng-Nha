@@ -3,6 +3,7 @@
 > Statut : **design validé** par Marc le 2026-10-14 (brainstorming). Implémentation **après** la correction de l'oral (reconnaissance vocale), dans l'ordre du §8.
 > Étapes 1–2 (arbre, boss) **implémentées** le 2026-10-14 — plan [`2026-10-14-tree-and-boss.md`](../plans/2026-10-14-tree-and-boss.md).
 > Étape 3 (énergie) **implémentée** le 2026-10-14 — plan [`2026-10-14-energy.md`](../plans/2026-10-14-energy.md).
+> Étape 4 (xu, boutique) **implémentée** le 2026-10-17 — plan [`2026-10-15-coins-shop.md`](../plans/2026-10-15-coins-shop.md). Écarts assumés : (1) rattrapage des xu pour les événements antérieurs à la migration ; (2) pas de colonne `boss_wins` : « 1re victoire » = meilleur score précédent < 70 ; (3) le gel de série couvre un jour manqué par gel ; (4) la recharge d'énergie est appliquée côté appli seulement (l'énergie est locale).
 > Complète la [spec V1](2026-10-09-vietlearn-design.md) ; en cas de conflit, ce document l'emporte pour les sujets qu'il couvre.
 > Langue des docs : français. Langue du code : anglais.
 

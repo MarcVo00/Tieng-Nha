@@ -561,7 +561,8 @@ export const fr = {
     error: "L'achat n'a pas pu se faire. Réessaie dans un instant.",
     loadError: "La boutique n'a pas pu s'ouvrir. Réessaie dans un instant.",
     refill: (price: number) => `Recharger (${price} xu)`,
-    previewAria: "Aperçu du cadre",
+    equipError: "Impossible de changer de cadre pour le moment. Réessaie.",
+    preview: (name: string) => `Aperçu du cadre : ${name}`,
   },
   profile: {
     title: "Mon profil",

@@ -82,6 +82,11 @@ describe("purchases", () => {
     expect(w.freezes).toBe(2);
     expect(w.coins).toBe(110);
   });
+  test("the freeze cap comes from the catalogue", () => {
+    const tight = shop.map((i) => (i.id === "streak_freeze" ? { ...i, maxStock: 1 } : i));
+    const w = walletAt([...funds(), buy("streak_freeze", 9), buy("streak_freeze", 10)], tight);
+    expect(w.freezes).toBe(1);
+  });
   test("freezes consumed by the streak free room for a new purchase", () => {
     const events = [
       ...funds(),

@@ -174,7 +174,7 @@ Pas de plafond quotidien (l'énergie limite déjà le rythme). Le trigger ignore
 ### 6.2 Côté appli
 - `ProgressSnapshot` : ajouter `energy`, `nextEnergyAt`, `coins`, `inventory`, `equipped`, `streakFreezes`, `bossWins`.
 - Nouveaux ports : aucun (tout passe par les événements existants et le dépôt de progression).
-- Hors ligne : énergie, achats et boss fonctionnent ; synchronisation ensuite. Un achat refusé par le serveur (solde divergent, cas rare) disparaît au prochain rafraîchissement, avec un toast.
+- Hors ligne : énergie, achats et boss fonctionnent ; synchronisation ensuite. Dans cette version, l'appli se fie à son propre journal : un achat refusé par le serveur (possible uniquement avec plusieurs appareils) reste visible dans l'appli, et le cadre n'apparaît pas dans le classement. La réconciliation est reportée.
 
 ## 7. Tests
 - Unitaires purs : `tree.ts` (prérequis, cycles), `bossFight.ts` (victoire, défaite, tirage sans répétition, rotation des sections, score du tableau §3.3), `energy.ts` (coûts, recharge 3 h, plafond, révision, recharge achetée), `wallet.ts` (barème, refus, gel de série).

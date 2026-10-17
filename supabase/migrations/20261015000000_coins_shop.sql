@@ -1,3 +1,5 @@
+set lock_timeout = '10s';
+
 -- Coins and shop (spec Progression V2 §5–6). Never edit after it is applied to prod: add a new migration.
 
 -- 1. New synced event types (session_started stays local-only and is never sent).

@@ -15,7 +15,8 @@ export type ResultState = {
   questions: ExamQuestion[];
   noSpeaking: boolean;
   xpGained: number;
-  coinsGained: number;
+  /** Missing in a state saved by an older client: counts as 0. */
+  coinsGained?: number;
   newBadges: BadgeDef[];
   remainingToday: number;
   dateIso: string;
@@ -45,7 +46,7 @@ export function isResultState(v: unknown): v is ResultState {
     typeof v["mention"] === "string" &&
     typeof v["noSpeaking"] === "boolean" &&
     typeof v["xpGained"] === "number" &&
-    typeof v["coinsGained"] === "number" &&
+    (v["coinsGained"] === undefined || typeof v["coinsGained"] === "number") &&
     typeof v["remainingToday"] === "number" &&
     typeof v["dateIso"] === "string" &&
     Array.isArray(v["newBadges"]) &&

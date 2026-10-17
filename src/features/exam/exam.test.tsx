@@ -338,6 +338,14 @@ describe("result", () => {
     expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
   });
 
+  test("a result saved by a previous client without coinsGained still renders", async () => {
+    const legacy: Partial<ResultState> = failedState(2);
+    delete legacy.coinsGained;
+    renderExam({ entry: { pathname: "/exam/result", state: legacy } });
+    await screen.findByRole("heading", { name: fr.exam.result.lost("Thủy Tinh") });
+    expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
+  });
+
   test("redirects to the intro without a result", async () => {
     renderExam({ entry: "/exam/result" });
     expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();

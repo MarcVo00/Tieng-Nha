@@ -4,7 +4,7 @@ import { daysBetween, parisDay } from "@/services/time";
 
 export const COINS = { lesson: 10, perfectBonus: 5, dialogue: 5, review: 3, badge: 10, firstBossWin: 50, bossWin: 20, bossPass: 70 } as const;
 
-const MAX_FREEZES = 2;
+const DEFAULT_MAX_FREEZES = 2;
 
 /** Same normalisation as the server: rounded, clamped to 0..100, anything non-numeric counts as 0. */
 export function normalisedScore(v: unknown): number {
@@ -36,7 +36,7 @@ export function purchasable(w: Wallet, shop: readonly ShopItem[], itemId: unknow
   const item = typeof itemId === "string" ? shop.find((i) => i.id === itemId) : undefined;
   if (!item || w.coins < item.price) return null;
   if (item.kind === "cosmetic" && w.inventory.includes(item.id)) return null;
-  if (item.id === "streak_freeze" && w.freezes >= MAX_FREEZES) return null;
+  if (item.id === "streak_freeze" && w.freezes >= (item.maxStock ?? DEFAULT_MAX_FREEZES)) return null;
   return item;
 }
 

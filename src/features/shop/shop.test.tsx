@@ -108,6 +108,30 @@ test("recharges the energy from the header sheet", async () => {
   await waitFor(() => expect(screen.queryByRole("button", { name: fr.shop.refill(30) })).toBeNull());
 });
 
+test("the refill confirmation is the only modal: Tab cycles its two buttons and Escape closes only it", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  await winExams(services, 1);
+  await services.activity.startSession("boss", "boss_thuy_tinh");
+  const user = setup(services, <EnergyIndicator />);
+  await user.click(await screen.findByRole("button", { name: fr.energy.label(2, 5) }));
+  await user.click(await screen.findByRole("button", { name: fr.shop.refill(30) }));
+  const dialog = await screen.findByRole("alertdialog");
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: fr.energy.title })).toBeNull());
+  const cancel = within(dialog).getByRole("button", { name: fr.shop.confirm.cancel });
+  const confirm = within(dialog).getByRole("button", { name: fr.shop.confirm.confirm });
+  await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true));
+  const seen = new Set<Element | null>();
+  for (let i = 0; i < 4; i++) {
+    seen.add(document.activeElement);
+    await user.tab();
+  }
+  expect(seen).toEqual(new Set([cancel, confirm]));
+  await user.keyboard("{Escape}");
+  await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+  expect(useAppState.getState().energy?.current).toBe(2);
+  expect(screen.getByRole("button", { name: fr.energy.label(2, 5) })).toHaveFocus();
+});
+
 test("hides the sheet refill when the player is too poor", async () => {
   const services = createFakeServices({ clock: () => NOW });
   await services.activity.startSession("boss", "boss_thuy_tinh");
@@ -164,6 +188,28 @@ describe("purchase failures", () => {
     release({ ok: false, wallet });
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
   });
+});
+
+test("each frame preview carries the frame name", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  setup(services);
+  for (const id of ["frame_bronze", "frame_jade", "frame_son_mai"]) {
+    const name = fr.shop.items[id]?.name ?? "";
+    expect(await screen.findByRole("img", { name: fr.shop.preview(name) })).toBeInTheDocument();
+  }
+});
+
+test("an equip failure shows the dedicated equip error", async () => {
+  useToastStore.setState({ toasts: [] });
+  const services = createFakeServices({ clock: () => NOW });
+  await winExams(services, 1);
+  await services.activity.purchase("frame_bronze");
+  const user = setup(services);
+  vi.spyOn(services.activity, "equip").mockRejectedValueOnce(new Error("boom"));
+  const bronze = await card(fr.shop.items["frame_bronze"]?.name ?? "");
+  await user.click(await within(bronze).findByRole("button", { name: fr.shop.equip }));
+  expect(await screen.findByText(fr.shop.equipError)).toBeInTheDocument();
+  expect(screen.queryByText(fr.shop.error)).toBeNull();
 });
 
 test("an equipped frame is exposed as pressed and equipping shows a toast", async () => {

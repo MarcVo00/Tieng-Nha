@@ -124,10 +124,10 @@ function ResultContent({ state }: { state: ResultState }) {
           <p className="text-body text-ink-muted">{fr.exam.result.damage(boss.hp - boss.bossHpLeft, boss.hp)}</p>
         )}
         {state.xpGained > 0 ? <XpCounter value={xpTotal ?? state.xpGained} delta={state.xpGained} /> : null}
-        {state.coinsGained > 0 ? (
+        {(state.coinsGained ?? 0) > 0 ? (
           <p className="flex items-center gap-1 text-body-strong text-gold-ink tabular">
             <Icon name="coin" size={20} />
-            {fr.shop.gained(state.coinsGained)}
+            {fr.shop.gained(state.coinsGained ?? 0)}
           </p>
         ) : null}
         {state.newBadges.length > 0 ? (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { useRefreshProgress, useAppState } from "@/app/appState";
@@ -22,6 +22,7 @@ export function EnergyIndicator() {
   const [asking, setAsking] = useState(false);
   const [buying, setBuying] = useState(false);
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [, setTick] = useState(0);
   const nextAt = energy?.nextAt ?? null;
 
@@ -60,8 +61,14 @@ export function EnergyIndicator() {
       toast.show({ title: fr.shop.error });
     } finally {
       setBuying(false);
-      setAsking(false);
+      closeAsk();
     }
+  }
+
+  // Only one modal at a time: the sheet is closed before the confirmation opens, and focus returns to the gauge.
+  function closeAsk(): void {
+    setAsking(false);
+    triggerRef.current?.focus();
   }
 
   // Keep the countdown honest while the sheet is open.
@@ -79,6 +86,7 @@ export function EnergyIndicator() {
   return (
     <>
       <motion.button
+        ref={triggerRef}
         type="button"
         whileTap={tap}
         aria-label={fr.energy.label(energy.current, energy.max)}
@@ -111,7 +119,10 @@ export function EnergyIndicator() {
               </Link>
             ) : null}
             {canRefill ? (
-              <Button variant="secondary" disabled={buying} onClick={() => setAsking(true)}>
+              <Button variant="secondary" disabled={buying} onClick={() => {
+                setOpen(false);
+                setAsking(true);
+              }}>
                 <Icon name="coin" size={20} className="text-gold" />
                 {fr.shop.refill(refillPrice ?? 0)}
               </Button>
@@ -129,7 +140,7 @@ export function EnergyIndicator() {
         cancelLabel={fr.shop.confirm.cancel}
         busy={buying}
         onConfirm={() => void refill()}
-        onCancel={() => !buying && setAsking(false)}
+        onCancel={() => !buying && closeAsk()}
       />
     </>
   );

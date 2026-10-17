@@ -73,14 +73,14 @@ export function ShopScreen() {
     loadWallet();
   }
 
-  async function run(job: () => Promise<{ ok: boolean }>, success: string): Promise<void> {
+  async function run(job: () => Promise<{ ok: boolean }>, success: string, failure: string = fr.shop.error): Promise<void> {
     setBusy(true);
     try {
       const r = await job();
       await refresh().catch(() => undefined);
-      toast.show({ title: r.ok ? success : fr.shop.error });
+      toast.show({ title: r.ok ? success : failure });
     } catch {
-      toast.show({ title: fr.shop.error });
+      toast.show({ title: failure });
     } finally {
       setBusy(false);
       setAsking(null);
@@ -90,8 +90,8 @@ export function ShopScreen() {
   function onAction(item: ShopItem, v: Verdict): void {
     if (busy) return;
     if (v.action === "buy") setAsking(item);
-    else if (v.action === "equip") void run(() => activity.equip("frame", item.id), fr.shop.equippedToast);
-    else if (v.action === "unequip") void run(() => activity.equip("frame", null), fr.shop.removedToast);
+    else if (v.action === "equip") void run(() => activity.equip("frame", item.id), fr.shop.equippedToast, fr.shop.equipError);
+    else if (v.action === "unequip") void run(() => activity.equip("frame", null), fr.shop.removedToast, fr.shop.equipError);
   }
 
   const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
@@ -106,7 +106,7 @@ export function ShopScreen() {
     return (
       <Card as="li" key={item.id} className="flex items-center gap-4 p-4">
         {item.kind === "cosmetic" ? (
-          <span role="img" aria-label={fr.shop.previewAria} className="flex w-16 shrink-0 justify-center">
+          <span role="img" aria-label={fr.shop.preview(text.name)} className="flex w-16 shrink-0 justify-center">
             <Avatar emoji={emoji} size="md" frame={item.id} />
           </span>
         ) : null}

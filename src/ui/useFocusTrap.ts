@@ -45,7 +45,10 @@ export function useFocusTrap(containerRef: RefObject<HTMLElement>, onEscape?: ()
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
-      if (previous instanceof HTMLElement && previous.isConnected) previous.focus();
+      // Do not steal focus back when another modal took over meanwhile (e.g. a confirmation opened from a closing sheet).
+      const active = document.activeElement;
+      const otherModal = active instanceof HTMLElement && !container.contains(active) && active.closest('[aria-modal="true"]') !== null;
+      if (!otherModal && previous instanceof HTMLElement && previous.isConnected) previous.focus();
     };
   }, [containerRef, previous]);
 }

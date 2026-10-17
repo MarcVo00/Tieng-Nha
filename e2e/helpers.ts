@@ -102,3 +102,31 @@ export async function playThrough(page: Page): Promise<"done" | "failed"> {
   }
   throw new Error("Lesson did not reach the done or failed state");
 }
+
+/** Writes `lesson_completed` events straight into the local event log (blind answers cannot pass a lesson reliably). Call after onboarding. */
+export async function seedLessonsCompleted(page: Page, ids: string[], opts: { perfect?: boolean } = {}): Promise<void> {
+  const perfect = opts.perfect ?? false;
+  await page.evaluate(
+    async ({ ids, perfect }) => {
+      const db: IDBDatabase = await new Promise((res, rej) => {
+        const r = indexedDB.open("tieng-nha");
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      const tx = db.transaction("events", "readwrite");
+      ids.forEach((id, i) => {
+        tx.objectStore("events").put({
+          clientId: crypto.randomUUID(),
+          schemaVersion: 1,
+          type: "lesson_completed",
+          refId: id,
+          xp: perfect ? 15 : 10,
+          payload: { mistakes: perfect ? 0 : 1, durationMs: 1000, perfect },
+          createdAt: new Date(Date.now() - (ids.length - i) * 60000).toISOString(),
+        });
+      });
+      await new Promise((res) => { tx.oncomplete = res; });
+    },
+    { ids, perfect },
+  );
+}

@@ -349,3 +349,34 @@ test("each start of a lesson draws a new exercise order, still grouped by type",
   }
   expect(orders.size).toBeGreaterThan(1);
 });
+
+describe("coins on the done screen", () => {
+  async function show(coinsGained: number | "real") {
+    const services = createFakeServices({ clock: () => NOW });
+    const r = await services.activity.completeLesson({ lessonId: "l05", mistakes: 0, durationMs: 1, vocabIds: [] });
+    const gained = coinsGained === "real" ? r.coinsGained : coinsGained;
+    const state = { ...r, coinsGained: gained, accuracy: 1, perfect: true };
+    const view = render(
+      <ServicesProvider services={services}>
+        <MemoryRouter initialEntries={[{ pathname: "/lesson/l05/done", state }]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route path="/lesson/:id/done" element={<LessonDoneScreen />} />
+          </Routes>
+        </MemoryRouter>
+      </ServicesProvider>,
+    );
+    await screen.findByRole("heading", { name: fr.lessons.done.perfect });
+    return { view, gained };
+  }
+
+  test("shows the coins earned, including a perfect bonus", async () => {
+    const { gained } = await show("real");
+    expect(gained).toBeGreaterThanOrEqual(15);
+    expect(screen.getByText(fr.shop.gained(gained))).toBeInTheDocument();
+  });
+
+  test("shows no coin line when nothing was earned", async () => {
+    await show(0);
+    expect(screen.queryByText(/ xu$/)).toBeNull();
+  });
+});

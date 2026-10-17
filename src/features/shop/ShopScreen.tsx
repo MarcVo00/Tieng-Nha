@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import type { ShopItem, Wallet } from "@/domain/types";
+import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { Avatar, Button, Card, ConfirmDialog, EmptyState, Icon, Skeleton, useToast } from "@/ui";
 
+const DEFAULT_EMOJI = "🐉";
+
 type Verdict = { label: string; disabled: boolean; action: "buy" | "equip" | "unequip" | "none" };
 
-function verdictOf(item: ShopItem, wallet: Wallet, energyFull: boolean): Verdict {
+function verdictOf(item: ShopItem, wallet: Wallet, energy: EnergyState | null): Verdict {
   if (item.kind === "cosmetic") {
     if (wallet.inventory.includes(item.id)) {
       return wallet.equipped.frame === item.id
@@ -18,7 +20,10 @@ function verdictOf(item: ShopItem, wallet: Wallet, energyFull: boolean): Verdict
     if (item.id === "streak_freeze" && item.maxStock !== undefined && wallet.freezes >= item.maxStock) {
       return { label: fr.shop.stockFull, disabled: true, action: "none" };
     }
-    if (item.id === "energy_refill" && energyFull) return { label: fr.shop.energyFull, disabled: true, action: "none" };
+    if (item.id === "energy_refill") {
+      if (energy === null) return { label: fr.shop.buy(item.price), disabled: true, action: "none" };
+      if (energy.current >= energy.max) return { label: fr.shop.energyFull, disabled: true, action: "none" };
+    }
   }
   if (wallet.coins < item.price) return { label: fr.shop.noFunds, disabled: true, action: "none" };
   return { label: fr.shop.buy(item.price), disabled: false, action: "buy" };
@@ -32,11 +37,12 @@ export function ShopScreen() {
   const refresh = useRefreshProgress();
   const wallet = useAppState((s) => s.wallet);
   const energy = useAppState((s) => s.energy);
-  const emoji = useAppState((s) => s.profile?.avatarEmoji ?? "");
+  const emoji = useAppState((s) => s.profile?.avatarEmoji ?? DEFAULT_EMOJI);
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [asking, setAsking] = useState<ShopItem | null>(null);
   const [busy, setBusy] = useState(false);
+  const [walletFailed, setWalletFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,17 +55,30 @@ export function ShopScreen() {
     };
   }, [content]);
 
-  useEffect(() => {
-    if (useAppState.getState().wallet === null) void refresh().catch(() => undefined);
+  const loadWallet = useCallback(() => {
+    setWalletFailed(false);
+    refresh().catch(() => setWalletFailed(true));
   }, [refresh]);
 
-  async function run(job: () => Promise<{ ok: boolean }>, success: string | null): Promise<void> {
+  useEffect(() => {
+    if (useAppState.getState().wallet === null) loadWallet();
+  }, [loadWallet]);
+
+  function retry(): void {
+    setFailed(false);
+    content
+      .getShop()
+      .then(setItems)
+      .catch(() => setFailed(true));
+    loadWallet();
+  }
+
+  async function run(job: () => Promise<{ ok: boolean }>, success: string): Promise<void> {
     setBusy(true);
     try {
       const r = await job();
       await refresh().catch(() => undefined);
-      if (!r.ok) toast.show({ title: fr.shop.error });
-      else if (success) toast.show({ title: success });
+      toast.show({ title: r.ok ? success : fr.shop.error });
     } catch {
       toast.show({ title: fr.shop.error });
     } finally {
@@ -71,20 +90,19 @@ export function ShopScreen() {
   function onAction(item: ShopItem, v: Verdict): void {
     if (busy) return;
     if (v.action === "buy") setAsking(item);
-    else if (v.action === "equip") void run(() => activity.equip("frame", item.id), null);
-    else if (v.action === "unequip") void run(() => activity.equip("frame", null), null);
+    else if (v.action === "equip") void run(() => activity.equip("frame", item.id), fr.shop.equippedToast);
+    else if (v.action === "unequip") void run(() => activity.equip("frame", null), fr.shop.removedToast);
   }
 
   const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
   const play = known.filter((i) => i.kind === "consumable");
   const frames = known.filter((i) => i.kind === "cosmetic").sort((a, b) => a.price - b.price);
-  const energyFull = energy !== null && energy.current >= energy.max;
   const asked = asking ? fr.shop.items[asking.id] : undefined;
 
   function card(item: ShopItem, w: Wallet) {
     const text = fr.shop.items[item.id];
     if (!text) return null;
-    const v = verdictOf(item, w, energyFull);
+    const v = verdictOf(item, w, energy);
     return (
       <Card as="li" key={item.id} className="flex items-center gap-4 p-4">
         {item.kind === "cosmetic" ? (
@@ -99,7 +117,13 @@ export function ShopScreen() {
             <p className="tabular text-caption text-ink-muted">{fr.shop.stock(w.freezes, item.maxStock)}</p>
           ) : null}
         </div>
-        <Button variant="secondary" disabled={v.disabled || busy} onClick={() => onAction(item, v)} className="shrink-0">
+        <Button
+          variant="secondary"
+          disabled={v.disabled || busy}
+          onClick={() => onAction(item, v)}
+          className="shrink-0"
+          {...(item.kind === "cosmetic" && w.inventory.includes(item.id) ? { "aria-pressed": v.action === "unequip" } : {})}
+        >
           {v.label}
         </Button>
       </Card>
@@ -118,8 +142,13 @@ export function ShopScreen() {
         </div>
       </Card>
 
-      {failed ? (
-        <EmptyState title={fr.shop.title} body={fr.shop.loadError} illustration="boat" />
+      {failed || walletFailed ? (
+        <EmptyState
+          title={fr.shop.title}
+          body={fr.shop.loadError}
+          illustration="boat"
+          action={<Button onClick={retry}>{fr.app.error.retry}</Button>}
+        />
       ) : items === null || wallet === null ? (
         <Skeleton lines={4} />
       ) : (

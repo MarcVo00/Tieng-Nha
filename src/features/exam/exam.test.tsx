@@ -329,6 +329,15 @@ describe("result", () => {
     boss: { id: "boss_thuy_tinh", name: "Thủy Tinh", title: "Le dieu des eaux", illustration: "boss_thuy_tinh", hp: 15, playerLives: 5, won: false, livesLeft: 0, bossHpLeft: 9 },
   });
 
+  test("shows the coins earned on the boss result, and no line when there are none", async () => {
+    const view = renderExam({ entry: { pathname: "/exam/result", state: { ...failedState(2), coinsGained: 50 } } });
+    expect(await screen.findByText(fr.shop.gained(50))).toBeInTheDocument();
+    view.unmount();
+    renderExam({ entry: { pathname: "/exam/result", state: failedState(2) } });
+    await screen.findByRole("heading", { name: fr.exam.result.lost("Thủy Tinh") });
+    expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
+  });
+
   test("redirects to the intro without a result", async () => {
     renderExam({ entry: "/exam/result" });
     expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();

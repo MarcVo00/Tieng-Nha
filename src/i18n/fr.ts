@@ -556,6 +556,8 @@ export const fr = {
       cancel: "Annuler",
     },
     bought: "Acheté !",
+    equippedToast: "Cadre équipé",
+    removedToast: "Cadre retiré",
     error: "L'achat n'a pas pu se faire. Réessaie dans un instant.",
     loadError: "La boutique n'a pas pu s'ouvrir. Réessaie dans un instant.",
     refill: (price: number) => `Recharger (${price} xu)`,

@@ -19,6 +19,7 @@ const TEST_TIMEOUT = 30_000;
 function setup(opts: { nowOffsetDays?: number; route?: string } = {}) {
   let now = Date.parse(T0) + (opts.nowOffsetDays ?? 0) * DAY;
   const services: Services = createFakeServices({ clock: () => new Date(now).toISOString() });
+  const realCompleteReview = services.activity.completeReview.bind(services.activity);
   const completeReview = vi.spyOn(services.activity, "completeReview");
   const ui: ReactElement = (
     <StrictMode>
@@ -32,7 +33,7 @@ function setup(opts: { nowOffsetDays?: number; route?: string } = {}) {
       </ServicesProvider>
     </StrictMode>
   );
-  return { services, completeReview, ui, setNow: (iso: string) => (now = Date.parse(iso)) };
+  return { services, completeReview, realCompleteReview, ui, setNow: (iso: string) => (now = Date.parse(iso)) };
 }
 
 beforeEach(() => {
@@ -190,6 +191,33 @@ test(
     await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
     expect(await screen.findByText(fr.review.done.title, {}, { timeout: 4000 })).toBeInTheDocument();
     expect(screen.queryByText(/⚡/)).not.toBeInTheDocument();
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  "the done screen shows the coins earned by a finished review",
+  async () => {
+    const { ui, services } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await playOneWord(ui);
+    await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    expect(await screen.findByText(fr.review.done.title, {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(screen.getByText(fr.shop.gained(3))).toBeInTheDocument();
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  "the done screen shows no coin line when no coin was earned",
+  async () => {
+    const { ui, services, completeReview, realCompleteReview } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    completeReview.mockImplementation(async (i) => ({ ...(await realCompleteReview(i)), coinsGained: 0 }));
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await playOneWord(ui);
+    await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    expect(await screen.findByText(fr.review.done.title, {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
   },
   TEST_TIMEOUT,
 );

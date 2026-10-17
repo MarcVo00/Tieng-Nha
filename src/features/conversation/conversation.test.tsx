@@ -12,11 +12,13 @@ import { DialogueScreen } from "@/features/conversation";
 const SLOW = { timeout: 5000 };
 const HOME = "page d'accueil";
 
-function setup(opts: { strict?: boolean } = {}) {
+function setup(opts: { strict?: boolean; noCoins?: boolean } = {}) {
   const stt = new FakeSpeechRecognizer();
   const tts = new FakeSpeechSynthesizer();
   const services = createFakeServices({ stt, tts });
+  const realCompleteDialogue = services.activity.completeDialogue.bind(services.activity);
   const completeDialogue = vi.spyOn(services.activity, "completeDialogue");
+  if (opts.noCoins) completeDialogue.mockImplementation(async (i) => ({ ...(await realCompleteDialogue(i)), coinsGained: 0 }));
   const tree = (
     <ServicesProvider services={services}>
       <MemoryRouter initialEntries={["/dialogue/d05"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -96,6 +98,18 @@ describe("DialogueScreen", () => {
     expect(await screen.findByText("Chào bạn! Bạn uống gì?", undefined, SLOW)).toBeInTheDocument();
     await waitFor(() => expect(tts.spoken).toContain("Chào bạn! Bạn uống gì?"));
     await waitFor(() => expect(screen.queryByRole("status", { name: fr.conversation.typing })).not.toBeInTheDocument());
+  });
+
+  it.each([
+    { noCoins: false, shown: true },
+    { noCoins: true, shown: false },
+  ])("shows the coin line only when coins were earned (noCoins: $noCoins)", async ({ noCoins, shown }) => {
+    setup({ noCoins });
+    await userEvent.click(await optionButton(/Cho tui một ly cà phê sữa đá/));
+    await userEvent.click(await optionButton(/Cảm ơn em/));
+    await screen.findByRole("button", { name: fr.conversation.done.home }, SLOW);
+    if (shown) expect(screen.getByText(/^\+\d+ xu$/)).toBeInTheDocument();
+    else expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
   });
 
   it("reveals the French translation on demand", async () => {

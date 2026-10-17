@@ -72,11 +72,11 @@ function ResultCard({ result, onHome, onReplay }: { result: ActivityResult; onHo
       <div>
         <XpCounter value={counted ? total : total - result.xpGained} {...(counted ? { delta: result.xpGained } : {})} />
         {result.coinsGained > 0 ? (
-            <p className="mt-3 flex items-center gap-1 text-body-strong text-gold-ink tabular">
-              <Icon name="coin" size={20} />
-              {fr.shop.gained(result.coinsGained)}
-            </p>
-          ) : null}
+          <p className="mt-3 flex items-center gap-1 text-body-strong text-gold-ink tabular">
+            <Icon name="coin" size={20} />
+            {fr.shop.gained(result.coinsGained)}
+          </p>
+        ) : null}
       </div>
       {result.newBadges.length > 0 ? (
         <section aria-label={fr.conversation.done.badges} className="flex flex-col gap-3">

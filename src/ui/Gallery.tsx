@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useInRouterContext } from "react-router-dom";
 import { fr } from "@/i18n/fr";
 import { TONES } from "@/domain/tones";
 import type { Tone } from "@/domain/types";
@@ -103,6 +103,14 @@ function Panel({ dark }: { dark: boolean }) {
             <Avatar emoji="🐼" size="sm" />
             <Avatar emoji="🐲" size="lg" ring="primary" />
           </div>
+          <div className="flex flex-wrap items-center gap-10 py-6">
+            <Avatar emoji="🦊" fx="fx_ink" />
+            <Avatar emoji="🐼" fx="fx_lightning" frame="frame_son_mai" />
+            <Avatar emoji="🐲" fx="fx_embers" frame="frame_jade" />
+            <Avatar emoji="🦊" size="lg" fx="fx_ink" frame="frame_bronze" />
+            <Avatar emoji="🐼" size="lg" fx="fx_lightning" />
+            <Avatar emoji="🐲" size="lg" fx="fx_embers" frame="frame_son_mai" />
+          </div>
           <div className="flex flex-wrap items-center gap-4">
             <XpCounter value={xp.value} delta={xp.delta} />
             <Button variant="secondary" onClick={() => setXp((s) => ({ value: s.value + 15, delta: 15 }))}>{g.xpGain}</Button>
@@ -111,7 +119,7 @@ function Panel({ dark }: { dark: boolean }) {
           <div className="flex flex-wrap gap-4">
             <BadgeMedal icon="☕" title={g.badgeTitle} unlocked />
             <BadgeMedal icon="☕" title={g.badgeTitle} unlocked={false} />
-            <BadgeMedal icon="☕" title={g.badgeTitle} unlocked size="lg" />
+            <BadgeMedal icon="☕" title={g.badgeTitle} unlocked size="lg" reward={g.badgeReward} />
           </div>
           <div className="relative h-24"><Confetti fire={confetti} /></div>
         </Section>
@@ -167,11 +175,12 @@ function Panel({ dark }: { dark: boolean }) {
 
 // TabBar is `fixed`; a transform on the wrapper makes it position relative to the preview box.
 function TabBarPreview() {
+  // Under the app router (route /__ui) a second Router would throw; reuse the existing context.
+  const inRouter = useInRouterContext();
+  const bar = <TabBar items={TABS} />;
   return (
     <div className="relative h-16 overflow-hidden rounded-md border border-line [transform:translateZ(0)]">
-      <MemoryRouter>
-        <TabBar items={TABS} />
-      </MemoryRouter>
+      {inRouter ? bar : <MemoryRouter>{bar}</MemoryRouter>}
     </div>
   );
 }

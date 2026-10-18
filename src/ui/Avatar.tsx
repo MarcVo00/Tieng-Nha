@@ -1,9 +1,13 @@
+import { isProfileFx, ProfileFx } from "@/ui/ProfileFx";
+
 type AvatarProps = {
   emoji: string;
   size?: "sm" | "md" | "lg";
   ring?: "none" | "gold" | "primary";
   /** Equipped shop frame id. A known frame replaces `ring`; unknown or null leaves the avatar unchanged. */
   frame?: string | null | undefined;
+  /** Equipped profile effect id (fx_*). A known effect wraps the avatar; unknown or null leaves it unchanged. */
+  fx?: string | null | undefined;
 };
 
 const SIZE = { sm: "h-8 w-8 text-body", md: "h-12 w-12 text-heading", lg: "h-20 w-20 text-display" } as const;
@@ -18,9 +22,9 @@ const FRAME = {
 
 const isFrame = (id: string | null | undefined): id is keyof typeof FRAME => id != null && Object.hasOwn(FRAME, id);
 
-export function Avatar({ emoji, size = "md", ring = "none", frame }: AvatarProps) {
+export function Avatar({ emoji, size = "md", ring = "none", frame, fx }: AvatarProps) {
   const decoration = isFrame(frame) ? FRAME[frame] : RING[ring];
-  return (
+  const avatar = (
     <span
       aria-hidden="true"
       {...(isFrame(frame) ? { "data-frame": frame } : {})}
@@ -29,4 +33,5 @@ export function Avatar({ emoji, size = "md", ring = "none", frame }: AvatarProps
       {emoji}
     </span>
   );
+  return isProfileFx(fx) ? <ProfileFx id={fx}>{avatar}</ProfileFx> : avatar;
 }

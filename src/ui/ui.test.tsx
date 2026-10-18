@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Avatar, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
+import { Avatar, BadgeMedal, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
 
 test("Button shows loading state and is disabled", () => {
   render(<Button loading>Valider</Button>);
@@ -129,5 +129,45 @@ describe("Avatar frames", () => {
     expect(ringOf(a!)).toBe(ringOf(c!));
     expect(ringOf(b!)).toBe(ringOf(c!));
     expect(ringOf(a!)).toContain("ring-gold");
+  });
+});
+
+describe("Profile effects", () => {
+  test("Avatar with fx_embers renders the effect layer", () => {
+    const { container } = render(<Avatar emoji="🐯" fx="fx_embers" />);
+    const layer = container.querySelector('[data-fx="fx_embers"]');
+    expect(layer).not.toBeNull();
+    expect(layer?.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  });
+  test("Avatar with an unknown fx renders no effect layer", () => {
+    const { container } = render(
+      <>
+        <Avatar emoji="🐯" fx="fx_unknown" />
+        <Avatar emoji="🐯" fx={null} />
+      </>,
+    );
+    expect(container.querySelector("[data-fx]")).toBeNull();
+    expect(container.querySelector("svg")).toBeNull();
+  });
+  test("each known effect draws its own shapes", () => {
+    const { container } = render(
+      <>
+        <Avatar emoji="🐯" fx="fx_ink" />
+        <Avatar emoji="🐯" fx="fx_lightning" />
+        <Avatar emoji="🐯" fx="fx_embers" />
+      </>,
+    );
+    const counts = ["fx_ink", "fx_lightning", "fx_embers"].map((id) => container.querySelectorAll(`[data-fx="${id}"] svg ${id === "fx_embers" ? "circle" : "g[transform]"}`).length);
+    expect(counts[0]).toBe(3);
+    expect(counts[1]).toBe(3);
+    expect(counts[2]).toBe(8);
+  });
+  test("BadgeMedal shows the reward caption", () => {
+    render(<BadgeMedal icon="☕" title="Premier café" unlocked reward="+ Cadre jade" />);
+    expect(screen.getByText("+ Cadre jade")).toBeInTheDocument();
+  });
+  test("BadgeMedal without reward shows no caption", () => {
+    render(<BadgeMedal icon="☕" title="Premier café" unlocked />);
+    expect(screen.queryByText(/Cadre/)).toBeNull();
   });
 });

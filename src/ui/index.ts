@@ -8,6 +8,7 @@ export { FeedbackSheet } from "@/ui/FeedbackSheet";
 export { ProgressBar } from "@/ui/ProgressBar";
 export { Hearts } from "@/ui/Hearts";
 export { Avatar } from "@/ui/Avatar";
+export { ProfileFx, type ProfileFxId } from "@/ui/ProfileFx";
 export { ToneMark, TONE_UI } from "@/ui/ToneMark";
 export { ToneButton } from "@/ui/ToneButton";
 export { XpCounter } from "@/ui/XpCounter";

@@ -83,6 +83,7 @@ export const fr = {
       cancelLabel: "Annuler",
       confirmText: "SUPPRIMER",
       badgeTitle: "Premier café",
+      badgeReward: "+ Cadre jade",
       emptyTitle: "Rien à réviser",
       emptyBody: "Reviens après ta prochaine leçon, bạn !",
       toastTitle: "Badge débloqué",

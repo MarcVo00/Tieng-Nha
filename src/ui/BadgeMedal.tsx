@@ -3,9 +3,16 @@ import { fr } from "@/i18n/fr";
 import { Icon } from "@/ui/icons";
 import { spring } from "@/ui/motion";
 
-type BadgeMedalProps = { icon: string; title: string; unlocked: boolean; size?: "sm" | "lg" };
+type BadgeMedalProps = {
+  icon: string;
+  title: string;
+  unlocked: boolean;
+  size?: "sm" | "lg";
+  /** Already-localised reward caption, shown under the title (e.g. a frame name). */
+  reward?: string;
+};
 
-export function BadgeMedal({ icon, title, unlocked, size = "sm" }: BadgeMedalProps) {
+export function BadgeMedal({ icon, title, unlocked, size = "sm", reward }: BadgeMedalProps) {
   const dim = size === "lg" ? "h-24 w-24 text-display" : "h-16 w-16 text-title";
   return (
     <figure className="m-0 flex flex-col items-center gap-1.5">
@@ -32,6 +39,7 @@ export function BadgeMedal({ icon, title, unlocked, size = "sm" }: BadgeMedalPro
         {title}
         {unlocked ? null : <span className="sr-only">{`, ${fr.ui.badge.locked}`}</span>}
       </figcaption>
+      {reward ? <p className="m-0 max-w-28 text-center text-caption text-gold-ink">{reward}</p> : null}
     </figure>
   );
 }

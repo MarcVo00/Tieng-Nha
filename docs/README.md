@@ -4,7 +4,8 @@
 |---|---|---|
 | [Spec V1](superpowers/specs/2026-10-09-vietlearn-design.md) | tous | le *quoi* : fonctionnalités, données, backend, écrans, erreurs, tests |
 | [Spec Progression V2](superpowers/specs/2026-10-14-progression-boss-energy-design.md) | tous | arbre de compétences, boss, énergie, xu et boutique (à implémenter après l'oral) |
-| [Spec Héros et cosmétiques](superpowers/specs/2026-10-18-hero-cosmetics-design.md) | tous | personnages, cosmétiques par thème, cadres et animations débloqués par les succès (brouillon) |
+| [Spec Héros et cosmétiques](superpowers/specs/2026-10-18-hero-cosmetics-design.md) | tous | personnages, cosmétiques par thème, cadres et animations débloqués par les succès |
+| [Plan récompenses de succès](superpowers/plans/2026-10-18-achievement-rewards.md) | orchestrateur + sous-agents | lot 1 : cadres et animations de profil débloqués par les badges, remboursement des cadres |
 | [Plan arbre + boss](superpowers/plans/2026-10-14-tree-and-boss.md) | orchestrateur + sous-agents | étapes 1–2 de la Progression V2 : arbre de compétences, boss Thủy Tinh |
 | [Plan énergie](superpowers/plans/2026-10-14-energy.md) | orchestrateur + sous-agents | étape 3 de la Progression V2 : énergie ⚡ |
 | [Plan xu + boutique](superpowers/plans/2026-10-15-coins-shop.md) | orchestrateur + sous-agents | étape 4 de la Progression V2 : xu, boutique, cadres, gel de série (migration Supabase) |

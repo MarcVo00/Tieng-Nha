@@ -1,6 +1,6 @@
 # Héros, cosmétiques et récompenses de succès — conception
 
-> Statut : **brouillon** (2026-10-18), à valider par Marc.
+> Statut : **validé** par Marc le 2026-10-18. Plan du lot 1 : [`plans/2026-10-18-achievement-rewards.md`](../plans/2026-10-18-achievement-rewards.md).
 > Complète la [spec Progression V2](2026-10-14-progression-boss-energy-design.md) (§5 coins, §6 boutique) et la [direction artistique](../../art-direction.md).
 > Échéance : l'anniversaire de Mathias, le **2026-10-29**. Tout ce qui n'est pas prêt et testé sur téléphone le 2026-10-27 passe après.
 

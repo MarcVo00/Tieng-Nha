@@ -17,7 +17,8 @@ export default tseslint.config(
       "import/resolver": { typescript: { project: "./tsconfig.app.json" } },
       "boundaries/include": ["src/**/*"],
       "boundaries/elements": [
-        { type: "di", pattern: "src/app/{ServicesProvider.tsx,services.ts,appState.ts,useEquipToggle.ts}", mode: "file" },
+        { type: "di", pattern: "src/app/{ServicesProvider.tsx,services.ts,appState.ts}", mode: "file" },
+        { type: "app-hook", pattern: "src/app/use*.ts", mode: "file" },
         { type: "app", pattern: "src/app/**" },
         { type: "root", pattern: "src/{main,App}.tsx", mode: "file" },
         { type: "feature", pattern: "src/features/*", capture: ["name"] },
@@ -44,9 +45,10 @@ export default tseslint.config(
         default: "disallow",
         rules: [
           { from: "root", allow: ["root", "app", "di", "styles", "i18n", "ui"] },
-          { from: "di", allow: ["di", "ports", "domain", "services", "content", "ui", "i18n"] },
-          { from: "app", allow: ["di", "app", "feature", "exercise-registry", "exercise", "ui", "services", "ports", "domain", "adapters", "content", "i18n", "styles"] },
-          { from: "feature", allow: [["feature", { name: "${from.name}" }], "di", "exercise-registry", "ui", "services", "ports", "domain", "i18n"] },
+          { from: "di", allow: ["di", "ports", "domain", "services", "content"] },
+          { from: "app-hook", allow: ["app-hook", "di", "domain", "services", "ports", "ui", "i18n"] },
+          { from: "app", allow: ["di", "app", "app-hook", "feature", "exercise-registry", "exercise", "ui", "services", "ports", "domain", "adapters", "content", "i18n", "styles"] },
+          { from: "feature", allow: [["feature", { name: "${from.name}" }], "di", "app-hook", "exercise-registry", "ui", "services", "ports", "domain", "i18n"] },
           { from: "exercise-registry", allow: ["exercise", "exercise-registry", "ui", "services", "ports", "domain", "content", "i18n"] },
           { from: "exercise", allow: [["exercise", { name: "${from.name}" }], "di", "exercise-registry", "ui", "services", "ports", "domain", "content", "i18n"] },
           { from: "ui", allow: ["ui", "domain", "i18n"] },

@@ -554,7 +554,8 @@ export const fr = {
     } as Record<string, { name: string; desc: string; confirmName: string }>,
     themes: { legendes_sombres: "Légendes sombres" } as Record<string, string>,
     tryOn: {
-      open: (name: string) => `Essayer ${name}`,
+      /** Read before the item name by screen readers, so the card is announced as « Essayer <nom>, <prix ou statut> ». */
+      prefix: "Essayer",
       buy: (price: number) => `Acheter (${price} xu)`,
       equip: "Équiper",
       unequip: "Retirer",

@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(15);
+select plan(19);
 
 insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111', 'alice@test.fr');
 insert into public.groups (id, name, invite_code) values ('aaaaaaaa-0000-0000-0000-000000000001', 'Famille', 'FAM');
@@ -53,6 +53,15 @@ select pg_temp.ev('item_purchased', '{"itemId": "aura_waves"}');
 select is(pg_temp.coins(), 860, 'aura_waves costs 80');
 select pg_temp.ev('item_purchased', '{"itemId": "outfit_son_tinh"}');
 select is(pg_temp.coins(), 770, 'outfit_son_tinh costs 90');
+-- too poor for the 120-coin item: refused, nothing taken
+reset role;
+update public.user_stats set coins = 100 where user_id = '11111111-1111-1111-1111-111111111111';
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
+select pg_temp.ev('item_purchased', '{"itemId": "acc_thuan_thien"}');
+select is(pg_temp.coins(), 100, 'acc_thuan_thien is refused when coins are short');
+reset role;
+update public.user_stats set coins = 770 where user_id = '11111111-1111-1111-1111-111111111111';
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select pg_temp.ev('item_purchased', '{"itemId": "acc_thuan_thien"}');
 select is(pg_temp.coins(), 650, 'acc_thuan_thien costs 120');
 select is(cardinality(pg_temp.inv()), 4, 'all four are in the inventory');
@@ -62,6 +71,13 @@ select pg_temp.ev('item_equipped', '{"slot": "hat", "itemId": "hat_thuy_tinh"}')
 select is(pg_temp.eq('hat'), 'hat_thuy_tinh', 'an owned hat can be equipped');
 select pg_temp.ev('item_equipped', '{"slot": "outfit", "itemId": "hat_thuy_tinh"}');
 select is(pg_temp.eq('outfit'), null, 'a hat cannot go in the outfit slot');
+
+select pg_temp.ev('item_equipped', '{"slot": "outfit", "itemId": "outfit_son_tinh"}');
+select is(pg_temp.eq('outfit'), 'outfit_son_tinh', 'an owned outfit can be equipped');
+select pg_temp.ev('item_equipped', '{"slot": "aura", "itemId": "aura_waves"}');
+select is(pg_temp.eq('aura'), 'aura_waves', 'an owned aura can be equipped');
+select pg_temp.ev('item_equipped', '{"slot": "accessory", "itemId": "acc_thuan_thien"}');
+select is(pg_temp.eq('accessory'), 'acc_thuan_thien', 'an owned accessory can be equipped');
 
 -- ---------- one-shot back-fill is gone ----------
 reset role;

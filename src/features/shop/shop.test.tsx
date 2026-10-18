@@ -211,7 +211,9 @@ test("a failed wallet load offers a retry instead of an endless skeleton", async
 
 describe("dark legends section and try-on", () => {
   const NAMES = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien"].map((id) => fr.shop.items[id]?.name ?? "");
-  const open = (name: string) => screen.findByRole("button", { name: fr.shop.tryOn.open(name) });
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
+  const tryOnName = (name: string) => new RegExp(`^${fr.shop.tryOn.prefix} ${escapeRe(name)}`);
+  const open = (name: string) => screen.findByRole("button", { name: tryOnName(name) });
   const types = async (services: Services) => (await services.progress.listEvents()).map((e) => e.type);
 
   test("lists the consumables first, then the themed items by price, each previewed on the current hero", async () => {
@@ -222,7 +224,11 @@ describe("dark legends section and try-on", () => {
     expect(play.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const section = heading.closest("section") as HTMLElement;
     const buttons = within(section).getAllByRole("button");
-    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(NAMES.map((n) => fr.shop.tryOn.open(n)));
+    buttons.forEach((b, i) => expect(b).toHaveAccessibleName(tryOnName(NAMES[i] ?? "")));
+    expect(buttons).toHaveLength(NAMES.length);
+    // The price is part of the accessible name (not hidden by an aria-label).
+    expect(buttons[0]).toHaveAccessibleName(/xu$/);
+    expect(within(section).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(NAMES.map((n) => `${fr.shop.tryOn.prefix} ${n}`));
     const ids = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien"];
     buttons.forEach((b, i) => expect(b.querySelector("[data-look]")?.getAttribute("data-look")).toContain(ids[i]));
   });

@@ -207,3 +207,15 @@ describe("Character layers", () => {
     expect(container.querySelector('[data-fx="fx_embers"]')).not.toBeNull();
   });
 });
+
+describe("Avatar xl with a look", () => {
+  test("shows the whole body on the medallion, keeps frame and effect", () => {
+    const { container } = render(<Avatar emoji="🐯" size="xl" look={{ hat: "hat_thuy_tinh" }} frame="frame_jade" fx="fx_ink" still />);
+    const circle = container.querySelector("[data-frame='frame_jade']") as HTMLElement;
+    expect(circle.className).toContain("h-40");
+    expect(circle.className).toContain("items-end");
+    expect(circle.querySelector("[data-look]")?.getAttribute("data-look")).toContain("hat_thuy_tinh");
+    expect(circle.querySelector(":scope > span.absolute")).toBeNull(); // no head-crop wrapper
+    expect(container.querySelector("[data-fx='fx_ink']")).not.toBeNull();
+  });
+});

@@ -184,12 +184,14 @@ export function ShopScreen() {
           type="button"
           whileTap={tap}
           disabled={busy}
-          aria-label={fr.shop.tryOn.open(text.name)}
           onClick={() => tryOn(item)}
           className="flex h-full w-full flex-col items-center gap-2 rounded-md bg-surface p-3 text-center shadow-card disabled:opacity-60"
         >
-          <HeroMedallion look={{ ...baseLook, [slot]: item.id }} size={112} />
-          <span className="text-body-strong text-ink">{text.name}</span>
+          <HeroMedallion look={{ ...baseLook, [slot]: item.id }} size={112} ring={owned ? "gold" : "neutral"} />
+          <h3 className="text-body-strong text-ink">
+            <span className="sr-only">{fr.shop.tryOn.prefix} </span>
+            {text.name}
+          </h3>
           {owned ? (
             <span className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</span>
           ) : (

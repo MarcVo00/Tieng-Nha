@@ -236,11 +236,12 @@ export function MeScreen() {
       <h1 className="sr-only">{fr.profile.title}</h1>
 
       <Card raised className="flex flex-col gap-4 p-5">
-        <div className="flex items-center gap-4">
-          <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className={`rounded-full ${fxSpill(fx)}`}>
-            <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" frame={frame} fx={fx} look={look} />
+        {/* The whole hero is the star of the header (spec 5.4); name and XP sit quietly beneath. */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className={`rounded-full ${fxSpill(fx, "xl")}`}>
+            <Avatar emoji={profile?.avatarEmoji ?? ""} size="xl" ring="gold" frame={frame} fx={fx} look={look} />
           </motion.button>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 max-w-full">
             <p className="truncate text-title text-ink">{profile?.pseudo ?? ""}</p>
             <p className="tabular text-heading text-gold-ink">{fr.leaderboard.xp(snapshot?.xpTotal ?? 0)}</p>
             <p className="text-caption text-ink-muted">{fr.profile.stats.xp}</p>

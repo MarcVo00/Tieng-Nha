@@ -125,12 +125,12 @@ export function PublicProfileScreen() {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.base, ease: ease.out }} className="pb-8">
       <BackLink />
-      <div className="flex items-center gap-4 pt-2">
+      <div className="flex flex-col items-center gap-3 pt-2 text-center">
         {/* The effect layer spills 40 % of the avatar on every side: leave it room so it never covers the text. */}
-        <span className={`inline-flex ${fxSpill(profile.fx)}`}>
-          <Avatar emoji={profile.avatarEmoji} size="lg" frame={profile.frame} fx={profile.fx} look={profile.look} />
+        <span className={`inline-flex ${fxSpill(profile.fx, "xl")}`}>
+          <Avatar emoji={profile.avatarEmoji} size="xl" frame={profile.frame} fx={profile.fx} look={profile.look} />
         </span>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 max-w-full">
           <h1 className="truncate text-title text-ink">{profile.pseudo}</h1>
           <p className="tabular text-heading text-gold-ink">{fr.leaderboard.xp(profile.xpTotal)}</p>
           <p className="text-caption text-ink-muted">{fr.publicProfile.xpTotal}</p>

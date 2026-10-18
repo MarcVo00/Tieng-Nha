@@ -41,7 +41,7 @@ export function TryOnSheet({ item, open, wallet, baseLook, busy, onClose, onBuy,
     const look: Look = { ...baseLook, [slot]: item.id };
     return (
       <div className="flex flex-col items-center gap-4 text-center">
-        <HeroMedallion look={look} size={208} label={fr.shop.tryOn.preview(text.name)} />
+        <HeroMedallion look={look} size={208} ring={owned ? "gold" : "neutral"} label={fr.shop.tryOn.preview(text.name)} />
         {confirming && price !== null ? (
           <>
             <h2 className="text-heading text-ink">{fr.shop.confirm.title(text.confirmName, price)}</h2>

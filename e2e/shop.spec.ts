@@ -33,7 +33,7 @@ test("buy and wear the crown of the tides", async ({ page }) => {
   await page.getByRole("link", { name: fr.shop.open }).click();
 
   const crown = fr.shop.items.hat_thuy_tinh!;
-  await page.getByRole("button", { name: fr.shop.tryOn.open(crown.name) }).click();
+  await page.getByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} ${crown.name}`) }).click();
   await page.getByRole("button", { name: fr.shop.tryOn.buy(60) }).click();
   await page.getByRole("button", { name: fr.shop.confirm.confirm, exact: true }).click();
   await expect(page.getByText(fr.shop.tryOn.equipped, { exact: true })).toBeVisible();

@@ -64,6 +64,7 @@ export const fr = {
       cards: "Cartes et feuilles",
       progress: "Progression et récompenses",
       tones: "Tons",
+      hero: "Le héros",
       audio: "Audio et micro",
       feedback: "Retours et dialogues",
       misc: "États et décors",

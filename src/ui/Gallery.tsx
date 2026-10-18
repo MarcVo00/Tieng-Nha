@@ -2,14 +2,16 @@ import { useState, type ReactNode } from "react";
 import { MemoryRouter, useInRouterContext } from "react-router-dom";
 import { fr } from "@/i18n/fr";
 import { TONES } from "@/domain/tones";
-import type { Tone } from "@/domain/types";
+import type { Look, Tone } from "@/domain/types";
+
 import {
-  Avatar, BadgeMedal, Button, Card, Confetti, ConfirmDialog, EmptyState, FeedbackSheet, FocusHeader, Hearts, Icon, MicButton, Motif,
+  Avatar, BadgeMedal, Button, Card, Character, Confetti, ConfirmDialog, EmptyState, FeedbackSheet, FocusHeader, Hearts, Icon, MicButton, Motif,
   ProgressBar, ReportButton, Sheet, Skeleton, SpeakerButton, StreakFlame, TabBar, ToastViewport, ToneButton, ToneMark, useToast, XpCounter,
   type IconName,
 } from "@/ui";
 
 const g = fr.ui.gallery;
+const FULL_LOOK: Look = { hat: "hat_thuy_tinh", outfit: "outfit_son_tinh", accessory: "acc_thuan_thien", aura: "aura_waves" };
 const ICONS: IconName[] = [
   "home", "review", "trophy", "user", "close", "check", "cross", "speaker", "turtle", "mic", "stop", "flag",
   "chevron-right", "chevron-left", "lock", "star", "flame", "refresh", "settings", "share", "download", "chat", "play",
@@ -122,6 +124,20 @@ function Panel({ dark }: { dark: boolean }) {
             <BadgeMedal icon="☕" title={g.badgeTitle} unlocked size="lg" reward={g.badgeReward} />
           </div>
           <div className="relative h-24"><Confetti fire={confetti} /></div>
+        </Section>
+
+        <Section title={g.hero}>
+          <div className="flex flex-wrap items-end gap-4">
+            {([{}, { hat: "hat_thuy_tinh" }, { outfit: "outfit_son_tinh" }, { accessory: "acc_thuan_thien" }, { aura: "aura_waves" }, FULL_LOOK] as Look[]).map((look, i) => (
+              <span key={i} className="rounded-card bg-paper p-2"><Character look={look} size={160} /></span>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-10 py-6">
+            <Avatar emoji="🦊" look={{}} size="sm" />
+            <Avatar emoji="🦊" look={FULL_LOOK} frame="frame_jade" />
+            <Avatar emoji="🦊" look={FULL_LOOK} size="lg" frame="frame_son_mai" fx="fx_embers" />
+            <Avatar emoji="🦊" look={{ hat: "hat_thuy_tinh" }} size="lg" fx="fx_ink" />
+          </div>
         </Section>
 
         <Section title={g.tones}>

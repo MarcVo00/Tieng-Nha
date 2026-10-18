@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { characterLayers } from "@/ui/characterLayers";
 import { Avatar, BadgeMedal, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
 
 test("Button shows loading state and is disabled", () => {
@@ -176,5 +177,33 @@ describe("Profile effects", () => {
   test("BadgeMedal without reward shows no caption", () => {
     render(<BadgeMedal icon="☕" title="Premier café" unlocked />);
     expect(screen.queryByText(/Cadre/)).toBeNull();
+  });
+});
+
+describe("Character layers", () => {
+  const slots = (look: Parameters<typeof characterLayers>[0]) => characterLayers(look).map((l) => l.slot);
+  const srcOf = (look: Parameters<typeof characterLayers>[0], slot: string) => characterLayers(look).find((l) => l.slot === slot)?.src;
+  test("default hero: shadow, base, face, outfit, hat", () => {
+    expect(slots({})).toEqual(["shadow", "base", "face", "outfit", "hat"]);
+    expect(characterLayers({}).every((l) => l.src.length > 0)).toBe(true);
+  });
+  test("aura first, crown replaces the nón lá, accessory last", () => {
+    const look = { hat: "hat_thuy_tinh", aura: "aura_waves", accessory: "acc_thuan_thien" };
+    expect(slots(look)).toEqual(["aura", "shadow", "base", "face", "outfit", "hat", "accessory"]);
+    expect(srcOf(look, "hat")).not.toBe(srcOf({}, "hat"));
+  });
+  test("unknown ids fall back to the defaults", () => {
+    expect(srcOf({ hat: "hat_future" }, "hat")).toBe(srcOf({}, "hat"));
+    expect(slots({ accessory: "acc_future", aura: "aura_future" })).toEqual(["shadow", "base", "face", "outfit", "hat"]);
+  });
+  test("Avatar with look shows the hero, not the emoji", () => {
+    const { container } = render(<Avatar emoji="🐯" look={{ hat: "hat_thuy_tinh" }} />);
+    expect(container.querySelector("[data-look]")).toHaveAttribute("data-look", "hat_thuy_tinh");
+    expect(container.textContent).not.toContain("🐯");
+  });
+  test("Avatar with look keeps the frame and the effect", () => {
+    const { container } = render(<Avatar emoji="🐯" look={{}} frame="frame_jade" fx="fx_embers" />);
+    expect(container.querySelector('[data-frame="frame_jade"]')).not.toBeNull();
+    expect(container.querySelector('[data-fx="fx_embers"]')).not.toBeNull();
   });
 });

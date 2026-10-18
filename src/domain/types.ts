@@ -150,6 +150,9 @@ export type Shop = ShopItem[];
 /** Equipment slots: profile (frame, profile_fx) and character layers (hat, outfit, accessory, aura). */
 export type ItemSlot = "frame" | "profile_fx" | "hat" | "outfit" | "accessory" | "aura";
 
+/** What the hero wears: one item id per character slot; a missing slot means the default (or nothing for aura and accessory). */
+export type Look = Partial<Record<"hat" | "outfit" | "accessory" | "aura", string>>;
+
 /** Coins and purchases replayed from the journal (same rules as the server). */
 export type Wallet = {
   coins: number;

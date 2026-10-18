@@ -130,3 +130,27 @@ export async function seedLessonsCompleted(page: Page, ids: string[], opts: { pe
     { ids, perfect },
   );
 }
+
+/** Writes `badge_unlocked` events straight into the local event log. Call after onboarding, then reload. */
+export async function seedBadges(page: Page, ids: string[]): Promise<void> {
+  await page.evaluate(async (ids) => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open("tieng-nha");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const tx = db.transaction("events", "readwrite");
+    ids.forEach((id, i) => {
+      tx.objectStore("events").put({
+        clientId: crypto.randomUUID(),
+        schemaVersion: 1,
+        type: "badge_unlocked",
+        refId: id,
+        xp: 0,
+        payload: {},
+        createdAt: new Date(Date.now() - (ids.length - i) * 60000).toISOString(),
+      });
+    });
+    await new Promise((res) => { tx.oncomplete = res; });
+  }, ids);
+}

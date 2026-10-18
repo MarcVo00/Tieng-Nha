@@ -547,9 +547,6 @@ export const fr = {
       fx_lightning: { name: "Éclairs", desc: "Animation de profil.", confirmName: "les éclairs" },
       fx_embers: { name: "Braises", desc: "Animation de profil.", confirmName: "les braises" },
     } as Record<string, { name: string; desc: string; confirmName: string }>,
-    // Kept for e2e/shop.spec.ts until it is rewritten (reward items moved to fr.rewards).
-    equip: "Équiper",
-    equipped: "Équipé ✓",
     buy: (price: number) => `Acheter (${price} xu)`,
     noFunds: "Pas assez de xu",
     stockFull: "Stock plein",

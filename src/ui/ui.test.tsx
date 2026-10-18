@@ -157,10 +157,17 @@ describe("Profile effects", () => {
         <Avatar emoji="🐯" fx="fx_embers" />
       </>,
     );
-    const counts = ["fx_ink", "fx_lightning", "fx_embers"].map((id) => container.querySelectorAll(`[data-fx="${id}"] svg ${id === "fx_embers" ? "circle" : "g[transform]"}`).length);
+    const counts = ["fx_ink", "fx_lightning", "fx_embers"].map((id) => container.querySelectorAll(`[data-fx="${id}"] svg g[transform]`).length);
     expect(counts[0]).toBe(3);
     expect(counts[1]).toBe(3);
     expect(counts[2]).toBe(8);
+  });
+  test("each effect animates when motion is allowed", () => {
+    for (const id of ["fx_ink", "fx_lightning", "fx_embers"]) {
+      const { container, unmount } = render(<Avatar emoji="🐯" fx={id} />);
+      expect(container.querySelector("[data-fx-motion]")).not.toBeNull();
+      unmount();
+    }
   });
   test("BadgeMedal shows the reward caption", () => {
     render(<BadgeMedal icon="☕" title="Premier café" unlocked reward="+ Cadre jade" />);

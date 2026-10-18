@@ -37,9 +37,9 @@ export function BadgeMedal({ icon, title, unlocked, size = "sm", reward }: Badge
       </motion.div>
       <figcaption className={`max-w-24 text-center text-caption ${unlocked ? "text-ink" : "text-ink-muted"}`}>
         {title}
+        {reward ? <span className="block text-gold-ink">{reward}</span> : null}
         {unlocked ? null : <span className="sr-only">{`, ${fr.ui.badge.locked}`}</span>}
       </figcaption>
-      {reward ? <p className="m-0 max-w-28 text-center text-caption text-gold-ink">{reward}</p> : null}
     </figure>
   );
 }

@@ -51,22 +51,23 @@ function Lightning({ animated }: { animated: boolean }) {
     <div className={LAYER}>
       <svg {...SVG_PROPS}>
         {BOLTS.map(({ deg, slot }) => {
+          // A big jagged bolt, tip touching the avatar frame (r ~ 34), ~28 units long.
           const shape = (
             <>
-              <path d="M55 0 L43 11 L49.5 11 L43 21 L58 8 L51 8 Z" className="fill-fx-gold stroke-fx-ink" strokeWidth="1.5" strokeLinejoin="round" />
-              <path d="M53 3 L48 9" className="fill-none stroke-paper" strokeWidth="1.1" strokeLinecap="round" />
+              <path d="M57 -12 L40 4 L49 4 L38 16 L63 -3 L52 -3 Z" className="fill-fx-gold stroke-fx-ink" strokeWidth="2.2" strokeLinejoin="round" />
+              <path d="M54 -7 L46 1" className="fill-none stroke-paper" strokeWidth="1.8" strokeLinecap="round" />
             </>
           );
           return (
-            <g key={deg} transform={`rotate(${deg} 50 50) translate(0 -8) translate(50 10) scale(1.35) translate(-50 -10)`}>
+            <g key={deg} transform={`rotate(${deg} 50 50)`}>
               {animated ? (
                 <motion.g
                   data-fx-motion
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 1, 1, 0.2, 1, 0, 0] }}
+                  animate={{ opacity: [0, 1, 1, 0.3, 1, 1, 0, 0] }}
                   transition={{
                     duration: BOLT_CYCLE,
-                    times: [0, 0.04, 0.12, 0.16, 0.2, 0.32, 1],
+                    times: [0, 0.03, 0.12, 0.15, 0.18, 0.3, 0.34, 1],
                     delay: slot * (BOLT_CYCLE / 3),
                     repeat: Infinity,
                     ease: "linear",
@@ -85,48 +86,52 @@ function Lightning({ animated }: { animated: boolean }) {
   );
 }
 
+// Embers: flame-shaped teardrops (vermilion body, gold core, ink outline). x/y are viewBox positions of the base pose.
 const EMBERS = [
-  { x: 20, y: 60, r: 2.4, c: "fill-fx-vermilion", d: 0, drift: -4 },
-  { x: 34, y: 66, r: 1.6, c: "fill-fx-gold", d: 0.35, drift: 5 },
-  { x: 46, y: 62, r: 2.2, c: "fill-fx-gold", d: 0.7, drift: -3 },
-  { x: 58, y: 68, r: 1.7, c: "fill-fx-vermilion", d: 0.2, drift: 4 },
-  { x: 70, y: 62, r: 2.5, c: "fill-fx-gold", d: 0.55, drift: -5 },
-  { x: 82, y: 60, r: 1.8, c: "fill-fx-vermilion", d: 0.85, drift: 3 },
-  { x: 27, y: 72, r: 1.5, c: "fill-fx-gold", d: 0.95, drift: 4 },
-  { x: 76, y: 72, r: 1.6, c: "fill-fx-vermilion", d: 0.1, drift: -4 },
+  { x: 14, y: 62, s: 1.2, hot: false, d: 0, drift: -5 },
+  { x: 86, y: 66, s: 1.1, hot: true, d: 0.3, drift: 6 },
+  { x: 26, y: 78, s: 0.9, hot: true, d: 0.55, drift: 4 },
+  { x: 74, y: 76, s: 1.3, hot: false, d: 0.8, drift: -5 },
+  { x: 8, y: 80, s: 0.8, hot: true, d: 0.15, drift: 3 },
+  { x: 92, y: 84, s: 0.85, hot: false, d: 0.65, drift: -3 },
+  { x: 50, y: 74, s: 1.2, hot: false, d: 0.4, drift: 5 },
+  { x: 38, y: 70, s: 1, hot: true, d: 0.95, drift: -4 },
 ] as const;
-const RISE = 58;
+// Rise and drift are in viewBox units (the layer scales with the avatar); the static pose uses the same unit.
+const RISE = 72;
 const EMBER_CYCLE = duration.loop * 3;
+
+function Ember({ x, y, s, hot }: { x: number; y: number; s: number; hot: boolean }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`}>
+      <path d="M0 -9 C5 -3 6 3 0 7 C-6 3 -5 -3 0 -9 Z" className={`${hot ? "fill-fx-gold" : "fill-fx-vermilion"} stroke-fx-ink`} strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M0 -3 C2.2 0 2.2 2.4 0 3.8 C-2.2 2.4 -2.2 0 0 -3 Z" className={hot ? "fill-paper" : "fill-fx-gold"} />
+    </g>
+  );
+}
 
 function Embers({ animated }: { animated: boolean }) {
   return (
     <div className={LAYER}>
       <svg {...SVG_PROPS}>
-        {EMBERS.map((e) => {
-          const dot = <circle cx={e.x} cy={e.y} r={e.r * 1.5} className={`${e.c} stroke-fx-ink`} strokeWidth="1" />;
-          return animated ? (
+        {EMBERS.map((e) =>
+          animated ? (
             <motion.g
               key={`${e.x}-${e.y}`}
               data-fx-motion
               initial={{ y: 0, x: 0, opacity: 0 }}
               animate={{ y: [0, -RISE], x: [0, e.drift], opacity: [0, 1, 0.9, 0] }}
-              transition={{
-                duration: EMBER_CYCLE,
-                times: [0, 0.15, 0.7, 1],
-                delay: e.d * (EMBER_CYCLE / 3),
-                repeat: Infinity,
-                ease: "linear",
-              }}
+              transition={{ duration: EMBER_CYCLE, times: [0, 0.15, 0.7, 1], delay: e.d * (EMBER_CYCLE / 3), repeat: Infinity, ease: "linear" }}
             >
-              {dot}
+              <Ember {...e} />
             </motion.g>
           ) : (
             // Static pose: embers frozen part-way up.
-            <g key={`${e.x}-${e.y}`} transform={`translate(0 ${-RISE / 2 + (e.d - 0.5) * 8})`} opacity="0.9">
-              {dot}
+            <g key={`${e.x}-${e.y}`} transform={`translate(0 ${-RISE / 2 + (e.d - 0.5) * 10})`} opacity="0.95">
+              <Ember {...e} />
             </g>
-          );
-        })}
+          ),
+        )}
       </svg>
     </div>
   );

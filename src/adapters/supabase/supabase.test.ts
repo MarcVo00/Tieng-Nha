@@ -245,3 +245,20 @@ describe("getPublicProfile fx mapping", () => {
     expect(await fxFor(7)).toBeNull();
   });
 });
+
+describe("getPublicProfile look mapping", () => {
+  async function lookFor(equipped: unknown) {
+    const row = { user_id: "u1", pseudo: "A", avatar_emoji: "🐯", xp_total: 1, xp_week: 1, streak: 0, equipped_frame: null, equipped };
+    const maybeSingle = vi.fn().mockResolvedValue({ data: row, error: null });
+    const db = { from: vi.fn(() => ({ select: () => ({ eq: () => ({ maybeSingle }) }) })) };
+    return (await new SupabaseLeaderboardRepository(db as never).getPublicProfile("u1")).look;
+  }
+
+  test("keeps the character slots and drops the profile ones", async () => {
+    expect(await lookFor({ hat: "hat_thuy_tinh", aura: "aura_waves", frame: "frame_jade", profile_fx: "fx_ink" })).toEqual({ hat: "hat_thuy_tinh", aura: "aura_waves" });
+  });
+
+  test("malformed equipped reads as the default hero", async () => {
+    for (const bad of [null, [], "hat_thuy_tinh", 7]) expect(await lookFor(bad)).toEqual({});
+  });
+});

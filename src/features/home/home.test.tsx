@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -22,7 +22,7 @@ function renderHome(services = createFakeServices()) {
 }
 
 beforeEach(() => {
-  useAppState.setState({ snapshot: null, dueCount: 0 });
+  useAppState.setState({ snapshot: null, dueCount: 0, wallet: null });
 });
 
 test("shows the first lesson as available with a start chip, and a locked exam", async () => {
@@ -71,4 +71,13 @@ test("the hero waits beside the path before the first lesson, then stands on the
   await services.activity.completeLesson({ lessonId: "l05", mistakes: 0, durationMs: 1000, vocabIds: [] });
   renderHome(services);
   expect(await screen.findByRole("img", { name: "Toi, après la leçon « Au café »" })).toBeInTheDocument();
+});
+
+test("the path token wears the equipped hero, and the default hero before the wallet loads", async () => {
+  const services = createFakeServices();
+  renderHome(services);
+  const token = await screen.findByRole("img", { name: "Toi, au départ du parcours" });
+  expect(token.querySelector("[data-look]")).toHaveAttribute("data-look", "");
+  useAppState.setState({ wallet: { ...(await services.activity.getWallet()), equipped: { hat: "hat_thuy_tinh" } } });
+  await waitFor(() => expect(token.querySelector('[data-look~="hat_thuy_tinh"]')).not.toBeNull());
 });

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
@@ -7,6 +7,7 @@ import { OfflineError } from "@/domain/errors";
 import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { BadgeDef, Boss } from "@/domain/types";
+import { lookOf } from "@/services/look";
 import { FINAL_BOSS_ID } from "@/services/tree";
 import { bossMention, livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS } from "@/services/exam";
@@ -101,6 +102,8 @@ export function MeScreen() {
   const coins = useAppState((s) => s.wallet?.coins ?? null);
   const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
   const fx = useAppState((s) => s.wallet?.equipped.profile_fx ?? null);
+  const equipped = useAppState((s) => s.wallet?.equipped);
+  const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
   const [boss, setBoss] = useState<Boss | null>(null);
   const [bossFailed, setBossFailed] = useState(false);
   const [badges, setBadges] = useState<BadgeDef[] | null>(null);
@@ -234,12 +237,15 @@ export function MeScreen() {
       <Card raised className="flex flex-col gap-4 p-5">
         <div className="flex items-center gap-4">
           <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className={`rounded-full ${fxSpill(fx)}`}>
-            <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" frame={frame} fx={fx} />
+            <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" frame={frame} fx={fx} look={look} />
           </motion.button>
           <div className="min-w-0 flex-1">
             <p className="truncate text-title text-ink">{profile?.pseudo ?? ""}</p>
             <p className="tabular text-heading text-gold-ink">{fr.leaderboard.xp(snapshot?.xpTotal ?? 0)}</p>
             <p className="text-caption text-ink-muted">{fr.profile.stats.xp}</p>
+            <Link to="/shop" className="mt-1 inline-flex min-h-11 items-center text-caption text-primary underline underline-offset-2">
+              {fr.profile.changeOutfit}
+            </Link>
           </div>
         </div>
         <dl className="flex gap-6">

@@ -1,7 +1,8 @@
 import type { Db } from "@/adapters/supabase/client";
 import { mapError } from "@/adapters/supabase/errors";
 import { ContentNotFoundError } from "@/domain/errors";
-import type { LeaderboardRow, PublicProfile } from "@/domain/types";
+import { lookOf } from "@/services/look";
+import type { ItemSlot, LeaderboardRow, Look, PublicProfile } from "@/domain/types";
 import type { LeaderboardRepository } from "@/ports";
 
 /** Equipped profile effect id from the `equipped` jsonb; any unexpected shape reads as none. */
@@ -9,6 +10,12 @@ function profileFx(equipped: unknown): string | null {
   if (typeof equipped !== "object" || equipped === null || Array.isArray(equipped)) return null;
   const fx = (equipped as Record<string, unknown>)["profile_fx"];
   return typeof fx === "string" ? fx : null;
+}
+
+/** Equipped hero look from the `equipped` jsonb; any unexpected shape reads as the default hero. */
+function lookFrom(equipped: unknown): Look {
+  if (typeof equipped !== "object" || equipped === null || Array.isArray(equipped)) return {};
+  return lookOf(equipped as Partial<Record<ItemSlot, string>>);
 }
 
 export class SupabaseLeaderboardRepository implements LeaderboardRepository {
@@ -58,6 +65,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
       examBest: data.exam_best,
       frame: data.equipped_frame ?? null,
       fx: profileFx(data.equipped),
+      look: lookFrom(data.equipped),
     };
   }
 }

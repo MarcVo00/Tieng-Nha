@@ -593,6 +593,7 @@ export const fr = {
   profile: {
     title: "Mon profil",
     editAria: "Modifier mon profil",
+    changeOutfit: "Changer de tenue",
     stats: {
       xp: "XP au total",
       streak: "Série en cours",

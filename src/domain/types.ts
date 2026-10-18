@@ -116,6 +116,8 @@ export type PublicProfile = {
   frame: string | null;
   /** Equipped profile effect item id (`fx_*`), or null. */
   fx: string | null;
+  /** Equipped hero look (hat, outfit, accessory, aura). */
+  look: Look;
 };
 
 export type ConversationEntry = { turnId: string; speaker: "npc" | "user"; vi: string; fr: string };

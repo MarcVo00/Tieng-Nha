@@ -128,7 +128,7 @@ export function PublicProfileScreen() {
       <div className="flex items-center gap-4 pt-2">
         {/* The effect layer spills 40 % of the avatar on every side: leave it room so it never covers the text. */}
         <span className={`inline-flex ${fxSpill(profile.fx)}`}>
-          <Avatar emoji={profile.avatarEmoji} size="lg" frame={profile.frame} fx={profile.fx} />
+          <Avatar emoji={profile.avatarEmoji} size="lg" frame={profile.frame} fx={profile.fx} look={profile.look} />
         </span>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-title text-ink">{profile.pseudo}</h1>

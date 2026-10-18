@@ -78,6 +78,7 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
       examBest: null,
       frame: bot.frame,
       fx: null,
+      look: {},
     };
   }
 }

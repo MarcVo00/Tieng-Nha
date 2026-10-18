@@ -431,6 +431,15 @@ describe("rewards section", () => {
     expect(screen.getByRole("button", { name: fr.profile.editAria }).querySelector("[data-fx]")).toHaveAttribute("data-fx", "fx_embers");
   });
 
+  test("the header shows the equipped hero (no emoji) and a link to change outfit", async () => {
+    const { services } = await setupRewards(["ten_lessons"]);
+    useAppState.setState({ wallet: { ...(await services.activity.getWallet()), equipped: { hat: "hat_thuy_tinh" } } });
+    const header = screen.getByRole("button", { name: fr.profile.editAria });
+    await waitFor(() => expect(header.querySelector('[data-look~="hat_thuy_tinh"]')).not.toBeNull());
+    expect(header.textContent).toBe("");
+    expect(screen.getByRole("link", { name: fr.profile.changeOutfit })).toHaveAttribute("href", "/shop");
+  });
+
   test("an equip failure shows the dedicated error", async () => {
     const { services, user } = await setupRewards(["ten_lessons"]);
     vi.spyOn(services.activity, "equip").mockRejectedValue(new Error("down"));

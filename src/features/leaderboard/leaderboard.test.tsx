@@ -176,7 +176,7 @@ test("a profile shows its lesson count and boss victory", async () => {
     list: (period) => base.leaderboard.list(period),
     getPublicProfile: async () => ({
       userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
-      lessonsDone: ["l01", "l02"], dialoguesDone: [], badges: ["first_lesson"], examBest: 92, frame: null, fx: null,
+      lessonsDone: ["l01", "l02"], dialoguesDone: [], badges: ["first_lesson"], examBest: 92, frame: null, fx: null, look: {},
     }),
   };
   setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
@@ -192,7 +192,7 @@ test("a profile renders its equipped effect", async () => {
     list: (period) => base.leaderboard.list(period),
     getPublicProfile: async () => ({
       userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
-      lessonsDone: [], dialoguesDone: [], badges: [], examBest: null, frame: null, fx: "fx_embers",
+      lessonsDone: [], dialoguesDone: [], badges: [], examBest: null, frame: null, fx: "fx_embers", look: {},
     }),
   };
   setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
@@ -206,7 +206,7 @@ test("a profile with a legacy passing score reads as a victory", async () => {
     list: (period) => base.leaderboard.list(period),
     getPublicProfile: async () => ({
       userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
-      lessonsDone: ["l01"], dialoguesDone: [], badges: [], examBest: 84, frame: null, fx: null,
+      lessonsDone: ["l01"], dialoguesDone: [], badges: [], examBest: 84, frame: null, fx: null, look: {},
     }),
   };
   setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
@@ -237,4 +237,19 @@ test("a profile opened offline shows an offline state", async () => {
   fakeOf(services).online = false;
   setup("/u/bot_anh_hai", services);
   expect(await screen.findByText(fr.publicProfile.offline.title)).toBeInTheDocument();
+});
+
+test("a profile shows the hero it wears", async () => {
+  const base = createFakeServices({ clock });
+  const leaderboard: Services["leaderboard"] = {
+    list: (period) => base.leaderboard.list(period),
+    getPublicProfile: async () => ({
+      userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
+      lessonsDone: [], dialoguesDone: [], badges: [], examBest: null, frame: null, fx: null, look: { hat: "hat_thuy_tinh" },
+    }),
+  };
+  setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
+  await screen.findByRole("heading", { level: 1, name: "Xuân" });
+  expect(document.querySelector('[data-look~="hat_thuy_tinh"]')).not.toBeNull();
+  expect(screen.queryByText("🐯")).toBeNull();
 });

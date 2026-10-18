@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { FINAL_BOSS_ID } from "@/services/tree";
@@ -6,6 +6,7 @@ import { fr } from "@/i18n/fr";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Boss, LessonSummary, Tree } from "@/domain/types";
+import { lookOf } from "@/services/look";
 import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
 import { PathStop } from "@/features/home/PathStop";
 import { HeroToken } from "@/features/home/HeroToken";
@@ -56,6 +57,8 @@ export function HomeScreen() {
   const refresh = useRefreshProgress();
   const snapshot = useAppState((s) => s.snapshot);
   const dueCount = useAppState((s) => s.dueCount);
+  const equipped = useAppState((s) => s.wallet?.equipped);
+  const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
   const reduced = useReducedMotion();
   const maskId = useId();
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
@@ -143,7 +146,7 @@ export function HomeScreen() {
                 <PathStop key={node.key} node={node} nextRef={nextRef} />
               ))}
             </ol>
-            <HeroToken hero={layout.hero} label={heroLabel(layout)} />
+            <HeroToken hero={layout.hero} label={heroLabel(layout)} look={look} />
           </div>
         )}
       </div>

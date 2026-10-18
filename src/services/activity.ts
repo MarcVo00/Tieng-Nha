@@ -30,8 +30,8 @@ export function createActivityService(deps: {
 }): ActivityService {
   const { progress, outbox, content, clock } = deps;
   const load = async (): Promise<{ events: AppEvent[]; wallet: Wallet }> => {
-    const [events, shop] = await Promise.all([progress.listEvents(), content.getShop()]);
-    return { events, wallet: walletAt(events, shop) };
+    const [events, shop, badges] = await Promise.all([progress.listEvents(), content.getShop(), content.getBadges()]);
+    return { events, wallet: walletAt(events, shop, badges) };
   };
   const snapshot = async () => {
     const { events, wallet } = await load();

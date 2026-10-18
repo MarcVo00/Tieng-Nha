@@ -132,7 +132,11 @@ describe("shop", () => {
     expect((await s.activity.equip("frame", "frame_bronze")).ok).toBe(false);
     expect((await s.activity.purchase("frame_bronze")).ok).toBe(false); // reward-only: cannot be bought
     expect((await s.activity.equip("frame", "frame_bronze")).ok).toBe(false);
-    // Owning a reward through its badge, then equipping it, is covered once the wallet replay grants rewards.
+    // A reward owned through its badge can be equipped.
+    await s.progress.appendEvent({ type: "badge_unlocked", refId: "streak_7", xp: 0, payload: {} }, "2026-10-10T09:00:00.000Z");
+    const r = await s.activity.equip("frame", "frame_bronze");
+    expect(r.ok).toBe(true);
+    expect(r.wallet.equipped.frame).toBe("frame_bronze");
     expect((await s.activity.equip("frame", null)).ok).toBe(true);
   });
 

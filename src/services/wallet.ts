@@ -1,4 +1,4 @@
-import type { AppEvent, ItemSlot, ShopItem, Wallet } from "@/domain/types";
+import type { AppEvent, BadgeDef, ItemSlot, ShopItem, Wallet } from "@/domain/types";
 import { STREAK_EVENT_TYPES } from "@/services/progress";
 import { daysBetween, parisDay } from "@/services/time";
 
@@ -31,13 +31,21 @@ export function coinsForEvent(e: AppEvent, bestBefore: number | null): number {
   }
 }
 
-/** The catalogue item a purchase would buy, or null when the server rules refuse it. */
-export function purchasable(w: Wallet, shop: readonly ShopItem[], itemId: unknown): ShopItem | null {
+/** The item a badge grants when first unlocked, or null (no such badge, or no reward). */
+export function rewardItem(badges: readonly BadgeDef[], badgeId: string): string | null {
+  return badges.find((b) => b.id === badgeId)?.reward ?? null;
+}
+
+export type PricedItem = ShopItem & { price: number };
+
+/** The catalogue item a purchase would buy, or null when the server rules refuse it (reward-only items have no price). */
+export function purchasable(w: Wallet, shop: readonly ShopItem[], itemId: unknown): PricedItem | null {
   const item = typeof itemId === "string" ? shop.find((i) => i.id === itemId) : undefined;
   if (!item || item.price === null || w.coins < item.price) return null;
+  const priced: PricedItem = { ...item, price: item.price };
   if (item.kind === "cosmetic" && w.inventory.includes(item.id)) return null;
   if (item.id === "streak_freeze" && w.freezes >= (item.maxStock ?? DEFAULT_MAX_FREEZES)) return null;
-  return item;
+  return priced;
 }
 
 /** True when equipping `itemId` (null = remove) in `slot` is accepted. */
@@ -48,16 +56,16 @@ export function equippable(w: Wallet, shop: readonly ShopItem[], slot: unknown, 
 }
 
 /** Replays the journal in time order with the server rules (earning, purchase acceptance, equipment). */
-export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[]): Wallet {
+export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[], badgeDefs: readonly BadgeDef[]): Wallet {
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const w: Wallet = { coins: 0, inventory: [], equipped: {}, freezes: 0, refills: [], streak: 0, lastActiveDay: null };
-  const badges = new Set<string>();
+  const unlocked = new Set<string>();
   let best: number | null = null;
 
   for (const e of sorted) {
     if (e.type === "item_purchased") {
       const item = purchasable(w, shop, e.payload["itemId"]);
-      if (!item || item.price === null) continue;
+      if (!item) continue;
       w.coins -= item.price;
       if (item.id === "streak_freeze") w.freezes += 1;
       else if (item.kind === "cosmetic") w.inventory.push(item.id);
@@ -73,8 +81,12 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[])
       continue;
     }
     if (e.type === "badge_unlocked") {
-      if (!badges.has(e.refId)) w.coins += coinsForEvent(e, best);
-      badges.add(e.refId);
+      if (!unlocked.has(e.refId)) {
+        w.coins += coinsForEvent(e, best);
+        const reward = rewardItem(badgeDefs, e.refId);
+        if (reward !== null && !w.inventory.includes(reward)) w.inventory.push(reward);
+      }
+      unlocked.add(e.refId);
     } else {
       w.coins += coinsForEvent(e, best);
     }

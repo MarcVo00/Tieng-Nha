@@ -169,8 +169,14 @@ declare
   v_frame text;
   v_equipped jsonb;
 begin
+  -- block concurrent event projections while we read-modify-write the wallets (lock_timeout bounds the wait)
+  lock table public.user_stats in share row exclusive mode;
+
   for r in select user_id, coins, inventory, badges, equipped from public.user_stats loop
-    -- old frame prices, hard-coded on purpose: frame_bronze 40, frame_jade 80, frame_son_mai 150
+    -- old frame prices, hard-coded on purpose: frame_bronze 40, frame_jade 80, frame_son_mai 150.
+    -- Assumption: the refund is an exact mirror of the old rules only when no consumable purchase
+    -- followed a frame purchase (a later purchase the refund would have made affordable is NOT replayed).
+    -- Production had 0 item_purchased events on 2026-10-18; the controller re-checks this before the push.
     v_coins := r.coins
       + case when 'frame_bronze' = any(r.inventory) then 40 else 0 end
       + case when 'frame_jade' = any(r.inventory) then 80 else 0 end
@@ -192,6 +198,7 @@ begin
         e.payload->>'itemId' is null
         or (
           (e.payload->>'itemId') = any(v_inventory)
+          and (select i.slot from public.shop_item(e.payload->>'itemId') i) = 'frame'
           and exists (
             select 1 from public.events bu
             where bu.user_id = r.user_id and bu.type = 'badge_unlocked'

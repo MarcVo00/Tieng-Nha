@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(40);
+select plan(45);
 
 -- fixtures (as postgres)
 insert into auth.users (id, email) values
@@ -8,7 +8,10 @@ insert into auth.users (id, email) values
   ('22222222-2222-2222-2222-222222222222', 'bob@test.fr'),
   ('33333333-3333-3333-3333-333333333333', 'carol@test.fr'),
   ('44444444-4444-4444-4444-444444444444', 'dave@test.fr'),
-  ('55555555-5555-5555-5555-555555555555', 'erin@test.fr');
+  ('55555555-5555-5555-5555-555555555555', 'erin@test.fr'),
+  ('66666666-6666-6666-6666-666666666666', 'frank@test.fr'),
+  ('77777777-7777-7777-7777-777777777777', 'grace@test.fr'),
+  ('88888888-8888-8888-8888-888888888888', 'heidi@test.fr');
 insert into public.groups (id, name, invite_code) values
   ('aaaaaaaa-0000-0000-0000-000000000001', 'Famille', 'FAM');
 
@@ -107,6 +110,12 @@ select pg_temp.login('44444444-4444-4444-4444-444444444444');
 select public.join_group('FAM', 'Dave', '🦊');
 select pg_temp.login('55555555-5555-5555-5555-555555555555');
 select public.join_group('FAM', 'Erin', '🐸');
+select pg_temp.login('66666666-6666-6666-6666-666666666666');
+select public.join_group('FAM', 'Frank', '🦉');
+select pg_temp.login('77777777-7777-7777-7777-777777777777');
+select public.join_group('FAM', 'Grace', '🦄');
+select pg_temp.login('88888888-8888-8888-8888-888888888888');
+select public.join_group('FAM', 'Heidi', '🐢');
 reset role;
 
 alter table public.events disable trigger events_apply;
@@ -127,6 +136,19 @@ insert into public.events (client_id, user_id, type, ref_id, xp, payload, client
 -- erin (d): earned exam_excellent, bought nothing
 insert into public.events (client_id, user_id, type, ref_id, xp, payload, client_created_at) values
   (gen_random_uuid(), '55555555-5555-5555-5555-555555555555', 'badge_unlocked', 'exam_excellent', 10, '{}', now() - interval '1 day');
+-- frank (e): two valid equips (last wins), then an effect equipped in the frame slot (ignored)
+insert into public.events (client_id, user_id, type, ref_id, xp, payload, client_created_at) values
+  (gen_random_uuid(), '66666666-6666-6666-6666-666666666666', 'badge_unlocked', 'streak_7', 10, '{}', now() - interval '6 days'),
+  (gen_random_uuid(), '66666666-6666-6666-6666-666666666666', 'badge_unlocked', 'ten_lessons', 10, '{}', now() - interval '5 days'),
+  (gen_random_uuid(), '66666666-6666-6666-6666-666666666666', 'badge_unlocked', 'perfect_5', 10, '{}', now() - interval '4 days'),
+  (gen_random_uuid(), '66666666-6666-6666-6666-666666666666', 'item_equipped', 'x', 0, '{"slot": "frame", "itemId": "frame_bronze"}', now() - interval '3 days'),
+  (gen_random_uuid(), '66666666-6666-6666-6666-666666666666', 'item_equipped', 'x', 0, '{"slot": "frame", "itemId": "frame_jade"}', now() - interval '2 days'),
+  (gen_random_uuid(), '66666666-6666-6666-6666-666666666666', 'item_equipped', 'x', 0, '{"slot": "frame", "itemId": "fx_ink"}', now() - interval '1 day');
+-- heidi (f): valid equip then a clear
+insert into public.events (client_id, user_id, type, ref_id, xp, payload, client_created_at) values
+  (gen_random_uuid(), '88888888-8888-8888-8888-888888888888', 'badge_unlocked', 'streak_7', 10, '{}', now() - interval '3 days'),
+  (gen_random_uuid(), '88888888-8888-8888-8888-888888888888', 'item_equipped', 'x', 0, '{"slot": "frame", "itemId": "frame_bronze"}', now() - interval '2 days'),
+  (gen_random_uuid(), '88888888-8888-8888-8888-888888888888', 'item_equipped', 'x', 0, '{"slot": "frame", "itemId": null}', now() - interval '1 day');
 alter table public.events enable trigger events_apply;
 
 -- state produced by the OLD rules
@@ -136,6 +158,13 @@ update public.user_stats set coins = 0, inventory = '{frame_bronze}', badges = '
   where user_id = '44444444-4444-4444-4444-444444444444';
 update public.user_stats set coins = 7, inventory = '{}', badges = '{exam_excellent}', equipped = '{}'
   where user_id = '55555555-5555-5555-5555-555555555555';
+
+update public.user_stats set coins = 0, inventory = '{frame_bronze,frame_jade,fx_ink}', badges = '{streak_7,ten_lessons,perfect_5}', equipped = '{"frame": "frame_jade"}'
+  where user_id = '66666666-6666-6666-6666-666666666666';
+update public.user_stats set coins = 0, inventory = '{frame_bronze,frame_jade,frame_son_mai}', badges = '{}', equipped = '{"profile_fx": "fx_ink"}'
+  where user_id = '77777777-7777-7777-7777-777777777777';
+update public.user_stats set coins = 0, inventory = '{frame_bronze}', badges = '{streak_7}', equipped = '{"frame": "frame_bronze"}'
+  where user_id = '88888888-8888-8888-8888-888888888888';
 
 select lives_ok($$ select public.rewards_backfill() $$, 'rewards_backfill runs');
 
@@ -153,6 +182,12 @@ select is((select equipped from public.user_stats where user_id = '44444444-4444
 
 select is((select coins from public.user_stats where user_id = '55555555-5555-5555-5555-555555555555'), 7, 'd: no refund');
 select is((select inventory from public.user_stats where user_id = '55555555-5555-5555-5555-555555555555'), '{fx_lightning}'::text[], 'd: badge reward granted');
+
+select is((select equipped from public.user_stats where user_id = '66666666-6666-6666-6666-666666666666'), '{"frame": "frame_jade"}'::jsonb, 'e: last valid equip wins, an effect in the frame slot is ignored');
+select is((select equipped from public.user_stats where user_id = '88888888-8888-8888-8888-888888888888'), '{}'::jsonb, 'f: a clear after a valid equip removes the frame');
+select is((select coins from public.user_stats where user_id = '77777777-7777-7777-7777-777777777777'), 270, 'g: three frames refund 40+80+150');
+select is((select inventory from public.user_stats where user_id = '77777777-7777-7777-7777-777777777777'), '{}'::text[], 'g: frames removed from the inventory');
+select is((select equipped from public.user_stats where user_id = '77777777-7777-7777-7777-777777777777'), '{"profile_fx": "fx_ink"}'::jsonb, 'g: equipped profile_fx is preserved');
 
 select * from finish();
 rollback;

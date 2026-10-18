@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { createFakeServices, FakeSpeechRecognizer, FakeSpeechSynthesizer } from "@/adapters/fakes";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { useAppState } from "@/app/appState";
+import type { BadgeDef } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { RecognitionError } from "@/ports";
 import { DialogueScreen } from "@/features/conversation";
@@ -12,13 +13,16 @@ import { DialogueScreen } from "@/features/conversation";
 const SLOW = { timeout: 5000 };
 const HOME = "page d'accueil";
 
-function setup(opts: { strict?: boolean; noCoins?: boolean } = {}) {
+const REWARD_BADGE: BadgeDef = { id: "streak_7", title: "Une semaine", description: "7 jours d'affilée.", icon: "🏮", rule: { kind: "streak", gte: 7 }, reward: "frame_bronze" };
+
+function setup(opts: { strict?: boolean; noCoins?: boolean; badge?: boolean } = {}) {
   const stt = new FakeSpeechRecognizer();
   const tts = new FakeSpeechSynthesizer();
   const services = createFakeServices({ stt, tts });
   const realCompleteDialogue = services.activity.completeDialogue.bind(services.activity);
   const completeDialogue = vi.spyOn(services.activity, "completeDialogue");
   if (opts.noCoins) completeDialogue.mockImplementation(async (i) => ({ ...(await realCompleteDialogue(i)), coinsGained: 0 }));
+  if (opts.badge) completeDialogue.mockImplementation(async (i) => ({ ...(await realCompleteDialogue(i)), newBadges: [REWARD_BADGE] }));
   const tree = (
     <ServicesProvider services={services}>
       <MemoryRouter initialEntries={["/dialogue/d05"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -110,6 +114,13 @@ describe("DialogueScreen", () => {
     await screen.findByRole("button", { name: fr.conversation.done.home }, SLOW);
     if (shown) expect(screen.getByText(/^\+\d+ xu$/)).toBeInTheDocument();
     else expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
+  });
+
+  it("shows the reward of a newly unlocked badge", async () => {
+    setup({ badge: true });
+    await userEvent.click(await optionButton(/Cho tui một ly cà phê sữa đá/));
+    await userEvent.click(await optionButton(/Cảm ơn em/));
+    expect(await screen.findByText(fr.rewards.gained("Cadre bronze"), undefined, SLOW)).toBeInTheDocument();
   });
 
   it("reveals the French translation on demand", async () => {

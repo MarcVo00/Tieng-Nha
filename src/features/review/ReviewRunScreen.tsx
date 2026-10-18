@@ -5,7 +5,7 @@ import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
-import { BadgeMedal, Button, Confetti, ConfirmDialog, EmptyState, FocusHeader, Icon, Motif, Skeleton, XpCounter } from "@/ui";
+import { BadgeMedal, rewardProp, Button, Confetti, ConfirmDialog, EmptyState, FocusHeader, Icon, Motif, Skeleton, XpCounter } from "@/ui";
 import { useReviewRun, type ReviewDone } from "@/features/review/useReviewRun";
 
 const BADGE_STAGGER_MS = 280;
@@ -58,7 +58,7 @@ function DonePanel({ result, finishing, onFinish }: { result: ReviewDone; finish
             <ul className="flex flex-wrap gap-5">
               {result.newBadges.slice(0, shownBadges).map((b) => (
                 <li key={b.id}>
-                  <BadgeMedal icon={b.icon} title={b.title} unlocked size="lg" />
+                  <BadgeMedal icon={b.icon} title={b.title} unlocked {...rewardProp(b)} size="lg" />
                 </li>
               ))}
             </ul>

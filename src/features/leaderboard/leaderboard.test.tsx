@@ -186,6 +186,20 @@ test("a profile shows its lesson count and boss victory", async () => {
   expect(screen.getAllByText(fr.ui.badge.locked, { exact: false }).length).toBeGreaterThan(0);
 });
 
+test("a profile renders its equipped effect", async () => {
+  const base = createFakeServices({ clock });
+  const leaderboard: Services["leaderboard"] = {
+    list: (period) => base.leaderboard.list(period),
+    getPublicProfile: async () => ({
+      userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
+      lessonsDone: [], dialoguesDone: [], badges: [], examBest: null, frame: null, fx: "fx_embers",
+    }),
+  };
+  setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
+  await screen.findByRole("heading", { level: 1, name: "Xuân" });
+  expect(document.querySelector('[data-fx="fx_embers"]')).not.toBeNull();
+});
+
 test("a profile with a legacy passing score reads as a victory", async () => {
   const base = createFakeServices({ clock });
   const leaderboard: Services["leaderboard"] = {

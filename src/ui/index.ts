@@ -13,7 +13,7 @@ export { ToneMark, TONE_UI } from "@/ui/ToneMark";
 export { ToneButton } from "@/ui/ToneButton";
 export { XpCounter } from "@/ui/XpCounter";
 export { StreakFlame } from "@/ui/StreakFlame";
-export { BadgeMedal } from "@/ui/BadgeMedal";
+export { BadgeMedal, rewardProp } from "@/ui/BadgeMedal";
 export { useToast, ToastViewport } from "@/ui/Toast";
 export { Skeleton } from "@/ui/Skeleton";
 export { TabBar } from "@/ui/TabBar";

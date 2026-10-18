@@ -380,3 +380,20 @@ describe("coins on the done screen", () => {
     expect(screen.queryByText(/ xu$/)).toBeNull();
   });
 });
+
+test("the done screen shows the reward of a newly unlocked badge", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  const r = await services.activity.completeLesson({ lessonId: "l05", mistakes: 0, durationMs: 1, vocabIds: [] });
+  const badge = { id: "streak_7", title: "Une semaine", description: "7 jours d'affilée.", icon: "🏮", rule: { kind: "streak", gte: 7 }, reward: "frame_bronze" } as const;
+  const state = { ...r, newBadges: [badge], accuracy: 1, perfect: true };
+  render(
+    <ServicesProvider services={services}>
+      <MemoryRouter initialEntries={[{ pathname: "/lesson/l05/done", state }]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/lesson/:id/done" element={<LessonDoneScreen />} />
+        </Routes>
+      </MemoryRouter>
+    </ServicesProvider>,
+  );
+  expect(await screen.findByText(fr.rewards.gained("Cadre bronze"))).toBeInTheDocument();
+});

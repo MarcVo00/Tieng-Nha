@@ -338,6 +338,12 @@ describe("result", () => {
     expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
   });
 
+  test("shows the reward of a newly unlocked badge", async () => {
+    const badge = { id: "exam_passed", title: "Vainqueur de Thủy Tinh", description: "Bats le boss final.", icon: "📜", rule: { kind: "exam_score", gte: 70 }, reward: "frame_son_mai" } as const;
+    renderExam({ entry: { pathname: "/exam/result", state: { ...failedState(2), newBadges: [badge] } } });
+    expect(await screen.findByText(fr.rewards.gained("Cadre laque dorée"))).toBeInTheDocument();
+  });
+
   test("a result saved by a previous client without coinsGained still renders", async () => {
     const legacy: Partial<ResultState> = failedState(2);
     delete legacy.coinsGained;

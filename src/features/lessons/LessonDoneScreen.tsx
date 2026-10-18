@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
-import { BadgeMedal, Button, Confetti, Icon, Motif, XpCounter } from "@/ui";
+import { BadgeMedal, rewardProp, Button, Confetti, Icon, Motif, XpCounter } from "@/ui";
 import type { LessonDoneState } from "@/features/lessons/useLessonRun";
 
 const BADGE_STAGGER_MS = 280;
@@ -86,7 +86,7 @@ function DoneContent({ state: given, lessonId }: { state: LessonDoneState; lesso
             <ul className="flex flex-wrap gap-5">
               {state.newBadges.slice(0, shownBadges).map((b) => (
                 <li key={b.id}>
-                  <BadgeMedal icon={b.icon} title={b.title} unlocked size="lg" />
+                  <BadgeMedal icon={b.icon} title={b.title} unlocked {...rewardProp(b)} size="lg" />
                 </li>
               ))}
             </ul>

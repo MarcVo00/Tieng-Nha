@@ -1,29 +1,20 @@
+import { Link } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { Avatar, Button, Card, ConfirmDialog, EmptyState, Icon, Skeleton, useToast } from "@/ui";
+import { Button, Card, ConfirmDialog, EmptyState, Icon, Skeleton, useToast } from "@/ui";
 
-const DEFAULT_EMOJI = "🐉";
-
-type Verdict = { label: string; disabled: boolean; action: "buy" | "equip" | "unequip" | "none" };
+type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
 function verdictOf(item: ShopItem, wallet: Wallet, energy: EnergyState | null): Verdict {
-  if (item.kind === "cosmetic") {
-    if (wallet.inventory.includes(item.id)) {
-      return wallet.equipped.frame === item.id
-        ? { label: fr.shop.equipped, disabled: false, action: "unequip" }
-        : { label: fr.shop.equip, disabled: false, action: "equip" };
-    }
-  } else {
-    if (item.id === "streak_freeze" && item.maxStock !== undefined && wallet.freezes >= item.maxStock) {
-      return { label: fr.shop.stockFull, disabled: true, action: "none" };
-    }
-    if (item.id === "energy_refill") {
-      if (energy === null) return { label: item.price === null ? fr.shop.noFunds : fr.shop.buy(item.price), disabled: true, action: "none" };
-      if (energy.current >= energy.max) return { label: fr.shop.energyFull, disabled: true, action: "none" };
-    }
+  if (item.id === "streak_freeze" && item.maxStock !== undefined && wallet.freezes >= item.maxStock) {
+    return { label: fr.shop.stockFull, disabled: true, action: "none" };
+  }
+  if (item.id === "energy_refill") {
+    if (energy === null) return { label: item.price === null ? fr.shop.noFunds : fr.shop.buy(item.price), disabled: true, action: "none" };
+    if (energy.current >= energy.max) return { label: fr.shop.energyFull, disabled: true, action: "none" };
   }
   if (item.price === null) return { label: fr.shop.noFunds, disabled: true, action: "none" };
   if (wallet.coins < item.price) return { label: fr.shop.noFunds, disabled: true, action: "none" };
@@ -38,7 +29,6 @@ export function ShopScreen() {
   const refresh = useRefreshProgress();
   const wallet = useAppState((s) => s.wallet);
   const energy = useAppState((s) => s.energy);
-  const emoji = useAppState((s) => s.profile?.avatarEmoji ?? DEFAULT_EMOJI);
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [asking, setAsking] = useState<ShopItem | null>(null);
@@ -91,13 +81,11 @@ export function ShopScreen() {
   function onAction(item: ShopItem, v: Verdict): void {
     if (busy) return;
     if (v.action === "buy") setAsking(item);
-    else if (v.action === "equip") void run(() => activity.equip("frame", item.id), fr.shop.equippedToast, fr.shop.equipError);
-    else if (v.action === "unequip") void run(() => activity.equip("frame", null), fr.shop.removedToast, fr.shop.equipError);
   }
 
   const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
-  const play = known.filter((i) => i.kind === "consumable");
-  const frames = known.filter((i) => i.kind === "cosmetic" && i.price !== null);
+  // Reward items (price null) are earned from badges, never sold.
+  const play = known.filter((i) => i.price !== null);
   const asked = asking ? fr.shop.items[asking.id] : undefined;
 
   function card(item: ShopItem, w: Wallet) {
@@ -106,11 +94,6 @@ export function ShopScreen() {
     const v = verdictOf(item, w, energy);
     return (
       <Card as="li" key={item.id} className="flex items-center gap-4 p-4">
-        {item.kind === "cosmetic" ? (
-          <span role="img" aria-label={fr.shop.preview(text.name)} className="flex w-16 shrink-0 justify-center">
-            <Avatar emoji={emoji} size="md" frame={item.id} />
-          </span>
-        ) : null}
         <div className="min-w-0 flex-1">
           <h3 className="text-body-strong text-ink">{text.name}</h3>
           <p className="text-caption text-ink-muted">{text.desc}</p>
@@ -123,7 +106,6 @@ export function ShopScreen() {
           disabled={v.disabled || busy}
           onClick={() => onAction(item, v)}
           className="shrink-0"
-          {...(item.kind === "cosmetic" && w.inventory.includes(item.id) ? { "aria-pressed": v.action === "unequip" } : {})}
         >
           {v.label}
         </Button>
@@ -160,12 +142,12 @@ export function ShopScreen() {
             </h2>
             <ul className="flex list-none flex-col gap-3">{play.map((i) => card(i, wallet))}</ul>
           </section>
-          <section aria-labelledby="shop-frames" className="flex flex-col gap-3">
-            <h2 id="shop-frames" className="text-heading text-ink">
-              {fr.shop.framesTitle}
-            </h2>
-            <ul className="flex list-none flex-col gap-3">{frames.map((i) => card(i, wallet))}</ul>
-          </section>
+          <p className="text-caption text-ink-muted">
+            {fr.rewards.hint}{" "}
+            <Link to="/me" className="text-body-strong text-primary underline">
+              {fr.rewards.shopLink}
+            </Link>
+          </p>
         </>
       )}
 

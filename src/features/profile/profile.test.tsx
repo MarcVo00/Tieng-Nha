@@ -11,6 +11,7 @@ import { MeScreen } from "@/features/profile";
 import { fr } from "@/i18n/fr";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { ToastViewport } from "@/ui";
+import { useToastStore } from "@/ui/Toast";
 import "@/test/routerTestEnv";
 
 const NOW = "2026-10-10T10:00:00.000Z";
@@ -55,7 +56,7 @@ test("shows the header and all 13 badges, unlocked first", async () => {
   expect(screen.getByText("Marc")).toBeInTheDocument();
   expect(screen.getByText(fr.leaderboard.xp(120))).toBeInTheDocument();
   const items = await screen.findAllByRole("listitem");
-  const badgeItems = items.filter((li) => within(li).queryByRole("button"));
+  const badgeItems = items.filter((li) => within(li).queryByRole("button") && !within(li).queryByRole("heading", { level: 3 }));
   expect(badgeItems).toHaveLength(13);
   expect(badgeItems[0]).toHaveTextContent(/./);
   expect(within(badgeItems[0] as HTMLElement).queryByText(fr.ui.badge.locked, { exact: false })).toBeNull();
@@ -352,4 +353,73 @@ test("being offline while changing the password shows the offline message", asyn
   await user.type(screen.getByLabelText(fr.password.confirmLabel), "secret123");
   await user.click(screen.getByRole("button", { name: fr.password.submit }));
   expect(await within(await screen.findByRole("dialog")).findByText(fr.profile.edit.offline)).toBeInTheDocument();
+});
+
+describe("rewards section", () => {
+  const unlock = (services: Services, ids: string[]) =>
+    Promise.all(ids.map((id) => services.progress.appendEvent({ type: "badge_unlocked", refId: id, xp: 0, payload: {} }, "2026-10-10T09:00:00.000Z")));
+  const rewardCard = async (name: string) => (await screen.findByRole("heading", { name })).closest("li") as HTMLElement;
+
+  async function setupRewards(unlocked: string[]) {
+    useToastStore.setState({ toasts: [] });
+    const services = createFakeServices({ clock: () => NOW });
+    await unlock(services, unlocked);
+    useAppState.setState({ wallet: await services.activity.getWallet() });
+    return { ...(await setup(services)), services };
+  }
+
+  test("lists the 6 rewards, owned ones equippable, the others say how to earn them", async () => {
+    await setupRewards(["ten_lessons"]);
+    const jade = await rewardCard("Cadre jade");
+    expect(within(jade).getByRole("button", { name: fr.rewards.equip })).toBeEnabled();
+    expect(within(jade).getByRole("img", { name: fr.rewards.preview("Cadre jade") })).toBeInTheDocument();
+    const names = ["Cadre bronze", "Cadre laque dorée", "Volutes d'encre", "Éclairs", "Braises"];
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(6);
+    for (const name of names) expect(within(await rewardCard(name)).queryByRole("button")).toBeNull();
+    expect(within(await rewardCard("Cadre bronze")).getByText(fr.rewards.lockedBy("Une semaine", "7 jours d'affilée."))).toBeInTheDocument();
+  });
+
+  test("equipping a frame calls activity.equip and the header avatar shows it", async () => {
+    const { services, user } = await setupRewards(["ten_lessons"]);
+    const equip = vi.spyOn(services.activity, "equip");
+    await user.click(within(await rewardCard("Cadre jade")).getByRole("button", { name: fr.rewards.equip }));
+    expect(equip).toHaveBeenCalledWith("frame", "frame_jade");
+    expect(await screen.findByText(fr.rewards.equippedToast)).toBeInTheDocument();
+    await waitFor(() => expect(useAppState.getState().wallet?.equipped.frame).toBe("frame_jade"));
+    const header = screen.getByRole("button", { name: fr.profile.editAria });
+    expect(header.querySelector('[data-frame="frame_jade"]')).not.toBeNull();
+    await user.click(within(await rewardCard("Cadre jade")).getByRole("button", { name: fr.rewards.unequip }));
+    await waitFor(() => expect(useAppState.getState().wallet?.equipped.frame ?? null).toBeNull());
+    expect(equip).toHaveBeenLastCalledWith("frame", null);
+  });
+
+  test("one frame and one effect at a time", async () => {
+    const { user } = await setupRewards(["ten_lessons", "streak_7", "perfect_5", "streak_30"]);
+    await user.click(within(await rewardCard("Cadre jade")).getByRole("button", { name: fr.rewards.equip }));
+    await waitFor(() => expect(useAppState.getState().wallet?.equipped.frame).toBe("frame_jade"));
+    await user.click(within(await rewardCard("Cadre bronze")).getByRole("button", { name: fr.rewards.equip }));
+    await waitFor(() => expect(useAppState.getState().wallet?.equipped.frame).toBe("frame_bronze"));
+    await user.click(within(await rewardCard("Volutes d'encre")).getByRole("button", { name: fr.rewards.equip }));
+    await waitFor(() => expect(useAppState.getState().wallet?.equipped.profile_fx).toBe("fx_ink"));
+    await user.click(within(await rewardCard("Braises")).getByRole("button", { name: fr.rewards.equip }));
+    await waitFor(() => expect(useAppState.getState().wallet?.equipped).toMatchObject({ frame: "frame_bronze", profile_fx: "fx_embers" }));
+    expect(screen.getByRole("button", { name: fr.profile.editAria }).querySelector("[data-fx]")).toHaveAttribute("data-fx", "fx_embers");
+  });
+
+  test("an equip failure shows the dedicated error", async () => {
+    const { services, user } = await setupRewards(["ten_lessons"]);
+    vi.spyOn(services.activity, "equip").mockRejectedValue(new Error("down"));
+    await user.click(within(await rewardCard("Cadre jade")).getByRole("button", { name: fr.rewards.equip }));
+    expect(await screen.findByText(fr.rewards.error)).toBeInTheDocument();
+    expect(useAppState.getState().wallet?.equipped.frame ?? null).toBeNull();
+    await waitFor(() => expect(within(screen.getByText("Cadre jade").closest("li") as HTMLElement).getByRole("button", { name: fr.rewards.equip })).toBeEnabled());
+  });
+
+  test("a refused equip shows the error too", async () => {
+    const { services, user } = await setupRewards(["ten_lessons"]);
+    const wallet = await services.activity.getWallet();
+    vi.spyOn(services.activity, "equip").mockResolvedValue({ ok: false, wallet });
+    await user.click(within(await rewardCard("Cadre jade")).getByRole("button", { name: fr.rewards.equip }));
+    expect(await screen.findByText(fr.rewards.error)).toBeInTheDocument();
+  });
 });

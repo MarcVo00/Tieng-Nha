@@ -187,10 +187,16 @@ describe("purchase failures", () => {
   });
 });
 
-// Frames are reward-only now (no price): their shop tests return with the redesigned shop (preview, equip, toasts).
-test.todo("each reward preview carries the item name");
-test.todo("an equip failure shows the dedicated equip error");
-test.todo("an equipped frame is exposed as pressed and equipping shows a toast");
+test("reward items are not for sale", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  setup(services);
+  await card(fr.shop.items["streak_freeze"]?.name ?? "");
+  for (const id of ["frame_bronze", "frame_jade", "frame_son_mai", "fx_ink", "fx_lightning", "fx_embers"]) {
+    expect(screen.queryByRole("heading", { name: fr.shop.items[id]?.name ?? "" })).toBeNull();
+  }
+  expect(screen.getByText(new RegExp(fr.rewards.hint))).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: fr.rewards.shopLink })).toHaveAttribute("href", "/me");
+});
 
 test("a failed wallet load offers a retry instead of an endless skeleton", async () => {
   const services = createFakeServices({ clock: () => NOW });

@@ -8,7 +8,7 @@ import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bu
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
-import { BadgeMedal, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
+import { BadgeMedal, rewardProp, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
 
 const BADGE_STAGGER_MS = 280;
@@ -84,7 +84,7 @@ function ResultCard({ result, onHome, onReplay }: { result: ActivityResult; onHo
           <ul className="flex flex-wrap gap-5">
             {result.newBadges.slice(0, shownBadges).map((b) => (
               <li key={b.id}>
-                <BadgeMedal icon={b.icon} title={b.title} unlocked size="lg" />
+                <BadgeMedal icon={b.icon} title={b.title} unlocked {...rewardProp(b)} size="lg" />
               </li>
             ))}
           </ul>

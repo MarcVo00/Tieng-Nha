@@ -221,3 +221,21 @@ test(
   },
   TEST_TIMEOUT,
 );
+
+test(
+  "the done screen shows the reward of a newly unlocked badge",
+  async () => {
+    const { ui, services, completeReview, realCompleteReview } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    completeReview.mockImplementation(async (i) => ({
+      ...(await realCompleteReview(i)),
+      newBadges: [
+        { id: "streak_7", title: "Une semaine", description: "7 jours d'affilée.", icon: "🏮", rule: { kind: "streak" as const, gte: 7 }, reward: "frame_bronze" },
+      ],
+    }));
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await playOneWord(ui);
+    await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    expect(await screen.findByText(fr.rewards.gained("Cadre bronze"), {}, { timeout: 4000 })).toBeInTheDocument();
+  },
+  TEST_TIMEOUT,
+);

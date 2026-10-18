@@ -43,3 +43,9 @@ export function BadgeMedal({ icon, title, unlocked, size = "sm", reward }: Badge
     </figure>
   );
 }
+
+/** Spreadable `reward` prop for a freshly unlocked badge: its item name, or nothing when it has no (known) reward. */
+export function rewardProp(badge: { reward?: string | undefined }): { reward?: string } {
+  const name = badge.reward ? fr.shop.items[badge.reward]?.name : undefined;
+  return name ? { reward: fr.rewards.gained(name) } : {};
+}

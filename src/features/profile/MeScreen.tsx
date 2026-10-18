@@ -16,6 +16,7 @@ import {
   type CertificateProps,
 } from "@/ui";
 import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
+import { RewardsSection } from "@/features/profile/RewardsSection";
 import { ReportProblemSheet } from "@/features/profile/ReportProblemSheet";
 import { SettingsSection } from "@/features/profile/SettingsSection";
 
@@ -99,6 +100,7 @@ export function MeScreen() {
   const snapshot = useAppState((s) => s.snapshot);
   const coins = useAppState((s) => s.wallet?.coins ?? null);
   const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
+  const fx = useAppState((s) => s.wallet?.equipped.profile_fx ?? null);
   const [boss, setBoss] = useState<Boss | null>(null);
   const [bossFailed, setBossFailed] = useState(false);
   const [badges, setBadges] = useState<BadgeDef[] | null>(null);
@@ -231,8 +233,8 @@ export function MeScreen() {
 
       <Card raised className="flex flex-col gap-4 p-5">
         <div className="flex items-center gap-4">
-          <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className="rounded-full">
-            <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" frame={frame} />
+          <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className={`rounded-full ${fx ? "my-3 ml-3 mr-4" : ""}`}>
+            <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" frame={frame} fx={fx} />
           </motion.button>
           <div className="min-w-0 flex-1">
             <p className="truncate text-title text-ink">{profile?.pseudo ?? ""}</p>
@@ -288,6 +290,8 @@ export function MeScreen() {
           ))}
         </ul>
       </section>
+
+      <RewardsSection badges={badges} />
 
       <SettingsSection onReport={() => setReportOpen(true)} />
 

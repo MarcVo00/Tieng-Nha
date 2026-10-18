@@ -6,6 +6,7 @@ import type { Boss } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import {
   BadgeMedal,
+  rewardProp,
   Button,
   Certificate,
   Confetti,
@@ -134,7 +135,7 @@ function ResultContent({ state }: { state: ResultState }) {
           <ul className="flex flex-wrap justify-center gap-5 pt-2">
             {state.newBadges.map((b) => (
               <li key={b.id}>
-                <BadgeMedal icon={b.icon} title={b.title} unlocked />
+                <BadgeMedal icon={b.icon} title={b.title} unlocked {...rewardProp(b)} />
               </li>
             ))}
           </ul>

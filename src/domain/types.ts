@@ -147,8 +147,8 @@ export type Tree = z.infer<typeof TreeFileSchema>;
 export type Boss = z.infer<typeof BossSchema>;
 export type ShopItem = z.infer<typeof ShopItemSchema>;
 export type Shop = ShopItem[];
-/** Equipment slots; grows later with the character (hat, outfit...). */
-export type ItemSlot = "frame" | "profile_fx";
+/** Equipment slots: profile (frame, profile_fx) and character layers (hat, outfit, accessory, aura). */
+export type ItemSlot = "frame" | "profile_fx" | "hat" | "outfit" | "accessory" | "aura";
 
 /** Coins and purchases replayed from the journal (same rules as the server). */
 export type Wallet = {

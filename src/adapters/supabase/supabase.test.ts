@@ -225,3 +225,23 @@ test("leaderboard repository selects and maps equipped_frame", async () => {
   expect(select.mock.calls[0]?.[0]).toContain("equipped_frame");
   expect(out.map((r) => r.frame)).toEqual(["frame_jade", null]);
 });
+
+describe("getPublicProfile fx mapping", () => {
+  async function fxFor(equipped: unknown): Promise<string | null> {
+    const row = { user_id: "u1", pseudo: "A", avatar_emoji: "🐯", xp_total: 1, xp_week: 1, streak: 0, equipped_frame: null, equipped };
+    const maybeSingle = vi.fn().mockResolvedValue({ data: row, error: null });
+    const db = { from: vi.fn(() => ({ select: () => ({ eq: () => ({ maybeSingle }) }) })) };
+    return (await new SupabaseLeaderboardRepository(db as never).getPublicProfile("u1")).fx;
+  }
+
+  test("reads equipped.profile_fx", async () => {
+    expect(await fxFor({ profile_fx: "fx_ink" })).toBe("fx_ink");
+  });
+
+  test("empty or malformed equipped reads as none", async () => {
+    expect(await fxFor({})).toBeNull();
+    expect(await fxFor([])).toBeNull();
+    expect(await fxFor("fx_ink")).toBeNull();
+    expect(await fxFor(7)).toBeNull();
+  });
+});

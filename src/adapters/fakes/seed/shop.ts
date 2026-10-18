@@ -10,4 +10,8 @@ export const shopFixture: ShopItem[] = [
   { id: "fx_ink", kind: "cosmetic", slot: "profile_fx", price: null },
   { id: "fx_lightning", kind: "cosmetic", slot: "profile_fx", price: null },
   { id: "fx_embers", kind: "cosmetic", slot: "profile_fx", price: null },
+  { id: "hat_thuy_tinh", kind: "cosmetic", slot: "hat", price: 60, theme: "legendes_sombres" },
+  { id: "aura_waves", kind: "cosmetic", slot: "aura", price: 80, theme: "legendes_sombres" },
+  { id: "outfit_son_tinh", kind: "cosmetic", slot: "outfit", price: 90, theme: "legendes_sombres" },
+  { id: "acc_thuan_thien", kind: "cosmetic", slot: "accessory", price: 120, theme: "legendes_sombres" },
 ];

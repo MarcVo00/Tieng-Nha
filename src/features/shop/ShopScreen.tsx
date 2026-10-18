@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
+import { lookOf } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, ConfirmDialog, EmptyState, Icon, Skeleton, useToast } from "@/ui";
+import { Button, Card, Character, ConfirmDialog, EmptyState, Icon, Skeleton, tap, useToast } from "@/ui";
+import { TryOnSheet } from "@/features/shop/TryOnSheet";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
@@ -34,6 +37,10 @@ export function ShopScreen() {
   const [asking, setAsking] = useState<ShopItem | null>(null);
   const [busy, setBusy] = useState(false);
   const [walletFailed, setWalletFailed] = useState(false);
+  const [trying, setTrying] = useState<ShopItem | null>(null);
+  const [tryOpen, setTryOpen] = useState(false);
+  const equipped = useAppState((s) => s.wallet?.equipped);
+  const baseLook = useMemo(() => lookOf(equipped ?? {}), [equipped]);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,9 +90,64 @@ export function ShopScreen() {
     if (v.action === "buy") setAsking(item);
   }
 
+  function tryOn(item: ShopItem): void {
+    if (busy) return;
+    setTrying(item);
+    setTryOpen(true);
+  }
+
+  // Buy, then wear it at once: two events. A failed equip still leaves the item owned.
+  async function buyCosmetic(item: ShopItem): Promise<void> {
+    if (busy || item.slot === null) return;
+    setBusy(true);
+    try {
+      const bought = await activity.purchase(item.id);
+      if (!bought.ok) {
+        await refresh().catch(() => undefined);
+        toast.show({ title: fr.shop.error });
+        return;
+      }
+      const worn = await activity.equip(item.slot, item.id).then((r) => r.ok, () => false);
+      await refresh().catch(() => undefined);
+      toast.show({ title: worn ? fr.shop.bought : fr.shop.tryOn.boughtNotEquipped });
+      setTryOpen(false);
+    } catch {
+      await refresh().catch(() => undefined);
+      toast.show({ title: fr.shop.error });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function toggleCosmetic(item: ShopItem, equippedNow: boolean): Promise<void> {
+    if (busy || item.slot === null) return;
+    setBusy(true);
+    try {
+      const r = await activity.equip(item.slot, equippedNow ? null : item.id);
+      const refreshed = await refresh().then(() => true, () => false);
+      toast.show({ title: r.ok && refreshed ? (equippedNow ? fr.rewards.removedToast : fr.rewards.equippedToast) : fr.rewards.error });
+      if (r.ok) setTryOpen(false);
+    } catch {
+      toast.show({ title: fr.rewards.error });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
   // Reward items (price null) are earned from badges, never sold.
-  const play = known.filter((i) => i.price !== null);
+  const play = known.filter((i) => i.price !== null && !i.theme);
+  const themes: { id: string; items: ShopItem[] }[] = [];
+  for (const i of known) {
+    if (!i.theme || i.slot === null || i.price === null || fr.shop.themes[i.theme] === undefined) continue;
+    let group = themes.find((t) => t.id === i.theme);
+    if (!group) {
+      group = { id: i.theme, items: [] };
+      themes.push(group);
+    }
+    group.items.push(i);
+  }
+  for (const t of themes) t.items.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
   const asked = asking ? fr.shop.items[asking.id] : undefined;
 
   function card(item: ShopItem, w: Wallet) {
@@ -110,6 +172,38 @@ export function ShopScreen() {
           {v.label}
         </Button>
       </Card>
+    );
+  }
+
+  function themedCard(item: ShopItem, w: Wallet) {
+    const text = fr.shop.items[item.id];
+    if (!text || item.slot === null) return null;
+    const owned = w.inventory.includes(item.id);
+    const on = w.equipped[item.slot] === item.id;
+    return (
+      <li key={item.id}>
+        <motion.button
+          type="button"
+          whileTap={tap}
+          disabled={busy}
+          aria-label={fr.shop.tryOn.open(text.name)}
+          onClick={() => tryOn(item)}
+          className="flex h-full w-full flex-col items-center gap-2 rounded-md bg-surface p-3 text-center shadow-card disabled:opacity-60"
+        >
+          <span className="flex h-28 w-28 items-end justify-center rounded-full bg-bg pb-1">
+            <Character look={{ ...baseLook, [item.slot as "hat"]: item.id }} size={66} />
+          </span>
+          <span className="text-body-strong text-ink">{text.name}</span>
+          {owned ? (
+            <span className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</span>
+          ) : (
+            <span className="tabular inline-flex items-center gap-1 text-caption text-gold-ink">
+              <Icon name="coin" size={16} className="text-gold" />
+              {fr.shop.balance(item.price ?? 0)}
+            </span>
+          )}
+        </motion.button>
+      </li>
     );
   }
 
@@ -142,6 +236,14 @@ export function ShopScreen() {
             </h2>
             <ul className="flex list-none flex-col gap-3">{play.map((i) => card(i, wallet))}</ul>
           </section>
+          {themes.map((t) => (
+            <section key={t.id} aria-labelledby={`shop-theme-${t.id}`} className="flex flex-col gap-3">
+              <h2 id={`shop-theme-${t.id}`} className="text-heading text-ink">
+                {fr.shop.themes[t.id]}
+              </h2>
+              <ul className="grid list-none grid-cols-2 gap-3">{t.items.map((i) => themedCard(i, wallet))}</ul>
+            </section>
+          ))}
           <p className="text-caption text-ink-muted">
             {fr.rewards.hint}{" "}
             <Link to="/me#me-rewards" className="inline-flex min-h-11 items-center text-body-strong text-primary underline">
@@ -150,6 +252,19 @@ export function ShopScreen() {
           </p>
         </>
       )}
+
+      {wallet ? (
+        <TryOnSheet
+          item={trying}
+          open={tryOpen}
+          wallet={wallet}
+          baseLook={baseLook}
+          busy={busy}
+          onClose={() => setTryOpen(false)}
+          onBuy={buyCosmetic}
+          onToggle={toggleCosmetic}
+        />
+      ) : null}
 
       <ConfirmDialog
         open={asking !== null}

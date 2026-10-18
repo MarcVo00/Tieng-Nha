@@ -465,3 +465,35 @@ describe("rewards section", () => {
     expect(await screen.findByText(fr.rewards.error)).toBeInTheDocument();
   });
 });
+
+describe("wardrobe section", () => {
+  async function setupWardrobe(own: string[]) {
+    useToastStore.setState({ toasts: [] });
+    const services = createFakeServices({ clock: () => NOW });
+    for (let i = 0; i < 6; i++) await services.activity.finishExam({ attemptId: `a${i}`, score: 90, noSpeaking: false });
+    for (const id of own) await services.activity.purchase(id);
+    useAppState.setState({ wallet: await services.activity.getWallet() });
+    return { ...(await setup(services)), services };
+  }
+
+  test("says what to do when nothing is owned", async () => {
+    await setupWardrobe([]);
+    expect(await screen.findByRole("heading", { name: fr.wardrobe.title })).toBeInTheDocument();
+    expect(screen.getByText(fr.wardrobe.empty)).toBeInTheDocument();
+  });
+
+  test("lists owned cosmetics by slot and equips then removes them", async () => {
+    const { services, user } = await setupWardrobe(["hat_thuy_tinh", "outfit_son_tinh"]);
+    const section = (await screen.findByRole("heading", { name: fr.wardrobe.title })).closest("section") as HTMLElement;
+    expect(screen.queryByText(fr.wardrobe.empty)).toBeNull();
+    expect(within(section).getByRole("heading", { name: fr.wardrobe.slots["hat"] ?? "" })).toBeInTheDocument();
+    expect(within(section).getByRole("heading", { name: fr.wardrobe.slots["outfit"] ?? "" })).toBeInTheDocument();
+    expect(within(section).queryByRole("heading", { name: fr.wardrobe.slots["aura"] ?? "" })).toBeNull();
+    const hat = within(section).getByRole("heading", { name: fr.shop.items["hat_thuy_tinh"]?.name ?? "" }).closest("li") as HTMLElement;
+    await user.click(within(hat).getByRole("button", { name: fr.shop.tryOn.equip }));
+    expect(await screen.findByText(fr.rewards.equippedToast)).toBeInTheDocument();
+    expect((await services.activity.getWallet()).equipped["hat"]).toBe("hat_thuy_tinh");
+    await user.click(await within(hat).findByRole("button", { name: fr.shop.tryOn.unequip }));
+    await waitFor(async () => expect((await services.activity.getWallet()).equipped["hat"]).toBeUndefined());
+  });
+});

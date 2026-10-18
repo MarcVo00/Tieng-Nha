@@ -553,6 +553,16 @@ export const fr = {
       acc_thuan_thien: { name: "Thuận Thiên, l'épée du lac", desc: "L'épée de la légende du lac. Pour ton héros.", confirmName: "Thuận Thiên, l'épée du lac" },
     } as Record<string, { name: string; desc: string; confirmName: string }>,
     themes: { legendes_sombres: "Légendes sombres" } as Record<string, string>,
+    tryOn: {
+      open: (name: string) => `Essayer ${name}`,
+      buy: (price: number) => `Acheter (${price} xu)`,
+      equip: "Équiper",
+      unequip: "Retirer",
+      owned: "Dans ta penderie",
+      equipped: "Équipé",
+      boughtNotEquipped: "Acheté ! Tu peux l'équiper quand tu veux.",
+      preview: (name: string) => `Ton héros avec : ${name}`,
+    },
     buy: (price: number) => `Acheter (${price} xu)`,
     noFunds: "Pas assez de xu",
     stockFull: "Stock plein",
@@ -589,6 +599,11 @@ export const fr = {
     removedToast: "Retiré",
     preview: (name: string) => `Aperçu : ${name}`,
     error: "Impossible de changer pour le moment. Réessaie.",
+  },
+  wardrobe: {
+    title: "Ma penderie",
+    empty: "Rien pour l'instant : la boutique a de quoi t'habiller.",
+    slots: { hat: "Chapeaux", outfit: "Tenues", accessory: "Accessoires", aura: "Auras" } as Record<string, string>,
   },
   profile: {
     title: "Mon profil",

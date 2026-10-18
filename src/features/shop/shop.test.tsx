@@ -208,3 +208,127 @@ test("a failed wallet load offers a retry instead of an endless skeleton", async
   await user.click(retry);
   expect(await screen.findByText(fr.shop.playTitle)).toBeInTheDocument();
 });
+
+describe("dark legends section and try-on", () => {
+  const NAMES = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien"].map((id) => fr.shop.items[id]?.name ?? "");
+  const open = (name: string) => screen.findByRole("button", { name: fr.shop.tryOn.open(name) });
+  const types = async (services: Services) => (await services.progress.listEvents()).map((e) => e.type);
+
+  test("lists the consumables first, then the themed items by price, each previewed on the current hero", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    setup(services);
+    const heading = await screen.findByRole("heading", { name: fr.shop.themes["legendes_sombres"] ?? "" });
+    const play = screen.getByRole("heading", { name: fr.shop.playTitle });
+    expect(play.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const section = heading.closest("section") as HTMLElement;
+    const buttons = within(section).getAllByRole("button");
+    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(NAMES.map((n) => fr.shop.tryOn.open(n)));
+    const ids = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien"];
+    buttons.forEach((b, i) => expect(b.querySelector("[data-look]")?.getAttribute("data-look")).toContain(ids[i]));
+  });
+
+  test("the preview adds the item to what the hero already wears", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    await winExams(services, 6);
+    await services.activity.purchase("hat_thuy_tinh");
+    await services.activity.equip("hat", "hat_thuy_tinh");
+    setup(services);
+    const sword = await open(NAMES[3] ?? "");
+    const look = sword.querySelector("[data-look]")?.getAttribute("data-look") ?? "";
+    expect(look).toContain("hat_thuy_tinh");
+    expect(look).toContain("acc_thuan_thien");
+  });
+
+  test("opening and closing the sheet sends no event; the only action is a disabled buy when poor", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    const user = setup(services);
+    await user.click(await open(NAMES[0] ?? ""));
+    const sheet = await screen.findByRole("dialog", { name: NAMES[0] ?? "" });
+    expect(within(sheet).getAllByRole("button")).toHaveLength(1);
+    expect(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) })).toBeDisabled();
+    expect(sheet.querySelector("[data-look]")).not.toBeNull();
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(await types(services)).toEqual([]);
+  });
+
+  test("buying confirms inside the sheet, then purchases and equips (two events)", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    await winExams(services, 6);
+    const before = (await types(services)).length;
+    const user = setup(services);
+    await user.click(await open(NAMES[0] ?? ""));
+    const sheet = await screen.findByRole("dialog", { name: NAMES[0] ?? "" });
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(sheet).toHaveTextContent(fr.shop.confirm.title("la couronne des marées", 60));
+    expect((await types(services)).length).toBe(before);
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
+    expect(await screen.findByText(fr.shop.bought)).toBeInTheDocument();
+    expect((await types(services)).slice(before)).toEqual(["item_purchased", "item_equipped"]);
+    expect((await services.activity.getWallet()).equipped["hat"]).toBe("hat_thuy_tinh");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+
+  test.each([
+    ["refuses", (s: Services) => vi.spyOn(s.activity, "equip").mockResolvedValue({ ok: false, wallet: {} as never })],
+    ["throws", (s: Services) => vi.spyOn(s.activity, "equip").mockRejectedValue(new Error("boom"))],
+  ])("when the equip %s, the item is still owned and the toast says so", async (_n, breakEquip) => {
+    useToastStore.setState({ toasts: [] });
+    const services = createFakeServices({ clock: () => NOW });
+    await winExams(services, 6);
+    const user = setup(services);
+    breakEquip(services);
+    await user.click(await open(NAMES[0] ?? ""));
+    const sheet = await screen.findByRole("dialog");
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) }));
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
+    expect(await screen.findByText(fr.shop.tryOn.boughtNotEquipped)).toBeInTheDocument();
+    expect((await services.activity.getWallet()).inventory).toContain("hat_thuy_tinh");
+    await waitFor(() => expect(screen.getByText(fr.shop.tryOn.owned)).toBeInTheDocument());
+  });
+
+  test("an owned item offers Equiper, then Retirer", async () => {
+    useToastStore.setState({ toasts: [] });
+    const services = createFakeServices({ clock: () => NOW });
+    await winExams(services, 6);
+    await services.activity.purchase("aura_waves");
+    const user = setup(services);
+    await user.click(await open(NAMES[1] ?? ""));
+    let sheet = await screen.findByRole("dialog");
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.equip }));
+    await waitFor(async () => expect((await services.activity.getWallet()).equipped["aura"]).toBe("aura_waves"));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    await user.click(await open(NAMES[1] ?? ""));
+    sheet = await screen.findByRole("dialog");
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.unequip }));
+    await waitFor(async () => expect((await services.activity.getWallet()).equipped["aura"]).toBeUndefined());
+  });
+
+  test("keyboard: Tab stays inside the sheet, also on the confirm step; Escape closes it alone", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    await winExams(services, 6);
+    const user = setup(services);
+    const trigger = await open(NAMES[0] ?? "");
+    await user.click(trigger);
+    const sheet = await screen.findByRole("dialog");
+    expect(document.querySelectorAll('[aria-modal="true"]')).toHaveLength(1);
+    await waitFor(() => expect(sheet.contains(document.activeElement)).toBe(true));
+    for (let i = 0; i < 3; i++) {
+      await user.tab();
+      expect(sheet.contains(document.activeElement)).toBe(true);
+    }
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) }));
+    expect(document.querySelectorAll('[aria-modal="true"]')).toHaveLength(1);
+    await waitFor(() => expect(sheet.contains(document.activeElement)).toBe(true));
+    for (let i = 0; i < 4; i++) {
+      await user.tab();
+      expect(sheet.contains(document.activeElement)).toBe(true);
+    }
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect((await services.activity.getWallet()).inventory).not.toContain("hat_thuy_tinh");
+    expect(trigger).toHaveFocus();
+  });
+});

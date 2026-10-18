@@ -17,6 +17,7 @@ import {
   type CertificateProps,
 } from "@/ui";
 import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
+import { WardrobeSection } from "@/features/profile/WardrobeSection";
 import { RewardsSection } from "@/features/profile/RewardsSection";
 import { ReportProblemSheet } from "@/features/profile/ReportProblemSheet";
 import { SettingsSection } from "@/features/profile/SettingsSection";
@@ -296,6 +297,8 @@ export function MeScreen() {
           ))}
         </ul>
       </section>
+
+      <WardrobeSection />
 
       <RewardsSection badges={badges} />
 

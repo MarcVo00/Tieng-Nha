@@ -9,7 +9,7 @@ import { FINAL_BOSS_ID } from "@/services/tree";
 import { livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS } from "@/services/exam";
 import { fr } from "@/i18n/fr";
-import { Avatar, BadgeMedal, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
+import { Avatar, fxSpill, BadgeMedal, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
 
 // Hero: avatar + pseudo, with the XP number beside it. The ten lesson dots are the quiet story of progress.
 
@@ -127,7 +127,7 @@ export function PublicProfileScreen() {
       <BackLink />
       <div className="flex items-center gap-4 pt-2">
         {/* The effect layer spills 40 % of the avatar on every side: leave it room so it never covers the text. */}
-        <span className={profile.fx ? "my-3 ml-3 mr-4 inline-flex" : "inline-flex"}>
+        <span className={`inline-flex ${fxSpill(profile.fx)}`}>
           <Avatar emoji={profile.avatarEmoji} size="lg" frame={profile.frame} fx={profile.fx} />
         </span>
         <div className="min-w-0 flex-1">

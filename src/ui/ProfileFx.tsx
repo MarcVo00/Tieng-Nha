@@ -137,9 +137,9 @@ function Embers({ animated }: { animated: boolean }) {
   );
 }
 
-/** Wraps an avatar in a profile effect (behind it). Purely decorative: the layer is aria-hidden and ignores pointer events. */
-export function ProfileFx({ id, children }: { id: ProfileFxId; children: ReactNode }) {
-  const animated = !useReducedMotion();
+/** Wraps an avatar in a profile effect (behind it); `still` freezes it in its static pose. Purely decorative: the layer is aria-hidden and ignores pointer events. */
+export function ProfileFx({ id, children, still = false }: { id: ProfileFxId; children: ReactNode; still?: boolean }) {
+  const animated = !useReducedMotion() && !still;
   return (
     <span data-fx={id} className="relative inline-flex shrink-0">
       <span aria-hidden="true" className="contents">

@@ -235,7 +235,7 @@ test(
     await seedKnownWords(services, ["v_ca_phe"]);
     await playOneWord(ui);
     await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
-    expect(await screen.findByText(fr.rewards.gained("Cadre bronze"), {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(await screen.findByText(fr.rewards.gained("cadre", "Bronze"), {}, { timeout: 4000 })).toBeInTheDocument();
   },
   TEST_TIMEOUT,
 );

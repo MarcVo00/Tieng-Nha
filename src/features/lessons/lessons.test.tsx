@@ -395,5 +395,5 @@ test("the done screen shows the reward of a newly unlocked badge", async () => {
       </MemoryRouter>
     </ServicesProvider>,
   );
-  expect(await screen.findByText(fr.rewards.gained("Cadre bronze"))).toBeInTheDocument();
+  expect(await screen.findByText(fr.rewards.gained("cadre", "Bronze"))).toBeInTheDocument();
 });

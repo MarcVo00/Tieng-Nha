@@ -169,8 +169,8 @@ declare
   v_frame text;
   v_equipped jsonb;
 begin
-  -- block concurrent event projections while we read-modify-write the wallets (lock_timeout bounds the wait)
-  lock table public.user_stats in share row exclusive mode;
+  -- EXCLUSIVE (not share row exclusive) conflicts with the trigger's SELECT ... FOR UPDATE (row share), so no deadlock
+  lock table public.user_stats in exclusive mode;
 
   for r in select user_id, coins, inventory, badges, equipped from public.user_stats loop
     -- old frame prices, hard-coded on purpose: frame_bronze 40, frame_jade 80, frame_son_mai 150.
@@ -221,7 +221,7 @@ begin
   end loop;
 end $$;
 
-revoke execute on function public.rewards_backfill() from public, anon, authenticated;
+revoke execute on function public.rewards_backfill() from public, anon, authenticated, service_role;
 
 select public.rewards_backfill();
 

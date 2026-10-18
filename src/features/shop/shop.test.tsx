@@ -195,7 +195,7 @@ test("reward items are not for sale", async () => {
     expect(screen.queryByRole("heading", { name: fr.shop.items[id]?.name ?? "" })).toBeNull();
   }
   expect(screen.getByText(new RegExp(fr.rewards.hint))).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: fr.rewards.shopLink })).toHaveAttribute("href", "/me");
+  expect(screen.getByRole("link", { name: fr.rewards.shopLink })).toHaveAttribute("href", "/me#me-rewards");
 });
 
 test("a failed wallet load offers a retry instead of an endless skeleton", async () => {

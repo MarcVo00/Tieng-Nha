@@ -8,7 +8,7 @@ type BadgeMedalProps = {
   title: string;
   unlocked: boolean;
   size?: "sm" | "lg";
-  /** Already-localised reward caption, shown under the title (e.g. a frame name). */
+  /** Already-localised reward caption, shown under the title (e.g. « + cadre Jade »). */
   reward?: string;
 };
 
@@ -44,8 +44,8 @@ export function BadgeMedal({ icon, title, unlocked, size = "sm", reward }: Badge
   );
 }
 
-/** Spreadable `reward` prop for a freshly unlocked badge: its item name, or nothing when it has no (known) reward. */
+/** Spreadable `reward` prop for a freshly unlocked badge: the reward kind and name, or nothing when it has no (known) reward. */
 export function rewardProp(badge: { reward?: string | undefined }): { reward?: string } {
-  const name = badge.reward ? fr.shop.items[badge.reward]?.name : undefined;
-  return name ? { reward: fr.rewards.gained(name) } : {};
+  const c = badge.reward ? fr.rewards.caption[badge.reward] : undefined;
+  return c ? { reward: fr.rewards.gained(c.kind, c.name) } : {};
 }

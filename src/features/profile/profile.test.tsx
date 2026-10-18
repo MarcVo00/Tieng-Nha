@@ -389,8 +389,19 @@ describe("rewards section", () => {
       const locked = badgeOf[id];
       if (!locked) continue;
       expect(within(card).queryByRole("button")).toBeNull();
-      expect(within(card).getByText(fr.rewards.lockedBy(...locked))).toBeInTheDocument();
+      expect(within(card).getByText(fr.rewards.lockedBy(...locked).replaceAll(String.fromCharCode(160), " "))).toBeInTheDocument();
     }
+  });
+
+  test("each equip button is described by its card title; locked effect previews stay still", async () => {
+    await setupRewards(["ten_lessons", "perfect_5"]);
+    const jade = await rewardCard("Cadre jade");
+    expect(within(jade).getByRole("button", { name: fr.rewards.equip })).toHaveAccessibleDescription("Cadre jade");
+    expect(within(await rewardCard("Volutes d'encre")).getByRole("button", { name: fr.rewards.equip })).toHaveAccessibleDescription("Volutes d'encre");
+    const locked = await rewardCard("Braises");
+    expect(locked.querySelector("[data-fx]")).not.toBeNull();
+    expect(locked.querySelector("[data-fx-motion]")).toBeNull();
+    expect((await rewardCard("Volutes d'encre")).querySelector("[data-fx-motion]")).not.toBeNull();
   });
 
   test("equipping a frame calls activity.equip and the header avatar shows it", async () => {

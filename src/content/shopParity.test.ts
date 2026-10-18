@@ -12,7 +12,7 @@ function latestMigrationDefining(fnName: string): string {
     .reverse();
   for (const f of files) {
     const text = readFileSync(`${DIR}/${f}`, "utf8");
-    if (text.includes(`function public.${fnName}`)) return text;
+    if (new RegExp(`create (or replace )?function public[.]${fnName}[^a-z_]`).test(text)) return text;
   }
   throw new Error(`no migration defines ${fnName}`);
 }

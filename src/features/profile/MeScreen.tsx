@@ -12,7 +12,7 @@ import { bossMention, livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS } from "@/services/exam";
 import { fr } from "@/i18n/fr";
 import {
-  Avatar, BadgeMedal, Button, Card, Certificate, ConfirmDialog, Icon, Sheet, StreakFlame, downloadCertificate, tap, useToast,
+  Avatar, fxSpill, BadgeMedal, Button, Card, Certificate, ConfirmDialog, Icon, Sheet, StreakFlame, downloadCertificate, tap, useToast,
   type CertificateProps,
 } from "@/ui";
 import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
@@ -233,7 +233,7 @@ export function MeScreen() {
 
       <Card raised className="flex flex-col gap-4 p-5">
         <div className="flex items-center gap-4">
-          <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className={`rounded-full ${fx ? "my-3 ml-3 mr-4" : ""}`}>
+          <motion.button type="button" whileTap={tap} onClick={() => setEditOpen(true)} aria-label={fr.profile.editAria} className={`rounded-full ${fxSpill(fx)}`}>
             <Avatar emoji={profile?.avatarEmoji ?? ""} size="lg" ring="gold" frame={frame} fx={fx} />
           </motion.button>
           <div className="min-w-0 flex-1">

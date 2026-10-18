@@ -120,7 +120,7 @@ describe("DialogueScreen", () => {
     setup({ badge: true });
     await userEvent.click(await optionButton(/Cho tui một ly cà phê sữa đá/));
     await userEvent.click(await optionButton(/Cảm ơn em/));
-    expect(await screen.findByText(fr.rewards.gained("Cadre bronze"), undefined, SLOW)).toBeInTheDocument();
+    expect(await screen.findByText(fr.rewards.gained("cadre", "Bronze"), undefined, SLOW)).toBeInTheDocument();
   });
 
   it("reveals the French translation on demand", async () => {

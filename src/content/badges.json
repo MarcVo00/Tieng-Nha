@@ -6,7 +6,7 @@
     { "id": "streak_3", "title": "Lancé·e", "description": "3 jours d'affilée.", "icon": "🔥", "rule": { "kind": "streak", "gte": 3 } },
     { "id": "streak_7", "title": "Une semaine", "description": "7 jours d'affilée.", "icon": "🏮", "rule": { "kind": "streak", "gte": 7 }, "reward": "frame_bronze" },
     { "id": "streak_30", "title": "Inarrêtable", "description": "30 jours d'affilée.", "icon": "🐉", "rule": { "kind": "streak", "gte": 30 }, "reward": "fx_embers" },
-    { "id": "perfect_lesson", "title": "Sans faute", "description": "Termine une leçon sans aucune erreur.", "icon": "⭐", "rule": { "kind": "perfect_lesson"} },
+    { "id": "perfect_lesson", "title": "Sans faute", "description": "Termine une leçon sans aucune erreur.", "icon": "⭐", "rule": { "kind": "perfect_lesson" } },
     { "id": "perfect_5", "title": "Main de maître", "description": "Réussis 5 leçons différentes sans aucune erreur.", "icon": "🖌️", "rule": { "kind": "perfect_lessons", "gte": 5 }, "reward": "fx_ink" },
     { "id": "vocab_100", "title": "Mémoire d'éléphant", "description": "Révise 100 mots correctement.", "icon": "🐘", "rule": { "kind": "vocab_reviewed", "gte": 100 } },
     { "id": "first_dialogue", "title": "Première conversation", "description": "Termine ton premier dialogue.", "icon": "💬", "rule": { "kind": "dialogues_done", "gte": 1 } },

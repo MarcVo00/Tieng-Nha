@@ -144,7 +144,7 @@ export function ShopScreen() {
           </section>
           <p className="text-caption text-ink-muted">
             {fr.rewards.hint}{" "}
-            <Link to="/me" className="text-body-strong text-primary underline">
+            <Link to="/me#me-rewards" className="inline-flex min-h-11 items-center text-body-strong text-primary underline">
               {fr.rewards.shopLink}
             </Link>
           </p>

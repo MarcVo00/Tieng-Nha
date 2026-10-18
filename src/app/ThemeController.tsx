@@ -4,6 +4,8 @@ import { useAppState } from "@/app/appState";
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 const THEME_COLOR = { dark: "#15110F", light: "#F6F0E4" } as const; // --color-bg of each theme
+// One manifest per theme: Android colours the installed app's navigation bar from it (see vite.config.ts).
+const MANIFEST = { dark: "/manifest-dark.webmanifest", light: "/manifest.webmanifest" } as const;
 
 export function ThemeController() {
   const theme = useAppState((s) => s.settings.theme);
@@ -14,6 +16,7 @@ export function ThemeController() {
       const dark = theme === "dark" || (theme === "system" && media.matches);
       document.documentElement.classList.toggle("dark", dark);
       document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? THEME_COLOR.dark : THEME_COLOR.light);
+      document.getElementById("app-manifest")?.setAttribute("href", dark ? MANIFEST.dark : MANIFEST.light);
     };
     apply();
     try {

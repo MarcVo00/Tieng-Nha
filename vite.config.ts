@@ -1,7 +1,50 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { VitePWA } from "vite-plugin-pwa";
+import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
+import type { Plugin } from "vite";
 import { fileURLToPath, URL } from "node:url";
+
+// Android paints an installed app's navigation bar with the manifest colours, and a manifest holds one colour only:
+// one manifest per theme, picked before first paint by the inline script in index.html (and by ThemeController).
+// Values are --color-surface of each theme, so the bar continues the tab bar.
+const MANIFEST_COLORS = {
+  light: { background_color: "#FFFBF3", theme_color: "#FFFBF3" },
+  dark: { background_color: "#1F1916", theme_color: "#1F1916" },
+} as const;
+
+const manifest: Partial<ManifestOptions> = {
+  name: "Tiếng Nhà",
+  short_name: "Tiếng Nhà",
+  id: "/",
+  description: "Le vietnamien du Sud, en famille.",
+  categories: ["education"],
+  lang: "fr",
+  start_url: "/",
+  scope: "/",
+  display: "standalone",
+  orientation: "portrait",
+  ...MANIFEST_COLORS.light,
+  icons: [
+    { src: "icons/pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+    { src: "icons/pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+    { src: "icons/maskable-icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+  ],
+};
+
+/** Emits the dark manifest and drops the plugin's own manifest link: index.html declares a swappable one. */
+function themedManifests(): Plugin {
+  return {
+    name: "tn-themed-manifests",
+    enforce: "post",
+    transformIndexHtml: {
+      order: "post",
+      handler: (html) => html.replace(/<link rel="manifest" href="[^"]*">/g, ""),
+    },
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "manifest-dark.webmanifest", source: JSON.stringify({ ...manifest, ...MANIFEST_COLORS.dark }) });
+    },
+  };
+}
 
 export default defineConfig({
   plugins: [
@@ -9,25 +52,7 @@ export default defineConfig({
     VitePWA({
       registerType: "prompt",
       includeAssets: ["favicon.ico", "icons/apple-touch-icon-180x180.png", "icons/icon.svg"],
-      manifest: {
-        name: "Tiếng Nhà",
-        short_name: "Tiếng Nhà",
-        id: "/",
-        description: "Le vietnamien du Sud, en famille.",
-        categories: ["education"],
-        lang: "fr",
-        start_url: "/",
-        scope: "/",
-        display: "standalone",
-        orientation: "portrait",
-        background_color: "#F6F0E4",
-        theme_color: "#A3201C",
-        icons: [
-          { src: "icons/pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-          { src: "icons/pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-          { src: "icons/maskable-icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-        ],
-      },
+      manifest,
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,woff2,json}"],
         // Voice packs are tens of MB: fetched on demand (see runtimeCaching), never precached.
@@ -48,6 +73,7 @@ export default defineConfig({
         ],
       },
     }),
+    themedManifests(),
   ],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
 });

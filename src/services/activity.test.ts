@@ -116,26 +116,24 @@ describe("shop", () => {
     const { s } = shopSetup();
     await s.activity.finishExam({ attemptId: "a", score: 90, noSpeaking: false }); // +50 coins
     const before = (await s.activity.getWallet()).coins;
-    const r = await s.activity.purchase("frame_bronze");
+    const r = await s.activity.purchase("streak_freeze");
     expect(r.ok).toBe(true);
-    expect(r.wallet.coins).toBe(before - 40);
-    expect(r.wallet.inventory).toEqual(["frame_bronze"]);
+    expect(r.wallet.coins).toBe(before - 50);
+    expect(r.wallet.freezes).toBe(1);
     const queued = await s.outbox.peek(100);
     const bought = queued.find((e) => e.type === "item_purchased");
-    expect(bought).toMatchObject({ xp: 0, payload: { itemId: "frame_bronze" } });
-    expect((await s.activity.purchase("frame_bronze")).ok).toBe(false); // already owned
+    expect(bought).toMatchObject({ xp: 0, payload: { itemId: "streak_freeze" } });
+    expect((await s.activity.purchase("frame_bronze")).ok).toBe(false); // reward-only: no price
   });
 
   test("equip follows the same rules", async () => {
     const { s } = shopSetup();
     await s.activity.finishExam({ attemptId: "a", score: 90, noSpeaking: false });
     expect((await s.activity.equip("frame", "frame_bronze")).ok).toBe(false);
-    await s.activity.purchase("frame_bronze");
-    const r = await s.activity.equip("frame", "frame_bronze");
-    expect(r.ok).toBe(true);
-    expect(r.wallet.equipped).toEqual({ frame: "frame_bronze" });
-    expect((await s.outbox.peek(100)).some((e) => e.type === "item_equipped")).toBe(true);
-    expect((await s.activity.equip("frame", null)).wallet.equipped).toEqual({});
+    expect((await s.activity.purchase("frame_bronze")).ok).toBe(false); // reward-only: cannot be bought
+    expect((await s.activity.equip("frame", "frame_bronze")).ok).toBe(false);
+    // Owning a reward through its badge, then equipping it, is covered once the wallet replay grants rewards.
+    expect((await s.activity.equip("frame", null)).ok).toBe(true);
   });
 
   test("an energy refill restores the energy to full", async () => {

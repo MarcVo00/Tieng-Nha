@@ -29,7 +29,7 @@ test("unknown ids throw ContentNotFoundError", async () => {
 test("vocab index spans all lessons", async () => expect((await src.getVocabIndex()).get("v_ly")?.vi).toBe("ly"));
 test("exam pool and badges", async () => {
   expect(await src.getExamPool()).toHaveLength(60);
-  expect((await src.getBadges()).length).toBe(12);
+  expect((await src.getBadges()).length).toBe(13);
 });
 test("createStaticContentSource lists real lessons in order and loads the real exam pool", async () => {
   const real = createStaticContentSource();
@@ -45,7 +45,7 @@ test("createStaticContentSource lists real lessons in order and loads the real e
   expect(count("translation")).toBeGreaterThanOrEqual(16);
   expect(count("tones")).toBeGreaterThanOrEqual(12);
   expect(count("speaking")).toBeGreaterThanOrEqual(12);
-  expect((await real.getBadges()).length).toBe(12);
+  expect((await real.getBadges()).length).toBe(13);
 });
 
 test("the real shop catalogue matches the fakes fixture", async () => {

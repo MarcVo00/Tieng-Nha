@@ -114,6 +114,8 @@ export type PublicProfile = {
   examBest: number | null;
   /** Equipped avatar frame item id (`frame_*`), or null. */
   frame: string | null;
+  /** Equipped profile effect item id (`fx_*`), or null. */
+  fx: string | null;
 };
 
 export type ConversationEntry = { turnId: string; speaker: "npc" | "user"; vi: string; fr: string };
@@ -146,7 +148,7 @@ export type Boss = z.infer<typeof BossSchema>;
 export type ShopItem = z.infer<typeof ShopItemSchema>;
 export type Shop = ShopItem[];
 /** Equipment slots; grows later with the character (hat, outfit...). */
-export type ItemSlot = "frame";
+export type ItemSlot = "frame" | "profile_fx";
 
 /** Coins and purchases replayed from the journal (same rules as the server). */
 export type Wallet = {

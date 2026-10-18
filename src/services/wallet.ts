@@ -34,7 +34,7 @@ export function coinsForEvent(e: AppEvent, bestBefore: number | null): number {
 /** The catalogue item a purchase would buy, or null when the server rules refuse it. */
 export function purchasable(w: Wallet, shop: readonly ShopItem[], itemId: unknown): ShopItem | null {
   const item = typeof itemId === "string" ? shop.find((i) => i.id === itemId) : undefined;
-  if (!item || w.coins < item.price) return null;
+  if (!item || item.price === null || w.coins < item.price) return null;
   if (item.kind === "cosmetic" && w.inventory.includes(item.id)) return null;
   if (item.id === "streak_freeze" && w.freezes >= (item.maxStock ?? DEFAULT_MAX_FREEZES)) return null;
   return item;
@@ -57,7 +57,7 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[])
   for (const e of sorted) {
     if (e.type === "item_purchased") {
       const item = purchasable(w, shop, e.payload["itemId"]);
-      if (!item) continue;
+      if (!item || item.price === null) continue;
       w.coins -= item.price;
       if (item.id === "streak_freeze") w.freezes += 1;
       else if (item.kind === "cosmetic") w.inventory.push(item.id);

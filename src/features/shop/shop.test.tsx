@@ -52,28 +52,25 @@ test("shows the balance as the hero", async () => {
   expect(await screen.findByText(fr.shop.balance(coins))).toBeInTheDocument();
 });
 
-test("buys a frame after confirming, then offers to equip and unequip it", async () => {
+test("buys a streak freeze after confirming", async () => {
   const services = createFakeServices({ clock: () => NOW });
   await winExams(services, 1);
   const { coins } = await services.activity.getWallet();
   const user = setup(services);
-  const bronze = await card(fr.shop.items["frame_bronze"]?.name ?? "");
-  await user.click(within(bronze).getByRole("button", { name: fr.shop.buy(40) }));
+  const freeze = await card(fr.shop.items["streak_freeze"]?.name ?? "");
+  await user.click(within(freeze).getByRole("button", { name: fr.shop.buy(50) }));
   const dialog = await screen.findByRole("alertdialog");
-  expect(dialog).toHaveTextContent(fr.shop.confirm.title("le cadre bronze", 40));
+  expect(dialog).toHaveTextContent(fr.shop.confirm.title("un gel de série", 50));
   await user.click(within(dialog).getByRole("button", { name: fr.shop.confirm.confirm }));
-  expect(await screen.findByText(fr.shop.balance(coins - 40))).toBeInTheDocument();
+  expect(await screen.findByText(fr.shop.balance(coins - 50))).toBeInTheDocument();
   expect(await screen.findByText(fr.shop.bought)).toBeInTheDocument();
-  await user.click(await within(bronze).findByRole("button", { name: fr.shop.equip }));
-  await user.click(await within(bronze).findByRole("button", { name: fr.shop.equipped }));
-  expect(await within(bronze).findByRole("button", { name: fr.shop.equip })).toBeEnabled();
 });
 
 test("disables what the player cannot afford", async () => {
   const services = createFakeServices({ clock: () => NOW });
   setup(services);
-  const jade = await card(fr.shop.items["frame_jade"]?.name ?? "");
-  expect(within(jade).getByRole("button", { name: fr.shop.noFunds })).toBeDisabled();
+  const freeze = await card(fr.shop.items["streak_freeze"]?.name ?? "");
+  expect(within(freeze).getByRole("button", { name: fr.shop.noFunds })).toBeDisabled();
 });
 
 test("a full freeze stock disables the purchase", async () => {
@@ -148,8 +145,8 @@ describe("purchase failures", () => {
     await winExams(services, 1);
     const { coins } = await services.activity.getWallet();
     const user = setup(services);
-    const bronze = await card(fr.shop.items["frame_bronze"]?.name ?? "");
-    await user.click(within(bronze).getByRole("button", { name: fr.shop.buy(40) }));
+    const bronze = await card(fr.shop.items["streak_freeze"]?.name ?? "");
+    await user.click(within(bronze).getByRole("button", { name: fr.shop.buy(50) }));
     const dialog = await screen.findByRole("alertdialog");
     return { services, user, bronze, dialog, coins };
   }
@@ -158,7 +155,7 @@ describe("purchase failures", () => {
     expect(await screen.findByText(fr.shop.error)).toBeInTheDocument();
     expect(screen.queryByText(fr.shop.bought)).toBeNull();
     expect(screen.getByText(fr.shop.balance(coins))).toBeInTheDocument();
-    await waitFor(() => expect(within(bronze).getByRole("button", { name: fr.shop.buy(40) })).toBeEnabled());
+    await waitFor(() => expect(within(bronze).getByRole("button", { name: fr.shop.buy(50) })).toBeEnabled());
   }
 
   test("a refused purchase shows the error and changes nothing", async () => {
@@ -190,41 +187,10 @@ describe("purchase failures", () => {
   });
 });
 
-test("each frame preview carries the frame name", async () => {
-  const services = createFakeServices({ clock: () => NOW });
-  setup(services);
-  for (const id of ["frame_bronze", "frame_jade", "frame_son_mai"]) {
-    const name = fr.shop.items[id]?.name ?? "";
-    expect(await screen.findByRole("img", { name: fr.shop.preview(name) })).toBeInTheDocument();
-  }
-});
-
-test("an equip failure shows the dedicated equip error", async () => {
-  useToastStore.setState({ toasts: [] });
-  const services = createFakeServices({ clock: () => NOW });
-  await winExams(services, 1);
-  await services.activity.purchase("frame_bronze");
-  const user = setup(services);
-  vi.spyOn(services.activity, "equip").mockRejectedValueOnce(new Error("boom"));
-  const bronze = await card(fr.shop.items["frame_bronze"]?.name ?? "");
-  await user.click(await within(bronze).findByRole("button", { name: fr.shop.equip }));
-  expect(await screen.findByText(fr.shop.equipError)).toBeInTheDocument();
-  expect(screen.queryByText(fr.shop.error)).toBeNull();
-});
-
-test("an equipped frame is exposed as pressed and equipping shows a toast", async () => {
-  useToastStore.setState({ toasts: [] });
-  const services = createFakeServices({ clock: () => NOW });
-  await winExams(services, 1);
-  await services.activity.purchase("frame_bronze");
-  const user = setup(services);
-  const bronze = await card(fr.shop.items["frame_bronze"]?.name ?? "");
-  await user.click(await within(bronze).findByRole("button", { name: fr.shop.equip }));
-  expect(await screen.findByText(fr.shop.equippedToast)).toBeInTheDocument();
-  expect(await within(bronze).findByRole("button", { name: fr.shop.equipped })).toHaveAttribute("aria-pressed", "true");
-  await user.click(within(bronze).getByRole("button", { name: fr.shop.equipped }));
-  expect(await screen.findByText(fr.shop.removedToast)).toBeInTheDocument();
-});
+// Frames are reward-only now (no price): their shop tests return with the redesigned shop (preview, equip, toasts).
+test.todo("each reward preview carries the item name");
+test.todo("an equip failure shows the dedicated equip error");
+test.todo("an equipped frame is exposed as pressed and equipping shows a toast");
 
 test("a failed wallet load offers a retry instead of an endless skeleton", async () => {
   const services = createFakeServices({ clock: () => NOW });

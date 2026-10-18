@@ -21,10 +21,11 @@ function verdictOf(item: ShopItem, wallet: Wallet, energy: EnergyState | null): 
       return { label: fr.shop.stockFull, disabled: true, action: "none" };
     }
     if (item.id === "energy_refill") {
-      if (energy === null) return { label: fr.shop.buy(item.price), disabled: true, action: "none" };
+      if (energy === null) return { label: item.price === null ? fr.shop.noFunds : fr.shop.buy(item.price), disabled: true, action: "none" };
       if (energy.current >= energy.max) return { label: fr.shop.energyFull, disabled: true, action: "none" };
     }
   }
+  if (item.price === null) return { label: fr.shop.noFunds, disabled: true, action: "none" };
   if (wallet.coins < item.price) return { label: fr.shop.noFunds, disabled: true, action: "none" };
   return { label: fr.shop.buy(item.price), disabled: false, action: "buy" };
 }
@@ -96,7 +97,7 @@ export function ShopScreen() {
 
   const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
   const play = known.filter((i) => i.kind === "consumable");
-  const frames = known.filter((i) => i.kind === "cosmetic").sort((a, b) => a.price - b.price);
+  const frames = known.filter((i) => i.kind === "cosmetic" && i.price !== null);
   const asked = asking ? fr.shop.items[asking.id] : undefined;
 
   function card(item: ShopItem, w: Wallet) {
@@ -170,7 +171,7 @@ export function ShopScreen() {
 
       <ConfirmDialog
         open={asking !== null}
-        title={asking && asked ? fr.shop.confirm.title(asked.confirmName, asking.price) : ""}
+        title={asking && asked && asking.price !== null ? fr.shop.confirm.title(asked.confirmName, asking.price) : ""}
         confirmLabel={fr.shop.confirm.confirm}
         cancelLabel={fr.shop.confirm.cancel}
         busy={busy}

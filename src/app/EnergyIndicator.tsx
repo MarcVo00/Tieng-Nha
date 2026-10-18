@@ -42,7 +42,7 @@ export function EnergyIndicator() {
       .getShop()
       .then((shop) => {
         const price = shop.find((i) => i.id === "energy_refill")?.price;
-        if (!cancelled && price !== undefined) setRefillPrice(price);
+        if (!cancelled && typeof price === "number") setRefillPrice(price);
       })
       .catch(() => undefined);
     return () => {

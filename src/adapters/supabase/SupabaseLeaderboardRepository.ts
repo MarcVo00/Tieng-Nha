@@ -4,6 +4,13 @@ import { ContentNotFoundError } from "@/domain/errors";
 import type { LeaderboardRow, PublicProfile } from "@/domain/types";
 import type { LeaderboardRepository } from "@/ports";
 
+/** Equipped profile effect id from the `equipped` jsonb; any unexpected shape reads as none. */
+function profileFx(equipped: unknown): string | null {
+  if (typeof equipped !== "object" || equipped === null || Array.isArray(equipped)) return null;
+  const fx = (equipped as Record<string, unknown>)["profile_fx"];
+  return typeof fx === "string" ? fx : null;
+}
+
 export class SupabaseLeaderboardRepository implements LeaderboardRepository {
   constructor(private readonly db: Db) {}
 
@@ -50,6 +57,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
       badges: data.badges ?? [],
       examBest: data.exam_best,
       frame: data.equipped_frame ?? null,
+      fx: profileFx(data.equipped),
     };
   }
 }

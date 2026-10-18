@@ -36,7 +36,7 @@ async function setup(given: Partial<Services> | Services = {}) {
       <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </ServicesProvider>,
   );
-  await screen.findByText(/ sur 12$/);
+  await screen.findByText(/ sur 13$/);
   return { services, router, user: userEvent.setup() };
 }
 
@@ -49,14 +49,14 @@ beforeEach(() => {
   });
 });
 
-test("shows the header and all 12 badges, unlocked first", async () => {
+test("shows the header and all 13 badges, unlocked first", async () => {
   useAppState.setState({ snapshot: snapshot({ badges: ["first_lesson"] }) });
   await setup();
   expect(screen.getByText("Marc")).toBeInTheDocument();
   expect(screen.getByText(fr.leaderboard.xp(120))).toBeInTheDocument();
   const items = await screen.findAllByRole("listitem");
   const badgeItems = items.filter((li) => within(li).queryByRole("button"));
-  expect(badgeItems).toHaveLength(12);
+  expect(badgeItems).toHaveLength(13);
   expect(badgeItems[0]).toHaveTextContent(/./);
   expect(within(badgeItems[0] as HTMLElement).queryByText(fr.ui.badge.locked, { exact: false })).toBeNull();
 });

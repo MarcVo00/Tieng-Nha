@@ -5,6 +5,7 @@ function holds(rule: BadgeDef["rule"], s: ProgressSnapshot): boolean {
     case "lessons_done": return s.lessonsDone.length >= rule.gte;
     case "streak": return s.streak >= rule.gte;
     case "perfect_lesson": return s.perfectLessons.length > 0;
+    case "perfect_lessons": return s.perfectLessons.length >= rule.gte;
     case "vocab_reviewed": return s.vocabReviewed >= rule.gte;
     case "dialogues_done": return s.dialoguesDone.length >= rule.gte;
     case "exam_score": return (s.examBest ?? 0) >= rule.gte;

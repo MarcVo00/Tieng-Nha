@@ -264,7 +264,8 @@ describe("dark legends section and try-on", () => {
     expect(sheet).toHaveTextContent(fr.shop.confirm.title("la couronne des marées", 60));
     expect((await types(services)).length).toBe(before);
     await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
-    expect(await screen.findByText(fr.shop.bought)).toBeInTheDocument();
+    await screen.findByText(fr.shop.bought);
+    expect(screen.getAllByText(fr.shop.bought)).toHaveLength(1); // one purchase, one toast
     expect((await types(services)).slice(before)).toEqual(["item_purchased", "item_equipped"]);
     expect((await services.activity.getWallet()).equipped["hat"]).toBe("hat_thuy_tinh");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import type { ItemSlot, Look, ShopItem, Wallet } from "@/domain/types";
+import type { Look, ShopItem, Wallet } from "@/domain/types";
+import { characterSlotOf } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Character, Icon, Sheet } from "@/ui";
+import { Button, HeroMedallion, Icon, Sheet } from "@/ui";
 
 type TryOnSheetProps = {
   item: ShopItem | null;
@@ -15,14 +16,6 @@ type TryOnSheetProps = {
   onToggle: (item: ShopItem, equippedNow: boolean) => Promise<void>;
 };
 
-type CharacterSlot = "hat" | "outfit" | "accessory" | "aura";
-const CHARACTER_SLOTS: ItemSlot[] = ["hat", "outfit", "accessory", "aura"];
-
-function characterSlot(item: ShopItem | null): CharacterSlot | null {
-  const slot = item?.slot ?? null;
-  return slot !== null && CHARACTER_SLOTS.includes(slot) ? (slot as CharacterSlot) : null;
-}
-
 // Hierarchy: the hero wearing the item is the star; the name and the price are secondary; one action.
 // The purchase confirmation happens inside this same sheet (never a second modal on top of it).
 export function TryOnSheet({ item, open, wallet, baseLook, busy, onClose, onBuy, onToggle }: TryOnSheetProps) {
@@ -32,7 +25,7 @@ export function TryOnSheet({ item, open, wallet, baseLook, busy, onClose, onBuy,
   }, [open]);
 
   const text = item ? fr.shop.items[item.id] : undefined;
-  const slot = characterSlot(item);
+  const slot = characterSlotOf(item ?? { slot: null });
   const price = item?.price ?? null;
 
   async function buy(it: ShopItem): Promise<void> {
@@ -48,9 +41,7 @@ export function TryOnSheet({ item, open, wallet, baseLook, busy, onClose, onBuy,
     const look: Look = { ...baseLook, [slot]: item.id };
     return (
       <div className="flex flex-col items-center gap-4 text-center">
-        <div role="img" aria-label={fr.shop.tryOn.preview(text.name)} className="flex h-52 w-52 items-end justify-center rounded-full bg-bg pb-2 shadow-card">
-          <Character look={look} size={132} />
-        </div>
+        <HeroMedallion look={look} size={208} label={fr.shop.tryOn.preview(text.name)} />
         {confirming && price !== null ? (
           <>
             <h2 className="text-heading text-ink">{fr.shop.confirm.title(text.confirmName, price)}</h2>

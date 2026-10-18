@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useAppState, useRefreshProgress } from "@/app/appState";
+import { useAppState } from "@/app/appState";
+import { useEquipToggle } from "@/app/useEquipToggle";
 import { useServices } from "@/app/ServicesProvider";
 import type { BadgeDef, ItemSlot, ShopItem } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { Avatar, Button, Card, Icon, useToast } from "@/ui";
+import { Avatar, Button, Card, Icon } from "@/ui";
 
 // Frames by badge difficulty (bronze, jade, son mai), then the three effects.
 const ORDER = ["frame_bronze", "frame_jade", "frame_son_mai", "fx_ink", "fx_lightning", "fx_embers"] as const;
 
 // Hierarchy: the previews are the hero; one quiet action per card, locked cards say how to earn them.
 export function RewardsSection({ badges }: { badges: BadgeDef[] | null }) {
-  const { content, activity } = useServices();
-  const toast = useToast();
-  const refresh = useRefreshProgress();
+  const { content } = useServices();
+  const equipToggle = useEquipToggle();
   const wallet = useAppState((s) => s.wallet);
   const emoji = useAppState((s) => s.profile?.avatarEmoji ?? "");
   const [items, setItems] = useState<ShopItem[] | null>(null);
@@ -45,12 +45,7 @@ export function RewardsSection({ badges }: { badges: BadgeDef[] | null }) {
     if (busy) return;
     setBusy(true);
     try {
-      const r = await activity.equip(slot, equippedNow ? null : id);
-      // A stale screen after a successful equip is reported as an error: the player must not trust it.
-      const refreshed = await refresh().then(() => true, () => false);
-      toast.show({ title: r.ok && refreshed ? (equippedNow ? fr.rewards.removedToast : fr.rewards.equippedToast) : fr.rewards.error });
-    } catch {
-      toast.show({ title: fr.rewards.error });
+      await equipToggle(id, slot, equippedNow);
     } finally {
       setBusy(false);
     }

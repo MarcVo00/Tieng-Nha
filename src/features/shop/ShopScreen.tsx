@@ -4,9 +4,10 @@ import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
-import { lookOf } from "@/services/look";
+import { useEquipToggle } from "@/app/useEquipToggle";
+import { characterSlotOf, lookOf } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, Character, ConfirmDialog, EmptyState, Icon, Skeleton, tap, useToast } from "@/ui";
+import { Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, Skeleton, tap, useToast } from "@/ui";
 import { TryOnSheet } from "@/features/shop/TryOnSheet";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
@@ -37,6 +38,7 @@ export function ShopScreen() {
   const [asking, setAsking] = useState<ShopItem | null>(null);
   const [busy, setBusy] = useState(false);
   const [walletFailed, setWalletFailed] = useState(false);
+  const equipToggle = useEquipToggle();
   const [trying, setTrying] = useState<ShopItem | null>(null);
   const [tryOpen, setTryOpen] = useState(false);
   const equipped = useAppState((s) => s.wallet?.equipped);
@@ -123,12 +125,7 @@ export function ShopScreen() {
     if (busy || item.slot === null) return;
     setBusy(true);
     try {
-      const r = await activity.equip(item.slot, equippedNow ? null : item.id);
-      const refreshed = await refresh().then(() => true, () => false);
-      toast.show({ title: r.ok && refreshed ? (equippedNow ? fr.rewards.removedToast : fr.rewards.equippedToast) : fr.rewards.error });
-      if (r.ok) setTryOpen(false);
-    } catch {
-      toast.show({ title: fr.rewards.error });
+      if (await equipToggle(item.id, item.slot, equippedNow)) setTryOpen(false);
     } finally {
       setBusy(false);
     }
@@ -177,9 +174,10 @@ export function ShopScreen() {
 
   function themedCard(item: ShopItem, w: Wallet) {
     const text = fr.shop.items[item.id];
-    if (!text || item.slot === null) return null;
+    const slot = characterSlotOf(item);
+    if (!text || slot === null) return null;
     const owned = w.inventory.includes(item.id);
-    const on = w.equipped[item.slot] === item.id;
+    const on = w.equipped[slot] === item.id;
     return (
       <li key={item.id}>
         <motion.button
@@ -190,9 +188,7 @@ export function ShopScreen() {
           onClick={() => tryOn(item)}
           className="flex h-full w-full flex-col items-center gap-2 rounded-md bg-surface p-3 text-center shadow-card disabled:opacity-60"
         >
-          <span className="flex h-28 w-28 items-end justify-center rounded-full bg-bg pb-1">
-            <Character look={{ ...baseLook, [item.slot as "hat"]: item.id }} size={66} />
-          </span>
+          <HeroMedallion look={{ ...baseLook, [slot]: item.id }} size={112} />
           <span className="text-body-strong text-ink">{text.name}</span>
           {owned ? (
             <span className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</span>

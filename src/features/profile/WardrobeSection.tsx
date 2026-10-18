@@ -1,23 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAppState, useRefreshProgress } from "@/app/appState";
+import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useEquipToggle } from "@/app/useEquipToggle";
 import type { ShopItem } from "@/domain/types";
-import { lookOf } from "@/services/look";
+import { CHARACTER_SLOTS, characterSlotOf, lookOf, type CharacterSlot } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, Character, useToast } from "@/ui";
-
-const SLOTS = ["hat", "outfit", "accessory", "aura"] as const;
-type CharacterSlot = (typeof SLOTS)[number];
-
-function slotOf(item: ShopItem): CharacterSlot | null {
-  return SLOTS.find((s) => s === item.slot) ?? null;
-}
+import { Button, Card, HeroMedallion } from "@/ui";
 
 // Hierarchy: the hero wearing each owned piece is the star; one quiet action per card.
 export function WardrobeSection() {
-  const { content, activity } = useServices();
-  const toast = useToast();
-  const refresh = useRefreshProgress();
+  const { content } = useServices();
+  const equipToggle = useEquipToggle();
   const wallet = useAppState((s) => s.wallet);
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,17 +30,13 @@ export function WardrobeSection() {
 
   if (!items || !wallet) return null;
 
-  const owned = items.filter((i) => slotOf(i) !== null && wallet.inventory.includes(i.id) && fr.shop.items[i.id] !== undefined);
+  const owned = items.filter((i) => characterSlotOf(i) !== null && wallet.inventory.includes(i.id) && fr.shop.items[i.id] !== undefined);
 
   async function toggle(id: string, slot: CharacterSlot, equippedNow: boolean): Promise<void> {
     if (busy) return;
     setBusy(true);
     try {
-      const r = await activity.equip(slot, equippedNow ? null : id);
-      const refreshed = await refresh().then(() => true, () => false);
-      toast.show({ title: r.ok && refreshed ? (equippedNow ? fr.rewards.removedToast : fr.rewards.equippedToast) : fr.rewards.error });
-    } catch {
-      toast.show({ title: fr.rewards.error });
+      await equipToggle(id, slot, equippedNow);
     } finally {
       setBusy(false);
     }
@@ -59,8 +48,8 @@ export function WardrobeSection() {
         {fr.wardrobe.title}
       </h2>
       {owned.length === 0 ? <p className="text-body text-ink-muted">{fr.wardrobe.empty}</p> : null}
-      {SLOTS.map((slot) => {
-        const inSlot = owned.filter((i) => slotOf(i) === slot);
+      {CHARACTER_SLOTS.map((slot) => {
+        const inSlot = owned.filter((i) => characterSlotOf(i) === slot);
         if (inSlot.length === 0) return null;
         return (
           <div key={slot} className="flex flex-col gap-2">
@@ -72,9 +61,7 @@ export function WardrobeSection() {
                 const on = wallet.equipped[slot] === item.id;
                 return (
                   <Card as="li" key={item.id} className="flex flex-col items-center gap-2 p-4 text-center">
-                    <span className="flex h-24 w-24 items-end justify-center rounded-full bg-bg pb-1">
-                      <Character look={{ ...base, [slot]: item.id }} size={56} />
-                    </span>
+                    <HeroMedallion look={{ ...base, [slot]: item.id }} size={96} />
                     <h4 id={`wardrobe-${item.id}`} className="text-body-strong text-ink">
                       {text.name}
                     </h4>

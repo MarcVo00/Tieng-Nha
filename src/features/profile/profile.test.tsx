@@ -373,10 +373,24 @@ describe("rewards section", () => {
     const jade = await rewardCard("Cadre jade");
     expect(within(jade).getByRole("button", { name: fr.rewards.equip })).toBeEnabled();
     expect(within(jade).getByRole("img", { name: fr.rewards.preview("Cadre jade") })).toBeInTheDocument();
-    const names = ["Cadre bronze", "Cadre laque dorée", "Volutes d'encre", "Éclairs", "Braises"];
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(6);
-    for (const name of names) expect(within(await rewardCard(name)).queryByRole("button")).toBeNull();
-    expect(within(await rewardCard("Cadre bronze")).getByText(fr.rewards.lockedBy("Une semaine", "7 jours d'affilée."))).toBeInTheDocument();
+    const all = ["frame_bronze", "frame_jade", "frame_son_mai", "fx_ink", "fx_lightning", "fx_embers"];
+    const badgeOf: Record<string, [string, string]> = {
+      frame_bronze: ["Une semaine", "7 jours d'affilée."],
+      frame_son_mai: ["Vainqueur de Thủy Tinh", "Bats le boss final."],
+      fx_ink: ["Main de maître", "Réussis 5 leçons différentes sans aucune erreur."],
+      fx_lightning: ["Excellence", "Bats le boss final en gardant au moins 4 vies."],
+      fx_embers: ["Inarrêtable", "30 jours d'affilée."],
+    };
+    for (const id of all) {
+      const name = fr.shop.items[id]?.name ?? "";
+      const card = await rewardCard(name);
+      expect(within(card).getByRole("img", { name: fr.rewards.preview(name) })).toBeInTheDocument();
+      const locked = badgeOf[id];
+      if (!locked) continue;
+      expect(within(card).queryByRole("button")).toBeNull();
+      expect(within(card).getByText(fr.rewards.lockedBy(...locked))).toBeInTheDocument();
+    }
   });
 
   test("equipping a frame calls activity.equip and the header avatar shows it", async () => {
@@ -413,6 +427,14 @@ describe("rewards section", () => {
     expect(await screen.findByText(fr.rewards.error)).toBeInTheDocument();
     expect(useAppState.getState().wallet?.equipped.frame ?? null).toBeNull();
     await waitFor(() => expect(within(screen.getByText("Cadre jade").closest("li") as HTMLElement).getByRole("button", { name: fr.rewards.equip })).toBeEnabled());
+  });
+
+  test("a refresh that fails after a successful equip is reported as an error", async () => {
+    const { services, user } = await setupRewards(["ten_lessons"]);
+    vi.spyOn(services.activity, "getWallet").mockRejectedValue(new Error("down"));
+    await user.click(within(await rewardCard("Cadre jade")).getByRole("button", { name: fr.rewards.equip }));
+    expect(await screen.findByText(fr.rewards.error)).toBeInTheDocument();
+    expect(screen.queryByText(fr.rewards.equippedToast)).toBeNull();
   });
 
   test("a refused equip shows the error too", async () => {

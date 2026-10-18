@@ -40,8 +40,9 @@ export function RewardsSection({ badges }: { badges: BadgeDef[] | null }) {
     setBusy(true);
     try {
       const r = await activity.equip(slotOf(id), equippedNow ? null : id);
-      await refresh().catch(() => undefined);
-      toast.show({ title: r.ok ? (equippedNow ? fr.rewards.removedToast : fr.rewards.equippedToast) : fr.rewards.error });
+      // A stale screen after a successful equip is reported as an error: the player must not trust it.
+      const refreshed = await refresh().then(() => true, () => false);
+      toast.show({ title: r.ok && refreshed ? (equippedNow ? fr.rewards.removedToast : fr.rewards.equippedToast) : fr.rewards.error });
     } catch {
       toast.show({ title: fr.rewards.error });
     } finally {
@@ -63,9 +64,11 @@ export function RewardsSection({ badges }: { badges: BadgeDef[] | null }) {
           const on = (slot === "frame" ? wallet.equipped.frame : wallet.equipped.profile_fx) === item.id;
           const badge = badges?.find((b) => b.reward === item.id);
           return (
-            <Card as="li" key={item.id} className={`flex flex-col items-center gap-2 p-4 text-center ${owned ? "" : "opacity-70"}`}>
+            <Card as="li" key={item.id} className="flex flex-col items-center gap-2 p-4 text-center">
               <span role="img" aria-label={fr.rewards.preview(text.name)} className="relative flex h-20 w-20 items-center justify-center">
-                <Avatar emoji={emoji} size="md" {...(slot === "frame" ? { frame: item.id } : { fx: item.id })} />
+                <span className={owned ? "inline-flex" : "inline-flex opacity-50 grayscale"}>
+                  <Avatar emoji={emoji} size="md" {...(slot === "frame" ? { frame: item.id } : { fx: item.id })} />
+                </span>
                 {owned ? null : (
                   <span className="absolute bottom-0 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-surface text-ink-muted shadow-card">
                     <Icon name="lock" size={14} />
@@ -75,8 +78,9 @@ export function RewardsSection({ badges }: { badges: BadgeDef[] | null }) {
               <h3 className="text-body-strong text-ink">{text.name}</h3>
               {owned ? (
                 <>
-                  {on ? <p className="text-caption text-gold-ink">{fr.rewards.equipped}</p> : null}
-                  <Button variant="secondary" fullWidth disabled={busy} aria-pressed={on} onClick={() => void toggle(item.id, on)}>
+                  {/* The line is always reserved (hidden when not equipped) so the buttons align across a row. */}
+                  <p className={`text-caption text-gold-ink ${on ? "" : "invisible"}`}>{fr.rewards.equipped}</p>
+                  <Button variant="secondary" fullWidth disabled={busy} onClick={() => void toggle(item.id, on)}>
                     {on ? fr.rewards.unequip : fr.rewards.equip}
                   </Button>
                 </>

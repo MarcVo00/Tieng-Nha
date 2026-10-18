@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- áo bà ba vermillon : trapèze simple, manches jusqu'aux mains -->
+    <path d="M40 94 Q60 86 80 94 L94 118 L86 122 L80 110 L82 138 L38 138 L40 110 L34 122 L26 118 Z" fill="#B23A2A"/>
+    <path d="M60 92 L60 138" fill="none" stroke-width="1.5"/>
+    <circle cx="64" cy="104" r="1.6" fill="#D9A93A" stroke="none"/>
+    <circle cx="64" cy="116" r="1.6" fill="#D9A93A" stroke="none"/>
+    <circle cx="64" cy="128" r="1.6" fill="#D9A93A" stroke="none"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- yeux en arcs mi-clos, comme sur les estampes -->
+    <path d="M49 73 Q53 70 57 73"/>
+    <path d="M63 73 Q67 70 71 73"/>
+    <path d="M56 82 Q60 85 64 82"/>
+    <!-- joues vermillon -->
+    <circle cx="46" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+  </g>
+</svg>

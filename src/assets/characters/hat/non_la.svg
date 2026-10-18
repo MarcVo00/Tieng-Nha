@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <pattern id="hat-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#1F1A17" stroke-width="0.8" opacity="0.35"/>
+    </pattern>
+  </defs>
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- nón lá (vàng hoè) : une seule zone texturée par personnage -->
+    <path d="M22 60 L60 22 L98 60 Q60 68 22 60 Z" fill="#D9A93A"/>
+    <path d="M22 60 L60 22 L98 60 Q60 68 22 60 Z" fill="url(#hat-hatch)" stroke="none"/>
+    <path d="M40 58 Q60 54 80 58" fill="none" stroke-width="1.2"/>
+  </g>
+</svg>

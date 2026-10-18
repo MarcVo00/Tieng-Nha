@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-base" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- jambes / pantalon (xanh chàm) -->
+    <path d="M46 134 L44 150 L58 150 L60 136 L62 150 L76 150 L74 134 Z" fill="#2B4E6E"/>
+    <!-- mains -->
+    <circle cx="28" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <!-- tête -->
+    <circle cx="60" cy="70" r="22" fill="#F6DDBF"/>
+    <!-- cheveux (noir laqué) -->
+    <path d="M38 70 Q38 50 60 48 Q82 50 82 70 Q74 60 60 60 Q46 60 38 70 Z" fill="#1F1A17"/>
+  </g>
+</svg>

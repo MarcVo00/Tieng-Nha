@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Couronne des marées : la couronne de Thủy Tinh, pointes noires en crêtes de vague recourbées vers l'extérieur -->
+    <path d="M39 64 Q39 50 34 44 Q30 40 26 40 Q37 36 45 49 Q47 37 41 27 Q38 24 35 23 Q50 24 54 46 Q57 30 60 13 Q63 30 66 46 Q70 24 85 23 Q82 24 79 27 Q73 37 75 49 Q83 36 94 40 Q90 40 86 44 Q81 50 81 64 Q60 56 39 64 Z" fill="#1F1A17"/>
+    <!-- écume : volutes crème au creux des vagues -->
+    <path d="M38 52 Q36 46 40 45 Q43 46 41 49 M48 44 Q46 36 50 35 Q53 36 51 40 M82 52 Q84 46 80 45 Q77 46 79 49 M72 44 Q74 36 70 35 Q67 36 69 40" fill="none" stroke="#F4E4C4" stroke-width="1.5"/>
+    <!-- bandeau indigo, écume crème -->
+    <path d="M39 64 Q60 56 81 64 L80 55 Q60 47 40 55 Z" fill="#2B4E6E"/>
+    <path d="M43 58 Q47 55 51 57 Q55 59 60 56 Q65 53 69 57 Q73 59 77 57" fill="none" stroke="#F4E4C4" stroke-width="1.5"/>
+    <!-- joyau de jade -->
+    <path d="M60 28 L63.5 35 L60 42 L56.5 35 Z" fill="#9CC3BB" stroke-width="1.5"/>
+  </g>
+</svg>

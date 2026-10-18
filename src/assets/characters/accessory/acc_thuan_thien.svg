@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Thuận Thiên : lame de jade au liseré vàng hoè, levée à la verticale dans la main droite (92,122) -->
+    <path d="M87 110 L87 34 L92 22 L97 34 L97 110 Z" fill="#D9A93A"/>
+    <path d="M89.5 108 L89.5 35 L92 29 L94.5 35 L94.5 108 Z" fill="#9CC3BB" stroke="none"/>
+    <path d="M92 36 L92 104" fill="none" stroke-width="1.2"/>
+    <!-- poignée noire, garde et pommeau or -->
+    <path d="M89 112 L95 112 L95 132 L89 132 Z" fill="#1F1A17"/>
+    <path d="M80 112 Q84 106 92 109 Q100 106 104 112 Q98 114 92 113 Q86 114 80 112 Z" fill="#D9A93A"/>
+    <circle cx="92" cy="135" r="3" fill="#D9A93A"/>
+    <!-- le poing qui la tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

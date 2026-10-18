@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Armure de Sơn Tinh : manches indigo, plastron vert en strates de roche, épaulières en montagnes -->
+    <path d="M42 94 L26 118 L34 122 L42 108 Z M78 94 L94 118 L86 122 L78 108 Z" fill="#2B4E6E"/>
+    <path d="M40 92 Q60 86 80 92 L82 128 L38 128 Z" fill="#4E7A4A"/>
+    <!-- strates de roche -->
+    <path d="M40 104 L47 101 L54 105 L61 100 L69 104 L80 101 M39 116 L46 113 L53 117 L61 112 L68 116 L81 113" fill="none" stroke-width="1.6"/>
+    <!-- ceinture et tassettes -->
+    <path d="M38 126 L82 126 L82 132 L38 132 Z" fill="#1F1A17"/>
+    <path d="M38 132 L59 132 L56 142 L40 140 Z M61 132 L82 132 L80 140 L64 142 Z" fill="#4E7A4A"/>
+    <path d="M56 125 L64 125 L64 133 L56 133 Z" fill="#D9A93A" stroke-width="1.5"/>
+    <!-- épaulières : trois sommets, neige crème -->
+    <path d="M23 106 L26 96 L30 98 L35 82 L42 94 L47 90 L52 104 Q37 110 23 106 Z" fill="#4E7A4A"/>
+    <path d="M97 106 L94 96 L90 98 L85 82 L78 94 L73 90 L68 104 Q83 110 97 106 Z" fill="#4E7A4A"/>
+    <path d="M31.5 90 L35 82 L38.8 89 L35 87.5 Z M88.5 90 L85 82 L81.2 89 L85 87.5 Z" fill="#F4E4C4" stroke-width="1.5"/>
+    <path d="M30 103 L36 99 L41 102 L47 98 M90 103 L84 99 L79 102 L73 98" fill="none" stroke-width="1.4"/>
+    <!-- sourcils déterminés -->
+    <path d="M48 67 L56 69.5 M72 67 L64 69.5" fill="none" stroke-width="2"/>
+  </g>
+</svg>

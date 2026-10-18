@@ -284,6 +284,7 @@ export type Database = {
           badges: string[] | null
           coins: number | null
           dialogues_done: string[] | null
+          equipped: Json | null
           equipped_frame: string | null
           exam_best: number | null
           group_id: string | null

@@ -89,8 +89,13 @@ select lives_ok($$ insert into public.events (client_id, user_id, type, ref_id, 
 select is(pg_temp.coins(), 143, 'malformed payloads credit only the flat types (lesson 10 + badge 10), nothing else');
 
 -- ---------- alice: shop ----------
+-- frames became reward-only in 20261019: the purchase is refused (see 02_), so the old
+-- purchase outcome (-40 coins, frame in inventory) is set up directly.
 select pg_temp.ev('item_purchased', '{"itemId": "frame_bronze"}');
-select is(pg_temp.coins(), 143 - 40, 'frame_bronze costs 40');
+select is(pg_temp.coins(), 143, 'frame_bronze is no longer purchasable');
+reset role;
+update public.user_stats set coins = coins - 40, inventory = '{frame_bronze}' where user_id = '11111111-1111-1111-1111-111111111111';
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select ok((select 'frame_bronze' = any(inventory) from public.user_stats where user_id = auth.uid()), 'frame_bronze in inventory');
 select pg_temp.ev('item_purchased', '{"itemId": "frame_bronze"}');
 select is(pg_temp.coins(), 103, 'buying an owned cosmetic again has no effect');

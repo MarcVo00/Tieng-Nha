@@ -17,7 +17,7 @@ Rendre la progression plus ludique et plus durable :
 4. **Récompenses** : une monnaie (« xu ») et une petite boutique.
 
 ### Calendrier (décision du 2026-10-14)
-| Pour le 2026-11-09 | Après |
+| Pour le 2026-10-29 | Après |
 |---|---|
 | Boss final (Thủy Tinh) | Branches de l'arbre (nouveau contenu, chacune avec son boss légendaire) |
 | Énergie | Personnage personnalisable acheté avec les xu |

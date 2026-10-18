@@ -9,7 +9,7 @@
 
 - **Quoi** : une PWA pour apprendre le **vietnamien du Sud (Sài Gòn)** destinée à des **francophones débutants**.
 - **Pour qui** : cadeau d'anniversaire ; l'apprenant principal + son entourage (cercle privé, < 50 personnes).
-- **Deadline** : V1 utilisable **avant le 2026-11-09**.
+- **Deadline** : V1 utilisable **avant le 2026-10-29** (anniversaire ; date corrigée le 2026-10-18).
 - **Budget** : 0 €. Aucun service payant, aucune API LLM payante.
 - **Différenciants** : oral (écoute + prononciation), conversations scénarisées, test final noté, **compétition** entre membres du cercle (XP, classement, streak, badges).
 

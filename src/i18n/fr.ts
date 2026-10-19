@@ -411,6 +411,48 @@ export const fr = {
       replay: "Rejouer",
     },
   },
+  // --- duels ---
+  duels: {
+    run: {
+      round1: "Manche 1 · QCM",
+      round2: "Manche 2 · À l'oral",
+      progress: (done: number, total: number) => `${done}/${total}`,
+      progressAria: (done: number, total: number) => `Question ${done} sur ${total}`,
+      timeBar: "Temps restant",
+      timeLeft: (seconds: number) => `${seconds} s`,
+      round2Intro: {
+        title: "Manche 2 : à voix haute !",
+        body: "Dis chaque phrase clairement. Tu as 30 secondes par phrase, et chaque bonne prononciation frappe fort.",
+        start: "Je suis prêt",
+      },
+      hit: "Touché !",
+      critical: "Critique !",
+      miss: "Raté",
+      loading: "Chargement du duel",
+      sending: "Envoi de ton combat…",
+      pendingOffline: {
+        title: "Ton combat est gardé au chaud",
+        body: "Pas de réseau pour l'instant. Il part dès que la connexion revient.",
+        retry: "Réessayer",
+        later: "Retour aux duels",
+      },
+      noMic: {
+        title: "Il te faut le micro",
+        body: "Les duels se jouent aussi à l'oral : ouvre l'appli dans Chrome et autorise le micro.",
+        back: "Retour aux duels",
+      },
+      loadError: { title: "Le duel n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
+      notFound: { title: "Duel introuvable", body: "Il n'existe plus ou ne t'est pas destiné." },
+      rejected: { title: "Ton combat n'a pas pu être enregistré", body: "Le duel est peut-être terminé. Regarde où il en est." },
+      quit: {
+        aria: "Quitter le duel",
+        title: "Quitter le duel ?",
+        body: "Tu pourras reprendre, mais la question en cours comptera comme ratée.",
+        confirm: "Quitter",
+        cancel: "Continuer",
+      },
+    },
+  },
   // --- exam ---
   exam: {
     boss: {

@@ -16,13 +16,14 @@ export type ExerciseHostProps = {
   onResult: (r: GradeResult) => void; // practice: after the user taps "Continuer"
   onReport?: (refId: string) => void;
   onCapabilityLost?: (c: "stt" | "recorder") => void;
+  seedSalt?: string; // fixes the answer shuffle (duels: same order for both players)
   attempt?: number; // bump when the same exercise is presented again (retry)
 };
 
 const SHAKE = { x: [0, -6, 6, -4, 4, 0] };
 const SHAKE_TRANSITION = { duration: duration.base, ease: ease.inOut };
 
-export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onReport, onCapabilityLost, attempt = 0 }: ExerciseHostProps) {
+export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onReport, onCapabilityLost, seedSalt, attempt = 0 }: ExerciseHostProps) {
   const plugin = getPlugin(exercise.type);
   // Each presentation (exercise id + attempt) owns its result and its one-answer guard.
   const presentation = `${exercise.id}:${attempt}`;
@@ -32,7 +33,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
   const emitted = useRef<string | null>(null); // the exiting sheet keeps its old onContinue: emit once per presentation
   // Answer positions are drawn again for every run and every presentation: they cannot be learnt by heart.
   const [runSalt] = useState(() => Math.random().toString(36).slice(2));
-  const seed = useMemo(() => seedFromString(`${presentation}:${runSalt}`), [presentation, runSalt]);
+  const seed = useMemo(() => seedFromString(`${presentation}:${seedSalt ?? runSalt}`), [presentation, runSalt, seedSalt]);
 
   const handleAnswer = (answer: unknown) => {
     if (answered.current === presentation) return; // one answer per presentation

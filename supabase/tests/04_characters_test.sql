@@ -1,0 +1,61 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(9);
+
+insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111', 'alice@test.fr');
+insert into public.groups (id, name, invite_code) values ('aaaaaaaa-0000-0000-0000-000000000001', 'Famille', 'FAM');
+
+create function pg_temp.login(uid uuid) returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claim.sub', uid::text, true);
+  perform set_config('role', 'authenticated', true);
+end $$;
+
+create function pg_temp.ev(t text, p jsonb default '{}', ts timestamptz default now(), r text default 'x') returns void
+language sql as $$
+  insert into public.events (client_id, user_id, type, ref_id, xp, payload, client_created_at)
+  values (gen_random_uuid(), auth.uid(), t, r, 0, p, ts)
+$$;
+
+create function pg_temp.coins() returns int language sql as $$
+  select coins from public.user_stats where user_id = auth.uid()
+$$;
+
+create function pg_temp.inv() returns text[] language sql as $$
+  select inventory from public.user_stats where user_id = auth.uid()
+$$;
+
+create function pg_temp.eq(k text) returns text language sql as $$
+  select equipped->>k from public.user_stats where user_id = auth.uid()
+$$;
+
+-- ---------- catalogue (as postgres) ----------
+select is((select price || '/' || kind || '/' || slot from public.shop_item('char_kiem_khach')), '200/cosmetic/character', 'char_kiem_khach: 200, cosmetic, character');
+select is((select price || '/' || kind || '/' || slot from public.shop_item('char_phap_su')), '200/cosmetic/character', 'char_phap_su: 200, cosmetic, character');
+
+-- ---------- purchase ----------
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
+select lives_ok($$ select public.join_group('FAM', 'Alice', '🐉') $$, 'alice joins');
+reset role;
+update public.user_stats set coins = 100 where user_id = '11111111-1111-1111-1111-111111111111';
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
+select pg_temp.ev('item_purchased', '{"itemId": "char_kiem_khach"}');
+select is(pg_temp.coins(), 100, 'a character is refused when coins are short');
+reset role;
+update public.user_stats set coins = 1000 where user_id = '11111111-1111-1111-1111-111111111111';
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
+select pg_temp.ev('item_purchased', '{"itemId": "char_kiem_khach"}');
+select is(pg_temp.coins(), 800, 'char_kiem_khach costs 200');
+select ok('char_kiem_khach' = any(pg_temp.inv()), 'char_kiem_khach is in the inventory');
+
+-- ---------- equipment ----------
+select pg_temp.ev('item_equipped', '{"slot": "character", "itemId": "char_kiem_khach"}');
+select is(pg_temp.eq('character'), 'char_kiem_khach', 'an owned character can be equipped');
+select pg_temp.ev('item_equipped', '{"slot": "hat", "itemId": "char_kiem_khach"}');
+select is(pg_temp.eq('hat'), null, 'a character cannot go in the hat slot');
+select pg_temp.ev('item_equipped', '{"slot": "character", "itemId": null}');
+select is(pg_temp.eq('character'), null, 'a null itemId removes the character');
+
+select * from finish();
+rollback;

@@ -116,7 +116,7 @@ export type PublicProfile = {
   frame: string | null;
   /** Equipped profile effect item id (`fx_*`), or null. */
   fx: string | null;
-  /** Equipped hero look (hat, outfit, accessory, aura). */
+  /** Equipped hero look (hat, outfit, accessory, aura, character). */
   look: Look;
 };
 
@@ -150,10 +150,10 @@ export type Boss = z.infer<typeof BossSchema>;
 export type ShopItem = z.infer<typeof ShopItemSchema>;
 export type Shop = ShopItem[];
 /** Equipment slots: profile (frame, profile_fx) and character layers (hat, outfit, accessory, aura). */
-export type ItemSlot = "frame" | "profile_fx" | "hat" | "outfit" | "accessory" | "aura";
+export type ItemSlot = "frame" | "profile_fx" | "hat" | "outfit" | "accessory" | "aura" | "character";
 
 /** What the hero wears: one item id per character slot; a missing slot means the default (or nothing for aura and accessory). */
-export type Look = Partial<Record<"hat" | "outfit" | "accessory" | "aura", string>>;
+export type Look = Partial<Record<"hat" | "outfit" | "accessory" | "aura" | "character", string>>;
 
 /** Coins and purchases replayed from the journal (same rules as the server). */
 export type Wallet = {

@@ -551,7 +551,10 @@ export const fr = {
       aura_waves: { name: "Vagues sombres", desc: "Des vagues sombres qui montent autour de ton héros.", confirmName: "les vagues sombres" },
       outfit_son_tinh: { name: "Armure de Sơn Tinh", desc: "L'armure du seigneur de la montagne. Pour ton héros.", confirmName: "l'armure de Sơn Tinh" },
       acc_thuan_thien: { name: "Thuận Thiên, l'épée du lac", desc: "L'épée de la légende du lac. Pour ton héros.", confirmName: "Thuận Thiên, l'épée du lac" },
+      char_kiem_khach: { name: "La lame errante", desc: "Un épéiste solitaire au bandeau vermillon. Il prend la place de ton héros.", confirmName: "la lame errante" },
+      char_phap_su: { name: "La gardienne des talismans", desc: "Une gardienne aux talismans protecteurs. Elle prend la place de ton héros.", confirmName: "la gardienne des talismans" },
     } as Record<string, { name: string; desc: string; confirmName: string }>,
+    characters: { title: "Personnages", starter: "Héros de départ" },
     themes: { legendes_sombres: "Légendes sombres" } as Record<string, string>,
     tryOn: {
       /** Read before the item name by screen readers, so the card is announced as « Essayer <nom>, <prix ou statut> ». */

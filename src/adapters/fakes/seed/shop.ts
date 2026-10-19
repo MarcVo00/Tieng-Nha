@@ -14,4 +14,6 @@ export const shopFixture: ShopItem[] = [
   { id: "aura_waves", kind: "cosmetic", slot: "aura", price: 80, theme: "legendes_sombres" },
   { id: "outfit_son_tinh", kind: "cosmetic", slot: "outfit", price: 90, theme: "legendes_sombres" },
   { id: "acc_thuan_thien", kind: "cosmetic", slot: "accessory", price: 120, theme: "legendes_sombres" },
+  { id: "char_kiem_khach", kind: "cosmetic", slot: "character", price: 200 },
+  { id: "char_phap_su", kind: "cosmetic", slot: "character", price: 200 },
 ];

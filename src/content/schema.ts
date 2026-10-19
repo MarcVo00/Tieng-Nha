@@ -137,7 +137,7 @@ export const ShopItemSchema = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
     kind: z.enum(["consumable", "cosmetic"]),
-    slot: z.enum(["frame", "profile_fx", "hat", "outfit", "accessory", "aura"]).nullable(),
+    slot: z.enum(["frame", "profile_fx", "hat", "outfit", "accessory", "aura", "character"]).nullable(),
     price: z.number().int().min(1).nullable(),
     theme: z.string().regex(/^[a-z0-9_]+$/).optional(),
     maxStock: z.number().int().min(1).optional(),

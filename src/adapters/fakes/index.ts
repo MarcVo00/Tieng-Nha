@@ -5,6 +5,7 @@ export { FakeEventSink } from "@/adapters/fakes/FakeEventSink";
 export { FakeLeaderboardRepository } from "@/adapters/fakes/FakeLeaderboardRepository";
 export { FakeAuthService } from "@/adapters/fakes/FakeAuthService";
 export { FakeExamGateway } from "@/adapters/fakes/FakeExamGateway";
+export { FakeDuelGateway } from "@/adapters/fakes/FakeDuelGateway";
 export { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes/FakeSpeech";
 export { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
 export { createFakeServices } from "@/adapters/fakes/createFakeServices";

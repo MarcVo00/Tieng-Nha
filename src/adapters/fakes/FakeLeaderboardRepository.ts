@@ -11,6 +11,27 @@ const BOTS: Array<Omit<LeaderboardRow, "isMe">> = [
   { userId: "bot_anh_hai", pseudo: "Anh Hai", avatarEmoji: "🐯", xp: 15, streak: 0, lessonsDone: 1, frame: null },
 ];
 
+/** Lessons/dialogues each fake member has done (consistent with `lessonsDone` above); duels use them as prerequisites. */
+const MEMBER_PROGRESS: Record<string, { lessonsDone: string[]; dialoguesDone: string[] }> = {
+  bot_ba_ngoai: { lessonsDone: ["l01", "l02", "l03"], dialoguesDone: ["d01", "d02", "d03"] },
+  bot_chu_tu: { lessonsDone: ["l01", "l02"], dialoguesDone: ["d01", "d02"] },
+  bot_be_na: { lessonsDone: ["l01"], dialoguesDone: ["d01"] },
+  bot_anh_hai: { lessonsDone: ["l01"], dialoguesDone: ["d01"] },
+};
+
+export type FakeMember = { userId: string; pseudo: string; avatarEmoji: string; lessonsDone: string[]; dialoguesDone: string[] };
+
+/** The fake group's members (excluding the player). */
+export function fakeMembers(): FakeMember[] {
+  return BOTS.map((b) => ({
+    userId: b.userId,
+    pseudo: b.pseudo,
+    avatarEmoji: b.avatarEmoji,
+    lessonsDone: [...(MEMBER_PROGRESS[b.userId]?.lessonsDone ?? [])],
+    dialoguesDone: [...(MEMBER_PROGRESS[b.userId]?.dialoguesDone ?? [])],
+  }));
+}
+
 const PARIS_PARTS = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Europe/Paris",
   year: "numeric",

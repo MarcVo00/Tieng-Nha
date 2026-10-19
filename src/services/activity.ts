@@ -1,4 +1,4 @@
-import type { AppEvent, AppEventType, BadgeDef, DialogueId, EnergyState, ItemSlot, LessonId, NewEvent, ProgressSnapshot, SessionKind, VocabId, Wallet } from "@/domain/types";
+import type { AppEvent, AppEventType, BadgeDef, DialogueId, Duel, EnergyState, ItemSlot, LessonId, NewEvent, ProgressSnapshot, SessionKind, VocabId, Wallet } from "@/domain/types";
 import type { ContentSource, Outbox, ProgressRepository } from "@/ports";
 import { computeProgress } from "@/services/progress";
 import { evaluateBadges } from "@/services/badges";
@@ -21,6 +21,8 @@ export type ActivityService = {
   completeDialogue(i: { dialogueId: DialogueId; durationMs: number }): Promise<ActivityResult>;
   completeReview(i: { correctCount: number; total: number }): Promise<ActivityResult>;
   finishExam(i: { attemptId: string; score: number; noSpeaking: boolean; boss?: BossOutcome }): Promise<ActivityResult>;
+  /** Appends one `duel_settled` per settled duel with a reward not yet in the journal; returns the Kim bài added. */
+  claimSettledDuels(duels: readonly Duel[]): Promise<number>;
 };
 
 export type BossOutcome = { bossId: string; won: boolean; livesLeft: number; bossHpLeft: number };
@@ -67,6 +69,24 @@ export function createActivityService(deps: {
   async function introduceVocab(ids: readonly VocabId[]) {
     const now = clock();
     for (const id of ids) if (!(await progress.getVocabProgress(id))) await progress.upsertVocabProgress(introduce(id, now));
+  }
+
+  // Serialises claims so two overlapping calls cannot both see a duel as unclaimed.
+  let claiming: Promise<unknown> = Promise.resolve();
+  async function claim(duels: readonly Duel[]): Promise<number> {
+    const claimed = new Set((await progress.listEvents()).filter((e) => e.type === "duel_settled").map((e) => e.refId));
+    let added = 0;
+    let appended = 0;
+    for (const d of duels) {
+      const reward = d.status === "settled" ? d.myRun?.reward : null;
+      if (reward === null || reward === undefined || claimed.has(d.id)) continue;
+      await append(ev("duel_settled", d.id, 0, { kimBai: reward }));
+      claimed.add(d.id);
+      added += reward;
+      appended += 1;
+    }
+    if (appended > 0) deps.onEventAppended?.();
+    return added;
   }
 
   return {
@@ -117,6 +137,11 @@ export function createActivityService(deps: {
       const before = (await energy()).current;
       const result = await commit(ev("review_session_completed", "review", reviewXp(correctCount), { correctCount, total }), false);
       return { ...result, energyGained: (await energy()).current - before };
+    },
+    claimSettledDuels(duels) {
+      const run = claiming.then(() => claim(duels));
+      claiming = run.catch(() => undefined);
+      return run;
     },
     async finishExam({ attemptId, score, noSpeaking, boss }) {
       const best = (await snapshot()).examBest;

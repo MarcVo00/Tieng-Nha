@@ -9,12 +9,12 @@ import { AudioPackSynthesizer, WebSpeechSynthesizer, WebSpeechRecognizer, MediaR
 import { createStaticContentSource } from "@/adapters/content";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
 import {
-  createSupabase, SupabaseAuthService, SupabaseEventSink, SupabaseLeaderboardRepository, SupabaseExamGateway, SupabaseContentReporter,
+  createSupabase, SupabaseAuthService, SupabaseEventSink, SupabaseLeaderboardRepository, SupabaseExamGateway, SupabaseDuelGateway, SupabaseContentReporter,
 } from "@/adapters/supabase";
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
 
-type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "reporter">;
+type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "duels" | "reporter">;
 
 /** Composition root: the only place that picks concrete adapters. */
 export function createServices(env: Env): Services {
@@ -40,7 +40,7 @@ export function createServices(env: Env): Services {
   let remote: Remote;
   if (env.VITE_USE_FAKES) {
     const f = createFakeServices({ clock, progress, auth: new FakeAuthService(true) });
-    remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, reporter: f.reporter };
+    remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, duels: f.duels, reporter: f.reporter };
   } else {
     const url = env.VITE_SUPABASE_URL;
     const key = env.VITE_SUPABASE_ANON_KEY;
@@ -55,6 +55,7 @@ export function createServices(env: Env): Services {
       auth: new SupabaseAuthService(sb),
       leaderboard: new SupabaseLeaderboardRepository(sb),
       exam: new SupabaseExamGateway(sb),
+      duels: new SupabaseDuelGateway(sb),
       reporter,
     };
   }

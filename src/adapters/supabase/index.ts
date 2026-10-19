@@ -7,3 +7,4 @@ export { SupabaseLeaderboardRepository } from "@/adapters/supabase/SupabaseLeade
 export { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
 export { SupabaseContentReporter } from "@/adapters/supabase/SupabaseContentReporter";
 export type { ReportQueue } from "@/adapters/supabase/SupabaseContentReporter";
+export { SupabaseDuelGateway } from "@/adapters/supabase/SupabaseDuelGateway";

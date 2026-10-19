@@ -10,3 +10,5 @@ export { RecognitionError } from "@/ports/Speech";
 export type { SpeakOptions, SpeechSynthesizer, SpeechRecognizer, VoiceRecorder, RecognitionErrorCode } from "@/ports/Speech";
 export type { ConversationEngine, ConversationInput } from "@/ports/ConversationEngine";
 export type { ContentReporter } from "@/ports/ContentReporter";
+export type { DuelGateway, DuelError } from "@/ports/DuelGateway";
+export { DUEL_ERRORS } from "@/ports/DuelGateway";

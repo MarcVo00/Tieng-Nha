@@ -1,3 +1,4 @@
+import type { Duel } from "@/domain/types";
 import { createActivityService } from "@/services/activity";
 import { InMemoryProgressRepository, InMemoryOutbox } from "@/adapters/fakes";
 import { createFakeServices } from "@/adapters/fakes";
@@ -158,5 +159,37 @@ describe("shop", () => {
     const r = await s.activity.completeReview({ correctCount: 1, total: 1 });
     expect(r.snapshot.streak).toBe(2);
     expect((await s.activity.getWallet()).freezes).toBe(0);
+  });
+});
+
+describe("claimSettledDuels", () => {
+  const run = (reward: number | null) => ({ round1: [], round2: [], damage: 0, timeMs: 0, reward });
+  const duel = (id: string, status: Duel["status"], myRun: Duel["myRun"]): Duel => ({
+    id, challenger: "me", opponent: "bot", opponentPseudo: "Bot", opponentAvatar: "x", createdAt: "2026-10-10T08:00:00.000Z",
+    expiresAt: "2026-10-13T08:00:00.000Z", status, winner: null, seed: 1, questions: { round1: [], round2: [] }, myRun, theirRun: null,
+  });
+
+  test("appends one synced duel_settled per rewarded settled duel and returns the Kim bai added", async () => {
+    const { svc, progress, outbox, appended } = setup();
+    const added = await svc.claimSettledDuels([
+      duel("d1", "settled", run(3)), duel("d2", "settled", run(1)), duel("d3", "open", run(null)),
+      duel("d4", "settled", null), duel("d5", "cancelled", null), duel("d6", "settled", run(null)),
+    ]);
+    expect(added).toBe(4);
+    const events = (await progress.listEvents()).filter((e) => e.type === "duel_settled");
+    expect(events.map((e) => [e.refId, e.xp, e.payload])).toEqual([["d1", 0, { kimBai: 3 }], ["d2", 0, { kimBai: 1 }]]);
+    expect(await outbox.size()).toBe(2);
+    expect(appended.length).toBe(1);
+    expect((await svc.getWallet()).kimBai).toBe(4);
+  });
+
+  test("is idempotent across calls and overlapping calls", async () => {
+    const { svc, progress } = setup();
+    const duels = [duel("d1", "settled", run(3))];
+    const [a, b] = await Promise.all([svc.claimSettledDuels(duels), svc.claimSettledDuels(duels)]);
+    expect(a + b).toBe(3);
+    expect(await svc.claimSettledDuels(duels)).toBe(0);
+    expect((await progress.listEvents()).filter((e) => e.type === "duel_settled")).toHaveLength(1);
+    expect((await svc.getWallet()).kimBai).toBe(3);
   });
 });

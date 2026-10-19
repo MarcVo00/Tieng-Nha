@@ -13,6 +13,7 @@ import { FakeEventSink } from "@/adapters/fakes/FakeEventSink";
 import { FakeAuthService } from "@/adapters/fakes/FakeAuthService";
 import { FakeLeaderboardRepository } from "@/adapters/fakes/FakeLeaderboardRepository";
 import { FakeExamGateway } from "@/adapters/fakes/FakeExamGateway";
+import { FakeDuelGateway } from "@/adapters/fakes/FakeDuelGateway";
 import { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes/FakeSpeech";
 import { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
@@ -48,6 +49,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), me, clock, myFrame),
     auth,
     exam: new FakeExamGateway(clock),
+    duels: new FakeDuelGateway(() => progress.listEvents(), clock),
     tts: new FakeSpeechSynthesizer(),
     stt: new FakeSpeechRecognizer(),
     recorder: new FakeVoiceRecorder(),

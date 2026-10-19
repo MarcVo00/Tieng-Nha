@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-base" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- La gardienne des talismans : jambes indigo -->
+    <path d="M47 134 L45 150 L58 150 L60 137 L62 150 L75 150 L73 134 Z" fill="#2B4E6E"/>
+    <!-- mains -->
+    <circle cx="28" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <!-- longue queue de cheval nouée haut, qui retombe derrière l'épaule -->
+    <path d="M58 40 Q38 36 32 54 Q28 70 35 86 Q38 95 34 104 Q45 98 44 84 Q41 70 47 56 Z" fill="#1F1A17"/>
+    <!-- tête -->
+    <circle cx="60" cy="70" r="22" fill="#F6DDBF"/>
+    <!-- chignon haut et ruban vermillon -->
+    <circle cx="60" cy="42" r="6" fill="#1F1A17"/>
+    <!-- cheveux, raie au milieu -->
+    <path d="M38 73 Q37 49 60 47 Q83 49 82 73 Q79 61 64 58 L60 62 L56 58 Q41 61 38 73 Z" fill="#1F1A17"/>
+    <path d="M54 47.5 Q60 44.5 66 47.5" fill="none" stroke="#B23A2A" stroke-width="3"/>
+  </g>
+</svg>

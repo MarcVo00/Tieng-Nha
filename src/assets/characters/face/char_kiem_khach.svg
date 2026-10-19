@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- sourcils déterminés (mêmes traits que l'armure de Sơn Tinh) -->
+    <path d="M48 65 L56 67.5 M72 65 L64 67.5"/>
+    <!-- yeux en points, le regard fixé sur l'adversaire -->
+    <ellipse cx="53" cy="73.5" rx="1.8" ry="2.4" fill="#1F1A17" stroke="none"/>
+    <ellipse cx="67" cy="73.5" rx="1.8" ry="2.4" fill="#1F1A17" stroke="none"/>
+    <!-- bouche serrée -->
+    <path d="M56.5 83 Q60 81.8 63.5 83"/>
+    <!-- joues vermillon -->
+    <circle cx="46" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <!-- cicatrice discrète sur la joue -->
+    <path d="M71.5 71.5 L76 78.5 M72 75.8 L74.8 74 M73.4 78 L76 76.3" stroke-width="1.2"/>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- tenue ajustée indigo : manches serrées jusqu'aux mains, pans fendus -->
+    <path d="M41 94 Q60 87 79 94 L94 117 L86 122 L79 109 L80 126 L83 140 L62 140 L60 134 L58 140 L37 140 L40 126 L41 109 L34 122 L26 117 Z" fill="#2B4E6E"/>
+    <!-- col croisé crème -->
+    <path d="M50 91 L60 108 L70 91" fill="none" stroke="#F4E4C4" stroke-width="2.6"/>
+    <path d="M48.5 92 L60 111 L71.5 92" fill="none" stroke-width="1.4"/>
+    <!-- bandes de poignets crème -->
+    <path d="M29.5 113 L36 117.5 M90.5 113 L84 117.5" fill="none" stroke="#F4E4C4" stroke-width="2.6"/>
+    <!-- ceinture noire, nœud et pans vermillon -->
+    <path d="M40 122 L80 122 L80 129 L40 129 Z" fill="#1F1A17"/>
+    <path d="M66 121 L72 121 L72 130 L66 130 Z" fill="#B23A2A" stroke-width="1.6"/>
+    <path d="M67 130 L64 141 L68.5 139 Z M71 130 L76 140 L72 140.5 Z" fill="#B23A2A" stroke-width="1.6"/>
+  </g>
+</svg>

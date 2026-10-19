@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- yeux mi-clos : paupière droite et pupille, calmes et décidés, un trait de cil à l'extérieur -->
+    <path d="M49 72 Q53 70.6 57 72 M49 72 L47.5 71.2"/>
+    <path d="M63 72 Q67 70.6 71 72 M71 72 L72.5 71.2"/>
+    <ellipse cx="53" cy="74" rx="1.7" ry="1.9" fill="#1F1A17" stroke="none"/>
+    <ellipse cx="67" cy="74" rx="1.7" ry="1.9" fill="#1F1A17" stroke="none"/>
+    <!-- sceau vermillon au front -->
+    <path d="M60 63.5 L62 66 L60 68.5 L58 66 Z" fill="#B23A2A" stroke="none"/>
+    <!-- bouche droite et sereine -->
+    <path d="M57 82.5 Q60 83.6 63 82.5"/>
+    <!-- joues vermillon -->
+    <circle cx="46" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+  </g>
+</svg>

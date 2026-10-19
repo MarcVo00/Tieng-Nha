@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-base" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- La lame errante : jambes noires serrées -->
+    <path d="M47 134 L45 150 L58 150 L60 137 L62 150 L75 150 L73 134 Z" fill="#1F1A17"/>
+    <!-- mains -->
+    <circle cx="28" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <!-- pans du bandeau vermillon qui claquent au vent, derrière la tête -->
+    <path d="M42 60 Q30 52 17 56 Q24 60 22 64 Q32 60 42 66 Z M41 65 Q31 68 21 79 Q29 77 31 81 Q35 72 43 69 Z" fill="#B23A2A"/>
+    <!-- tête -->
+    <circle cx="60" cy="70" r="22" fill="#F6DDBF"/>
+    <!-- cheveux noirs en épis -->
+    <path d="M38 67 L30 61 L36 56 L28 47 L39 47 L36 35 L47 40 L50 26 L58 36 L66 24 L70 37 L81 31 L80 44 L92 43 L85 53 L92 60 L83 67 Q72 58 60 58 Q48 58 38 67 Z" fill="#1F1A17"/>
+    <!-- bandeau vermillon sur le front -->
+    <path d="M38.5 66 Q60 52 81.5 66 L82 59.5 Q60 46 38 59.5 Z" fill="#B23A2A"/>
+    <!-- mèches rebelles sur le bandeau -->
+    <path d="M52 55 L49 66 L56 58 Z M66 54 L70 64 L70 55 Z" fill="#1F1A17" stroke-width="1.6"/>
+  </g>
+</svg>

@@ -25,11 +25,11 @@ function valuesOf(sql: string, fnName: string): string {
   return sql.slice(from, to);
 }
 
-// Rows look like: ('frame_bronze', null::int, 'cosmetic', 'frame') or ('energy_refill', 30, 'consumable', null::text)
+// Rows look like: ('frame_bronze', null::int, 'cosmetic', 'frame', 'xu') or ('energy_refill', 30, 'consumable', null::text, 'xu')
 function shopRows() {
   const body = valuesOf(latestMigrationDefining("shop_item"), "shop_item");
-  const rows = [...body.matchAll(/\(\s*'([a-z_]+)'\s*,\s*(\d+|null(?:::int)?)\s*,\s*'(consumable|cosmetic)'\s*,\s*(?:'([a-z_]+)'|null(?:::text)?)\s*\)/g)];
-  return rows.map((m) => ({ id: m[1], price: m[2]!.startsWith("null") ? null : Number(m[2]), kind: m[3], slot: m[4] ?? null }));
+  const rows = [...body.matchAll(/\(\s*'([a-z_]+)'\s*,\s*(\d+|null(?:::int)?)\s*,\s*'(consumable|cosmetic)'\s*,\s*(?:'([a-z_]+)'|null(?:::text)?)\s*,\s*'(xu|kim_bai)'\s*\)/g)];
+  return rows.map((m) => ({ id: m[1], price: m[2]!.startsWith("null") ? null : Number(m[2]), kind: m[3], slot: m[4] ?? null, currency: m[5] }));
 }
 
 function rewardRows() {
@@ -39,10 +39,15 @@ function rewardRows() {
 
 describe("catalogue parity with the SQL migrations", () => {
   test("shop_item rows equal shop.json items", () => {
-    const fromJson = shop.items.map((i) => ({ id: i.id, price: i.price, kind: i.kind, slot: i.slot }));
+    const fromJson = shop.items.map((i) => ({ id: i.id, price: i.price, kind: i.kind, slot: i.slot, currency: "currency" in i ? i.currency : "xu" }));
     const rows = shopRows();
     expect(rows).toHaveLength(fromJson.length);
     expect(rows).toEqual(fromJson);
+  });
+
+  test("only the arena items are paid in Kim bài", () => {
+    const kimBai = shopRows().filter((r) => r.currency === "kim_bai").map((r) => r.id);
+    expect(kimBai).toEqual(["hat_tay_son", "acc_con_vo", "outfit_hoi_vat"]);
   });
 
   test("badge_reward rows equal the rewards of badges.json", () => {

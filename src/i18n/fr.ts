@@ -553,9 +553,12 @@ export const fr = {
       acc_thuan_thien: { name: "Thuận Thiên, l'épée du lac", desc: "L'épée de la légende du lac. Pour ton héros.", confirmName: "Thuận Thiên, l'épée du lac" },
       char_kiem_khach: { name: "La lame errante", desc: "Un épéiste solitaire au bandeau vermillon. Il prend la place de ton héros.", confirmName: "la lame errante" },
       char_phap_su: { name: "La gardienne des talismans", desc: "Une gardienne aux talismans protecteurs. Elle prend la place de ton héros.", confirmName: "la gardienne des talismans" },
+      hat_tay_son: { name: "Bandeau de Tây Sơn", desc: "Le bandeau rouge des guerriers de Tây Sơn. Pour ton héros.", confirmName: "le bandeau de Tây Sơn" },
+      acc_con_vo: { name: "Bâton de Bình Định", desc: "Le bâton des maîtres d'arts martiaux de Bình Định. Pour ton héros.", confirmName: "le bâton de Bình Định" },
+      outfit_hoi_vat: { name: "Tenue de lutteur", desc: "La tenue des lutteurs du hội vật, avec sa ceinture de soie rouge. Pour ton héros.", confirmName: "la tenue de lutteur" },
     } as Record<string, { name: string; desc: string; confirmName: string }>,
     characters: { title: "Personnages", starter: "Héros de départ" },
-    themes: { legendes_sombres: "Légendes sombres" } as Record<string, string>,
+    themes: { legendes_sombres: "Légendes sombres", arene: "Arène" } as Record<string, string>,
     tryOn: {
       /** Read before the item name by screen readers, so the card is announced as « Essayer <nom>, <prix ou statut> ». */
       prefix: "Essayer",

@@ -14,6 +14,9 @@
     { "id": "outfit_son_tinh", "kind": "cosmetic", "slot": "outfit", "price": 90, "theme": "legendes_sombres" },
     { "id": "acc_thuan_thien", "kind": "cosmetic", "slot": "accessory", "price": 120, "theme": "legendes_sombres" },
     { "id": "char_kiem_khach", "kind": "cosmetic", "slot": "character", "price": 200 },
-    { "id": "char_phap_su", "kind": "cosmetic", "slot": "character", "price": 200 }
+    { "id": "char_phap_su", "kind": "cosmetic", "slot": "character", "price": 200 },
+    { "id": "hat_tay_son", "kind": "cosmetic", "slot": "hat", "price": 6, "theme": "arene", "currency": "kim_bai" },
+    { "id": "acc_con_vo", "kind": "cosmetic", "slot": "accessory", "price": 8, "theme": "arene", "currency": "kim_bai" },
+    { "id": "outfit_hoi_vat", "kind": "cosmetic", "slot": "outfit", "price": 10, "theme": "arene", "currency": "kim_bai" }
   ]
 }

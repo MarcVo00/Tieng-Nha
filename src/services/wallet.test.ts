@@ -3,12 +3,12 @@ import { streakAtDay } from "@/services/streak";
 import { COINS, walletAt } from "@/services/wallet";
 
 const shop: ShopItem[] = [
-  { id: "energy_refill", kind: "consumable", slot: null, price: 30 },
-  { id: "streak_freeze", kind: "consumable", slot: null, price: 50, maxStock: 2 },
-  { id: "frame_bronze", kind: "cosmetic", slot: "frame", price: null },
-  { id: "frame_jade", kind: "cosmetic", slot: "frame", price: null },
-  { id: "fx_ink", kind: "cosmetic", slot: "profile_fx", price: null },
-  { id: "cheap_frame", kind: "cosmetic", slot: "frame", price: 40 },
+  { id: "energy_refill", kind: "consumable", slot: null, price: 30, currency: "xu" },
+  { id: "streak_freeze", kind: "consumable", slot: null, price: 50, maxStock: 2, currency: "xu" },
+  { id: "frame_bronze", kind: "cosmetic", slot: "frame", price: null, currency: "xu" },
+  { id: "frame_jade", kind: "cosmetic", slot: "frame", price: null, currency: "xu" },
+  { id: "fx_ink", kind: "cosmetic", slot: "profile_fx", price: null, currency: "xu" },
+  { id: "cheap_frame", kind: "cosmetic", slot: "frame", price: 40, currency: "xu" },
 ];
 const rule = { kind: "lessons_done" as const, gte: 1 };
 const badges: BadgeDef[] = [

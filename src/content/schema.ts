@@ -141,6 +141,8 @@ export const ShopItemSchema = z
     price: z.number().int().min(1).nullable(),
     theme: z.string().regex(/^[a-z0-9_]+$/).optional(),
     maxStock: z.number().int().min(1).optional(),
+    /** What the item costs: xu (default) or Kim bài (duels). */
+    currency: z.enum(["xu", "kim_bai"]).default("xu"),
   })
   .strict();
 export const ShopFileSchema = z.object({ contentVersion: z.number().int().min(1), items: z.array(ShopItemSchema).min(1) }).strict();

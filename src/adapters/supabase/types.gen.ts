@@ -69,6 +69,128 @@ export type Database = {
           },
         ]
       }
+      duel_runs: {
+        Row: {
+          claimed: boolean
+          damage: number
+          duel_id: string
+          reward: number | null
+          round1: Json
+          round2: Json
+          submitted_at: string
+          time_ms: number
+          user_id: string
+        }
+        Insert: {
+          claimed?: boolean
+          damage: number
+          duel_id: string
+          reward?: number | null
+          round1: Json
+          round2: Json
+          submitted_at?: string
+          time_ms: number
+          user_id: string
+        }
+        Update: {
+          claimed?: boolean
+          damage?: number
+          duel_id?: string
+          reward?: number | null
+          round1?: Json
+          round2?: Json
+          submitted_at?: string
+          time_ms?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_runs_duel_id_fkey"
+            columns: ["duel_id"]
+            isOneToOne: false
+            referencedRelation: "duels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_runs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duels: {
+        Row: {
+          challenger: string
+          created_at: string
+          expires_at: string
+          group_id: string
+          id: string
+          opponent: string
+          questions: Json
+          seed: number
+          settled_at: string | null
+          status: string
+          winner: string | null
+        }
+        Insert: {
+          challenger: string
+          created_at?: string
+          expires_at: string
+          group_id: string
+          id?: string
+          opponent: string
+          questions: Json
+          seed: number
+          settled_at?: string | null
+          status?: string
+          winner?: string | null
+        }
+        Update: {
+          challenger?: string
+          created_at?: string
+          expires_at?: string
+          group_id?: string
+          id?: string
+          opponent?: string
+          questions?: Json
+          seed?: number
+          settled_at?: string | null
+          status?: string
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duels_challenger_fkey"
+            columns: ["challenger"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duels_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duels_opponent_fkey"
+            columns: ["opponent"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duels_winner_fkey"
+            columns: ["winner"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           client_created_at: string
@@ -207,6 +329,7 @@ export type Database = {
           exam_best: number | null
           group_id: string
           inventory: string[]
+          kim_bai: number
           last_active_day: string | null
           lessons_done: string[]
           streak: number
@@ -227,6 +350,7 @@ export type Database = {
           exam_best?: number | null
           group_id: string
           inventory?: string[]
+          kim_bai?: number
           last_active_day?: string | null
           lessons_done?: string[]
           streak?: number
@@ -247,6 +371,7 @@ export type Database = {
           exam_best?: number | null
           group_id?: string
           inventory?: string[]
+          kim_bai?: number
           last_active_day?: string | null
           lessons_done?: string[]
           streak?: number
@@ -315,6 +440,14 @@ export type Database = {
       }
     }
     Functions: {
+      create_duel: {
+        Args: {
+          p_opponent: string
+          p_questions: Json
+          p_seed: number
+        }
+        Returns: Json
+      }
       delete_my_account: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -326,6 +459,10 @@ export type Database = {
           p_avatar: string
         }
         Returns: undefined
+      }
+      list_duels: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       my_group_id: {
         Args: Record<PropertyKey, never>
@@ -343,6 +480,14 @@ export type Database = {
       }
       start_exam_attempt: {
         Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      submit_duel_run: {
+        Args: {
+          p_duel: string
+          p_round1: Json
+          p_round2: Json
+        }
         Returns: Json
       }
     }

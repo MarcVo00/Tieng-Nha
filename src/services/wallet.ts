@@ -41,8 +41,8 @@ export type PricedItem = ShopItem & { price: number };
 /** The catalogue item a purchase would buy, or null when the server rules refuse it (reward-only items have no price). */
 export function purchasable(w: Wallet, shop: readonly ShopItem[], itemId: unknown): PricedItem | null {
   const item = typeof itemId === "string" ? shop.find((i) => i.id === itemId) : undefined;
-  // Kim bài items are not payable with coins (the Kim bài debit comes with the duels wallet).
-  if (!item || item.price === null || item.currency !== "xu" || w.coins < item.price) return null;
+  if (!item || item.price === null) return null;
+  if ((item.currency === "kim_bai" ? w.kimBai : w.coins) < item.price) return null;
   const priced: PricedItem = { ...item, price: item.price };
   if (item.kind === "cosmetic" && w.inventory.includes(item.id)) return null;
   if (item.id === "streak_freeze" && w.freezes >= (item.maxStock ?? DEFAULT_MAX_FREEZES)) return null;
@@ -59,15 +59,17 @@ export function equippable(w: Wallet, shop: readonly ShopItem[], slot: unknown, 
 /** Replays the journal in time order with the server rules (earning, purchase acceptance, equipment). */
 export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[], badgeDefs: readonly BadgeDef[]): Wallet {
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  const w: Wallet = { coins: 0, inventory: [], equipped: {}, freezes: 0, refills: [], streak: 0, lastActiveDay: null };
+  const w: Wallet = { coins: 0, kimBai: 0, inventory: [], equipped: {}, freezes: 0, refills: [], streak: 0, lastActiveDay: null };
   const unlocked = new Set<string>();
+  const settledDuels = new Set<string>();
   let best: number | null = null;
 
   for (const e of sorted) {
     if (e.type === "item_purchased") {
       const item = purchasable(w, shop, e.payload["itemId"]);
       if (!item) continue;
-      w.coins -= item.price;
+      if (item.currency === "kim_bai") w.kimBai -= item.price;
+      else w.coins -= item.price;
       if (item.id === "streak_freeze") w.freezes += 1;
       else if (item.kind === "cosmetic") w.inventory.push(item.id);
       else if (item.id === "energy_refill") w.refills.push(e.createdAt);
@@ -79,6 +81,13 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
       if (!equippable(w, shop, slot, id)) continue;
       if (typeof id === "string") w.equipped[slot as ItemSlot] = id;
       else w.equipped = Object.fromEntries(Object.entries(w.equipped).filter(([k]) => k !== slot)) as Wallet["equipped"];
+      continue;
+    }
+    if (e.type === "duel_settled") {
+      // Same as the server: each duel credits once; only non-negative integers count.
+      const kb = e.payload["kimBai"];
+      if (!settledDuels.has(e.refId) && typeof kb === "number" && Number.isInteger(kb) && kb >= 0) w.kimBai += kb;
+      settledDuels.add(e.refId);
       continue;
     }
     if (e.type === "badge_unlocked") {

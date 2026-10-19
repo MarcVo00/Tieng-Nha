@@ -202,3 +202,35 @@ describe("streak replay", () => {
     expect(streakAtDay(w.streak, w.lastActiveDay, w.freezes, "2026-10-14")).toBe(0);
   });
 });
+
+describe("Kim bài", () => {
+  const settled = (kimBai: unknown, refId: string, hour: number) => ev("duel_settled", { kimBai }, refId, 10, hour);
+  const kb = (events: AppEvent[]) => walletAt(events, shop, badges).kimBai;
+  test("duel_settled credits Kim bài once per refId, never xu", () => {
+    const w = walletAt([settled(3, "d1", 1), settled(3, "d1", 2), settled(2, "d2", 3)], shop, badges);
+    expect(w.kimBai).toBe(5);
+    expect(w.coins).toBe(0);
+  });
+  test("negative, fractional or non-numeric amounts are ignored", () => {
+    expect(kb([settled(-3, "d1", 1), settled(1.5, "d2", 2), settled("3", "d3", 3), settled(null, "d4", 4)])).toBe(0);
+  });
+  test("a kim_bai item is bought with 6 Kim bài: Kim bài debited, xu untouched", () => {
+    const w = walletAt([ev("lesson_completed", {}, "l", 10, 1), settled(6, "d1", 2), buy("arena_hat", 3)], shop, badges);
+    expect(w.kimBai).toBe(0);
+    expect(w.coins).toBe(10);
+    expect(w.inventory).toContain("arena_hat");
+  });
+  test("refused with 5 Kim bài, even when rich in xu", () => {
+    const w = walletAt([exam(100, 1), settled(5, "d1", 2), buy("arena_hat", 3)], shop, badges);
+    expect(w.kimBai).toBe(5);
+    expect(w.inventory).not.toContain("arena_hat");
+  });
+  test("owned cosmetic cannot be bought twice", () => {
+    expect(kb([settled(12, "d1", 1), buy("arena_hat", 2), buy("arena_hat", 3)])).toBe(6);
+  });
+  test("an xu item is not payable with Kim bài", () => {
+    const w = walletAt([settled(50, "d1", 1), buy("cheap_frame", 2)], shop, badges);
+    expect(w.inventory).not.toContain("cheap_frame");
+    expect(w.kimBai).toBe(50);
+  });
+});

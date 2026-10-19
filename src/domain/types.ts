@@ -37,7 +37,8 @@ export type AppEventType =
   | "badge_unlocked"
   | "session_started"
   | "item_purchased"
-  | "item_equipped";
+  | "item_equipped"
+  | "duel_settled";
 
 /** Payload shapes by event type (stored as JSON). */
 export type EventPayload = {
@@ -49,6 +50,7 @@ export type EventPayload = {
   session_started: { kind: SessionKind };
   item_purchased: { itemId: string };
   item_equipped: { slot: ItemSlot; itemId: string | null };
+  duel_settled: { kimBai: number };
 };
 
 export type SessionKind = "lesson" | "dialogue" | "boss";
@@ -158,6 +160,8 @@ export type Look = Partial<Record<"hat" | "outfit" | "accessory" | "aura" | "cha
 /** Coins and purchases replayed from the journal (same rules as the server). */
 export type Wallet = {
   coins: number;
+  /** Kim bài (duel currency): sum of `duel_settled` rewards minus Kim bài purchases. */
+  kimBai: number;
   inventory: string[];
   equipped: Partial<Record<ItemSlot, string>>;
   /** Streak freezes in stock: accepted purchases minus those the streak has consumed. */
@@ -167,4 +171,27 @@ export type Wallet = {
   /** Streak value right after the last active day (time-ordered replay, identical to the server). */
   streak: number;
   lastActiveDay: string | null;
+};
+
+/** A question reference stored in a duel: the exercise is resolved from the lesson content. */
+export type DuelQuestionRef = { lessonId: LessonId; exerciseId: string };
+export type DuelQuestions = { round1: DuelQuestionRef[]; round2: DuelQuestionRef[] };
+export type Round1Answer = { correct: boolean; ms: number };
+export type Round2Answer = { correct: boolean };
+export type DuelRun = { round1: Round1Answer[]; round2: Round2Answer[]; damage: number; timeMs: number; reward: number | null };
+export type DuelStatus = "open" | "settled" | "cancelled";
+export type Duel = {
+  id: string;
+  challenger: string;
+  opponent: string;
+  opponentPseudo: string;
+  opponentAvatar: string;
+  createdAt: string;
+  expiresAt: string;
+  status: DuelStatus;
+  winner: string | null;
+  seed: number;
+  questions: DuelQuestions;
+  myRun: DuelRun | null;
+  theirRun: DuelRun | null;
 };

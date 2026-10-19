@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(9);
+select plan(13);
 
 insert into auth.users (id, email) values ('11111111-1111-1111-1111-111111111111', 'alice@test.fr');
 insert into public.groups (id, name, invite_code) values ('aaaaaaaa-0000-0000-0000-000000000001', 'Famille', 'FAM');
@@ -42,6 +42,7 @@ update public.user_stats set coins = 100 where user_id = '11111111-1111-1111-111
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select pg_temp.ev('item_purchased', '{"itemId": "char_kiem_khach"}');
 select is(pg_temp.coins(), 100, 'a character is refused when coins are short');
+select ok(not ('char_kiem_khach' = any(pg_temp.inv())), 'a refused purchase leaves the inventory unchanged');
 reset role;
 update public.user_stats set coins = 1000 where user_id = '11111111-1111-1111-1111-111111111111';
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
@@ -52,8 +53,13 @@ select ok('char_kiem_khach' = any(pg_temp.inv()), 'char_kiem_khach is in the inv
 -- ---------- equipment ----------
 select pg_temp.ev('item_equipped', '{"slot": "character", "itemId": "char_kiem_khach"}');
 select is(pg_temp.eq('character'), 'char_kiem_khach', 'an owned character can be equipped');
+select pg_temp.ev('item_purchased', '{"itemId": "hat_thuy_tinh"}');
+select ok('hat_thuy_tinh' = any(pg_temp.inv()), 'a real hat is owned');
+select pg_temp.ev('item_equipped', '{"slot": "hat", "itemId": "hat_thuy_tinh"}');
+select is(pg_temp.eq('hat'), 'hat_thuy_tinh', 'the real hat is equipped');
 select pg_temp.ev('item_equipped', '{"slot": "hat", "itemId": "char_kiem_khach"}');
-select is(pg_temp.eq('hat'), null, 'a character cannot go in the hat slot');
+select is(pg_temp.eq('hat'), 'hat_thuy_tinh', 'a character cannot go in the hat slot: the hat stays');
+select is(pg_temp.eq('character'), 'char_kiem_khach', 'the character slot is unchanged by the refused hat equip');
 select pg_temp.ev('item_equipped', '{"slot": "character", "itemId": null}');
 select is(pg_temp.eq('character'), null, 'a null itemId removes the character');
 

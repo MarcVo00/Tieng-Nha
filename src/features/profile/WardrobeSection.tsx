@@ -38,11 +38,11 @@ export function WardrobeSection() {
 
   const owned = items.filter((i) => characterSlotOf(i) !== null && wallet.inventory.includes(i.id) && fr.shop.items[i.id] !== undefined);
 
-  async function toggle(id: string, slot: CharacterSlot, equippedNow: boolean): Promise<void> {
+  async function toggle(id: string, slot: CharacterSlot, equippedNow: boolean, successTitle?: string): Promise<void> {
     if (busy) return;
     setBusy(true);
     try {
-      await equipToggle(id, slot, equippedNow);
+      await equipToggle(id, slot, equippedNow, successTitle);
     } finally {
       setBusy(false);
     }
@@ -53,7 +53,6 @@ export function WardrobeSection() {
       <h2 id="me-wardrobe-title" className="text-heading text-ink">
         {fr.wardrobe.title}
       </h2>
-      {owned.length === 0 ? <p className="text-body text-ink-muted">{fr.wardrobe.empty}</p> : null}
       {CHARACTER_SLOTS.map((slot) => {
         const inSlot = owned.filter((i) => characterSlotOf(i) === slot);
         if (inSlot.length === 0 && slot !== "character") return null;
@@ -68,7 +67,7 @@ export function WardrobeSection() {
                     {fr.shop.characters.starter}
                   </h4>
                   <p className={`text-caption text-gold-ink ${wallet.equipped.character === undefined ? "" : "invisible"}`}>{fr.rewards.equipped}</p>
-                  <Button variant="secondary" fullWidth disabled={busy || wallet.equipped.character === undefined} aria-describedby="wardrobe-starter" onClick={() => void toggle("hero", "character", true)}>
+                  <Button variant="secondary" fullWidth disabled={busy || wallet.equipped.character === undefined} aria-describedby="wardrobe-starter" onClick={() => void toggle("hero", "character", true, fr.wardrobe.starterToast)}>
                     {fr.shop.tryOn.equip}
                   </Button>
                 </Card>
@@ -84,9 +83,11 @@ export function WardrobeSection() {
                       {text.name}
                     </h4>
                     <p className={`text-caption text-gold-ink ${on ? "" : "invisible"}`}>{fr.rewards.equipped}</p>
-                    <Button variant="secondary" fullWidth disabled={busy} aria-describedby={`wardrobe-${item.id}`} onClick={() => void toggle(item.id, slot, on)}>
-                      {on ? fr.shop.tryOn.unequip : fr.shop.tryOn.equip}
-                    </Button>
+                    {on && slot === "character" ? null : (
+                      <Button variant="secondary" fullWidth disabled={busy} aria-describedby={`wardrobe-${item.id}`} onClick={() => void toggle(item.id, slot, on)}>
+                        {on ? fr.shop.tryOn.unequip : fr.shop.tryOn.equip}
+                      </Button>
+                    )}
                   </Card>
                 );
               })}
@@ -94,6 +95,7 @@ export function WardrobeSection() {
           </div>
         );
       })}
+      {owned.length === 0 ? <p className="text-body text-ink-muted">{fr.wardrobe.empty}</p> : null}
     </section>
   );
 }

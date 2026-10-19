@@ -6,7 +6,7 @@ import i18next from "eslint-plugin-i18next";
 import globals from "globals";
 
 export default tseslint.config(
-  { ignores: ["dist", "dev-dist", "coverage", "node_modules", "playwright-report", "src/adapters/supabase/types.gen.ts"] },
+  { ignores: ["dist", "dev-dist", "coverage", "node_modules", "playwright-report", ".superpowers", ".playwright-mcp", "src/adapters/supabase/types.gen.ts"] },
   js.configs.recommended,
   ...tseslint.configs.strict,
   {

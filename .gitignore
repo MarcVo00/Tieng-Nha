@@ -14,3 +14,4 @@ supabase/.temp/
 vietlearn-design-workspace/
 __pycache__/
 *.pyc
+.playwright-mcp/

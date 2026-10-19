@@ -606,7 +606,8 @@ export const fr = {
   },
   wardrobe: {
     title: "Ma penderie",
-    empty: "Rien pour l'instant : la boutique a de quoi t'habiller.",
+    empty: "Pas encore d'objet : la boutique a de quoi t'équiper.",
+    starterToast: "Héros de départ choisi !",
     slots: { character: "Personnages", hat: "Chapeaux", outfit: "Tenues", accessory: "Accessoires", aura: "Auras" } as Record<string, string>,
   },
   profile: {

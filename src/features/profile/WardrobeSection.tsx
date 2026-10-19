@@ -30,7 +30,7 @@ export function WardrobeSection() {
 
   if (!items || !wallet) return null;
 
-  const owned = items.filter((i) => characterSlotOf(i) !== null && wallet.inventory.includes(i.id) && fr.shop.items[i.id] !== undefined);
+  const owned = items.filter((i) => characterSlotOf(i) !== null && i.slot !== "character" && wallet.inventory.includes(i.id) && fr.shop.items[i.id] !== undefined);
 
   async function toggle(id: string, slot: CharacterSlot, equippedNow: boolean): Promise<void> {
     if (busy) return;

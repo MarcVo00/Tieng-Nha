@@ -1,6 +1,6 @@
 import type { ItemSlot, Look } from "@/domain/types";
 
-const LOOK_SLOTS = ["hat", "outfit", "accessory", "aura"] as const;
+const LOOK_SLOTS = ["character", "hat", "outfit", "accessory", "aura"] as const;
 
 /** The character slots of an equipped map; profile slots (frame, profile_fx) are dropped. */
 export function lookOf(equipped: Partial<Record<ItemSlot, string>>): Look {

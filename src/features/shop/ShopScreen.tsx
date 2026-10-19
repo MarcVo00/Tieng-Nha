@@ -133,7 +133,7 @@ export function ShopScreen() {
 
   const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
   // Reward items (price null) are earned from badges, never sold.
-  const play = known.filter((i) => i.price !== null && !i.theme);
+  const play = known.filter((i) => i.price !== null && !i.theme && i.slot !== "character");
   const themes: { id: string; items: ShopItem[] }[] = [];
   for (const i of known) {
     if (!i.theme || i.slot === null || i.price === null || fr.shop.themes[i.theme] === undefined) continue;

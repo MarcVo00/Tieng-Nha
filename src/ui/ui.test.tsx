@@ -2,7 +2,7 @@ import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { characterLayers } from "@/ui/characterLayers";
-import { Avatar, BadgeMedal, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
+import { Avatar, BadgeMedal, Character, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
 
 test("Button shows loading state and is disabled", () => {
   render(<Button loading>Valider</Button>);
@@ -195,6 +195,23 @@ describe("Character layers", () => {
   test("unknown ids fall back to the defaults", () => {
     expect(srcOf({ hat: "hat_future" }, "hat")).toBe(srcOf({}, "hat"));
     expect(slots({ accessory: "acc_future", aura: "aura_future" })).toEqual(["shadow", "base", "face", "outfit", "hat"]);
+  });
+  test("a character replaces the hero and has no hat of its own", () => {
+    expect(slots({ character: "char_kiem_khach" })).toEqual(["shadow", "base", "face", "outfit"]);
+    expect(srcOf({ character: "char_kiem_khach" }, "base")).not.toBe(srcOf({}, "base"));
+    expect(srcOf({ character: "char_phap_su" }, "outfit")).not.toBe(srcOf({ character: "char_kiem_khach" }, "outfit"));
+  });
+  test("a hat or an outfit cosmetic goes on top of a character", () => {
+    const withCrown = characterLayers({ character: "char_kiem_khach", hat: "hat_thuy_tinh" });
+    expect(withCrown.map((l) => l.slot)).toEqual(["shadow", "base", "face", "outfit", "hat"]);
+    expect(srcOf({ character: "char_kiem_khach", outfit: "outfit_son_tinh" }, "outfit")).toBe(srcOf({ outfit: "outfit_son_tinh" }, "outfit"));
+  });
+  test("an unknown character is the starting hero", () => {
+    expect(characterLayers({ character: "char_future" })).toEqual(characterLayers({}));
+  });
+  test("data-look lists the character id", () => {
+    const { container } = render(<Character look={{ character: "char_phap_su", hat: "hat_thuy_tinh" }} size={80} />);
+    expect(container.querySelector("[data-look]")?.getAttribute("data-look")).toBe("char_phap_su hat_thuy_tinh");
   });
   test("Avatar with look shows the hero, not the emoji", () => {
     const { container } = render(<Avatar emoji="🐯" look={{ hat: "hat_thuy_tinh" }} />);

@@ -11,6 +11,11 @@ import {
 } from "@/ui";
 
 const g = fr.ui.gallery;
+const CHAR_LOOKS: Look[] = [
+  {}, { character: "char_kiem_khach" }, { character: "char_phap_su" },
+  { character: "char_kiem_khach", hat: "hat_thuy_tinh" }, { character: "char_phap_su", outfit: "outfit_son_tinh" },
+  { character: "char_kiem_khach", accessory: "acc_thuan_thien" }, { character: "char_phap_su", aura: "aura_waves" },
+];
 const FULL_LOOK: Look = { hat: "hat_thuy_tinh", outfit: "outfit_son_tinh", accessory: "acc_thuan_thien", aura: "aura_waves" };
 const ICONS: IconName[] = [
   "home", "review", "trophy", "user", "close", "check", "cross", "speaker", "turtle", "mic", "stop", "flag",
@@ -130,6 +135,11 @@ function Panel({ dark }: { dark: boolean }) {
           <div className="flex flex-wrap items-end gap-4">
             {([{}, { hat: "hat_thuy_tinh" }, { outfit: "outfit_son_tinh" }, { accessory: "acc_thuan_thien" }, { aura: "aura_waves" }, FULL_LOOK] as Look[]).map((look, i) => (
               <span key={i} className="rounded-card bg-paper p-2"><Character look={look} size={160} /></span>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-end gap-4">
+            {CHAR_LOOKS.map((look, i) => (
+              <span key={i} className="rounded-card bg-paper p-2"><Character look={look} size={120} /></span>
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-10 py-6">

@@ -10,7 +10,14 @@ const URLS = new Map<string, string>(
   }),
 );
 
-const DEFAULTS = { outfit: "ao_ba_ba", hat: "non_la" } as const;
+type Defaults = { base: string; face: string; outfit: string; hat: string | null };
+const HERO: Defaults = { base: "hero", face: "hero", outfit: "ao_ba_ba", hat: "non_la" };
+/** Per-character defaults; a character without a default hat has its headgear in the base. */
+const CHARACTERS: Record<string, Defaults> = {
+  hero: HERO,
+  char_kiem_khach: { base: "char_kiem_khach", face: "char_kiem_khach", outfit: "char_kiem_khach", hat: null },
+  char_phap_su: { base: "char_phap_su", face: "char_phap_su", outfit: "char_phap_su", hat: null },
+};
 
 function urlOf(slot: string, id: string): string | undefined {
   return URLS.get(`${slot}/${id}`);
@@ -24,10 +31,11 @@ export function characterLayers(look: Look): { slot: string; src: string }[] {
   };
   if (look.aura) push("aura", urlOf("aura", look.aura));
   push("shadow", urlOf("shadow", "hero"));
-  push("base", urlOf("base", "hero"));
-  push("face", urlOf("face", "hero"));
-  push("outfit", urlOf("outfit", look.outfit ?? "") ?? urlOf("outfit", DEFAULTS.outfit));
-  push("hat", urlOf("hat", look.hat ?? "") ?? urlOf("hat", DEFAULTS.hat));
+  const d = (look.character !== undefined ? CHARACTERS[look.character] : undefined) ?? HERO;
+  push("base", urlOf("base", d.base));
+  push("face", urlOf("face", d.face));
+  push("outfit", urlOf("outfit", look.outfit ?? "") ?? urlOf("outfit", d.outfit));
+  push("hat", urlOf("hat", look.hat ?? "") ?? (d.hat === null ? undefined : urlOf("hat", d.hat)));
   if (look.accessory) push("accessory", urlOf("accessory", look.accessory));
   return layers;
 }

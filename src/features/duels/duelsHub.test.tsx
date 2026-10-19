@@ -308,7 +308,7 @@ describe("Kim bài", () => {
     await screen.findByRole("region", { name: fr.duels.done });
     await waitFor(() => expect(useAppState.getState().wallet?.kimBai).toBeGreaterThan(0));
     const balance = useAppState.getState().wallet?.kimBai ?? 0;
-    expect(screen.getByLabelText(new RegExp(fr.duels.kimBaiLabel))).toHaveTextContent(String(balance));
+    expect(screen.getByText(`${fr.duels.kimBaiLabel} : ${fr.duels.kimBai(balance)}`)).toBeInTheDocument();
 
     cleanup();
     renderAt("/duels", services); // a second opening must not pay twice
@@ -329,12 +329,64 @@ describe("pending duels entry points", () => {
     expect(banner).toHaveAttribute("href", "/duels");
   });
 
-  test("no banner without a pending duel, nor after I played it", async () => {
+  test("no banner when there is no duel at all (once the list has loaded)", async () => {
     const services = makeServices();
     await unlock(services);
+    const list = vi.spyOn(services.duels, "list");
     renderAt("/", services);
-    await screen.findByRole("heading", { level: 1, hidden: true });
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    await list.mock.results[0]?.value;
+    await act(async () => undefined);
     expect(screen.queryByRole("link", { name: /Duel en attente/ })).not.toBeInTheDocument();
+  });
+
+  test("no banner for a duel I already played", async () => {
+    const services = makeServices();
+    await unlock(services);
+    const gw = gateway(services);
+    const id = gw.seedIncoming(QUESTIONS, { from: "bot_ba_ngoai" });
+    await gw.submitRun(id, QUESTIONS.round1.map(() => ({ correct: true, ms: 1000 })), QUESTIONS.round2.map(() => ({ correct: true })));
+    const list = vi.spyOn(services.duels, "list");
+    renderAt("/", services);
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    const listed = await list.mock.results[0]?.value;
+    expect(listed).toHaveLength(1); // the duel is there, played: that is why there is no banner
+    await act(async () => undefined);
+    expect(screen.queryByRole("link", { name: /Duel en attente/ })).not.toBeInTheDocument();
+  });
+
+  test("offline while creating: a lesson load that fails offline shows the offline message", async () => {
+    const services = makeServices();
+    await unlock(services);
+    vi.spyOn(services.content, "getLesson").mockRejectedValue(new OfflineError());
+    const create = vi.spyOn(services.duels, "create");
+    renderAt(`/u/${BE_NA}`, services);
+    await userEvent.click(await screen.findByRole("button", { name: fr.duels.challenge }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(fr.duels.offline);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  test("a member-list failure shows a hint with retry, not an empty group", async () => {
+    const services = makeServices();
+    await unlock(services);
+    vi.spyOn(services.leaderboard, "list").mockRejectedValueOnce(new OfflineError());
+    renderAt("/duels", services);
+    expect(await screen.findByText(fr.duels.hub.membersError)).toBeInTheDocument();
+    expect(screen.queryByText(fr.duels.hub.empty.title)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: fr.app.error.retry }));
+    expect(await screen.findByRole("button", { name: fr.duels.hub.challengeWho("Bé Na") })).toBeInTheDocument();
+  });
+
+  test("only the first duel to play carries the primary pill", async () => {
+    const services = makeServices();
+    await unlock(services);
+    const gw = gateway(services);
+    gw.seedIncoming(QUESTIONS, { from: "bot_ba_ngoai" });
+    gw.seedIncoming(QUESTIONS, { from: "bot_chu_tu" });
+    renderAt("/duels", services);
+    const toPlay = await screen.findByRole("region", { name: fr.duels.toPlay });
+    const pills = within(toPlay).getAllByText(fr.duels.hub.play);
+    expect(pills.filter((p) => p.className.includes("bg-primary"))).toHaveLength(1);
   });
 
   test("the leaderboard « Duels » entry counts the duels to play", async () => {

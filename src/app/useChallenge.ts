@@ -68,7 +68,10 @@ export function useChallenge() {
 
         const mine = snapshot?.lessonsDone ?? [];
         const lessons = (
-          await Promise.all(commonLessons(mine, target.lessonsDone).map((id) => content.getLesson(id).catch(() => null)))
+          await Promise.all(commonLessons(mine, target.lessonsDone).map((id) => content.getLesson(id).catch((e: unknown) => {
+            if (e instanceof ContentNotFoundError) return null; // a lesson removed from the content is just skipped
+            throw e;
+          })))
         ).filter((l): l is Lesson => l !== null);
         const questions = pickDuelQuestions(lessons, Math.random);
         if (!questions) return fail(fr.duels.noCommon);

@@ -14,10 +14,14 @@ export function DuelSync() {
 
   useEffect(() => {
     let running = false;
+    let again = false; // an `online` event arrived during a pass: one more pass afterwards
     let stopped = false;
 
-    const deliver = async () => {
-      if (running) return;
+    const deliver = async (): Promise<void> => {
+      if (running) {
+        again = true;
+        return;
+      }
       running = true;
       try {
         for (const id of unsentDuelIds()) {
@@ -37,13 +41,18 @@ export function DuelSync() {
       } finally {
         running = false;
       }
+      if (again && !stopped) {
+        again = false;
+        await deliver();
+      }
     };
 
     void deliver();
-    window.addEventListener("online", deliver);
+    const onOnline = () => void deliver();
+    window.addEventListener("online", onOnline);
     return () => {
       stopped = true;
-      window.removeEventListener("online", deliver);
+      window.removeEventListener("online", onOnline);
     };
   }, [duels]);
 

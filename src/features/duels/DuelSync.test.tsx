@@ -115,3 +115,28 @@ test("stops listening to the network when unmounted", async () => {
   await flush();
   expect(submit).not.toHaveBeenCalled();
 });
+
+test("an online event during a running pass schedules exactly one more pass", async () => {
+  const services = createFakeServices();
+  let release: (() => void) | undefined;
+  const submit = vi.spyOn(services.duels, "submitRun").mockImplementation(
+    (id) => new Promise((resolve) => {
+      if (id === "a") release = () => resolve({ ok: true });
+      else resolve({ ok: true });
+    }),
+  );
+  localStorage.setItem(pendingKey("a"), JSON.stringify(RUN));
+  mount(services);
+  await flush();
+  expect(submit).toHaveBeenCalledTimes(1); // pass 1 is waiting on the network
+  localStorage.setItem(pendingKey("b"), JSON.stringify(RUN)); // arrives while the pass runs
+  window.dispatchEvent(new Event("online"));
+  window.dispatchEvent(new Event("online"));
+  await flush();
+  expect(submit).toHaveBeenCalledTimes(1); // not concurrent
+  release?.();
+  await flush();
+  await flush();
+  expect(submit).toHaveBeenCalledTimes(2); // one re-run picked up the new run, not two
+  expect(localStorage.length).toBe(0);
+});

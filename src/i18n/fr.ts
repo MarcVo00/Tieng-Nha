@@ -415,7 +415,6 @@ export const fr = {
   duels: {
     title: "Duels",
     challenge: "Défier",
-    challenging: "Création du duel…",
     toPlay: "À toi de jouer",
     waiting: "En attente",
     done: "Terminés",
@@ -455,6 +454,7 @@ export const fr = {
       versus: (name: string) => `contre ${name}`,
       timeLeft: (hours: number) => (hours >= 48 ? `${Math.floor(hours / 24)} j restants` : hours >= 1 ? `${hours} h restantes` : "Dernière heure"),
       outcome: { win: "Victoire", loss: "Défaite", draw: "Match nul", forfeit: "Forfait", cancelled: "Annulé" },
+      membersError: "La liste du groupe n'a pas pu se charger.",
       challengeTitle: "Défier un membre",
       challengeSub: "Choisis un adversaire du groupe.",
       challengeWho: (name: string) => `Défier ${name}`,

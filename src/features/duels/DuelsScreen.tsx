@@ -17,7 +17,7 @@ import { hoursLeft, otherId, outcomeOf, splitDuels } from "@/features/duels/duel
 type Load =
   | { status: "loading" }
   | { status: "offline" | "error" }
-  | { status: "ready"; duels: Duel[]; members: LeaderboardRow[] };
+  | { status: "ready"; duels: Duel[]; members: LeaderboardRow[]; membersFailed: boolean };
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
@@ -69,8 +69,14 @@ export function DuelsScreen() {
           .claimSettledDuels(list)
           .then((added) => (added > 0 ? refresh() : undefined))
           .catch(() => undefined);
-        const members = await leaderboard.list("all").catch(() => []);
-        if (!cancelled) setLoad({ status: "ready", duels: list, members: members.filter((m) => !m.isMe) });
+        let members: LeaderboardRow[] = [];
+        let membersFailed = false;
+        try {
+          members = (await leaderboard.list("all")).filter((m) => !m.isMe);
+        } catch {
+          membersFailed = true; // the duels themselves loaded: only the challenge list gets a quiet hint
+        }
+        if (!cancelled) setLoad({ status: "ready", duels: list, members, membersFailed });
       } catch (e) {
         if (!cancelled) setLoad({ status: e instanceof OfflineError ? "offline" : "error" });
       }
@@ -95,9 +101,10 @@ export function DuelsScreen() {
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.base, ease: ease.out }} className="pb-8">
       <div className="flex items-center gap-3">
         <h1 className="flex-1 text-title text-ink">{fr.duels.title}</h1>
-        <p className="tabular flex items-center gap-1.5 text-body-strong text-gold-ink" aria-label={`${fr.duels.kimBaiLabel} : ${fr.duels.kimBai(kimBai)}`}>
+        <p className="tabular flex items-center gap-1.5 text-body-strong text-gold-ink">
           <Icon name="medal" size={22} />
           <span aria-hidden="true">{kimBai}</span>
+          <span className="sr-only">{`${fr.duels.kimBaiLabel} : ${fr.duels.kimBai(kimBai)}`}</span>
         </p>
       </div>
 
@@ -135,7 +142,7 @@ export function DuelsScreen() {
         <>
           {sections.toPlay.length > 0 ? (
             <Section id="duels-to-play" title={fr.duels.toPlay}>
-              {sections.toPlay.map((d) => {
+              {sections.toPlay.map((d, index) => {
                 const pending = unsent.has(d.id);
                 const resumable = pending || readRun(d.id) !== null || readPending(d.id) !== null;
                 return (
@@ -146,7 +153,7 @@ export function DuelsScreen() {
                     title={fr.duels.hub.versus(d.opponentPseudo)}
                     caption={pending ? fr.duels.hub.unsentHint : fr.duels.hub.timeLeft(hoursLeft(d, clock()))}
                     trailing={
-                      <span className="rounded-full bg-primary px-3 py-1 text-caption font-semibold text-primary-on">
+                      <span className={`rounded-full px-3 py-1 text-caption font-semibold ${index === 0 ? "bg-primary text-primary-on" : "bg-surface-2 text-primary"}`}>
                         {pending ? fr.duels.hub.unsent : resumable ? fr.duels.hub.resume : fr.duels.hub.play}
                       </span>
                     }
@@ -174,6 +181,12 @@ export function DuelsScreen() {
             <h2 id="duels-challenge" className="text-heading text-ink">{fr.duels.hub.challengeTitle}</h2>
             <p className="text-caption text-ink-muted">{fr.duels.hub.challengeSub}</p>
             {challenge.message ? <p role="alert" className="mt-3 rounded-md bg-surface-2 p-3 text-body text-ink">{challenge.message}</p> : null}
+            {ready.membersFailed ? (
+              <div className="mt-3 flex items-center gap-3 text-caption text-ink-muted">
+                <p className="flex-1">{fr.duels.hub.membersError}</p>
+                <Button variant="ghost" onClick={reload}>{fr.app.error.retry}</Button>
+              </div>
+            ) : null}
             {ready.members.length > 0 ? (
               <ul aria-label={fr.duels.hub.membersLabel} className="mt-3 list-none">
                 {ready.members.map((m) => (
@@ -213,7 +226,7 @@ export function DuelsScreen() {
             </Section>
           ) : null}
 
-          {sections.toPlay.length + sections.waiting.length + sections.done.length === 0 && ready.members.length === 0 ? (
+          {sections.toPlay.length + sections.waiting.length + sections.done.length === 0 && ready.members.length === 0 && !ready.membersFailed ? (
             <EmptyState title={fr.duels.hub.empty.title} body={fr.duels.hub.empty.body} illustration="lantern" />
           ) : null}
         </>

@@ -120,6 +120,7 @@ export function PublicProfileScreen() {
   }
 
   const { profile, badges } = state;
+  const blocked = challenge.blockedBy(profile);
   const done = new Set(profile.lessonsDone);
   const doneCount = Array.from({ length: LESSON_COUNT }, (_, i) => done.has(lessonId(i + 1))).filter(Boolean).length;
   const unlocked = new Set(profile.badges);
@@ -139,24 +140,19 @@ export function PublicProfileScreen() {
         </div>
       </div>
 
-      {(() => {
-        const blocked = challenge.blockedBy(profile);
-        return (
-          <div className="mt-5">
-            {blocked ? (
-              <p className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-caption text-ink-muted">
-                <Icon name="lock" size={18} className="mt-0.5 shrink-0" />
-                {blocked}
-              </p>
-            ) : (
-              <Button fullWidth loading={challenge.busy} onClick={() => void challenge.start(profile)}>
-                {fr.duels.challenge}
-              </Button>
-            )}
-            {challenge.message && challenge.message !== blocked ? <p role="alert" className="pt-2 text-caption text-ink">{challenge.message}</p> : null}
-          </div>
-        );
-      })()}
+      <div className="mt-5">
+        {blocked ? (
+          <p className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-caption text-ink-muted">
+            <Icon name="lock" size={18} className="mt-0.5 shrink-0" />
+            {blocked}
+          </p>
+        ) : (
+          <Button fullWidth loading={challenge.busy} onClick={() => void challenge.start(profile)}>
+            {fr.duels.challenge}
+          </Button>
+        )}
+        {challenge.message && challenge.message !== blocked ? <p role="alert" className="pt-2 text-caption text-ink">{challenge.message}</p> : null}
+      </div>
 
       <dl className="mt-5 flex gap-6">
         <div>

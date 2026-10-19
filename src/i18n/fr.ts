@@ -436,6 +436,7 @@ export const fr = {
         retry: "Réessayer",
         later: "Retour aux duels",
       },
+      sendError: { title: "L'envoi a échoué", body: "Ton combat est gardé sur ton téléphone. Réessaie dans un instant." },
       noMic: {
         title: "Il te faut le micro",
         body: "Les duels se jouent aussi à l'oral : ouvre l'appli dans Chrome et autorise le micro.",

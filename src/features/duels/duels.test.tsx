@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { createFakeServices, type FakeSpeechRecognizer } from "@/adapters/fakes";
@@ -11,7 +11,7 @@ import { fr } from "@/i18n/fr";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { RecognitionError } from "@/ports/Speech";
 import { DuelRunScreen } from "@/features/duels";
-import { newRecord, pendingKey, readPending, readRun, runKey, saveRun } from "@/features/duels/duelRunState";
+import { newRecord, pendingKey, readPending, readRun, recordAnswer, runKey, saveRun, unsentDuelIds } from "@/features/duels/duelRunState";
 
 const ID = "duel-1";
 const QUESTIONS: DuelQuestions = {
@@ -259,4 +259,93 @@ describe("duel run", () => {
     renderRun(services);
     expect(await screen.findByText("écran de résultat")).toBeInTheDocument();
   });
+});
+
+describe("duel run, hardening", () => {
+  const FINISHED = { round1: [{ correct: true, ms: 2000 }, { correct: false, ms: 20000 }], round2: [{ correct: true }, { correct: false }] };
+
+  test("a non-network error is not « offline »: error state, run kept, retry works", async () => {
+    saveRun(ID, { ...newRecord(QUESTIONS, 7), ...FINISHED });
+    const services = createFakeServices();
+    const submit = vi.spyOn(services.duels, "submitRun").mockRejectedValueOnce(new Error("not_authenticated")).mockResolvedValue({ ok: true });
+    renderRun(services);
+    expect(await screen.findByText(fr.duels.run.sendError.title)).toBeInTheDocument();
+    expect(screen.queryByText(fr.duels.run.pendingOffline.title)).not.toBeInTheDocument();
+    expect(readPending(ID)).toEqual(FINISHED);
+    await userEvent.click(screen.getByRole("button", { name: fr.duels.run.pendingOffline.retry }));
+    expect(await screen.findByText("écran de résultat")).toBeInTheDocument();
+    expect(submit).toHaveBeenCalledTimes(2);
+  });
+
+  test("an OfflineError still shows the offline state", async () => {
+    saveRun(ID, { ...newRecord(QUESTIONS, 7), ...FINISHED });
+    const services = createFakeServices();
+    vi.spyOn(services.duels, "submitRun").mockRejectedValue(new OfflineError());
+    renderRun(services);
+    expect(await screen.findByText(fr.duels.run.pendingOffline.title)).toBeInTheDocument();
+  });
+
+  test("a negative elapsed time (clock moved back) is a miss at the cap, not a 0 ms answer", () => {
+    const rec = recordAnswer(newRecord(QUESTIONS, 7), true, -500);
+    expect(rec.round1).toEqual([{ correct: false, ms: 20000 }]);
+    expect(recordAnswer(newRecord(QUESTIONS, 7), true, Number.NaN).round1).toEqual([{ correct: false, ms: 20000 }]);
+  });
+
+  test("unsentDuelIds lists pending and fully answered runs only, and readUnsent gives their payload", async () => {
+    const { readUnsent } = await import("@/features/duels/duelRunState");
+    localStorage.clear();
+    saveRun("a", newRecord(QUESTIONS, 1)); // in progress: not unsent
+    saveRun("b", { ...newRecord(QUESTIONS, 1), ...FINISHED }); // finished, never sent
+    localStorage.setItem(pendingKey("c"), JSON.stringify(FINISHED));
+    localStorage.setItem(pendingKey("d"), "not json");
+    localStorage.setItem("other", "x");
+    expect(unsentDuelIds().sort()).toEqual(["b", "c"]);
+    expect(readUnsent("b")).toEqual(FINISHED);
+    expect(readUnsent("c")).toEqual(FINISHED);
+    expect(readUnsent("a")).toBeNull();
+  });
+
+  test(
+    "the same duel seed shows the same answer order on every mount",
+    async () => {
+      const order = async () => {
+        await screen.findByText("1/2");
+        await option(E03.right);
+        return screen
+          .getAllByRole("button", { pressed: false })
+          .map((b) => b.textContent ?? "");
+      };
+      renderRun();
+      const first = await order();
+      cleanup();
+      saveRun(ID, newRecord(QUESTIONS, 7));
+      renderRun();
+      expect(await order()).toEqual(first);
+      expect(first).toHaveLength(4);
+    },
+    TIMEOUT,
+  );
+
+  test(
+    "a round-2 question past 30 s counts as missed",
+    async () => {
+      saveRun(ID, { ...newRecord(QUESTIONS, 7), round1: [{ correct: true, ms: 4000 }, { correct: true, ms: 4000 }] });
+      renderRun();
+      await userEvent.click(await screen.findByRole("button", { name: fr.duels.run.round2Intro.start }));
+      await screen.findByRole("button", { name: fr.exercises.speak.micLabel });
+      await act(async () => {
+        t += 29_000;
+      });
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 400));
+      });
+      expect(screen.queryByText(fr.duels.run.miss)).not.toBeInTheDocument();
+      await act(async () => {
+        t += 1_500;
+      });
+      expect(await screen.findByText(fr.duels.run.miss, undefined, { timeout: 2000 })).toBeInTheDocument();
+      await waitFor(() => expect(readRun(ID)?.round2).toEqual([{ correct: false }]));
+    },
+    TIMEOUT,
+  );
 });

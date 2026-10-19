@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { OfflineError } from "@/domain/errors";
 import type { Capabilities, Exercise, VocabId, VocabItem } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import type { GradeResult } from "@/exercises/types";
@@ -38,7 +39,7 @@ type Load =
   | { status: "noMic" }
   | { status: "ready"; exercises: (Exercise | null)[]; vocabIndex: ReadonlyMap<VocabId, VocabItem>; seed: number };
 
-type Phase = { kind: "running" } | { kind: "sending" } | { kind: "offline" } | { kind: "rejected" };
+type Phase = { kind: "running" } | { kind: "sending" } | { kind: "offline" } | { kind: "failed" } | { kind: "rejected" };
 
 const VERDICT_STYLE: Record<Verdict, string> = {
   critical: "text-gold-ink",
@@ -109,9 +110,9 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
           clearRun(id);
           setPhase({ kind: "rejected" });
         }
-      } catch {
-        // Offline (or any transport failure): the finished run stays on the phone and is retried.
-        if (mounted.current) setPhase({ kind: "offline" });
+      } catch (e) {
+        // The finished run stays on the phone either way; only a network failure is « offline ».
+        if (mounted.current) setPhase({ kind: e instanceof OfflineError ? "offline" : "failed" });
       } finally {
         submitting.current = false;
       }
@@ -179,6 +180,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
   const afterAnswer = useCallback(
     (next: RunRecord, round: 1 | 2) => {
       commit(next);
+      setLeft(1); // the next question starts with a full bar: no stale frame
       const last = round === 1 ? next.round1[next.round1.length - 1] : next.round2[next.round2.length - 1];
       setFlash(verdictOf(round, last));
       if (flashTimer.current) clearTimeout(flashTimer.current);
@@ -309,6 +311,23 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
         title={fr.duels.run.pendingOffline.title}
         body={fr.duels.run.pendingOffline.body}
         illustration="boat"
+        action={
+          <div className="flex gap-2">
+            <Button onClick={() => pendingRun.current && void send(pendingRun.current)}>{fr.duels.run.pendingOffline.retry}</Button>
+            <Button variant="secondary" onClick={leave}>
+              {fr.duels.run.pendingOffline.later}
+            </Button>
+          </div>
+        }
+      />
+    );
+  }
+  if (phase.kind === "failed") {
+    return (
+      <EmptyState
+        title={fr.duels.run.sendError.title}
+        body={fr.duels.run.sendError.body}
+        illustration="lantern"
         action={
           <div className="flex gap-2">
             <Button onClick={() => pendingRun.current && void send(pendingRun.current)}>{fr.duels.run.pendingOffline.retry}</Button>

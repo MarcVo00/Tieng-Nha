@@ -39,8 +39,10 @@ export function positionOf(rec: RunRecord): Position {
 export function recordAnswer(rec: RunRecord, correct: boolean, elapsed: number): RunRecord {
   const pos = positionOf(rec);
   if (pos.round === "done") return rec;
-  const ms = toDuelMs(elapsed);
-  const ok = correct && ms <= pos.cap;
+  // A clock moved back gives a negative elapsed time: not a 0 ms answer, a miss at the cap.
+  const valid = Number.isFinite(elapsed) && elapsed >= 0;
+  const ms = valid ? toDuelMs(elapsed) : pos.cap;
+  const ok = correct && valid && ms <= pos.cap;
   if (pos.round === 1) return { ...rec, round1: [...rec.round1, { correct: ok, ms: Math.min(ms, pos.cap) }], shownAt: null };
   return { ...rec, round2: [...rec.round2, { correct: ok }], shownAt: null };
 }
@@ -128,3 +130,30 @@ export const clearRun = (id: string): void => remove(runKey(id));
 export const readPending = (id: string): PendingRun | null => read(pendingKey(id), isPendingRun);
 export const savePending = (id: string, run: PendingRun): void => write(pendingKey(id), run);
 export const clearPending = (id: string): void => remove(pendingKey(id));
+
+type KeyStorage = Pick<Storage, "length" | "key">;
+
+/** The run to send for a duel: a pending one, or an in-progress record that is fully answered. */
+export function readUnsent(id: string): PendingRun | null {
+  const pending = readPending(id);
+  if (pending) return pending;
+  const rec = readRun(id);
+  return rec && positionOf(rec).round === "done" ? { round1: rec.round1, round2: rec.round2 } : null;
+}
+
+/** Ids of the duels that have a finished run waiting to be sent. */
+export function unsentDuelIds(storage: KeyStorage = localStorage): string[] {
+  const ids = new Set<string>();
+  try {
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      if (key === null) continue;
+      for (const prefix of [pendingKey(""), runKey("")]) {
+        if (key.startsWith(prefix) && key.length > prefix.length) ids.add(key.slice(prefix.length));
+      }
+    }
+  } catch {
+    return [];
+  }
+  return [...ids].filter((id) => readUnsent(id) !== null);
+}

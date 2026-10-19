@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(83);
+select plan(87);
 
 -- alice (A) and bob (B) duel; carol is in another group; dave lacks the prerequisites.
 insert into auth.users (id, email) values
@@ -123,7 +123,15 @@ select is(pg_temp.err(public.create_duel('b0000000-0000-0000-0000-000000000002',
 select is(pg_temp.err(public.create_duel('b0000000-0000-0000-0000-000000000002', null, 1)), 'bad_questions', 'create: null questions');
 select is(pg_temp.err(public.create_duel('b0000000-0000-0000-0000-000000000002',
   jsonb_set(pg_temp.q(8, 3), '{round1,0,lessonId}', '"l03"'), 1)), 'not_common_lesson', 'create: lesson done by alice only');
-select is((select count(*)::int from (select 1 from public.duels) x), 0, 'refusals created no duel (and a player cannot read duels directly)');
+select is(pg_temp.err(public.create_duel('b0000000-0000-0000-0000-000000000002', pg_temp.q(8, 3), null)), 'bad_questions', 'create: null seed');
+select is(pg_temp.err(public.create_duel('b0000000-0000-0000-0000-000000000002',
+  jsonb_set(pg_temp.q(8, 3), '{round1,0,exerciseId}', to_jsonb(repeat('x', 65))), 1)), 'bad_questions', 'create: over-long exerciseId');
+select pg_temp.login('d0000000-0000-0000-0000-000000000004');
+select is(pg_temp.err(public.create_duel('a0000000-0000-0000-0000-000000000001', pg_temp.q(8, 3), 1)), 'prerequisites', 'create: the challenger lacks the dialogue');
+select pg_temp.login('a0000000-0000-0000-0000-000000000001');
+reset role;
+select is((select count(*)::int from public.duels), 0, 'refusals created no duel');
+select pg_temp.login('a0000000-0000-0000-0000-000000000001');
 
 -- ---------- create ----------
 select is((pg_temp.mk('b0000000-0000-0000-0000-000000000002', 8, 3))->>'ok', 'true', 'create: ok');
@@ -249,8 +257,9 @@ select pg_temp.ev('item_purchased', 'x', '{"itemId": "energy_refill"}');
 select is(pg_temp.kb() || '/' || pg_temp.coins(), '0/70', 'an xu purchase still debits xu only');
 
 -- ---------- RLS ----------
-select is((select count(*)::int from public.duels), 0, 'a player cannot select duels directly');
-select is((select count(*)::int from public.duel_runs), 0, 'a player cannot select duel runs directly');
+select throws_ok($$ select count(*) from public.duels $$, '42501', null, 'a player cannot select duels directly');
+select throws_ok($$ select count(*) from public.duel_runs $$, '42501', null, 'a player cannot select duel runs directly');
+select throws_ok($$ truncate public.duels cascade $$, '42501', null, 'a player cannot truncate duels');
 select throws_ok($$ insert into public.duels (group_id, challenger, opponent, questions, seed, expires_at)
   values ('aaaaaaaa-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', '{}', 1, now()) $$,
   '42501', null, 'a player cannot insert a duel directly');

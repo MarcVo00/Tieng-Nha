@@ -9,6 +9,7 @@ const shop: ShopItem[] = [
   { id: "frame_jade", kind: "cosmetic", slot: "frame", price: null, currency: "xu" },
   { id: "fx_ink", kind: "cosmetic", slot: "profile_fx", price: null, currency: "xu" },
   { id: "cheap_frame", kind: "cosmetic", slot: "frame", price: 40, currency: "xu" },
+  { id: "arena_hat", kind: "cosmetic", slot: "hat", price: 6, currency: "kim_bai" },
 ];
 const rule = { kind: "lessons_done" as const, gte: 1 };
 const badges: BadgeDef[] = [
@@ -79,6 +80,11 @@ describe("purchases", () => {
     const w = walletAt([...funds(), buy("cheap_frame", 9), buy("cheap_frame", 10)], shop, badges);
     expect(w.coins).toBe(170);
     expect(w.inventory).toEqual(["cheap_frame"]);
+  });
+  test("a Kim bài item is not bought with coins", () => {
+    const w = walletAt([...funds(), buy("arena_hat", 9)], shop, badges);
+    expect(w.coins).toBe(210);
+    expect(w.inventory).toEqual([]);
   });
   test("purchase of a reward-priced item is refused", () => {
     const w = walletAt([...Array.from({ length: 10 }, (_, i) => exam(90, i)), buy("frame_bronze", 11)], shop, badges);

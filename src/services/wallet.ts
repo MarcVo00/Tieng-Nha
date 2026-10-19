@@ -41,7 +41,8 @@ export type PricedItem = ShopItem & { price: number };
 /** The catalogue item a purchase would buy, or null when the server rules refuse it (reward-only items have no price). */
 export function purchasable(w: Wallet, shop: readonly ShopItem[], itemId: unknown): PricedItem | null {
   const item = typeof itemId === "string" ? shop.find((i) => i.id === itemId) : undefined;
-  if (!item || item.price === null || w.coins < item.price) return null;
+  // Kim bài items are not payable with coins (the Kim bài debit comes with the duels wallet).
+  if (!item || item.price === null || item.currency !== "xu" || w.coins < item.price) return null;
   const priced: PricedItem = { ...item, price: item.price };
   if (item.kind === "cosmetic" && w.inventory.includes(item.id)) return null;
   if (item.id === "streak_freeze" && w.freezes >= (item.maxStock ?? DEFAULT_MAX_FREEZES)) return null;

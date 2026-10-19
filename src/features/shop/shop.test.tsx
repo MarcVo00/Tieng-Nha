@@ -52,6 +52,17 @@ test("shows the balance as the hero", async () => {
   expect(await screen.findByText(fr.shop.balance(coins))).toBeInTheDocument();
 });
 
+test("arena items (Kim bài) are not listed in the xu shop", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  await winExams(services, 9);
+  setup(services);
+  await screen.findByRole("heading", { name: fr.shop.items["streak_freeze"]?.name ?? "" });
+  for (const id of ["hat_tay_son", "acc_con_vo", "outfit_hoi_vat"]) {
+    expect(screen.queryByText(fr.shop.items[id]?.name ?? id)).not.toBeInTheDocument();
+  }
+  expect(screen.queryByText(fr.shop.themes["arene"] ?? "arene")).not.toBeInTheDocument();
+});
+
 test("buys a streak freeze after confirming", async () => {
   const services = createFakeServices({ clock: () => NOW });
   await winExams(services, 1);

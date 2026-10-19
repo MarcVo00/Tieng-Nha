@@ -131,7 +131,8 @@ export function ShopScreen() {
     }
   }
 
-  const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
+  // Arena items (Kim bài) are sold on the Arena screen, never with xu here.
+  const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined && i.currency === "xu");
   // Reward items (price null) are earned from badges, never sold.
   const play = known.filter((i) => i.price !== null && !i.theme && i.slot !== "character");
   const characters = known.filter((i) => i.slot === "character" && i.price !== null).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));

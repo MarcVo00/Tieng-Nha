@@ -47,10 +47,8 @@ create table public.duel_runs (
 
 alter table public.duels enable row level security;
 alter table public.duel_runs enable row level security;
-revoke all on public.duels from anon;
-revoke all on public.duel_runs from anon;
-revoke insert, update, delete on public.duels from authenticated;
-revoke insert, update, delete on public.duel_runs from authenticated;
+-- RPC-only tables: no direct access at all (TRUNCATE and REFERENCES ignore RLS).
+revoke all on public.duels, public.duel_runs from anon, authenticated;
 
 -- 4. Catalogue with currency (must match src/content/shop.json). The return type changes: drop + recreate.
 drop function public.shop_item(text);

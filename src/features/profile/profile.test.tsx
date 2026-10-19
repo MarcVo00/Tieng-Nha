@@ -373,7 +373,7 @@ describe("rewards section", () => {
     const jade = await rewardCard("Cadre jade");
     expect(within(jade).getByRole("button", { name: fr.rewards.equip })).toBeEnabled();
     expect(within(jade).getByRole("img", { name: fr.rewards.preview("Cadre jade") })).toBeInTheDocument();
-    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(6);
+    expect(within(jade.closest("section") as HTMLElement).getAllByRole("heading", { level: 3 })).toHaveLength(6);
     const all = ["frame_bronze", "frame_jade", "frame_son_mai", "fx_ink", "fx_lightning", "fx_embers"];
     const badgeOf: Record<string, [string, string]> = {
       frame_bronze: ["Une semaine", "7 jours d'affilée."],
@@ -467,10 +467,10 @@ describe("rewards section", () => {
 });
 
 describe("wardrobe section", () => {
-  async function setupWardrobe(own: string[]) {
+  async function setupWardrobe(own: string[], exams = 6) {
     useToastStore.setState({ toasts: [] });
     const services = createFakeServices({ clock: () => NOW });
-    for (let i = 0; i < 6; i++) await services.activity.finishExam({ attemptId: `a${i}`, score: 90, noSpeaking: false });
+    for (let i = 0; i < exams; i++) await services.activity.finishExam({ attemptId: `a${i}`, score: 90, noSpeaking: false });
     for (const id of own) await services.activity.purchase(id);
     useAppState.setState({ wallet: await services.activity.getWallet() });
     return { ...(await setup(services)), services };
@@ -495,5 +495,36 @@ describe("wardrobe section", () => {
     expect((await services.activity.getWallet()).equipped["hat"]).toBe("hat_thuy_tinh");
     await user.click(await within(hat).findByRole("button", { name: fr.shop.tryOn.unequip }));
     await waitFor(async () => expect((await services.activity.getWallet()).equipped["hat"]).toBeUndefined());
+  });
+
+  describe("characters", () => {
+    const group = async () => (await screen.findByRole("heading", { name: fr.wardrobe.slots["character"] ?? "" })).parentElement as HTMLElement;
+    const starter = (g: HTMLElement) => within(g).getByRole("heading", { name: fr.shop.characters.starter }).closest("li") as HTMLElement;
+
+    test("the starting hero is always offered, first, and marked when worn", async () => {
+      await setupWardrobe([]);
+      const g = await group();
+      const li = starter(g);
+      expect(within(li).getByText(fr.rewards.equipped)).toBeVisible();
+      expect(within(g).getAllByRole("listitem")).toHaveLength(1);
+    });
+
+    test("owned characters join it; switching keeps the other slots and going back sends a null equip", async () => {
+      const { services, user } = await setupWardrobe(["char_kiem_khach", "char_phap_su", "hat_thuy_tinh"], 24);
+      await services.activity.equip("hat", "hat_thuy_tinh");
+      useAppState.setState({ wallet: await services.activity.getWallet() });
+      const g = await group();
+      expect(within(g).getAllByRole("listitem")).toHaveLength(3);
+      const blade = within(g).getByRole("heading", { name: fr.shop.items["char_kiem_khach"]?.name ?? "" }).closest("li") as HTMLElement;
+      await user.click(within(blade).getByRole("button", { name: fr.shop.tryOn.equip }));
+      await waitFor(async () => expect((await services.activity.getWallet()).equipped["character"]).toBe("char_kiem_khach"));
+      expect((await services.activity.getWallet()).equipped["hat"]).toBe("hat_thuy_tinh");
+      await waitFor(() => expect(within(blade).getByText(fr.rewards.equipped)).toBeVisible());
+      const equip = vi.spyOn(services.activity, "equip");
+      await user.click(within(starter(g)).getByRole("button", { name: fr.shop.tryOn.equip }));
+      await waitFor(() => expect(equip).toHaveBeenCalledWith("character", null));
+      await waitFor(async () => expect((await services.activity.getWallet()).equipped["character"]).toBeUndefined());
+      expect((await services.activity.getWallet()).equipped["hat"]).toBe("hat_thuy_tinh");
+    });
   });
 });

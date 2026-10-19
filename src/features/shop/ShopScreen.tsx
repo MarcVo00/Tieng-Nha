@@ -134,6 +134,7 @@ export function ShopScreen() {
   const known = (items ?? []).filter((i) => fr.shop.items[i.id] !== undefined);
   // Reward items (price null) are earned from badges, never sold.
   const play = known.filter((i) => i.price !== null && !i.theme && i.slot !== "character");
+  const characters = known.filter((i) => i.slot === "character" && i.price !== null).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
   const themes: { id: string; items: ShopItem[] }[] = [];
   for (const i of known) {
     if (!i.theme || i.slot === null || i.price === null || fr.shop.themes[i.theme] === undefined) continue;
@@ -234,6 +235,14 @@ export function ShopScreen() {
             </h2>
             <ul className="flex list-none flex-col gap-3">{play.map((i) => card(i, wallet))}</ul>
           </section>
+          {characters.length > 0 ? (
+            <section aria-labelledby="shop-characters" className="flex flex-col gap-3">
+              <h2 id="shop-characters" className="text-heading text-ink">
+                {fr.shop.characters.title}
+              </h2>
+              <ul className="grid list-none grid-cols-2 gap-3">{characters.map((i) => themedCard(i, wallet))}</ul>
+            </section>
+          ) : null}
           {themes.map((t) => (
             <section key={t.id} aria-labelledby={`shop-theme-${t.id}`} className="flex flex-col gap-3">
               <h2 id={`shop-theme-${t.id}`} className="text-heading text-ink">

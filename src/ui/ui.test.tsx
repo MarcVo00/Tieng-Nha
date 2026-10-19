@@ -206,8 +206,13 @@ describe("Character layers", () => {
     expect(withCrown.map((l) => l.slot)).toEqual(["shadow", "base", "face", "outfit", "hat"]);
     expect(srcOf({ character: "char_kiem_khach", outfit: "outfit_son_tinh" }, "outfit")).toBe(srcOf({ outfit: "outfit_son_tinh" }, "outfit"));
   });
+  test("the sorcerer has no default hat either", () => {
+    expect(slots({ character: "char_phap_su" })).toEqual(["shadow", "base", "face", "outfit"]);
+  });
   test("an unknown character is the starting hero", () => {
     expect(characterLayers({ character: "char_future" })).toEqual(characterLayers({}));
+    expect(characterLayers({ character: "constructor" })).toEqual(characterLayers({}));
+    expect(characterLayers({ character: "__proto__" })).toEqual(characterLayers({}));
   });
   test("data-look lists the character id", () => {
     const { container } = render(<Character look={{ character: "char_phap_su", hat: "hat_thuy_tinh" }} size={80} />);

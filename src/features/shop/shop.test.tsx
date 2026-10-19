@@ -339,3 +339,47 @@ describe("dark legends section and try-on", () => {
     expect(trigger).toHaveFocus();
   });
 });
+
+describe("characters section", () => {
+  const IDS = ["char_kiem_khach", "char_phap_su"];
+  const NAMES = IDS.map((id) => fr.shop.items[id]?.name ?? "");
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
+  const open = (name: string) => screen.findByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} ${escapeRe(name)}`) });
+
+  test("sits between the consumables and the dark legends, previewed on the current look", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    await winExams(services, 9);
+    await services.activity.purchase("hat_thuy_tinh");
+    await services.activity.equip("hat", "hat_thuy_tinh");
+    setup(services);
+    const chars = await screen.findByRole("heading", { name: fr.shop.characters.title });
+    const play = screen.getByRole("heading", { name: fr.shop.playTitle });
+    const legends = screen.getByRole("heading", { name: fr.shop.themes["legendes_sombres"] ?? "" });
+    expect(play.compareDocumentPosition(chars) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(chars.compareDocumentPosition(legends) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const section = chars.closest("section") as HTMLElement;
+    const buttons = within(section).getAllByRole("button");
+    expect(buttons).toHaveLength(2);
+    buttons.forEach((b, i) => {
+      const look = b.querySelector("[data-look]")?.getAttribute("data-look") ?? "";
+      expect(look.split(" ")[0]).toBe(IDS[i]);
+      expect(look).toContain("hat_thuy_tinh");
+    });
+    expect(within(play.closest("section") as HTMLElement).queryByText(NAMES[0] ?? "")).toBeNull();
+  });
+
+  test("the try-on buys in the sheet, then equips the character", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    await winExams(services, 9);
+    const user = setup(services);
+    await user.click(await open(NAMES[0] ?? ""));
+    const sheet = await screen.findByRole("dialog", { name: NAMES[0] ?? "" });
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(200) }));
+    await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
+    await screen.findByText(fr.shop.bought);
+    const wallet = await services.activity.getWallet();
+    expect(wallet.inventory).toContain("char_kiem_khach");
+    expect(wallet.equipped["character"]).toBe("char_kiem_khach");
+  });
+});
+

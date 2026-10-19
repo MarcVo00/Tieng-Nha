@@ -31,7 +31,7 @@ export function characterLayers(look: Look): { slot: string; src: string }[] {
   };
   if (look.aura) push("aura", urlOf("aura", look.aura));
   push("shadow", urlOf("shadow", "hero"));
-  const d = (look.character !== undefined ? CHARACTERS[look.character] : undefined) ?? HERO;
+  const d = (look.character !== undefined && Object.hasOwn(CHARACTERS, look.character) ? CHARACTERS[look.character] : undefined) ?? HERO;
   push("base", urlOf("base", d.base));
   push("face", urlOf("face", d.face));
   push("outfit", urlOf("outfit", look.outfit ?? "") ?? urlOf("outfit", d.outfit));

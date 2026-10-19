@@ -17,6 +17,12 @@ export function WardrobeSection() {
   const equipped = wallet?.equipped;
   const base = useMemo(() => lookOf(equipped ?? {}), [equipped]);
 
+  const starterLook = useMemo(() => {
+    const look = { ...base };
+    delete look.character;
+    return look;
+  }, [base]);
+
   useEffect(() => {
     let cancelled = false;
     content
@@ -30,7 +36,7 @@ export function WardrobeSection() {
 
   if (!items || !wallet) return null;
 
-  const owned = items.filter((i) => characterSlotOf(i) !== null && i.slot !== "character" && wallet.inventory.includes(i.id) && fr.shop.items[i.id] !== undefined);
+  const owned = items.filter((i) => characterSlotOf(i) !== null && wallet.inventory.includes(i.id) && fr.shop.items[i.id] !== undefined);
 
   async function toggle(id: string, slot: CharacterSlot, equippedNow: boolean): Promise<void> {
     if (busy) return;
@@ -50,11 +56,23 @@ export function WardrobeSection() {
       {owned.length === 0 ? <p className="text-body text-ink-muted">{fr.wardrobe.empty}</p> : null}
       {CHARACTER_SLOTS.map((slot) => {
         const inSlot = owned.filter((i) => characterSlotOf(i) === slot);
-        if (inSlot.length === 0) return null;
+        if (inSlot.length === 0 && slot !== "character") return null;
         return (
           <div key={slot} className="flex flex-col gap-2">
             <h3 className="text-body-strong text-ink-muted">{fr.wardrobe.slots[slot]}</h3>
             <ul className="grid list-none grid-cols-2 gap-3">
+              {slot === "character" ? (
+                <Card as="li" className="flex flex-col items-center gap-2 p-4 text-center">
+                  <HeroMedallion look={starterLook} size={96} />
+                  <h4 id="wardrobe-starter" className="text-body-strong text-ink">
+                    {fr.shop.characters.starter}
+                  </h4>
+                  <p className={`text-caption text-gold-ink ${wallet.equipped.character === undefined ? "" : "invisible"}`}>{fr.rewards.equipped}</p>
+                  <Button variant="secondary" fullWidth disabled={busy || wallet.equipped.character === undefined} aria-describedby="wardrobe-starter" onClick={() => void toggle("hero", "character", true)}>
+                    {fr.shop.tryOn.equip}
+                  </Button>
+                </Card>
+              ) : null}
               {inSlot.map((item) => {
                 const text = fr.shop.items[item.id];
                 if (!text) return null;

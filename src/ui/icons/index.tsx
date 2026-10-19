@@ -3,7 +3,7 @@ import type { ReactNode, SVGProps } from "react";
 export type IconName =
   | "home" | "review" | "trophy" | "user" | "close" | "check" | "cross" | "speaker" | "turtle" | "mic" | "stop"
   | "flag" | "chevron-right" | "chevron-left" | "lock" | "star" | "flame" | "refresh" | "settings" | "share"
-  | "download" | "chat" | "play" | "eye" | "eye-off" | "bolt" | "coin";
+  | "download" | "chat" | "play" | "eye" | "eye-off" | "bolt" | "coin" | "swords" | "medal";
 
 // 24x24 grid, 2px round strokes. Paths are drawn by hand; `flame` is the only filled glyph.
 const PATHS: Record<IconName, ReactNode> = {
@@ -32,6 +32,8 @@ const PATHS: Record<IconName, ReactNode> = {
   play: <path d="M8 5.5v13l11-6.5L8 5.5Z" />,
   eye: <><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="3" /></>,
   coin: <><circle cx="12" cy="12" r="8.5" /><rect x="9.5" y="9.5" width="5" height="5" rx="0.5" /></>,
+  swords: <><path d="M5 4.5 15.5 15" /><path d="M5 4.5V8l1 1h3.5" /><path d="M19 4.5 8.5 15" /><path d="M19 4.5V8l-1 1h-3.5" /><path d="M13.5 17 17 20.5" /><path d="M10.5 17 7 20.5" /></>,
+  medal: <><circle cx="12" cy="14.5" r="5" /><path d="M9 3.5 11 9.8" /><path d="M15 3.5 13 9.8" /><path d="m12 12.2.9 1.8 2 .3-1.4 1.4.3 2-1.8-.9-1.8.9.3-2-1.4-1.4 2-.3.9-1.8Z" /></>,
   bolt: <path d="M13 3 5.5 13.5H11L10 21l7.5-10.5H12L13 3Z" />,
   "eye-off": <><path d="M9.9 6a9.6 9.6 0 0 1 2.1-.5c6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.6 3.4" /><path d="M6.3 7.3A16 16 0 0 0 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.4 4-.9" /><path d="M10 10a3 3 0 0 0 4 4" /><path d="M4 4l16 16" /></>,
 };

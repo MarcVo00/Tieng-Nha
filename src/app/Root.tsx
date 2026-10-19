@@ -8,6 +8,7 @@ import { clearCachedProfile, readCachedProfile, useAppState, useRefreshProgress,
 import { useServices } from "@/app/ServicesProvider";
 import { ThemeController } from "@/app/ThemeController";
 import { UpdatePrompt } from "@/app/UpdatePrompt";
+import { DuelSync } from "@/features/duels/DuelSync";
 import { fr } from "@/i18n/fr";
 import { ToastViewport } from "@/ui";
 
@@ -24,6 +25,7 @@ export function Root() {
   const { auth, progress, sync } = useServices();
   const refreshProgress = useRefreshProgress();
   const ready = useAppState((s) => s.ready);
+  const signedIn = useAppState((s) => s.session !== null);
   useVoicePrefetch();
 
   useEffect(() => {
@@ -119,6 +121,7 @@ export function Root() {
       {ready ? <ThemeController /> : null}
       <ToastViewport />
       <UpdatePrompt />
+      {ready && signedIn ? <DuelSync /> : null}
       {ready ? <Outlet /> : <Splash />}
     </>
   );

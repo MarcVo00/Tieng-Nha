@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
+import { Link } from "react-router-dom";
 import { useServices } from "@/app/ServicesProvider";
+import { usePendingDuels } from "@/app/usePendingDuels";
 import { OfflineError } from "@/domain/errors";
 import type { LeaderboardRow as Row } from "@/domain/types";
 import { fr } from "@/i18n/fr";
@@ -50,6 +52,7 @@ function SkeletonRows() {
 export function LeaderboardScreen() {
   const { leaderboard, progress, clock } = useServices();
   const reduced = useReducedMotion();
+  const pendingDuels = usePendingDuels().length;
   const [period, setPeriod] = useState<Period>("week");
   const [view, setView] = useState<View | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -119,6 +122,21 @@ export function LeaderboardScreen() {
     <div className="pb-20">
       <div className="flex items-center gap-2">
         <h1 className="flex-1 text-title text-ink">{fr.leaderboard.title}</h1>
+        <motion.div whileTap={tap}>
+          <Link
+            to="/duels"
+            aria-label={pendingDuels > 0 ? `${fr.duels.entry.label}, ${fr.duels.entry.pending(pendingDuels)}` : fr.duels.entry.label}
+            className="relative flex min-h-11 items-center gap-1.5 rounded-full px-3 text-body-strong text-primary"
+          >
+            <Icon name="swords" size={22} />
+            {fr.duels.entry.label}
+            {pendingDuels > 0 ? (
+              <span aria-hidden="true" className="tabular flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-caption text-primary-on">
+                {pendingDuels}
+              </span>
+            ) : null}
+          </Link>
+        </motion.div>
         <motion.button
           type="button"
           whileTap={tap}

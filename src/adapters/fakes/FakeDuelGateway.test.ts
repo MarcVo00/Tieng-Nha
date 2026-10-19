@@ -200,3 +200,38 @@ test("list returns copies, newest first", async () => {
   list[0]?.questions.round1.pop();
   expect((await gw.list())[0]?.questions.round1).toHaveLength(4);
 });
+
+describe("incoming duels (a fake member challenges me)", () => {
+  test("seedIncoming lists an open duel I still have to play, with the challenger as the other party", async () => {
+    const { gw } = setup();
+    const id = gw.seedIncoming(q(), { from: BOT, seed: 4 });
+    const [d] = await gw.list();
+    expect(d).toMatchObject({ id, challenger: BOT, opponent: "me", opponentPseudo: "Bà Ngoại", status: "open", myRun: null, theirRun: null, seed: 4 });
+  });
+
+  test("my run settles it against the challenger's run, and their run only shows once settled", async () => {
+    const { gw } = setup();
+    const id = gw.seedIncoming(q());
+    const { r1, r2 } = answers(4, 1, true);
+    expect(await gw.submitRun(id, r1, r2)).toEqual({ ok: true });
+    const [d] = await gw.list();
+    expect(d?.status).toBe("settled");
+    expect(d?.theirRun).not.toBeNull();
+    expect(d?.myRun?.reward).toBeGreaterThan(0);
+  });
+
+  test("an incoming duel blocks a new challenge to the same member and does not use my daily quota", async () => {
+    const { gw } = setup();
+    gw.seedIncoming(q(), { from: BOT });
+    expect(await gw.create(BOT, q(), 1)).toEqual({ ok: false, error: "already_open" });
+    expect(await gw.create("bot_chu_tu", q(), 1)).toMatchObject({ ok: true });
+  });
+
+  test("expired and unplayed by me: the challenger wins by forfeit", async () => {
+    const { gw, setNow } = setup();
+    gw.seedIncoming(q());
+    setNow("2026-10-14T08:00:00.000Z");
+    const [d] = await gw.list();
+    expect(d).toMatchObject({ status: "settled", winner: BOT, myRun: null });
+  });
+});

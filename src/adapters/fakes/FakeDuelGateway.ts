@@ -65,9 +65,9 @@ export class FakeDuelGateway implements DuelGateway {
     }
     const common = new Set(commonLessons(mine.lessons, member.lessonsDone));
     if (![...round1, ...round2].every((q) => common.has(q.lessonId))) return refuse("not_common_lesson");
-    if (this.duels.some((d) => d.status === "open" && d.opponent === opponent)) return refuse("already_open");
+    if (this.duels.some((d) => d.status === "open" && this.other(d) === opponent)) return refuse("already_open");
     const now = this.clock();
-    if (this.duels.filter((d) => parisDay(d.createdAt) === parisDay(now)).length >= MAX_PER_DAY) return refuse("daily_limit");
+    if (this.duels.filter((d) => d.challenger === ME && parisDay(d.createdAt) === parisDay(now)).length >= MAX_PER_DAY) return refuse("daily_limit");
 
     const duel: Stored = {
       id: crypto.randomUUID(),
@@ -116,8 +116,43 @@ export class FakeDuelGateway implements DuelGateway {
       ...d,
       questions: structuredClone(d.questions),
       myRun: structuredClone(runs.get(ME) ?? null),
-      theirRun: d.status === "settled" ? structuredClone(runs.get(d.opponent) ?? null) : null,
+      theirRun: d.status === "settled" ? structuredClone(runs.get(this.other(d)) ?? null) : null,
     }));
+  }
+
+  /**
+   * Seeds a duel that a fake member opened against me (for tests and the demo mode): the member has already played,
+   * I still have to (`theirRun: false` when they have not played yet). `from` defaults to the first member.
+   */
+  seedIncoming(questions: DuelQuestions, options: { from?: string; seed?: number; theirRun?: boolean } = {}): string {
+    const member = this.members.find((m) => m.userId === options.from) ?? this.members[0];
+    if (!member) throw new Error("no fake member to challenge me");
+    const now = this.clock();
+    const duel: Stored = {
+      id: crypto.randomUUID(),
+      challenger: member.userId,
+      opponent: ME,
+      opponentPseudo: member.pseudo,
+      opponentAvatar: member.avatarEmoji,
+      createdAt: now,
+      expiresAt: addDaysIso(now, EXPIRY_DAYS),
+      status: "open",
+      winner: null,
+      seed: options.seed ?? 1,
+      questions: { round1: [...questions.round1], round2: [...questions.round2] },
+      runs: new Map(),
+    };
+    if (options.theirRun ?? true) {
+      const run = autoOpponentRun(duel.questions);
+      duel.runs.set(member.userId, this.makeRun(run.round1, run.round2));
+    }
+    this.duels.push(duel);
+    return duel.id;
+  }
+
+  /** The other player of a duel (`opponentPseudo` always describes them). */
+  private other(d: Pick<Stored, "challenger" | "opponent">): string {
+    return d.challenger === ME ? d.opponent : d.challenger;
   }
 
   private makeRun(round1: Round1Answer[], round2: Round2Answer[]): DuelRun {
@@ -132,19 +167,20 @@ export class FakeDuelGateway implements DuelGateway {
   private settle(d: Stored): void {
     if (d.status !== "open") return;
     const mine = d.runs.get(ME);
-    const theirs = d.runs.get(d.opponent);
+    const other = this.other(d);
+    const theirs = d.runs.get(other);
     const { rewards } = DUEL;
     if (mine && theirs) {
       const outcome = duelOutcome(mine, theirs);
       d.status = "settled";
-      d.winner = outcome === "a" ? ME : outcome === "b" ? d.opponent : null;
+      d.winner = outcome === "a" ? ME : outcome === "b" ? other : null;
       mine.reward = outcome === "a" ? rewards.win : outcome === "b" ? rewards.loss : rewards.draw;
       theirs.reward = outcome === "b" ? rewards.win : outcome === "a" ? rewards.loss : rewards.draw;
     } else if (Date.parse(d.expiresAt) <= Date.parse(this.clock())) {
       const only = mine ?? theirs;
       if (only) {
         d.status = "settled";
-        d.winner = mine ? ME : d.opponent;
+        d.winner = mine ? ME : other;
         only.reward = rewards.forfeitWin;
       } else {
         d.status = "cancelled";

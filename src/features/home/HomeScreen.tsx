@@ -5,6 +5,7 @@ import { FINAL_BOSS_ID } from "@/services/tree";
 import { fr } from "@/i18n/fr";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { usePendingDuels } from "@/app/usePendingDuels";
 import type { Boss, LessonSummary, Tree } from "@/domain/types";
 import { lookOf } from "@/services/look";
 import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
@@ -27,6 +28,22 @@ function ReviewCard({ count }: { count: number }) {
             <span className="block text-body-strong text-ink">{fr.home.review.title}</span>
             <span className="block text-caption tabular-nums text-ink-muted">{fr.home.review.count(count)}</span>
           </span>
+          <Icon name="chevron-right" size={20} className="text-ink-muted" />
+        </Link>
+      </Card>
+    </motion.div>
+  );
+}
+
+function DuelBanner({ name, more }: { name: string; more: number }) {
+  return (
+    <motion.div whileTap={tap} className="mb-3">
+      <Card raised>
+        <Link to="/duels" className="flex min-h-11 items-center gap-3 p-4">
+          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-2 text-primary">
+            <Icon name="swords" size={24} />
+          </span>
+          <span className="min-w-0 flex-1 text-body-strong text-ink">{fr.duels.banner(name, more)}</span>
           <Icon name="chevron-right" size={20} className="text-ink-muted" />
         </Link>
       </Card>
@@ -60,6 +77,7 @@ export function HomeScreen() {
   const equipped = useAppState((s) => s.wallet?.equipped);
   const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
   const reduced = useReducedMotion();
+  const pendingDuels = usePendingDuels();
   const maskId = useId();
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
   const [tree, setTree] = useState<Tree | null>(null);
@@ -119,6 +137,7 @@ export function HomeScreen() {
       </div>
       <h1 className="sr-only">{fr.home.pathLabel}</h1>
       <div className="relative">
+        {pendingDuels[0] ? <DuelBanner name={pendingDuels[0].opponentPseudo} more={pendingDuels.length - 1} /> : null}
         {dueCount > 0 ? <ReviewCard count={dueCount} /> : null}
         {layout === null ? (
           <SkeletonStops />

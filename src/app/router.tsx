@@ -25,6 +25,7 @@ const DialogueScreen = lazy(() => import("@/features/conversation").then((m) => 
 const ExamIntroScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamIntroScreen })));
 const ExamRunScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamRunScreen })));
 const ExamResultScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamResultScreen })));
+const DuelsScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelsScreen })));
 const DuelRunScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelRunScreen })));
 
 function screen(Screen: ComponentType): ReactNode {
@@ -45,6 +46,7 @@ const tabRoutes: RouteObject[] = [
   { path: "shop", element: screen(ShopScreen) },
   { path: "u/:userId", element: screen(PublicProfileScreen) },
   { path: "exam", element: screen(ExamIntroScreen) },
+  { path: "duels", element: screen(DuelsScreen) },
   { path: "*", element: screen(NotFound) },
 ];
 

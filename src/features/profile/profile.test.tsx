@@ -59,7 +59,7 @@ test("shows the header and all 13 badges, unlocked first", async () => {
   // Earned medals first; the 12 locked ones stay folded behind « +12 à découvrir ».
   expect(badgeItems).toHaveLength(1);
   expect(within(badgeItems[0] as HTMLElement).queryByText(fr.ui.badge.locked, { exact: false })).toBeNull();
-  const more = screen.getByRole("button", { name: fr.ui.badge.moreAria(12) });
+  const more = screen.getByRole("button", { name: fr.ui.badge.more(12) });
   expect(more).toHaveAttribute("aria-expanded", "false");
   expect(more).toHaveTextContent(fr.ui.badge.more(12));
   await userEvent.click(more);

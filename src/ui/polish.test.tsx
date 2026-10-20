@@ -78,6 +78,7 @@ test("EmptyState scene shows the hero, a Vietnamese line and full-width actions"
   const { container } = render(<EmptyState title="Plus de vies" scene={{ look: {}, line: "Cố lên!", expression: "hurt", heading: "h1" }} action={<Button>Réessayer</Button>} />);
   expect(screen.getByRole("heading", { level: 1, name: "Plus de vies" })).toBeInTheDocument();
   expect(screen.getByText("Cố lên!")).toHaveAttribute("lang", "vi");
+  expect(screen.getByText("Cố lên!").className).not.toContain("gold");
   expect(container.querySelector("[data-expression='hurt']")).not.toBeNull();
   expect(screen.getByRole("button", { name: "Réessayer" })).toBeInTheDocument();
 });
@@ -88,7 +89,7 @@ test("BadgeShelf folds the locked badges behind a real disclosure button", async
   const badges = [{ id: "a", icon: "☕", title: "Un" }, { id: "b", icon: "☕", title: "Deux" }, { id: "c", icon: "☕", title: "Trois" }];
   render(<BadgeShelf badges={badges} unlocked={new Set(["a"])} />);
   expect(screen.queryByText("Deux")).toBeNull();
-  const more = screen.getByRole("button", { name: "2 badges à découvrir" });
+  const more = screen.getByRole("button", { name: "+2 à découvrir" });
   expect(more).toHaveAttribute("aria-expanded", "false");
   await userEvent.click(more);
   expect(more).toHaveAttribute("aria-expanded", "true");

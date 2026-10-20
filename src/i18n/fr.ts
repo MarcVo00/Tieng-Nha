@@ -71,7 +71,6 @@ export const fr = {
     badge: {
       locked: "Pas encore débloqué",
       more: (n: number) => `+${n} à découvrir`,
-      moreAria: (n: number) => `${n} ${n > 1 ? "badges" : "badge"} à découvrir`,
       none: "Ta première médaille t'attend.",
     },
     rare: "Hiếm",

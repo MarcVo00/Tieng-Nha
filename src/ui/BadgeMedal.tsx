@@ -19,7 +19,7 @@ export function BadgeMedal({ icon, title, unlocked, size = "sm", reward }: Badge
         initial={unlocked ? { scale: 0 } : false}
         animate={{ scale: 1 }}
         transition={spring.bouncy}
-        className={`relative flex items-center justify-center rounded-full leading-none ${dim} ${unlocked ? "border-4 border-gold bg-surface shadow-card" : "border-2 border-dashed border-gold bg-transparent"}`}
+        className={`relative flex items-center justify-center rounded-full leading-none ${dim} ${unlocked ? "border-4 border-gold bg-surface shadow-card" : "border-2 border-dashed border-gold-ink bg-transparent"}`}
       >
         {unlocked ? (
           <>

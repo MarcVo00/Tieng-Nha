@@ -5,7 +5,7 @@ import { Motif } from "@/ui/Motif";
 import type { Expression } from "@/ui/characterLayers";
 
 /** A staged moment: the hero centred on a cloud-patterned page, a Vietnamese line, then the sentence and the action. */
-type Scene = { look: Look; line: string; expression?: Expression; overline?: string; heading?: "h1" | "h2" };
+type Scene = { look: Look; line: string; expression?: Expression; overline?: string; heading?: "h1" | "h2"; /** "reward" turns the line gold: only for a real reward moment. */ tone?: "plain" | "reward" };
 
 type EmptyStateProps = { title: string; body?: string; illustration?: "bowl" | "lantern" | "boat"; action?: ReactNode; scene?: Scene };
 
@@ -48,10 +48,10 @@ function SceneState({ title, body, action, scene }: Omit<EmptyStateProps, "scene
       </div>
       <div className="relative flex flex-col items-center gap-3">
         <HeroMedallion look={scene.look} size={160} expression={scene.expression ?? "idle"} />
-        <p lang="vi" className="text-title text-gold-ink">
+        {scene.overline ? <p className="text-caption text-ink-muted">{scene.overline}</p> : null}
+        <p lang="vi" className={`text-title ${scene.tone === "reward" ? "text-gold-ink" : "text-ink"}`}>
           {scene.line}
         </p>
-        {scene.overline ? <p className="text-caption text-ink-muted">{scene.overline}</p> : null}
         <Heading className="text-heading text-ink">{title}</Heading>
         {body ? <p className="max-w-xs text-body text-ink-muted">{body}</p> : null}
         {action ? <div className="flex w-full max-w-sm flex-col gap-2 pt-3 [&>*]:w-full">{action}</div> : null}

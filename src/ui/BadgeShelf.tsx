@@ -44,16 +44,17 @@ export function BadgeShelf({ badges, unlocked, onSelect, none = fr.ui.badge.none
             type="button"
             aria-expanded={open}
             aria-controls={panel}
-            aria-label={fr.ui.badge.moreAria(locked.length)}
             onClick={() => setOpen((v) => !v)}
-            className="flex min-h-11 items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-gold text-body-strong text-gold-ink"
+            className="flex min-h-11 items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-gold-ink text-body-strong text-gold-ink"
           >
             {fr.ui.badge.more(locked.length)}
             <Icon name={open ? "chevron-up" : "chevron-down"} size={18} />
           </button>
-          <div id={panel} hidden={!open}>
-            {open ? <ul className="grid list-none grid-cols-3 gap-4">{locked.map(cell)}</ul> : null}
-          </div>
+          {open ? (
+            <div id={panel}>
+              <ul className="grid list-none grid-cols-3 gap-4">{locked.map(cell)}</ul>
+            </div>
+          ) : null}
         </>
       ) : null}
     </div>

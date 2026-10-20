@@ -5,7 +5,7 @@ import { useEquipToggle } from "@/app/useEquipToggle";
 import { useServices } from "@/app/ServicesProvider";
 import type { BadgeDef, ItemSlot, ShopItem } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { Avatar, Button, Card, Icon } from "@/ui";
+import { Avatar, Button, Card, Icon, SectionTitle } from "@/ui";
 
 // Frames by badge difficulty (bronze, jade, son mai), then the three effects.
 const ORDER = ["frame_bronze", "frame_jade", "frame_son_mai", "fx_ink", "fx_lightning", "fx_embers"] as const;
@@ -53,9 +53,9 @@ export function RewardsSection({ badges }: { badges: BadgeDef[] | null }) {
 
   return (
     <section aria-labelledby="me-rewards-title" id="me-rewards" className="flex scroll-mt-4 flex-col gap-3">
-      <h2 id="me-rewards-title" className="text-heading text-ink">
+      <SectionTitle id="me-rewards-title" overline={fr.ui.overline.rewards}>
         {fr.rewards.title}
-      </h2>
+      </SectionTitle>
       <ul className="grid list-none grid-cols-2 gap-3">
         {rewards.map((item) => {
           const text = fr.shop.items[item.id];

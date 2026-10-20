@@ -7,7 +7,7 @@ import { useChallenge } from "@/app/useChallenge";
 import { OfflineError } from "@/domain/errors";
 import type { Duel, LeaderboardRow } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { Avatar, Button, Card, duration, EmptyState, ease, Icon, Skeleton, tap } from "@/ui";
+import { Avatar, Button, Card, duration, EmptyState, ease, Icon, SectionTitle, Skeleton, tap } from "@/ui";
 import { readPending, readRun, unsentDuelIds } from "@/features/duels/duelRunState";
 import { hoursLeft, otherId, outcomeOf, splitDuels } from "@/features/duels/duelsView";
 
@@ -22,7 +22,7 @@ type Load =
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="mt-8">
-      <h2 id={id} className="text-heading text-ink">{title}</h2>
+      <SectionTitle id={id} overline={fr.ui.overline.duels}>{title}</SectionTitle>
       <ul className="mt-3 flex list-none flex-col gap-3">{children}</ul>
     </section>
   );
@@ -193,7 +193,7 @@ export function DuelsScreen() {
           ) : null}
 
           <section aria-labelledby="duels-challenge" className="mt-8">
-            <h2 id="duels-challenge" className="text-heading text-ink">{fr.duels.hub.challengeTitle}</h2>
+            <SectionTitle id="duels-challenge" overline={fr.ui.overline.duels}>{fr.duels.hub.challengeTitle}</SectionTitle>
             <p className="text-caption text-ink-muted">{fr.duels.hub.challengeSub}</p>
             {challenge.message ? <p role="alert" className="mt-3 rounded-md bg-surface-2 p-3 text-body text-ink">{challenge.message}</p> : null}
             {ready.membersFailed ? (

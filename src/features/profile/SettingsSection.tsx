@@ -6,7 +6,7 @@ import { useDeviceTest, useSettings } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { ChangePasswordSheet } from "@/features/profile/ChangePasswordSheet";
-import { Button, DeviceCheck, Icon, Sheet, tap, useToast } from "@/ui";
+import { Button, DeviceCheck, Icon, SectionTitle, Sheet, tap, useToast } from "@/ui";
 
 type SegmentedProps<T extends string> = { label: string; value: T; options: readonly { id: T; label: string }[]; onChange(v: T): void };
 
@@ -126,9 +126,9 @@ export function SettingsSection({ onReport }: { onReport(): void }) {
 
   return (
     <section aria-labelledby="me-settings" className="flex flex-col gap-5">
-      <h2 id="me-settings" className="text-heading text-ink">
+      <SectionTitle id="me-settings" overline={fr.ui.overline.settings}>
         {t.title}
-      </h2>
+      </SectionTitle>
       <Segmented
         label={t.theme.label}
         value={settings.theme}

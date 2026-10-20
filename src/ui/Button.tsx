@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import { motion, type HTMLMotionProps } from "motion/react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { motion, useReducedMotion, type HTMLMotionProps } from "motion/react";
 import { fr } from "@/i18n/fr";
-import { duration, spring, tap } from "@/ui/motion";
+import { duration, ease, spring, tap } from "@/ui/motion";
 
 export type ButtonProps = Omit<HTMLMotionProps<"button">, "children"> & {
   variant?: "primary" | "secondary" | "ghost" | "danger";
@@ -12,11 +12,28 @@ export type ButtonProps = Omit<HTMLMotionProps<"button">, "children"> & {
 };
 
 const VARIANT: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-primary text-primary-on border-b-4 border-primary-hover active:translate-y-[2px] active:border-b-2",
+  primary: "overflow-hidden bg-primary text-primary-on border-b-4 border-primary-hover active:translate-y-[2px] active:border-b-2",
   secondary: "bg-surface border-2 border-line text-ink",
   ghost: "bg-transparent text-primary",
   danger: "bg-error text-primary-on border-b-4 border-ink active:translate-y-[2px] active:border-b-2",
 };
+
+// Disabled primary reads as "not available": red is reserved for an action that can be taken now.
+const PRIMARY_DISABLED = "overflow-hidden cursor-not-allowed bg-surface-2 text-ink-muted border-b-4 border-line";
+
+/** One lacquer glint sweeping across the button, mounted only when it turns from disabled to enabled (transform only). */
+function Shine() {
+  return (
+    <motion.span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -skew-x-12"
+      style={{ background: "linear-gradient(90deg, transparent, rgb(255 248 238 / 0.38), transparent)" }}
+      initial={{ x: "-120%" }}
+      animate={{ x: "420%" }}
+      transition={{ duration: duration.celebrate, ease: ease.out }}
+    />
+  );
+}
 
 function Dots() {
   return (
@@ -34,6 +51,15 @@ function Dots() {
 }
 
 export function Button({ variant = "primary", size = "md", loading = false, fullWidth = false, className, disabled, children, type = "button", ...rest }: ButtonProps) {
+  const reduced = useReducedMotion();
+  const wasDisabled = useRef(disabled === true);
+  const [shine, setShine] = useState(false);
+  useEffect(() => {
+    const now = disabled === true;
+    if (variant === "primary" && wasDisabled.current && !now && !reduced) setShine(true);
+    wasDisabled.current = now;
+  }, [disabled, variant, reduced]);
+  const greyed = variant === "primary" && disabled === true && !loading;
   const sizing = size === "lg" ? "px-5 py-4 text-heading" : "px-5 py-3 text-body-strong";
   return (
     <motion.button
@@ -42,10 +68,11 @@ export function Button({ variant = "primary", size = "md", loading = false, full
       transition={spring.snappy}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={`relative inline-flex min-h-11 min-w-11 select-none items-center justify-center gap-2 rounded-md disabled:opacity-50 ${sizing} ${VARIANT[variant]} ${fullWidth ? "w-full" : ""} ${className ?? ""}`}
+      className={`relative inline-flex min-h-11 min-w-11 select-none items-center justify-center gap-2 rounded-md ${greyed ? "" : "disabled:opacity-50"} ${sizing} ${greyed ? PRIMARY_DISABLED : VARIANT[variant]} ${fullWidth ? "w-full" : ""} ${className ?? ""}`}
       {...rest}
     >
       <span className={`inline-flex items-center justify-center gap-2 ${loading ? "opacity-0" : ""}`}>{children}</span>
+      {shine ? <Shine /> : null}
       {loading ? (
         <>
           <Dots />

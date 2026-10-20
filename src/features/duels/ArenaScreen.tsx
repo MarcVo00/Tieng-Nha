@@ -8,7 +8,7 @@ import { OfflineError } from "@/domain/errors";
 import type { ShopItem } from "@/domain/types";
 import { characterSlotOf, lookOf } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, duration, EmptyState, ease, HeroMedallion, Icon, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
+import { Button, Card, duration, DropNumber, EmptyState, ease, HeroMedallion, Icon, SectionTitle, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
 
 // Hierarchy: the Kim bài balance is the hero (gold, big). Below, the three arena outfits as try-on cards.
 // The one action is inside the sheet (buy / wear). Buying is safe: online, and both the local wallet and the
@@ -114,7 +114,9 @@ export function ArenaScreen() {
       <Card raised className="flex items-center gap-4 p-6">
         <Icon name="medal" size={48} className="shrink-0 text-gold" />
         <div>
-          <p className="tabular text-display text-gold-ink">{wallet ? fr.arena.balance(wallet.kimBai) : "…"}</p>
+          <p className="tabular text-display text-gold-ink">
+            <DropNumber>{wallet ? fr.arena.balance(wallet.kimBai) : "…"}</DropNumber>
+          </p>
           <p className="text-caption text-ink-muted">{fr.arena.balanceCaption}</p>
         </div>
       </Card>
@@ -132,7 +134,7 @@ export function ArenaScreen() {
         <Skeleton lines={4} />
       ) : (
         <section aria-labelledby="arena-list" className="flex flex-col gap-3">
-          <h2 id="arena-list" className="text-heading text-ink">{fr.arena.list}</h2>
+          <SectionTitle id="arena-list" overline={fr.ui.overline.arena}>{fr.arena.list}</SectionTitle>
           <ul className="grid list-none grid-cols-2 gap-3">
             {arena.map((item) => {
               const text = fr.shop.items[item.id];

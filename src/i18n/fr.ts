@@ -54,6 +54,7 @@ export const fr = {
   // --- ui ---
   ui: {
     close: "Fermer",
+    overline: { badges: "Huy hiệu", wardrobe: "Tủ đồ", rewards: "Quà", settings: "Cài đặt", account: "Tài khoản", shop: "Cửa hàng", arena: "Đấu trường", duels: "Thách đấu" },
     button: { loading: "Chargement en cours" },
     feedback: {
       sheetLabel: "Résultat de ta réponse",

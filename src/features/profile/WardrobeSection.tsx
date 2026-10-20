@@ -5,7 +5,7 @@ import { useEquipToggle } from "@/app/useEquipToggle";
 import type { ShopItem } from "@/domain/types";
 import { CHARACTER_SLOTS, characterSlotOf, lookOf, type CharacterSlot } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, HeroMedallion } from "@/ui";
+import { Button, Card, HeroMedallion, SectionTitle } from "@/ui";
 
 // Hierarchy: the hero wearing each owned piece is the star; one quiet action per card.
 export function WardrobeSection() {
@@ -50,9 +50,9 @@ export function WardrobeSection() {
 
   return (
     <section aria-labelledby="me-wardrobe-title" id="me-wardrobe" className="flex scroll-mt-4 flex-col gap-3">
-      <h2 id="me-wardrobe-title" className="text-heading text-ink">
+      <SectionTitle id="me-wardrobe-title" overline={fr.ui.overline.wardrobe}>
         {fr.wardrobe.title}
-      </h2>
+      </SectionTitle>
       {CHARACTER_SLOTS.map((slot) => {
         const inSlot = owned.filter((i) => characterSlotOf(i) === slot);
         if (inSlot.length === 0 && slot !== "character") return null;

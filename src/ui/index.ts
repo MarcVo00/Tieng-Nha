@@ -15,6 +15,8 @@ export { HeroMedallion } from "@/ui/HeroMedallion";
 export { ProfileFx, type ProfileFxId } from "@/ui/ProfileFx";
 export { ToneMark, TONE_UI } from "@/ui/ToneMark";
 export { ToneButton } from "@/ui/ToneButton";
+export { SectionTitle } from "@/ui/SectionTitle";
+export { DropNumber } from "@/ui/DropNumber";
 export { XpCounter } from "@/ui/XpCounter";
 export { StreakFlame } from "@/ui/StreakFlame";
 export { BadgeMedal, rewardProp } from "@/ui/BadgeMedal";

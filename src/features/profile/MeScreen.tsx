@@ -13,7 +13,7 @@ import { bossMention, livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS } from "@/services/exam";
 import { fr } from "@/i18n/fr";
 import {
-  Avatar, fxSpill, BadgeMedal, Button, Card, Certificate, ConfirmDialog, Icon, Sheet, StreakFlame, downloadCertificate, tap, useToast,
+  Avatar, fxSpill, BadgeMedal, Button, Card, Certificate, ConfirmDialog, DropNumber, Icon, SectionTitle, Sheet, StreakFlame, downloadCertificate, tap, useToast,
   type CertificateProps,
 } from "@/ui";
 import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
@@ -279,7 +279,7 @@ export function MeScreen() {
           <Icon name="coin" size={24} className="text-gold" />
           {fr.shop.open}
         </span>
-        {coins !== null ? <span className="tabular text-gold-ink">{fr.shop.balance(coins)}</span> : null}
+        {coins !== null ? <DropNumber className="tabular text-gold-ink">{fr.shop.balance(coins)}</DropNumber> : null}
       </Link>
 
       <Link
@@ -290,14 +290,14 @@ export function MeScreen() {
           <Icon name="medal" size={24} className="text-gold" />
           {fr.arena.meEntry}
         </span>
-        {kimBai !== null ? <span className="tabular text-gold-ink">{fr.arena.balance(kimBai)}</span> : null}
+        {kimBai !== null ? <DropNumber className="tabular text-gold-ink">{fr.arena.balance(kimBai)}</DropNumber> : null}
       </Link>
 
       <section aria-labelledby="me-badges">
         <div className="flex items-baseline justify-between">
-          <h2 id="me-badges" className="text-heading text-ink">
+          <SectionTitle id="me-badges" overline={fr.ui.overline.badges}>
             {fr.profile.badges.title}
-          </h2>
+          </SectionTitle>
           {badges ? <span className="tabular text-caption text-ink-muted">{fr.profile.badges.count(sortedBadges.filter((b) => unlockedIds.has(b.id)).length, sortedBadges.length)}</span> : null}
         </div>
         {badgesFailed ? <p className="mt-3 text-body text-ink-muted">{fr.profile.badges.loadError}</p> : null}
@@ -321,9 +321,9 @@ export function MeScreen() {
       <DemoPanel />
 
       <section aria-labelledby="me-account" className="flex flex-col gap-3 pt-4">
-        <h2 id="me-account" className="text-heading text-ink">
+        <SectionTitle id="me-account" overline={fr.ui.overline.account}>
           {a.title}
-        </h2>
+        </SectionTitle>
         <Button variant="secondary" fullWidth onClick={() => setConfirm("signout")}>
           {a.signOut.open}
         </Button>

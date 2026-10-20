@@ -7,7 +7,7 @@ import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
 import { useEquipToggle } from "@/app/useEquipToggle";
 import { characterSlotOf, lookOf } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
+import { Button, Card, ConfirmDialog, DropNumber, EmptyState, HeroMedallion, Icon, SectionTitle, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
@@ -213,7 +213,9 @@ export function ShopScreen() {
       <Card raised className="flex items-center gap-4 p-6">
         <Icon name="coin" size={48} className="shrink-0 text-gold" />
         <div>
-          <p className="tabular text-display text-gold-ink">{wallet ? fr.shop.balance(wallet.coins) : "…"}</p>
+          <p className="tabular text-display text-gold-ink">
+            <DropNumber>{wallet ? fr.shop.balance(wallet.coins) : "…"}</DropNumber>
+          </p>
           <p className="text-caption text-ink-muted">{fr.shop.balanceCaption}</p>
         </div>
       </Card>
@@ -230,24 +232,20 @@ export function ShopScreen() {
       ) : (
         <>
           <section aria-labelledby="shop-play" className="flex flex-col gap-3">
-            <h2 id="shop-play" className="text-heading text-ink">
+            <SectionTitle id="shop-play" overline={fr.ui.overline.shop}>
               {fr.shop.playTitle}
-            </h2>
+            </SectionTitle>
             <ul className="flex list-none flex-col gap-3">{play.map((i) => card(i, wallet))}</ul>
           </section>
           {characters.length > 0 ? (
             <section aria-labelledby="shop-characters" className="flex flex-col gap-3">
-              <h2 id="shop-characters" className="text-heading text-ink">
-                {fr.shop.characters.title}
-              </h2>
+              <SectionTitle id="shop-characters">{fr.shop.characters.title}</SectionTitle>
               <ul className="grid list-none grid-cols-2 gap-3">{characters.map((i) => themedCard(i, wallet))}</ul>
             </section>
           ) : null}
           {themes.map((t) => (
             <section key={t.id} aria-labelledby={`shop-theme-${t.id}`} className="flex flex-col gap-3">
-              <h2 id={`shop-theme-${t.id}`} className="text-heading text-ink">
-                {fr.shop.themes[t.id]}
-              </h2>
+              <SectionTitle id={`shop-theme-${t.id}`}>{fr.shop.themes[t.id]}</SectionTitle>
               <ul className="grid list-none grid-cols-2 gap-3">{t.items.map((i) => themedCard(i, wallet))}</ul>
             </section>
           ))}

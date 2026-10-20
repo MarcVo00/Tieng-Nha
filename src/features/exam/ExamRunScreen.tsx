@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useEntryState } from "@/app/useEntryState";
 import { useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Boss, Capabilities, ExamQuestion, VocabId, VocabItem } from "@/domain/types";
@@ -268,7 +269,7 @@ function ExamRun({ run }: { run: RunState }) {
 }
 
 export function ExamRunScreen() {
-  const { state } = useLocation() as { state: unknown };
+  const state = useEntryState();
   // Decided once, on the first render (before the effect below marks the run as running).
   const [mark] = useState(() => (isRunState(state) ? readAttemptMark(state.attemptId) : "none"));
   const attemptId = isRunState(state) ? state.attemptId : null;

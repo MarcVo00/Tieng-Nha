@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useEntryState } from "@/app/useEntryState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { BadgeMedal, rewardProp, Button, Confetti, Icon, Motif, XpCounter } from "@/ui";
@@ -116,7 +117,7 @@ function DoneContent({ state: given, lessonId }: { state: LessonDoneState; lesso
 
 export function LessonDoneScreen() {
   const { id } = useParams<{ id: string }>();
-  const { state } = useLocation() as { state: unknown };
+  const state = useEntryState();
   if (!id || !isDoneState(state)) return <Navigate to="/" replace />;
   return <DoneContent state={state} lessonId={id} />;
 }

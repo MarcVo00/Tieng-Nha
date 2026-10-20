@@ -15,3 +15,10 @@ if (!window.matchMedia) {
   });
 }
 
+
+// Unit tests read the copy with plain spaces (see frPlainSpaces.ts); `vi.importActual("@/i18n/fr")` gives the real one.
+vi.mock("@/i18n/fr", async (importActual) => {
+  const actual = await importActual<{ fr: Record<string, unknown> }>();
+  const { plainSpaces } = await import("@/test/frPlainSpaces");
+  return { ...actual, fr: plainSpaces(actual.fr) };
+});

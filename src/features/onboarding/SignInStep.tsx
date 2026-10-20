@@ -17,7 +17,7 @@ type SignInStepProps = {
 
 // Hero: the two fields. One action: sign in. Forgot password and back are quiet links.
 export function SignInStep({ initialEmail, onAuthenticated, onForgot, onBack }: SignInStepProps) {
-  const { auth } = useServices();
+  const { auth, env } = useServices();
   const t = fr.onboarding.signIn;
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
@@ -77,6 +77,7 @@ export function SignInStep({ initialEmail, onAuthenticated, onForgot, onBack }: 
           {t.back}
         </Button>
       </div>
+      {env.VITE_DEMO ? <p className="text-caption text-ink-muted">{t.demoHint}</p> : null}
     </form>
   );
 }

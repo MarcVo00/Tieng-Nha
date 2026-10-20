@@ -3,7 +3,7 @@ import type { VoiceId } from "@/domain/types";
 import type { DemoTools, Services } from "@/app/services";
 import { flags } from "@/app/flags";
 import { useAppState } from "@/app/appState";
-import { createFakeServices, FakeAuthService, FakeDuelGateway, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
+import { createFakeServices, FakeAuthService, type FakeAuthOptions, FakeDuelGateway, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
 import { TiengNhaDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
 import { AudioPackSynthesizer, WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
 import { createStaticContentSource } from "@/adapters/content";
@@ -23,6 +23,16 @@ function demoStorage(): { duelStorage?: Storage } {
     return { duelStorage: window.localStorage };
   } catch {
     return {};
+  }
+}
+
+/** Demo accounts live in localStorage (they survive a closed PWA) and accept any invite code. */
+function demoAuthOptions(demo: boolean): FakeAuthOptions {
+  if (!demo) return { persist: true };
+  try {
+    return { persist: true, storage: window.localStorage, anyInvite: true };
+  } catch {
+    return { persist: true, anyInvite: true };
   }
 }
 
@@ -49,7 +59,7 @@ export function createServices(env: Env): Services {
   // Remote (fake or Supabase)
   let remote: Remote;
   if (env.VITE_USE_FAKES) {
-    const f = createFakeServices({ clock, progress, auth: new FakeAuthService(true) }, env.VITE_DEMO ? demoStorage() : {});
+    const f = createFakeServices({ clock, progress, auth: new FakeAuthService(demoAuthOptions(env.VITE_DEMO)) }, env.VITE_DEMO ? demoStorage() : {});
     remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, duels: f.duels, reporter: f.reporter };
   } else {
     const url = env.VITE_SUPABASE_URL;

@@ -52,3 +52,45 @@ test("fake exam gateway limits to 3 attempts", async () => {
   expect((await g.startAttempt()).remainingToday).toBe(0);
   await expect(g.startAttempt()).rejects.toBeInstanceOf(ExamLimitError);
 });
+
+function memoryStorage(): Pick<Storage, "getItem" | "setItem"> {
+  const data = new Map<string, string>();
+  return { getItem: (k) => data.get(k) ?? null, setItem: (k, v) => void data.set(k, v) };
+}
+
+test("fake auth persists to the given storage and reloads from it", async () => {
+  const storage = memoryStorage();
+  const first = new FakeAuthService({ persist: true, storage });
+  await first.verifyOtp("a@b.c", "123456");
+  await first.setPassword("secret123");
+  await first.joinGroup("TEST-CODE", "Marc", "🐉");
+  const second = new FakeAuthService({ persist: true, storage });
+  expect((await second.getSession())?.email).toBe("a@b.c");
+  expect(await second.hasProfile()).toBe(true);
+  expect((await second.signInWithPassword("a@b.c", "secret123")).email).toBe("a@b.c");
+});
+
+test("fake auth survives storage that throws", async () => {
+  const broken = {
+    getItem: () => {
+      throw new Error("blocked");
+    },
+    setItem: () => {
+      throw new Error("blocked");
+    },
+  };
+  const auth = new FakeAuthService({ persist: true, storage: broken });
+  await auth.verifyOtp("a@b.c", "123456");
+  expect((await auth.getSession())?.email).toBe("a@b.c");
+});
+
+test("fake auth accepts any non-empty invite only with anyInvite", async () => {
+  const strict = new FakeAuthService();
+  await strict.verifyOtp("a@b.c", "123456");
+  await expect(strict.joinGroup("whatever", "Marc", "🐉")).rejects.toBeInstanceOf(InvalidInviteError);
+  const demo = new FakeAuthService({ anyInvite: true });
+  await demo.verifyOtp("a@b.c", "123456");
+  await expect(demo.joinGroup("  ", "Marc", "🐉")).rejects.toBeInstanceOf(InvalidInviteError);
+  await demo.joinGroup("whatever", "Marc", "🐉");
+  expect(await demo.hasProfile()).toBe(true);
+});

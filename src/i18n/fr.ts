@@ -193,6 +193,7 @@ export const fr = {
       passwordEmpty: "Entre ton mot de passe",
       forgot: "Mot de passe oublié ?",
       back: "Retour",
+      demoHint: "Démo : utilise le compte créé sur cet appareil (n'importe quel e-mail, le mot de passe que tu as choisi). Aucun e-mail n'est envoyé.",
     },
     recovery: {
       title: "Mot de passe oublié ?",
@@ -225,6 +226,8 @@ export const fr = {
       resendIn: (s: number) => `Renvoyer le code (${s} s)`,
       resent: "Code renvoyé",
       changeEmail: "Changer d'e-mail",
+      demoHintInvite: "Démo : n'importe quel code d'invitation, puis le code 123456 (aucun e-mail n'est envoyé).",
+      demoHintCode: "Démo : le code est 123456 (aucun e-mail n'est envoyé).",
     },
     profile: {
       title: "Qui es-tu ?",

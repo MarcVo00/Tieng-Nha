@@ -12,6 +12,8 @@
 | [Plan Duels](superpowers/plans/2026-10-20-duels.md) | orchestrateur + sous-agents | plan A : duels + Kim bài (migration, écrans, combat rejoué) |
 | [Plan Boutique d'arène](superpowers/plans/2026-10-20-arena-shop.md) | orchestrateur + sous-agents | plan B : 3 cosmétiques martiaux, écran Arène, achats en Kim bài vérifiés côté serveur |
 | [Plan Mode démo](superpowers/plans/2026-10-20-demo-mode.md) | orchestrateur + sous-agents | version démo (faux serveur, adversaires automatiques, panneau +xu / +Kim bài) |
+| [Audit design](superpowers/specs/2026-10-20-design-polish-audit.md) | tous | signes « IA », embellissements, chorégraphie des combats, garde-fous de perf |
+| [Plan embellissement](superpowers/plans/2026-10-20-design-polish.md) | orchestrateur + sous-agents | bug du résultat du boss, combats, textures, avatars-héros, parcours, vitrine |
 | [Déploiement](deploy.md) | toi | runbook Netlify/Supabase, et version démo sur le deploy preview de la PR « Démo (ne pas fusionner) » |
 | [Plan arbre + boss](superpowers/plans/2026-10-14-tree-and-boss.md) | orchestrateur + sous-agents | étapes 1–2 de la Progression V2 : arbre de compétences, boss Thủy Tinh |
 | [Plan énergie](superpowers/plans/2026-10-14-energy.md) | orchestrateur + sous-agents | étape 3 de la Progression V2 : énergie ⚡ |

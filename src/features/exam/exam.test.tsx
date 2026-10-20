@@ -105,7 +105,6 @@ describe("intro", () => {
     expect(rules.querySelectorAll("[data-rule]")).toHaveLength(3);
     expect(rules.querySelectorAll("[data-drop='full']")).toHaveLength(15);
     expect(within(rules).getByRole("img", { name: fr.ui.hearts(5, 5) })).toBeInTheDocument();
-    expect(within(rules).getByRole("img", { name: fr.exam.intro.rules.noCorrectionAria })).toBeInTheDocument();
     expect(within(rules).getByText(fr.exam.intro.rules.hp(15))).toBeInTheDocument();
     expect(within(rules).getByText(fr.exam.intro.rules.lives(5))).toBeInTheDocument();
     expect(screen.getByText(fr.exam.intro.rules.tries)).toBeInTheDocument();

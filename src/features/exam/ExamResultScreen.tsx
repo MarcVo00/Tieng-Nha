@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEntryState } from "@/app/useEntryState";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
-import { lookOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
 import {
   BadgeMedal,
   rewardProp,
@@ -147,8 +147,7 @@ function ResultContent({ state }: { state: ResultState }) {
   const navigate = useNavigate();
   const profile = useAppState((s) => s.profile);
   const xpTotal = useAppState((s) => s.snapshot?.xpTotal);
-  const equipped = useAppState((s) => s.wallet?.equipped);
-  const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const look = useHeroLook();
   const reduced = useReducedMotion() === true;
   const [downloadFailed, setDownloadFailed] = useState(false);
   const { boss } = state;

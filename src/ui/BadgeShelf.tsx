@@ -43,7 +43,7 @@ export function BadgeShelf({ badges, unlocked, onSelect, none = fr.ui.badge.none
           <button
             type="button"
             aria-expanded={open}
-            aria-controls={panel}
+            aria-controls={open ? panel : undefined}
             onClick={() => setOpen((v) => !v)}
             className="flex min-h-11 items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-gold-ink text-body-strong text-gold-ink"
           >

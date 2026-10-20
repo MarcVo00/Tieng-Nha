@@ -40,10 +40,10 @@ function RareCard({ entry, featured }: { entry: RareEntry; featured: boolean }) 
       >
         <HeroMedallion look={entry.look} size={featured ? 160 : 72} ring={entry.owned ? "gold" : "neutral"} />
         <span className="flex min-w-0 flex-col gap-1">
-          <h3 className={featured ? "text-heading text-ink" : "text-body-strong text-ink"}>
+          <span className={featured ? "text-heading text-ink" : "text-body-strong text-ink"}>
             <span className="sr-only">{fr.shop.tryOn.prefix} </span>
             {entry.name}
-          </h3>
+          </span>
           {featured ? <span className="mx-auto max-w-xs text-caption text-ink-muted">{entry.desc}</span> : null}
           {entry.status}
         </span>

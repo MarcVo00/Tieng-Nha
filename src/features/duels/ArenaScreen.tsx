@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useEquipToggle } from "@/app/useEquipToggle";
 import { OfflineError } from "@/domain/errors";
-import type { ShopItem, Wallet } from "@/domain/types";
-import { characterSlotOf, lookOf } from "@/services/look";
+import type { ShopItem } from "@/domain/types";
+import { characterSlotOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
+import { rareEntriesOf } from "@/app/useRareEntries";
 import { fr } from "@/i18n/fr";
-import { BalanceLine, Button, duration, EmptyState, ease, Icon, RareShowcase, SectionTitle, Skeleton, tap, TryOnSheet, useToast, type RareEntry } from "@/ui";
+import { BalanceLine, Button, duration, EmptyState, ease, Icon, RareShowcase, SectionTitle, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
 
 // Hierarchy: the Kim bài balance is the hero (gold, big). Below, the three arena outfits as try-on cards.
 // The one action is inside the sheet (buy / wear). Buying is safe: online, and both the local wallet and the
@@ -19,8 +21,7 @@ export function ArenaScreen() {
   const refresh = useRefreshProgress();
   const equipToggle = useEquipToggle();
   const wallet = useAppState((s) => s.wallet);
-  const equipped = useAppState((s) => s.wallet?.equipped);
-  const baseLook = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const baseLook = useHeroLook();
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [trying, setTrying] = useState<ShopItem | null>(null);
@@ -102,35 +103,6 @@ export function ArenaScreen() {
     }
   }
 
-  function entries(w: Wallet): RareEntry[] {
-    const out: RareEntry[] = [];
-    for (const item of arena) {
-      const text = fr.shop.items[item.id];
-      const slot = characterSlotOf(item);
-      if (!text || slot === null) continue;
-      const owned = w.inventory.includes(item.id);
-      const on = w.equipped[slot] === item.id;
-      out.push({
-        id: item.id,
-        look: { ...baseLook, [slot]: item.id },
-        name: text.name,
-        desc: text.desc,
-        owned,
-        disabled: busy,
-        onOpen: () => tryOn(item),
-        status: owned ? (
-          <span className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</span>
-        ) : (
-          <span className="tabular inline-flex items-center gap-1 text-caption text-gold-ink">
-            <Icon name="medal" size={16} className="text-gold" />
-            {fr.duels.kimBai(item.price ?? 0)}
-          </span>
-        ),
-      });
-    }
-    return out;
-  }
-
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.base, ease: ease.out }} className="flex flex-col gap-6 pb-8">
       <motion.div whileTap={tap} className="inline-block self-start">
@@ -156,7 +128,7 @@ export function ArenaScreen() {
       ) : (
         <section aria-labelledby="arena-list" className="flex flex-col gap-3">
           <SectionTitle id="arena-list" overline={fr.ui.overline.arena}>{fr.arena.list}</SectionTitle>
-          <RareShowcase entries={entries(wallet)} />
+          <RareShowcase entries={rareEntriesOf({ items: arena, wallet, baseLook, busy, onOpen: tryOn, currency: { icon: "medal", label: fr.duels.kimBai } })} />
         </section>
       )}
 

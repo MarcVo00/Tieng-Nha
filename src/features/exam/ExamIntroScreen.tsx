@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useEntryState } from "@/app/useEntryState";
@@ -40,14 +40,15 @@ function ScrollRoll() {
 
 /** The legend on a paper scroll between two rollers, left-aligned (audit §B9). Paper keeps its light palette in dark mode. */
 function ScrollCartouche({ label, children }: { label: string; children: string }) {
+  const id = useId();
   return (
-    <section aria-label={label} className="relative px-1">
+    <section aria-labelledby={id} className="relative px-1">
       <ScrollRoll />
       <div data-theme="light" className="relative overflow-hidden bg-paper px-5 py-4 shadow-card">
         <div aria-hidden="true" className="absolute inset-0 text-ink">
           <Motif kind="clouds" />
         </div>
-        <p className="relative text-caption uppercase tracking-[0.08em] text-gold-ink">{label}</p>
+        <p id={id} className="relative text-caption uppercase tracking-[0.08em] text-ink-muted">{label}</p>
         <p className="relative pt-1 text-body text-ink">{children}</p>
       </div>
       <ScrollRoll />
@@ -58,7 +59,7 @@ function ScrollCartouche({ label, children }: { label: string; children: string 
 /** A brush with a stroke through it: no correction during the fight. */
 function NoBrush() {
   return (
-    <svg role="img" aria-label={fr.exam.intro.rules.noCorrectionAria} viewBox="0 0 32 32" width={32} height={32} className="text-ink">
+    <svg aria-hidden="true" viewBox="0 0 32 32" width={32} height={32} className="text-ink">
       <path d="M21 4 L11 20" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
       <path d="M11 20 C7 21 6 25 5 28 C9 27 12 25 13 22 Z" fill="currentColor" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" />
       <path d="M5 5 L27 27" fill="none" stroke="var(--color-primary)" strokeWidth={2.5} strokeLinecap="round" />
@@ -70,8 +71,8 @@ function NoBrush() {
 function Rules({ hp, lives }: { hp: number; lives: number }) {
   const r = fr.exam.intro.rules;
   return (
-    <section aria-label={fr.exam.intro.rulesLabel} className="flex flex-col gap-3">
-      <h2 className="text-heading text-ink">{fr.exam.intro.rulesLabel}</h2>
+    <section aria-labelledby="exam-rules" className="flex flex-col gap-3">
+      <h2 id="exam-rules" className="text-heading text-ink">{fr.exam.intro.rulesLabel}</h2>
       <div data-rule="hp" className="flex flex-col gap-2 rounded-md bg-surface px-4 py-3 shadow-card">
         <WaterDropHp value={hp} max={hp} decorative />
         <p className="text-body text-ink">

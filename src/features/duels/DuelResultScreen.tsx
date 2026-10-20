@@ -7,7 +7,7 @@ import { useChallenge } from "@/app/useChallenge";
 import { OfflineError } from "@/domain/errors";
 import type { Duel, Look } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { lookOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
 import { DUEL } from "@/services/duel";
 import { Avatar, Button, Confetti, duration, EmptyState, ease, FocusHeader, frameRing, Icon, Skeleton, spring } from "@/ui";
 import type { Expression } from "@/ui/characterLayers";
@@ -273,7 +273,7 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
   const challenge = useChallenge();
   const equipped = useAppState((s) => s.wallet?.equipped);
   const myName = useAppState((s) => s.profile?.pseudo) ?? fr.duels.result.me;
-  const myLook = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const myLook = useHeroLook();
   const theirName = duel.opponentPseudo;
   const them = otherId(duel, myId);
   const verdict = verdictOf(duel, myId);
@@ -512,7 +512,7 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
 function Waiting({ duel, theirLook, theirFrame }: { duel: Duel; theirLook: Look; theirFrame: string | null }) {
   const navigate = useNavigate();
   const equipped = useAppState((s) => s.wallet?.equipped);
-  const myLook = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const myLook = useHeroLook();
   const w = fr.duels.result.waiting;
   return (
     <div className="pb-10">

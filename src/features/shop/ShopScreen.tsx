@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
 import { useEquipToggle } from "@/app/useEquipToggle";
-import { characterSlotOf, lookOf } from "@/services/look";
+import { characterSlotOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
+import { rareEntriesOf } from "@/app/useRareEntries";
 import { fr } from "@/i18n/fr";
-import { BalanceLine, Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, RareShowcase, SectionTitle, Skeleton, tap, TryOnSheet, useToast, type RareEntry } from "@/ui";
+import { BalanceLine, Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, RareShowcase, SectionTitle, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
@@ -40,8 +42,7 @@ export function ShopScreen() {
   const equipToggle = useEquipToggle();
   const [trying, setTrying] = useState<ShopItem | null>(null);
   const [tryOpen, setTryOpen] = useState(false);
-  const equipped = useAppState((s) => s.wallet?.equipped);
-  const baseLook = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const baseLook = useHeroLook();
 
   useEffect(() => {
     let cancelled = false;
@@ -206,36 +207,6 @@ export function ShopScreen() {
     );
   }
 
-  // Themed pieces are the rare ones: shown on the lacquer showcase, the first one large.
-  function rareEntries(list: ShopItem[], w: Wallet): RareEntry[] {
-    const out: RareEntry[] = [];
-    for (const item of list) {
-      const text = fr.shop.items[item.id];
-      const slot = characterSlotOf(item);
-      if (!text || slot === null) continue;
-      const owned = w.inventory.includes(item.id);
-      const on = w.equipped[slot] === item.id;
-      out.push({
-        id: item.id,
-        look: { ...baseLook, [slot]: item.id },
-        name: text.name,
-        desc: text.desc,
-        owned,
-        disabled: busy,
-        onOpen: () => tryOn(item),
-        status: owned ? (
-          <span className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</span>
-        ) : (
-          <span className="tabular inline-flex items-center gap-1 text-caption text-gold-ink">
-            <Icon name="coin" size={16} className="text-gold" />
-            {fr.shop.balance(item.price ?? 0)}
-          </span>
-        ),
-      });
-    }
-    return out;
-  }
-
   return (
     <div className="flex flex-col gap-8 pb-8">
       <h1 className="sr-only">{fr.shop.title}</h1>
@@ -268,7 +239,7 @@ export function ShopScreen() {
           {themes.map((t) => (
             <section key={t.id} aria-labelledby={`shop-theme-${t.id}`} className="flex flex-col gap-3">
               <SectionTitle id={`shop-theme-${t.id}`}>{fr.shop.themes[t.id]}</SectionTitle>
-              <RareShowcase entries={rareEntries(t.items, wallet)} />
+              <RareShowcase entries={rareEntriesOf({ items: t.items, wallet, baseLook, busy, onOpen: tryOn, currency: { icon: "coin", label: fr.shop.balance } })} />
             </section>
           ))}
           <p className="text-caption text-ink-muted">

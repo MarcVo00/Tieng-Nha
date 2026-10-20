@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useAnimationControls, type AnimationControls } from "motion/react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEntryState } from "@/app/useEntryState";
-import { useAppState, useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
+import { useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Boss, Capabilities, ExamQuestion, Look, VocabId, VocabItem } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
@@ -11,7 +11,7 @@ import { fr } from "@/i18n/fr";
 import { answer, bossMention, buildDeck, fightScore, outOfQuestions, startFight, type Fight } from "@/services/bossFight";
 import { FINAL_BOSS_ID } from "@/services/tree";
 import { seedFromString } from "@/services/random";
-import { lookOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
 import { Button, ConfirmDialog, duration, ease, EmptyState, FocusHeader, Hearts, Motif, Skeleton, spring, tap, WaterDropHp } from "@/ui";
 import {
   DamageNumber,
@@ -81,7 +81,7 @@ type StageProps = {
  */
 function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled, fx, hero, bossCtl, stage, reduced, live }: StageProps) {
   return (
-    <div role="group" aria-label={fr.exam.run.stage(boss.name)} className="relative mx-5 h-28">
+    <div role="group" aria-label={fr.exam.run.stage(boss.name)} className="relative mx-5 h-28 max-[359px]:h-24">
       {/* Backdrop clipped to the strip; the fighters and their FX may spill over its edge. */}
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden rounded-lg bg-surface-2">
         <div className="absolute inset-0 text-info">
@@ -89,7 +89,8 @@ function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled
         </div>
         <motion.div data-veil={veiled ? "on" : "off"} className="absolute inset-0 bg-scrim" initial={false} animate={{ opacity: veiled ? 1 : 0 }} transition={{ duration: duration.base }} />
       </div>
-      <motion.div className={`relative mx-auto h-full w-full max-w-[20rem] ${live ? "will-change-transform" : ""}`} animate={stage}>
+      <div className="absolute inset-y-0 left-1/2 w-80 origin-top -translate-x-1/2 max-[359px]:scale-[0.85]">
+      <motion.div className={`relative h-full w-full ${live ? "will-change-transform" : ""}`} animate={stage}>
         {/* Paper medallions stay put like mats (giấy điệp): only the fighters move. */}
         <span aria-hidden="true" className="absolute bottom-2 left-1.5 h-[4.75rem] w-[4.75rem] rounded-full border-2 border-line bg-paper" />
         <span aria-hidden="true" className="absolute bottom-1 right-0.5 h-[6.25rem] w-[6.25rem] rounded-full border-2 border-line bg-paper" />
@@ -142,6 +143,7 @@ function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled
           </motion.svg>
         ) : null}
       </motion.div>
+      </div>
     </div>
   );
 }
@@ -163,8 +165,7 @@ function ExamRun({ run }: { run: RunState }) {
   const [saveError, setSaveError] = useState(false);
   const [quitting, setQuitting] = useState(false);
 
-  const equipped = useAppState((st) => st.wallet?.equipped);
-  const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const look = useHeroLook();
   const beat = useFightBeat();
   const heroCtl = useFighterControls();
   const bossCtl = useFighterControls();
@@ -478,12 +479,12 @@ function ExamRun({ run }: { run: RunState }) {
         <motion.button
           type="button"
           aria-label={fr.exam.run.skip}
-          className="fixed inset-0 z-40 flex items-end justify-center pb-10"
+          className="group fixed inset-0 z-40 flex items-end justify-center pb-10 focus-visible:outline-none"
           whileTap="pressed"
           ref={skipRef}
           onClick={() => gate.current?.open()}
         >
-          <motion.span variants={{ pressed: tap }} className="rounded-md bg-surface px-5 py-3 text-body-strong text-ink shadow-raised" aria-hidden="true">
+          <motion.span variants={{ pressed: tap }} className="rounded-md bg-surface px-5 py-3 text-body-strong text-ink shadow-raised group-focus-visible:outline group-focus-visible:outline-[3px] group-focus-visible:outline-offset-2 group-focus-visible:outline-gold" aria-hidden="true">
             {fr.exam.run.skip}
           </motion.span>
         </motion.button>

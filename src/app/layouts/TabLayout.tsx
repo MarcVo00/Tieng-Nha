@@ -1,11 +1,10 @@
-import { useMemo } from "react";
 import { AnimatePresence } from "motion/react";
 import { Link, useLocation, useOutlet } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { EnergyIndicator } from "@/app/EnergyIndicator";
 import { SyncIndicator } from "@/app/SyncIndicator";
 import { fr } from "@/i18n/fr";
-import { lookOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
 import { InAppBrowserNotice } from "@/features/onboarding";
 import { useServices } from "@/app/ServicesProvider";
 import { Avatar, PageTransition, StreakFlame, TabBar, XpCounter } from "@/ui";
@@ -17,7 +16,7 @@ export function TabLayout() {
   const snapshot = useAppState((s) => s.snapshot);
   const equipped = useAppState((s) => s.wallet?.equipped);
   const frame = equipped?.frame ?? null;
-  const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const look = useHeroLook();
   const dueCount = useAppState((s) => s.dueCount);
   const demo = useServices().env.VITE_DEMO;
 

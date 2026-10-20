@@ -5,6 +5,7 @@ import { getPlugin } from "@/exercises/registry";
 import type { ExerciseServices, GradeResult } from "@/exercises/types";
 import { seedFromString } from "@/services/random";
 import { duration, EXIT_RATIO, ease, FeedbackSheet } from "@/ui";
+import { ShineContext } from "@/ui/Button";
 
 export type ExerciseHostProps = {
   exercise: Exercise;
@@ -57,6 +58,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
           <motion.div animate={wrong ? SHAKE : { x: 0 }} transition={wrong ? SHAKE_TRANSITION : { duration: 0 }}>
             {/* Layout-animated children (word_order tiles) must not take part in this exit: they never release it. */}
             <PresenceContext.Provider value={null}>
+              <ShineContext.Provider value={mode !== "exam"}>
               <plugin.Component
                 exercise={exercise}
                 disabled={result !== null}
@@ -68,6 +70,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
                 seed={seed}
                 {...(onCapabilityLost ? { onCapabilityLost } : {})}
               />
+              </ShineContext.Provider>
             </PresenceContext.Provider>
           </motion.div>
         </motion.div>

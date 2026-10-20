@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useReducedMotion, type HTMLMotionProps } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { duration, ease, spring, tap } from "@/ui/motion";
@@ -10,6 +10,9 @@ export type ButtonProps = Omit<HTMLMotionProps<"button">, "children"> & {
   fullWidth?: boolean;
   children?: ReactNode;
 };
+
+/** Fight screens turn the glint off: their beats stay within the animated-element budget (audit §D). */
+export const ShineContext = createContext(true);
 
 const VARIANT: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary: "overflow-hidden bg-primary text-primary-on border-b-4 border-primary-hover active:translate-y-[2px] active:border-b-2",
@@ -52,13 +55,14 @@ function Dots() {
 
 export function Button({ variant = "primary", size = "md", loading = false, fullWidth = false, className, disabled, children, type = "button", ...rest }: ButtonProps) {
   const reduced = useReducedMotion();
+  const shineOn = useContext(ShineContext);
   const wasDisabled = useRef(disabled === true);
   const [shine, setShine] = useState(0);
   useEffect(() => {
     const now = disabled === true;
-    if (variant === "primary" && wasDisabled.current && !now && !reduced) setShine((n) => n + 1);
+    if (variant === "primary" && shineOn && wasDisabled.current && !now && !reduced) setShine((n) => n + 1);
     wasDisabled.current = now;
-  }, [disabled, variant, reduced]);
+  }, [disabled, variant, reduced, shineOn]);
   const greyed = variant === "primary" && disabled === true && !loading;
   const sizing = size === "lg" ? "px-5 py-4 text-heading" : "px-5 py-3 text-body-strong";
   return (

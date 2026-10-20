@@ -18,7 +18,7 @@ export default tseslint.config(
       "boundaries/include": ["src/**/*"],
       "boundaries/elements": [
         { type: "di", pattern: "src/app/{ServicesProvider.tsx,services.ts,appState.ts}", mode: "file" },
-        { type: "app-hook", pattern: "src/app/use*.ts", mode: "file" },
+        { type: "app-hook", pattern: "src/app/use*.{ts,tsx}", mode: "file" },
         { type: "app", pattern: "src/app/**" },
         { type: "root", pattern: "src/{main,App}.tsx", mode: "file" },
         { type: "feature", pattern: "src/features/*", capture: ["name"] },

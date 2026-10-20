@@ -411,6 +411,25 @@ export const fr = {
       replay: "Rejouer",
     },
   },
+  // --- arena (Kim bài shop) ---
+  arena: {
+    title: "Arène",
+    intro: "Ici, les Kim bài gagnés en duel s'échangent contre des tenues de guerriers du Sud.",
+    balance: (n: number) => `${n} Kim bài`,
+    balanceCaption: "Gagnés en duel",
+    buy: (price: number) => `Acheter (${price} Kim bài)`,
+    confirmTitle: (what: string, price: number) => `Acheter ${what} pour ${price} Kim bài ?`,
+    needOnline: "Connecte-toi pour acheter à l'arène.",
+    notEnough: "Pas assez de Kim bài : gagne des duels !",
+    serverBehind: "Ton solde de Kim bài se met à jour : réessaie dans un instant.",
+    bought: "Acheté ! Bien vu, guerrier.",
+    error: "L'achat n'a pas pu se faire. Réessaie dans un instant.",
+    loadError: "L'arène n'a pas pu s'ouvrir. Réessaie dans un instant.",
+    entry: "Arène",
+    entryHint: "Dépense tes Kim bài en tenues de guerrier",
+    list: "Les tenues de l'arène",
+    meEntry: "Arène",
+  },
   // --- duels ---
   duels: {
     title: "Duels",

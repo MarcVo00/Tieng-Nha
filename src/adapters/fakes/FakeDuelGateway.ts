@@ -15,6 +15,8 @@ type Options = {
   /** When true (default), a fake member answers right after the challenge, so the duel settles once the player submits. */
   autoOpponent?: boolean;
   members?: FakeMember[];
+  /** Kim bài of the local journal (wallet), used by `balance()` until a test overrides it. */
+  localKimBai?: () => Promise<number>;
 };
 
 /** Deterministic opponent run: 5/8 correct (2 of them critical), 1/3 oral, scaled to the duel's question counts. */
@@ -29,9 +31,12 @@ export function autoOpponentRun(questions: DuelQuestions): { round1: Round1Answe
 /** In-memory duels with the server's rules (shared `services/duel` formulas). */
 export class FakeDuelGateway implements DuelGateway {
   online = true;
+  /** Tests: the server balance, when it differs from the local journal. */
+  serverKimBai: number | null = null;
   private duels: Stored[] = [];
   private readonly autoOpponent: boolean;
   private readonly members: FakeMember[];
+  private readonly localKimBai: () => Promise<number>;
 
   constructor(
     private readonly getMyEvents: () => Promise<AppEvent[]>,
@@ -40,6 +45,7 @@ export class FakeDuelGateway implements DuelGateway {
   ) {
     this.autoOpponent = options.autoOpponent ?? true;
     this.members = options.members ?? fakeMembers();
+    this.localKimBai = options.localKimBai ?? (() => Promise.resolve(0));
   }
 
   async create(opponent: string, questions: DuelQuestions, seed: number): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }> {
@@ -122,6 +128,11 @@ export class FakeDuelGateway implements DuelGateway {
       myRun: mine(d, runs.get(ME)),
       theirRun: d.status === "settled" ? structuredClone(runs.get(this.other(d)) ?? null) : null,
     }));
+  }
+
+  async balance(): Promise<number> {
+    if (!this.online) throw new OfflineError();
+    return this.serverKimBai ?? (await this.localKimBai());
   }
 
   /**

@@ -446,3 +446,13 @@ describe("pending duels entry points", () => {
     expect(await screen.findByRole("link", { name: fr.duels.entry.label })).toBeInTheDocument();
   });
 });
+
+describe("arena entry", () => {
+  test("the hub links to /arena once duels are unlocked", async () => {
+    const services = makeServices();
+    await unlock(services);
+    renderAt("/duels", services);
+    const link = await screen.findByRole("link", { name: new RegExp(fr.arena.entry) });
+    expect(link).toHaveAttribute("href", "/arena");
+  });
+});

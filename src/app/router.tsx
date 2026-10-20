@@ -26,6 +26,7 @@ const ExamIntroScreen = lazy(() => import("@/features/exam").then((m) => ({ defa
 const ExamRunScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamRunScreen })));
 const ExamResultScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamResultScreen })));
 const DuelsScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelsScreen })));
+const ArenaScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.ArenaScreen })));
 const DuelRunScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelRunScreen })));
 const DuelResultScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelResultScreen })));
 
@@ -48,6 +49,7 @@ const tabRoutes: RouteObject[] = [
   { path: "u/:userId", element: screen(PublicProfileScreen) },
   { path: "exam", element: screen(ExamIntroScreen) },
   { path: "duels", element: screen(DuelsScreen) },
+  { path: "arena", element: screen(ArenaScreen) },
   { path: "*", element: screen(NotFound) },
 ];
 

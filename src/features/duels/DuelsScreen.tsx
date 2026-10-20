@@ -108,6 +108,21 @@ export function DuelsScreen() {
         </p>
       </div>
 
+      {challenge.unlocked === false ? null : (
+        <motion.div whileTap={tap} className="mt-4">
+          <Card>
+            <Link to="/arena" className="flex min-h-14 items-center gap-3 p-3">
+              <Icon name="medal" size={28} className="shrink-0 text-gold" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-body-strong text-ink">{fr.arena.entry}</span>
+                <span className="block truncate text-caption text-ink-muted">{fr.arena.entryHint}</span>
+              </span>
+              <Icon name="chevron-right" size={20} className="shrink-0 text-ink-muted" />
+            </Link>
+          </Card>
+        </motion.div>
+      )}
+
       {challenge.unlocked === false ? (
         <EmptyState title={fr.duels.hub.lockedTitle} body={fr.duels.locked} illustration="lantern" />
       ) : load.status === "loading" ? (

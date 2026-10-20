@@ -4,6 +4,7 @@ export { PasswordField } from "@/ui/PasswordField";
 export { Button, type ButtonProps } from "@/ui/Button";
 export { Card } from "@/ui/Card";
 export { Sheet } from "@/ui/Sheet";
+export { TryOnSheet } from "@/ui/TryOnSheet";
 export { FeedbackSheet } from "@/ui/FeedbackSheet";
 export { ProgressBar } from "@/ui/ProgressBar";
 export { Hearts } from "@/ui/Hearts";

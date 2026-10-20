@@ -101,6 +101,7 @@ export function MeScreen() {
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
   const coins = useAppState((s) => s.wallet?.coins ?? null);
+  const kimBai = useAppState((s) => s.wallet?.kimBai ?? null);
   const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
   const fx = useAppState((s) => s.wallet?.equipped.profile_fx ?? null);
   const equipped = useAppState((s) => s.wallet?.equipped);
@@ -278,6 +279,17 @@ export function MeScreen() {
           {fr.shop.open}
         </span>
         {coins !== null ? <span className="tabular text-gold-ink">{fr.shop.balance(coins)}</span> : null}
+      </Link>
+
+      <Link
+        to="/arena"
+        className="flex min-h-11 items-center justify-between gap-3 rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
+      >
+        <span className="flex items-center gap-2">
+          <Icon name="medal" size={24} className="text-gold" />
+          {fr.arena.meEntry}
+        </span>
+        {kimBai !== null ? <span className="tabular text-gold-ink">{fr.arena.balance(kimBai)}</span> : null}
       </Link>
 
       <section aria-labelledby="me-badges">

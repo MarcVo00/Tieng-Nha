@@ -49,7 +49,9 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), me, clock, myFrame),
     auth,
     exam: new FakeExamGateway(clock),
-    duels: new FakeDuelGateway(() => progress.listEvents(), clock),
+    duels: new FakeDuelGateway(() => progress.listEvents(), clock, {
+      localKimBai: async () => walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).kimBai,
+    }),
     tts: new FakeSpeechSynthesizer(),
     stt: new FakeSpeechRecognizer(),
     recorder: new FakeVoiceRecorder(),

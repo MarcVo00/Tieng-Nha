@@ -3,6 +3,7 @@ import type { Db } from "@/adapters/supabase/client";
 import type { Json } from "@/adapters/supabase/types.gen";
 import { mapError } from "@/adapters/supabase/errors";
 import type { Duel, DuelQuestions, Round1Answer, Round2Answer } from "@/domain/types";
+import { NotAuthenticatedError } from "@/domain/errors";
 import { DUEL_ERRORS, type DuelError, type DuelGateway } from "@/ports";
 
 const RunSchema = z.object({
@@ -15,7 +16,12 @@ const RunSchema = z.object({
 });
 /** Postgres timestamps ("2026-10-10T08:00:00.123456+00:00", "2026-10-10 08:00:00+00") to ISO-Z; invalid ones are refused. */
 const IsoSchema = z.string().transform((v, ctx) => {
-  const normal = v.trim().replace(" ", "T").replace(/([+-]\d{2})$/, "$1:00");
+  // Old iOS Safari rejects fractions longer than 3 digits: keep milliseconds only (padded when shorter).
+  const normal = v
+    .trim()
+    .replace(" ", "T")
+    .replace(/\.(\d+)/, (_, f: string) => `.${f.slice(0, 3).padEnd(3, "0")}`)
+    .replace(/([+-]\d{2})$/, "$1:00");
   const ms = Date.parse(normal);
   if (Number.isNaN(ms)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: "invalid timestamp" });
@@ -80,5 +86,15 @@ export class SupabaseDuelGateway implements DuelGateway {
     const parsed = z.array(DuelSchema).safeParse(data);
     if (!parsed.success) throw new Error("invalid_duel_response");
     return parsed.data;
+  }
+
+  async balance(): Promise<number> {
+    const { data: auth, error: authError } = await this.db.auth.getUser();
+    if (authError) throw mapError(authError);
+    const uid = auth.user?.id;
+    if (!uid) throw new NotAuthenticatedError();
+    const { data, error } = await this.db.from("user_stats").select("kim_bai").eq("user_id", uid).maybeSingle();
+    if (error) throw mapError(error);
+    return data?.kim_bai ?? 0;
   }
 }

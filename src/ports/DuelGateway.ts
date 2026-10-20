@@ -26,4 +26,6 @@ export interface DuelGateway {
   submitRun(duelId: string, round1: Round1Answer[], round2: Round2Answer[]): Promise<{ ok: true } | { ok: false; error: DuelError }>;
   /** My duels, newest first; `theirRun` is only present once the duel is settled. */
   list(): Promise<Duel[]>;
+  /** Server-side Kim bài of the current user (the safety net of Kim bài purchases). */
+  balance(): Promise<number>;
 }

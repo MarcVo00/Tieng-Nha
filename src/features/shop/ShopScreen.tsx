@@ -7,8 +7,7 @@ import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
 import { useEquipToggle } from "@/app/useEquipToggle";
 import { characterSlotOf, lookOf } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, Skeleton, tap, useToast } from "@/ui";
-import { TryOnSheet } from "@/features/shop/TryOnSheet";
+import { Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
@@ -268,6 +267,7 @@ export function ShopScreen() {
           wallet={wallet}
           baseLook={baseLook}
           busy={busy}
+          slot={trying ? characterSlotOf(trying) : null}
           onClose={() => setTryOpen(false)}
           onBuy={buyCosmetic}
           onToggle={toggleCosmetic}

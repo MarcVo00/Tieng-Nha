@@ -17,6 +17,15 @@ import { createDemoTools } from "@/app/demoTools";
 
 type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "duels" | "reporter">;
 
+/** Site data may be blocked: reading `localStorage` can throw, so the demo falls back to in-memory duels. */
+function demoStorage(): { duelStorage?: Storage } {
+  try {
+    return { duelStorage: window.localStorage };
+  } catch {
+    return {};
+  }
+}
+
 /** Composition root: the only place that picks concrete adapters. */
 export function createServices(env: Env): Services {
   const clock = () => new Date().toISOString();
@@ -40,7 +49,7 @@ export function createServices(env: Env): Services {
   // Remote (fake or Supabase)
   let remote: Remote;
   if (env.VITE_USE_FAKES) {
-    const f = createFakeServices({ clock, progress, auth: new FakeAuthService(true) }, env.VITE_DEMO ? { duelStorage: localStorage } : {});
+    const f = createFakeServices({ clock, progress, auth: new FakeAuthService(true) }, env.VITE_DEMO ? demoStorage() : {});
     remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, duels: f.duels, reporter: f.reporter };
   } else {
     const url = env.VITE_SUPABASE_URL;

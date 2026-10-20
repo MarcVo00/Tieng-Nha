@@ -17,7 +17,12 @@ type Options = {
   members?: FakeMember[];
   /** Kim bài of the local journal (wallet), used by `balance()` until a test overrides it. */
   localKimBai?: () => Promise<number>;
+  /** Opt-in persistence (demo mode): the whole state is saved under `storageKey` and loaded at construction. */
+  storage?: Pick<Storage, "getItem" | "setItem">;
+  storageKey?: string;
 };
+
+export const DEMO_DUELS_KEY = "tn-demo-duels";
 
 /** Deterministic opponent run: 5/8 correct (2 of them critical), 1/3 oral, scaled to the duel's question counts. */
 export function autoOpponentRun(questions: DuelQuestions): { round1: Round1Answer[]; round2: Round2Answer[] } {
@@ -46,6 +51,41 @@ export class FakeDuelGateway implements DuelGateway {
     this.autoOpponent = options.autoOpponent ?? true;
     this.members = options.members ?? fakeMembers();
     this.localKimBai = options.localKimBai ?? (() => Promise.resolve(0));
+    this.storage = options.storage ?? null;
+    this.storageKey = options.storageKey ?? DEMO_DUELS_KEY;
+    this.load();
+  }
+
+  private readonly storage: Pick<Storage, "getItem" | "setItem"> | null;
+  private readonly storageKey: string;
+
+  private load(): void {
+    if (!this.storage) return;
+    try {
+      const raw = this.storage.getItem(this.storageKey);
+      if (!raw) return;
+      const data: unknown = JSON.parse(raw);
+      if (!Array.isArray(data)) return;
+      const loaded: Stored[] = [];
+      for (const item of data) {
+        if (typeof item !== "object" || item === null || !Array.isArray((item as { runs?: unknown }).runs)) return;
+        const { runs, ...d } = item as Omit<Stored, "runs"> & { runs: [string, DuelRun][] };
+        if (typeof d.id !== "string" || typeof d.status !== "string") return;
+        loaded.push({ ...d, runs: new Map(runs) });
+      }
+      this.duels = loaded;
+    } catch {
+      this.duels = []; // corrupt storage: start empty
+    }
+  }
+
+  private persist(): void {
+    if (!this.storage) return;
+    try {
+      this.storage.setItem(this.storageKey, JSON.stringify(this.duels.map((d) => ({ ...d, runs: [...d.runs.entries()] }))));
+    } catch {
+      // storage full or unavailable: the demo keeps working in memory
+    }
   }
 
   async create(opponent: string, questions: DuelQuestions, seed: number): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }> {
@@ -94,6 +134,7 @@ export class FakeDuelGateway implements DuelGateway {
       const run = autoOpponentRun(duel.questions);
       duel.runs.set(opponent, this.makeRun(run.round1, run.round2));
     }
+    this.persist();
     return { ok: true, duelId: duel.id };
   }
 
@@ -112,12 +153,14 @@ export class FakeDuelGateway implements DuelGateway {
     if (!valid) return refuse("bad_run");
     duel.runs.set(ME, this.makeRun(round1, round2));
     this.settle(duel);
+    this.persist();
     return { ok: true };
   }
 
   async list(): Promise<Duel[]> {
     if (!this.online) throw new OfflineError();
     this.expire();
+    this.persist();
     // Like the server's `duel_runs.claimed`: true once a `duel_settled` for that duel went through the app.
     const claimedIds = new Set((await this.getMyEvents()).filter((e) => e.type === "duel_settled").map((e) => e.refId));
     const mine = (d: { id: string }, run: DuelRun | undefined): DuelRun | null =>
@@ -162,6 +205,7 @@ export class FakeDuelGateway implements DuelGateway {
       duel.runs.set(member.userId, this.makeRun(run.round1, run.round2));
     }
     this.duels.push(duel);
+    this.persist();
     return duel.id;
   }
 

@@ -15,6 +15,8 @@ const EnvSchema = z
     VITE_DEMO: bool,
   })
   .superRefine((e, ctx) => {
+    if (e.VITE_DEMO && !e.VITE_USE_FAKES)
+      ctx.addIssue({ code: "custom", message: "VITE_DEMO=true requires VITE_USE_FAKES=true" });
     if (!e.VITE_USE_FAKES && (!e.VITE_SUPABASE_URL || !e.VITE_SUPABASE_ANON_KEY))
       ctx.addIssue({
         code: "custom",

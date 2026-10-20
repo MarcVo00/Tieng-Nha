@@ -21,7 +21,7 @@ import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
 import { walletAt } from "@/services/wallet";
 
-export function createFakeServices(overrides: Partial<Services> = {}): Services {
+export function createFakeServices(overrides: Partial<Services> = {}, options: { duelStorage?: Pick<Storage, "getItem" | "setItem"> } = {}): Services {
   // Dependent fakes are built from the overridden instances so callers can inject e.g. a Dexie-backed progress repo.
   const clock = overrides.clock ?? (() => new Date().toISOString());
   const progress = overrides.progress ?? new InMemoryProgressRepository();
@@ -50,6 +50,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
     auth,
     exam: new FakeExamGateway(clock),
     duels: new FakeDuelGateway(() => progress.listEvents(), clock, {
+      ...(options.duelStorage ? { storage: options.duelStorage } : {}),
       localKimBai: async () => walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).kimBai,
     }),
     tts: new FakeSpeechSynthesizer(),

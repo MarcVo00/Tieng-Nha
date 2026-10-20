@@ -26,3 +26,7 @@ describe("demo mode", () => {
     expect(shouldRefuseFakes(base)).toBe(true);
   });
 });
+
+test("VITE_DEMO=true requires VITE_USE_FAKES=true", () => {
+  expect(() => parseEnv({ VITE_DEMO: "true", VITE_USE_FAKES: "false", VITE_SUPABASE_URL: "https://x.supabase.co", VITE_SUPABASE_ANON_KEY: "0123456789" })).toThrow(/VITE_DEMO/);
+});

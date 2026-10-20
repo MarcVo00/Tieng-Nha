@@ -13,7 +13,7 @@ export function DemoPanel() {
   const refresh = useRefreshProgress();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
-  if (!env.VITE_DEMO) return null;
+  if (!env.VITE_DEMO || !demo) return null;
   const t = fr.demo.toast;
 
   async function run(action: () => Promise<string>): Promise<void> {
@@ -27,6 +27,15 @@ export function DemoPanel() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function grant(coins: number, kimBai: number, message: string): Promise<string> {
+    await activity.demoGrant(coins, kimBai);
+    return message;
+  }
+
+  async function challenge(): Promise<string> {
+    return (await demo?.receiveChallenge()) ? t.challenge : t.noChallenge;
   }
 
   // Same events as really finishing the lessons and the dialogue (first time only).
@@ -57,16 +66,16 @@ export function DemoPanel() {
           <p className="text-caption text-ink-muted">{fr.demo.hint}</p>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <Button variant="secondary" disabled={busy} onClick={() => void run(async () => (await activity.demoGrant(500, 0), t.coins))}>
+          <Button variant="secondary" disabled={busy} onClick={() => void run(() => grant(500, 0, t.coins))}>
             {fr.demo.coins}
           </Button>
-          <Button variant="secondary" disabled={busy} onClick={() => void run(async () => (await activity.demoGrant(0, 20), t.kimBai))}>
+          <Button variant="secondary" disabled={busy} onClick={() => void run(() => grant(0, 20, t.kimBai))}>
             {fr.demo.kimBai}
           </Button>
           <Button variant="secondary" disabled={busy} onClick={() => void run(unlockDuels)}>
             {fr.demo.unlock}
           </Button>
-          <Button variant="secondary" disabled={busy} onClick={() => void run(async () => ((await demo?.receiveChallenge()) ? t.challenge : t.noChallenge))}>
+          <Button variant="secondary" disabled={busy} onClick={() => void run(challenge)}>
             {fr.demo.challenge}
           </Button>
         </div>

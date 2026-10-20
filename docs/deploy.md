@@ -154,6 +154,7 @@ Une version de démonstration (faux serveur, adversaires de duel automatiques, v
 
 - Pour rafraîchir la démo : fusionne `main` dans `demo`, puis pousse `demo`.
 - Ne fusionne **jamais** cette PR dans `main`.
+- La démo stocke tout sur le téléphone (Dexie + `localStorage`) : « Effacer les données du site » la remet à zéro.
 
 ---
 

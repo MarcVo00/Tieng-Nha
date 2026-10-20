@@ -40,7 +40,7 @@ export function createServices(env: Env): Services {
   // Remote (fake or Supabase)
   let remote: Remote;
   if (env.VITE_USE_FAKES) {
-    const f = createFakeServices({ clock, progress, auth: new FakeAuthService(true) });
+    const f = createFakeServices({ clock, progress, auth: new FakeAuthService(true) }, env.VITE_DEMO ? { duelStorage: localStorage } : {});
     remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, duels: f.duels, reporter: f.reporter };
   } else {
     const url = env.VITE_SUPABASE_URL;

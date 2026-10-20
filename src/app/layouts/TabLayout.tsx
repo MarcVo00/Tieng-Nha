@@ -19,11 +19,6 @@ export function TabLayout() {
 
   return (
     <div className="mx-auto min-h-dvh max-w-md px-5 pb-28">
-      {demo ? (
-        <p className="pointer-events-none fixed left-0 top-0 z-40 rounded-br-md bg-ink px-2 py-0.5 text-caption text-surface opacity-80">
-          {fr.demo.badge}
-        </p>
-      ) : null}
       <header className="flex items-center gap-3 py-3">
         <Link to="/me" aria-label={fr.app.header.profile} className="flex h-11 w-11 items-center justify-center rounded-full">
           <Avatar emoji={profile?.avatarEmoji ?? ""} size="sm" frame={frame} />
@@ -35,6 +30,11 @@ export function TabLayout() {
           <XpCounter value={snapshot?.xpTotal ?? 0} />
         </div>
       </header>
+      {demo ? (
+        <p className="-mt-1 mb-3 flex justify-center">
+          <span className="rounded-full border border-line bg-surface-2 px-3 py-0.5 text-caption text-ink-muted">{fr.demo.badge}</span>
+        </p>
+      ) : null}
       <InAppBrowserNotice className="mb-4" dismissible />
       <main>
         <AnimatePresence mode="wait">

@@ -163,7 +163,11 @@ export function HomeScreen() {
                   />
                 </mask>
               </defs>
-              <path d={layout.d} stroke="currentColor" strokeWidth={4} strokeLinecap="round" strokeDasharray="2 12" mask={`url(#${maskId})`} />
+              {/* Brush stroke: a wide, soft ink band under a dashed centre line, revealed together by the mask. */}
+              <g mask={`url(#${maskId})`}>
+                <path d={layout.d} className="stroke-line" strokeWidth={9} strokeLinecap="round" opacity={0.55} />
+                <path d={layout.d} className="stroke-ink-muted" strokeWidth={2.5} strokeLinecap="round" strokeDasharray="1 9" opacity={0.7} />
+              </g>
             </svg>
             <ol className="absolute inset-0 list-none">
               {layout.nodes.map((node) => (

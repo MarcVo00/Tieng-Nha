@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { AnimatePresence } from "motion/react";
 import { Link, useLocation, useOutlet } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { EnergyIndicator } from "@/app/EnergyIndicator";
 import { SyncIndicator } from "@/app/SyncIndicator";
 import { fr } from "@/i18n/fr";
+import { lookOf } from "@/services/look";
 import { InAppBrowserNotice } from "@/features/onboarding";
 import { useServices } from "@/app/ServicesProvider";
 import { Avatar, PageTransition, StreakFlame, TabBar, XpCounter } from "@/ui";
@@ -13,7 +15,9 @@ export function TabLayout() {
   const outlet = useOutlet();
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
-  const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
+  const equipped = useAppState((s) => s.wallet?.equipped);
+  const frame = equipped?.frame ?? null;
+  const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
   const dueCount = useAppState((s) => s.dueCount);
   const demo = useServices().env.VITE_DEMO;
 
@@ -21,7 +25,7 @@ export function TabLayout() {
     <div className="mx-auto min-h-dvh max-w-md px-5 pb-28">
       <header className="flex items-center gap-3 py-3">
         <Link to="/me" aria-label={fr.app.header.profile} className="flex h-11 w-11 items-center justify-center rounded-full">
-          <Avatar emoji={profile?.avatarEmoji ?? ""} size="sm" frame={frame} />
+          <Avatar emoji={profile?.avatarEmoji ?? ""} size="sm" frame={frame} look={look} />
         </Link>
         <div className="ml-auto flex items-center gap-3">
           <SyncIndicator />

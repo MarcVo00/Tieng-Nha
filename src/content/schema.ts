@@ -65,6 +65,8 @@ export const LessonSchema = z
     contentVersion: z.number().int().min(1),
     title: z.string().min(1),
     description: z.string().min(1),
+    /** One short line for the home path (28 characters at most); lessons without one fall back to a clipped description. */
+    tagline: z.string().min(1).max(28).optional(),
     emoji: z.string().min(1),
     dialogueId: DialogueIdSchema,
     vocab: z.array(VocabItemSchema).min(12).max(18),

@@ -54,7 +54,7 @@ test("settings saved before voice packs get the default voice; unknown voices ar
 test("leaderboard cache roundtrip", async () => {
   const repo = new DexieProgressRepository(db);
   expect(await repo.getCachedLeaderboard("week")).toBeUndefined();
-  await repo.cacheLeaderboard("week", [{ userId: "u", pseudo: "A", avatarEmoji: "🐉", xp: 3, streak: 1, lessonsDone: 1, frame: null, isMe: true }], NOW);
+  await repo.cacheLeaderboard("week", [{ userId: "u", pseudo: "A", avatarEmoji: "🐉", xp: 3, streak: 1, lessonsDone: 1, frame: null, look: {}, isMe: true }], NOW);
   expect(await repo.getCachedLeaderboard("week")).toMatchObject({ fetchedAt: NOW, rows: [{ pseudo: "A" }] });
 });
 

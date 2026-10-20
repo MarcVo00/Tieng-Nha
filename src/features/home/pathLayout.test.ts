@@ -71,3 +71,19 @@ test("the exam node carries the boss name and illustration", () => {
   const node = buildPathLayout(lessons, snapshot([]), tree, boss).nodes.find((n) => n.kind === "exam");
   expect(node).toMatchObject({ kind: "exam", boss: { name: "Thủy Tinh", illustration: "boss_thuy_tinh" } });
 });
+
+test("stars: 0 before completion, 1 completed, 2 with its dialogue done, 3 perfect", () => {
+  const snap = { ...snapshot(["l01", "l02", "l03"]), dialoguesDone: ["d02", "d03"], perfectLessons: ["l03"] };
+  const { nodes } = buildPathLayout(lessons, snap, tree, boss);
+  const starsOf = (id: string) => {
+    const n = stop(nodes, id);
+    return n.kind === "lesson" ? n.stars : -1;
+  };
+  expect([starsOf("l01"), starsOf("l02"), starsOf("l03"), starsOf("l04")]).toEqual([1, 2, 3, 0]);
+});
+
+test("a lantern milestone marks every third lesson", () => {
+  const { nodes } = buildPathLayout(lessons, snapshot([]), tree, boss);
+  const lit = nodes.flatMap((n) => (n.kind === "lesson" && n.milestone ? [n.order] : []));
+  expect(lit).toEqual([3, 6, 9]);
+});

@@ -3,6 +3,7 @@
   "contentVersion": 4,
   "title": "La famille",
   "description": "Présente ta famille : papa, maman, frères et sœurs, enfants. Au Sud, l'aîné de la fratrie s'appelle « hai » (deux).",
+  "tagline": "Toute la famille",
   "emoji": "👨‍👩‍👧",
   "dialogueId": "d04",
   "vocab": [

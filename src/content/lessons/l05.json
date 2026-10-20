@@ -3,6 +3,7 @@
   "contentVersion": 3,
   "title": "Au café",
   "description": "Commander un café glacé comme à Sài Gòn.",
+  "tagline": "Un cà phê sữa đá",
   "emoji": "☕",
   "dialogueId": "d05",
   "vocab": [

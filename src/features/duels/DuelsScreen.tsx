@@ -5,7 +5,7 @@ import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useChallenge } from "@/app/useChallenge";
 import { OfflineError } from "@/domain/errors";
-import type { Duel, LeaderboardRow } from "@/domain/types";
+import type { Duel, LeaderboardRow, Look } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { Avatar, Button, Card, duration, EmptyState, ease, Icon, SectionTitle, Skeleton, tap } from "@/ui";
 import { readPending, readRun, unsentDuelIds } from "@/features/duels/duelRunState";
@@ -28,12 +28,12 @@ function Section({ id, title, children }: { id: string; title: string; children:
   );
 }
 
-function DuelRow({ duel, to, title, caption, trailing }: { duel: Duel; to: string; title: string; caption: string; trailing?: ReactNode }) {
+function DuelRow({ duel, to, title, caption, trailing, look }: { duel: Duel; to: string; title: string; caption: string; trailing?: ReactNode; look?: Look | undefined }) {
   return (
     <motion.li whileTap={tap}>
       <Card raised>
         <Link to={to} className="flex min-h-14 items-center gap-3 p-3">
-          <Avatar emoji={duel.opponentAvatar} size="md" />
+          <Avatar emoji={duel.opponentAvatar} size="md" look={look} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-body-strong text-ink">{title}</span>
             <span className="block truncate text-caption text-ink-muted">{caption}</span>
@@ -91,6 +91,9 @@ export function DuelsScreen() {
   // Local runs are re-read with every load of the list.
   const unsent = useMemo(() => new Set(load.status === "loading" ? [] : unsentDuelIds()), [load]);
   const busyWith = useMemo(() => new Set((ready?.duels ?? []).filter((d) => d.status === "open").map((d) => otherId(d, myId))), [ready, myId]);
+
+  // Duels only carry the opponent's emoji: their hero comes from the member list (emoji stays the fallback).
+  const lookOfOpponent = (d: Duel): Look | undefined => ready?.members.find((m) => m.userId === otherId(d, myId))?.look;
 
   const onChallenge = (userId: string) => {
     setChallenging(userId);
@@ -164,6 +167,7 @@ export function DuelsScreen() {
                   <DuelRow
                     key={d.id}
                     duel={d}
+                    look={lookOfOpponent(d)}
                     to={`/duel/${d.id}/run`}
                     title={fr.duels.hub.versus(d.opponentPseudo)}
                     caption={pending ? fr.duels.hub.unsentHint : fr.duels.hub.timeLeft(hoursLeft(d, clock()))}
@@ -184,6 +188,7 @@ export function DuelsScreen() {
                 <DuelRow
                   key={d.id}
                   duel={d}
+                  look={lookOfOpponent(d)}
                   to={`/duel/${d.id}`}
                   title={fr.duels.hub.waitingFor(d.opponentPseudo)}
                   caption={fr.duels.hub.timeLeft(hoursLeft(d, clock()))}
@@ -206,7 +211,7 @@ export function DuelsScreen() {
               <ul aria-label={fr.duels.hub.membersLabel} className="mt-3 list-none">
                 {ready.members.map((m) => (
                   <li key={m.userId} className="flex min-h-14 items-center gap-3 border-b border-line py-2">
-                    <Avatar emoji={m.avatarEmoji} size="md" frame={m.frame} />
+                    <Avatar emoji={m.avatarEmoji} size="md" frame={m.frame} look={m.look} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-body-strong text-ink">{m.pseudo}</span>
                       {busyWith.has(m.userId) ? (
@@ -237,6 +242,7 @@ export function DuelsScreen() {
                   <DuelRow
                     key={d.id}
                     duel={d}
+                    look={lookOfOpponent(d)}
                     to={`/duel/${d.id}`}
                     title={fr.duels.hub.versus(d.opponentPseudo)}
                     caption={fr.duels.hub.outcome[outcomeOf(d, myId)]}

@@ -20,6 +20,7 @@ export class InMemoryContentSource implements ContentSource {
         id: l.id,
         title: l.title,
         description: l.description,
+        ...(l.tagline === undefined ? {} : { tagline: l.tagline }),
         emoji: l.emoji,
         dialogueId: l.dialogueId,
         order: i + 1,

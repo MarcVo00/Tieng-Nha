@@ -3,6 +3,7 @@
   "contentVersion": 3,
   "title": "Le temps",
   "description": "Situe-toi dans le temps : aujourd'hui, demain, hier, les moments de la journée, et demande l'heure (jusqu'à dix heures).",
+  "tagline": "Hier et demain",
   "emoji": "🕰️",
   "dialogueId": "d09",
   "vocab": [

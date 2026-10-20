@@ -38,7 +38,7 @@ function setup(route = "/leaderboard", services: Services = createFakeServices({
 }
 
 const row = (userId: string, pseudo: string, xp: number, isMe = false): LeaderboardRow => ({
-  userId, pseudo, avatarEmoji: "🌸", xp, streak: 0, lessonsDone: 1, frame: null, isMe,
+  userId, pseudo, avatarEmoji: "🌸", xp, streak: 0, lessonsDone: 1, frame: null, look: {}, isMe,
 });
 
 beforeEach(() => {
@@ -252,4 +252,12 @@ test("a profile shows the hero it wears", async () => {
   await screen.findByRole("heading", { level: 1, name: "Xuân" });
   expect(document.querySelector('[data-look~="hat_thuy_tinh"]')).not.toBeNull();
   expect(screen.queryByText("🐯")).toBeNull();
+});
+
+test("members wear their hero, not an emoji", async () => {
+  setup();
+  const podium = await screen.findByRole("list", { name: fr.leaderboard.podiumLabel });
+  expect(podium.querySelectorAll("[data-look]").length).toBeGreaterThan(0);
+  expect(podium).not.toHaveTextContent("🐢");
+  expect(screen.getByRole("list", { name: fr.leaderboard.listLabel })).not.toHaveTextContent("🐯");
 });

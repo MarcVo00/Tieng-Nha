@@ -19,7 +19,7 @@ export type TonePick = z.infer<typeof TonePickSchema>;
 export type WordOrder = z.infer<typeof WordOrderSchema>;
 export type Speak = z.infer<typeof SpeakSchema>;
 export type Lesson = z.infer<typeof LessonSchema>;
-export type LessonSummary = Pick<Lesson, "id" | "title" | "description" | "emoji" | "dialogueId"> & { order: number };
+export type LessonSummary = Pick<Lesson, "id" | "title" | "description" | "tagline" | "emoji" | "dialogueId"> & { order: number };
 export type Turn = z.infer<typeof TurnSchema>;
 export type NpcTurn = z.infer<typeof NpcTurnSchema>;
 export type UserTurn = z.infer<typeof UserTurnSchema>;
@@ -102,6 +102,7 @@ export type LeaderboardRow = {
   streak: number;
   lessonsDone: number;
   frame: string | null; // equipped frame item id
+  look: Look; // equipped hero (character, hat, outfit, accessory, aura)
   isMe: boolean;
 };
 

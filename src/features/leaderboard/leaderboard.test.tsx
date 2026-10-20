@@ -50,9 +50,9 @@ test("podium shows the top 3, the list starts at rank 4 and my row is highlighte
   const podium = await screen.findByRole("list", { name: fr.leaderboard.podiumLabel });
   const places = within(podium).getAllByRole("link");
   expect(places.map((p) => p.getAttribute("aria-label"))).toEqual([
-    expect.stringContaining("Rang 2 : Chú Tư"),
-    expect.stringContaining("Rang 1 : Bà Ngoại"),
-    expect.stringContaining("Rang 3 : Bé Na"),
+    expect.stringContaining("Rang 2\u202f: Chú Tư"),
+    expect.stringContaining("Rang 1\u202f: Bà Ngoại"),
+    expect.stringContaining("Rang 3\u202f: Bé Na"),
   ]);
   const list = screen.getByRole("list", { name: fr.leaderboard.listLabel });
   const rows = within(list).getAllByRole("link");

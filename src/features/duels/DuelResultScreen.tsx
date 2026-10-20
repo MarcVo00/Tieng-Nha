@@ -448,7 +448,7 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
               >
                 <Icon name="medal" size={24} />
                 <span aria-hidden="true">{fr.duels.result.reward(reward)}</span>
-                <span className="sr-only">{`${fr.duels.result.rewardLabel} : ${reward}`}</span>
+                <span className="sr-only">{`${fr.duels.result.rewardLabel}\u202f: ${reward}`}</span>
               </motion.p>
             ) : null}
           </header>

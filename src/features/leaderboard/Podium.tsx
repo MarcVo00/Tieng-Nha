@@ -13,7 +13,7 @@ function Column({ row, place, reduced }: { row: LeaderboardRow; place: Place; re
   return (
     <li className="flex min-w-0 flex-1 flex-col">
       <motion.div whileTap={tap} className="flex flex-1 flex-col">
-        <Link to={profilePath(row)} aria-label={`${fr.leaderboard.rankLabel(place)} : ${row.pseudo}, ${fr.leaderboard.xp(row.xp)}`} className="flex flex-1 flex-col items-center justify-end gap-1 px-1 text-center">
+        <Link to={profilePath(row)} aria-label={`${fr.leaderboard.rankLabel(place)}\u202f: ${row.pseudo}, ${fr.leaderboard.xp(row.xp)}`} className="flex flex-1 flex-col items-center justify-end gap-1 px-1 text-center">
           <Avatar emoji={row.avatarEmoji} size={place === 1 ? "lg" : "md"} ring={place === 1 ? "gold" : "none"} frame={row.frame} />
           <span className="mt-1 w-full truncate text-body-strong text-ink">{row.pseudo}</span>
           {row.isMe ? <span className="text-caption text-primary">{fr.leaderboard.you}</span> : null}

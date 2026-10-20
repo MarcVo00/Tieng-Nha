@@ -104,7 +104,7 @@ export function DuelsScreen() {
         <p className="tabular flex items-center gap-1.5 text-body-strong text-gold-ink">
           <Icon name="medal" size={22} />
           <span aria-hidden="true">{kimBai}</span>
-          <span className="sr-only">{`${fr.duels.kimBaiLabel} : ${fr.duels.kimBai(kimBai)}`}</span>
+          <span className="sr-only">{`${fr.duels.kimBaiLabel}\u202f: ${fr.duels.kimBai(kimBai)}`}</span>
         </p>
       </div>
 

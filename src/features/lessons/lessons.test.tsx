@@ -182,7 +182,7 @@ test(
     expect(useAppState.getState().snapshot?.xpTotal).toBeGreaterThanOrEqual(15);
 
     // The dialogue is the primary next step.
-    await userEvent.click(await screen.findByRole("button", { name: "Dialogue : Commander au café" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Dialogue\u202f: Commander au café" }));
     expect(await screen.findByText("page du dialogue")).toBeInTheDocument();
   },
   TEST_TIMEOUT,

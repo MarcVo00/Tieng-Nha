@@ -62,7 +62,7 @@ function Corrections({ state }: { state: ResultState }) {
                     </p>
                   ) : null}
                   <p className="text-body text-ink">
-                    <span className="text-caption text-ink-muted">{fr.exam.result.expected} : </span>
+                    <span className="text-caption text-ink-muted">{fr.exam.result.expected}{"\u202f: "}</span>
                     <span lang="vi">{r.expected}</span>
                   </p>
                 </div>

@@ -10,6 +10,7 @@
 | [Plan personnages](superpowers/plans/2026-10-19-characters.md) | orchestrateur + sous-agents | lot 3 : deux personnages à acheter, compatibles avec les cosmétiques |
 | [Spec Duels et arène](superpowers/specs/2026-10-19-duels-arena-design.md) | tous | duels en différé (QCM chronométré + oral), Kim bài, boutique d'arène |
 | [Plan Duels](superpowers/plans/2026-10-20-duels.md) | orchestrateur + sous-agents | plan A : duels + Kim bài (migration, écrans, combat rejoué) |
+| [Plan Boutique d'arène](superpowers/plans/2026-10-20-arena-shop.md) | orchestrateur + sous-agents | plan B : 3 cosmétiques martiaux, écran Arène, achats en Kim bài vérifiés côté serveur |
 | [Plan arbre + boss](superpowers/plans/2026-10-14-tree-and-boss.md) | orchestrateur + sous-agents | étapes 1–2 de la Progression V2 : arbre de compétences, boss Thủy Tinh |
 | [Plan énergie](superpowers/plans/2026-10-14-energy.md) | orchestrateur + sous-agents | étape 3 de la Progression V2 : énergie ⚡ |
 | [Plan xu + boutique](superpowers/plans/2026-10-15-coins-shop.md) | orchestrateur + sous-agents | étape 4 de la Progression V2 : xu, boutique, cadres, gel de série (migration Supabase) |

@@ -41,7 +41,7 @@ test("a completed lesson turns done and reveals its dialogue stop", async () => 
   renderHome(services);
   const stop = await screen.findByRole("link", { name: /Au café.*terminée sans faute/ });
   expect(stop).toHaveAttribute("href", "/lesson/l05");
-  expect(screen.getByRole("link", { name: "Dialogue : Au café" })).toHaveAttribute("href", "/dialogue/d05");
+  expect(screen.getByRole("link", { name: "Dialogue\u202f: Au café" })).toHaveAttribute("href", "/dialogue/d05");
   // The only lesson of the fakes tree is done, so the boss stop is unlocked and takes over the start chip.
   expect(screen.queryByRole("button", { name: /Thủy Tinh.*verrouillé/ })).not.toBeInTheDocument();
   expect(screen.getAllByText("Commencer")).toHaveLength(1);
@@ -70,7 +70,7 @@ test("the hero waits beside the path before the first lesson, then stands on the
   const services = createFakeServices();
   await services.activity.completeLesson({ lessonId: "l05", mistakes: 0, durationMs: 1000, vocabIds: [] });
   renderHome(services);
-  expect(await screen.findByRole("img", { name: "Toi, après la leçon « Au café »" })).toBeInTheDocument();
+  expect(await screen.findByRole("img", { name: "Toi, après la leçon «\u202fAu café\u202f»" })).toBeInTheDocument();
 });
 
 test("the path token wears the equipped hero, and the default hero before the wallet loads", async () => {

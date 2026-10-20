@@ -30,7 +30,7 @@ test("opens the explanation sheet with the countdown and a review link", async (
   expect(dialog).toHaveTextContent(fr.energy.explain);
   expect(dialog).toHaveTextContent(fr.energy.next(2, 14));
   expect(screen.getByRole("link", { name: fr.energy.review })).toHaveAttribute("href", "/review");
-  expect(dialog).toHaveTextContent(fr.energy.label(3, 5));
+  expect(dialog).toHaveTextContent(fr.energy.label(3, 5), { normalizeWhitespace: false });
 });
 
 test("hides the review link when no word is due", async () => {

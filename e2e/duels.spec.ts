@@ -51,7 +51,7 @@ test("duel against a family member, replay and Kim bài", async ({ page }) => {
   await expect(page).toHaveURL(/\/duel\/[^/]+$/);
   await page.getByRole("button", { name: fr.duels.result.skip }).click();
   await expect(page.getByRole("table", { name: fr.duels.result.statsLabel })).toBeVisible();
-  const reward = page.getByText(new RegExp(`${fr.duels.result.rewardLabel} : (\\d+)`));
+  const reward = page.getByText(new RegExp(`${fr.duels.result.rewardLabel}\u202f: (\\d+)`));
   await expect(reward).toBeAttached();
   const kim = Number((await reward.textContent())?.match(/(\d+)$/)?.[1]);
   expect(kim).toBeGreaterThanOrEqual(1);
@@ -61,7 +61,7 @@ test("duel against a family member, replay and Kim bài", async ({ page }) => {
   const done = page.getByRole("region", { name: fr.duels.done }).or(page.locator("section", { has: page.getByRole("heading", { name: fr.duels.done }) })).first();
   await expect(done.getByText(fr.duels.hub.versus(OPPONENT.pseudo))).toBeVisible();
   await expect(done.getByText(fr.duels.kimBaiWon(kim))).toBeVisible();
-  await expect(page.getByText(`${fr.duels.kimBaiLabel} : ${fr.duels.kimBai(kim)}`)).toBeAttached();
+  await expect(page.getByText(`${fr.duels.kimBaiLabel}\u202f: ${fr.duels.kimBai(kim)}`)).toBeAttached();
 });
 
 test("locked duels: the profile explains what is missing", async ({ page }) => {

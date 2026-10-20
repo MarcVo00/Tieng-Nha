@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useEntryState } from "@/app/useEntryState";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Boss } from "@/domain/types";
@@ -61,7 +62,7 @@ function Corrections({ state }: { state: ResultState }) {
                     </p>
                   ) : null}
                   <p className="text-body text-ink">
-                    <span className="text-caption text-ink-muted">{fr.exam.result.expected} : </span>
+                    <span className="text-caption text-ink-muted">{fr.exam.result.expected}{"\u202f: "}</span>
                     <span lang="vi">{r.expected}</span>
                   </p>
                 </div>
@@ -181,7 +182,7 @@ function ResultContent({ state }: { state: ResultState }) {
 }
 
 export function ExamResultScreen() {
-  const { state } = useLocation() as { state: unknown };
+  const state = useEntryState();
   if (!isResultState(state)) return <Navigate to="/exam" replace />;
   return <ResultContent state={state} />;
 }

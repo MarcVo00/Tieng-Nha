@@ -71,7 +71,7 @@ test("buys a streak freeze after confirming", async () => {
   const freeze = await card(fr.shop.items["streak_freeze"]?.name ?? "");
   await user.click(within(freeze).getByRole("button", { name: fr.shop.buy(50) }));
   const dialog = await screen.findByRole("alertdialog");
-  expect(dialog).toHaveTextContent(fr.shop.confirm.title("un gel de série", 50));
+  expect(dialog).toHaveTextContent(fr.shop.confirm.title("un gel de série", 50), { normalizeWhitespace: false });
   await user.click(within(dialog).getByRole("button", { name: fr.shop.confirm.confirm }));
   expect(await screen.findByText(fr.shop.balance(coins - 50))).toBeInTheDocument();
   expect(await screen.findByText(fr.shop.bought)).toBeInTheDocument();
@@ -92,7 +92,7 @@ test("a full freeze stock disables the purchase", async () => {
   setup(services);
   const freeze = await card(fr.shop.items["streak_freeze"]?.name ?? "");
   expect(within(freeze).getByRole("button", { name: fr.shop.stockFull })).toBeDisabled();
-  expect(freeze).toHaveTextContent(fr.shop.stock(2, 2));
+  expect(freeze).toHaveTextContent(fr.shop.stock(2, 2), { normalizeWhitespace: false });
 });
 
 test("the refill is disabled while the energy is full", async () => {
@@ -278,7 +278,7 @@ describe("dark legends section and try-on", () => {
     const sheet = await screen.findByRole("dialog", { name: NAMES[0] ?? "" });
     await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) }));
     expect(screen.queryByRole("alertdialog")).toBeNull();
-    expect(sheet).toHaveTextContent(fr.shop.confirm.title("la couronne des marées", 60));
+    expect(sheet).toHaveTextContent(fr.shop.confirm.title("la couronne des marées", 60), { normalizeWhitespace: false });
     expect((await types(services)).length).toBe(before);
     await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
     await screen.findByText(fr.shop.bought);

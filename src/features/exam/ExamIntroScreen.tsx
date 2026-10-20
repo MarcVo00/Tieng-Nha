@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppState, useRefreshProgress } from "@/app/appState";
+import { useEntryState } from "@/app/useEntryState";
 import { useServices } from "@/app/ServicesProvider";
 import type { Boss, Tree } from "@/domain/types";
 import { ENERGY } from "@/services/energy";
@@ -33,7 +34,7 @@ export function ExamIntroScreen() {
   const { exam, content, activity } = useServices();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
-  const interrupted = isInterruptedState((useLocation() as { state: unknown }).state);
+  const interrupted = isInterruptedState(useEntryState());
   const snapshot = useAppState((s) => s.snapshot);
   const energy = useAppState((s) => s.energy);
   const dueCount = useAppState((s) => s.dueCount);

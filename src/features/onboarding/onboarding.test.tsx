@@ -53,7 +53,7 @@ async function choosePassword(user: User, password = "secret123", confirmation =
 }
 
 async function passwordSignIn(user: User, email = "marc@example.com", password = "secret123") {
-  await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+  await user.click(await screen.findByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
   await user.type(await screen.findByLabelText("E-mail"), email);
   await user.type(screen.getByLabelText("Mot de passe"), password);
   await user.click(screen.getByRole("button", { name: "Se connecter" }));
@@ -82,7 +82,7 @@ test("happy path ends on / with onboarding done and profile cached", async () =>
   await user.click(await screen.findByRole("button", { name: "Écouter" }));
   await waitFor(() => expect(screen.getByLabelText("Résultats du test")).toHaveTextContent("Disponible"));
   await user.click(screen.getByRole("button", { name: "Continuer" }));
-  await user.click(await screen.findByRole("button", { name: "C'est parti !" }));
+  await user.click(await screen.findByRole("button", { name: "C'est parti\u202f!" }));
   await waitFor(() => expect(router.state.location.pathname).toBe("/"));
   expect(useAppState.getState().settings.onboardingDone).toBe(true);
   expect((await services.progress.getSettings()).onboardingDone).toBe(true);
@@ -283,7 +283,7 @@ describe("password", () => {
 
   test("the eye button reveals the password", async () => {
     const { user } = setup();
-    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
     const field = await screen.findByLabelText("Mot de passe");
     expect(field).toHaveAttribute("type", "password");
     expect(field).toHaveAttribute("autocomplete", "current-password");
@@ -366,9 +366,9 @@ describe("password", () => {
   test("forgot password: code, new password, then home", async () => {
     const auth = await existingAccount(true);
     const { services, router, user } = setup({ auth });
-    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
     await user.type(await screen.findByLabelText("E-mail"), "marc@example.com");
-    await user.click(screen.getByRole("button", { name: "Mot de passe oublié ?" }));
+    await user.click(screen.getByRole("button", { name: "Mot de passe oublié\u202f?" }));
     const send = await screen.findByRole("button", { name: "Recevoir mon code" });
     expect(screen.queryByLabelText("Code d'invitation")).not.toBeInTheDocument();
     expect(screen.getByLabelText("E-mail")).toHaveValue("marc@example.com");
@@ -387,9 +387,9 @@ describe("password", () => {
 
   test("forgot password for an unknown e-mail shows the neutral message and sends no code", async () => {
     const { services, user } = setup();
-    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
     await user.type(await screen.findByLabelText("E-mail"), "ghost@example.com");
-    await user.click(screen.getByRole("button", { name: "Mot de passe oublié ?" }));
+    await user.click(screen.getByRole("button", { name: "Mot de passe oublié\u202f?" }));
     await user.click(await screen.findByRole("button", { name: "Recevoir mon code" }));
     expect(await screen.findByText("Si un compte existe, un code t'a été envoyé.")).toBeInTheDocument();
     expect((services.auth as FakeAuthService).otpRequests).toEqual([]);
@@ -400,9 +400,9 @@ describe("password", () => {
     const auth = await existingAccount(true);
     const spy = vi.spyOn(auth, "requestOtp");
     const { user } = setup({ auth });
-    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
     await user.type(await screen.findByLabelText("E-mail"), "marc@example.com");
-    await user.click(screen.getByRole("button", { name: "Mot de passe oublié ?" }));
+    await user.click(screen.getByRole("button", { name: "Mot de passe oublié\u202f?" }));
     await user.click(await screen.findByRole("button", { name: "Recevoir mon code" }));
     await screen.findByLabelText("Code à 6 chiffres");
     expect(spy).toHaveBeenCalledWith("marc@example.com", { createUser: false });
@@ -449,7 +449,7 @@ describe("password", () => {
 
     await user.click(screen.getByRole("button", { name: "Commencer" }));
     await user.type(await screen.findByLabelText("E-mail"), "marc@example.com");
-    await user.click(screen.getByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.click(screen.getByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
     expect(await screen.findByRole("heading", { name: "Content de te revoir" })).toBeInTheDocument();
     expect(screen.getByLabelText("E-mail")).toHaveValue("marc@example.com");
   });
@@ -457,7 +457,7 @@ describe("password", () => {
   test("the progress dots appear on the sign-up path only", async () => {
     const { user } = setup();
     expect(screen.getByRole("img", { name: "Étape 1 sur 6" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.click(screen.getByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
     await screen.findByLabelText("Mot de passe");
     expect(screen.queryByRole("img", { name: /Étape/ })).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Retour" }));
@@ -506,7 +506,7 @@ describe("install step", () => {
     expect(await screen.findByText("Pour installer Tiếng Nhà, passe par Chrome")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ouvrir dans Chrome" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Installer l'application" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "C'est parti !" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "C'est parti\u202f!" })).toBeInTheDocument();
   });
 
   test("standalone display mode skips the step and finishes", async () => {
@@ -549,7 +549,7 @@ describe("install step", () => {
     stubDisplayMode(false);
     const { user, router } = setup({ progress });
     await user.click(await screen.findByRole("button", { name: "Continuer" }));
-    await user.click(await screen.findByRole("button", { name: "C'est parti !" }));
+    await user.click(await screen.findByRole("button", { name: "C'est parti\u202f!" }));
     await user.click(await screen.findByRole("button", { name: "Réessayer" }));
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
     expect(save).toHaveBeenCalled();
@@ -574,8 +574,8 @@ describe("demo hints", () => {
 
   test.each([false, true])("sign-in screen shows the hint only in demo mode (demo=%s)", async (demo) => {
     const { user } = setup({ env: demoEnv(demo) });
-    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte\u202f? Se connecter" }));
     await screen.findByLabelText("Mot de passe");
-    expect(screen.queryAllByText(/Démo : utilise le compte/)).toHaveLength(demo ? 1 : 0);
+    expect(screen.queryAllByText(/Démo\u202f: utilise le compte/)).toHaveLength(demo ? 1 : 0);
   });
 });

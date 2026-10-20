@@ -11,4 +11,6 @@
 html { background: var(--color-bg); color: var(--color-ink); transition: background-color 200ms, color 200ms; -webkit-tap-highlight-color: transparent; }
 body { font-family: "Be Vietnam Pro", system-ui, sans-serif; min-height: 100dvh; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 :focus-visible { outline: 3px solid var(--color-gold); outline-offset: 2px; }
+/* Programmatic focus (headings with tabindex="-1") is for screen readers: no ring. Keyboard focus stays on controls. */
+[tabindex="-1"]:focus-visible { outline: none; }
 .tabular { font-variant-numeric: tabular-nums; }

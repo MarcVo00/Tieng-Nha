@@ -162,7 +162,7 @@ describe("challenge from a public profile", () => {
     const create = vi.spyOn(services.duels, "create");
     renderAt(`/u/${BE_NA}`, services);
     await userEvent.click(await screen.findByRole("button", { name: fr.duels.challenge }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(fr.duels.noMic);
+    expect(await screen.findByRole("alert")).toHaveTextContent(fr.duels.noMic, { normalizeWhitespace: false });
     expect(create).not.toHaveBeenCalled();
   });
 
@@ -172,7 +172,7 @@ describe("challenge from a public profile", () => {
     vi.spyOn(services.duels, "create").mockResolvedValue({ ok: false, error: code });
     renderAt(`/u/${BE_NA}`, services);
     await userEvent.click(await screen.findByRole("button", { name: fr.duels.challenge }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(fr.duels.errors[code]);
+    expect(await screen.findByRole("alert")).toHaveTextContent(fr.duels.errors[code], { normalizeWhitespace: false });
     expect(screen.getByTestId("where")).toHaveTextContent(`/u/${BE_NA}`);
   });
 
@@ -207,7 +207,7 @@ describe("hub lists", () => {
     expect(within(done).getByRole("link")).toHaveAttribute("href", `/duel/${mine.duelId}`);
   });
 
-  test("a duel I played and that waits for the other is « En attente »", async () => {
+  test("a duel I played and that waits for the other is «\u202fEn attente\u202f»", async () => {
     const services = makeServices();
     await unlock(services);
     const gw = gateway(services);
@@ -320,7 +320,7 @@ describe("Kim bài", () => {
     await screen.findByRole("region", { name: fr.duels.done });
     await waitFor(() => expect(useAppState.getState().wallet?.kimBai).toBeGreaterThan(0));
     const balance = useAppState.getState().wallet?.kimBai ?? 0;
-    expect(screen.getByText(`${fr.duels.kimBaiLabel} : ${fr.duels.kimBai(balance)}`)).toBeInTheDocument();
+    expect(screen.getByText(`${fr.duels.kimBaiLabel}\u202f: ${fr.duels.kimBai(balance)}`)).toBeInTheDocument();
 
     cleanup();
     renderAt("/duels", services); // a second opening must not pay twice
@@ -427,7 +427,7 @@ describe("pending duels entry points", () => {
     expect(pills.filter((p) => p.className.includes("bg-primary"))).toHaveLength(1);
   });
 
-  test("the leaderboard « Duels » entry counts the duels to play", async () => {
+  test("the leaderboard «\u202fDuels\u202f» entry counts the duels to play", async () => {
     const services = makeServices();
     await unlock(services);
     gateway(services).seedIncoming(QUESTIONS, { from: "bot_ba_ngoai" });

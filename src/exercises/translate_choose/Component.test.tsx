@@ -42,6 +42,6 @@ test("key 1 selects the first option and Enter validates it", async () => {
 test("each option has a speaker button that speaks it", async () => {
   tts.spoken = [];
   renderWithServices(<Component {...props()} />);
-  await userEvent.click(screen.getByRole("button", { name: "Écouter : Cho tui một ly cà phê đen." }));
+  await userEvent.click(screen.getByRole("button", { name: "Écouter\u202f: Cho tui một ly cà phê đen." }));
   expect(tts.spoken).toEqual(["Cho tui một ly cà phê đen."]);
 });

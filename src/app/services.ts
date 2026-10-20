@@ -28,4 +28,11 @@ export type Services = {
   reporter: ContentReporter;
   activity: ActivityService; // real implementation in T07
   sync: SyncService; // real implementation in T10
+  /** Demo mode only (undefined otherwise): test helpers on top of the fake backend. */
+  demo?: DemoTools;
+};
+
+export type DemoTools = {
+  /** A fake group member challenges the player (needs at least one lesson in common). Resolves false when no duel can be picked. */
+  receiveChallenge(): Promise<boolean>;
 };

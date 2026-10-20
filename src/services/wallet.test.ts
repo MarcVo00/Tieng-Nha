@@ -234,3 +234,21 @@ describe("Kim bài", () => {
     expect(w.kimBai).toBe(50);
   });
 });
+
+describe("demo_grant", () => {
+  test("adds coins and Kim bài from non-negative integers only", () => {
+    const w = walletAt(
+      [
+        ev("demo_grant", { coins: 500, kimBai: 0 }, "demo", 10, 9),
+        ev("demo_grant", { coins: 0, kimBai: 20 }, "demo", 10, 10),
+        ev("demo_grant", { coins: -5, kimBai: 1.5 }, "demo", 10, 11),
+        ev("demo_grant", { coins: "9", kimBai: null }, "demo", 10, 12),
+      ],
+      shop,
+      badges,
+    );
+    expect(w.coins).toBe(500);
+    expect(w.kimBai).toBe(20);
+    expect(w.streak).toBe(0);
+  });
+});

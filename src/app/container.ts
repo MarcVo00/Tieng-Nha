@@ -1,9 +1,9 @@
 import type { Env } from "@/domain/config";
 import type { VoiceId } from "@/domain/types";
-import type { Services } from "@/app/services";
+import type { DemoTools, Services } from "@/app/services";
 import { flags } from "@/app/flags";
 import { useAppState } from "@/app/appState";
-import { createFakeServices, FakeAuthService, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
+import { createFakeServices, FakeAuthService, FakeDuelGateway, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
 import { TiengNhaDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
 import { AudioPackSynthesizer, WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
 import { createStaticContentSource } from "@/adapters/content";
@@ -13,6 +13,7 @@ import {
 } from "@/adapters/supabase";
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
+import { createDemoTools } from "@/app/demoTools";
 
 type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "duels" | "reporter">;
 
@@ -63,8 +64,13 @@ export function createServices(env: Env): Services {
   const sync = createSyncService({ outbox, sink: remote.sink });
   const activity = createActivityService({ progress, outbox, content, clock, onEventAppended: () => sync.notifyEnqueued() });
 
+  const demo: DemoTools | undefined =
+    env.VITE_DEMO && env.VITE_USE_FAKES && remote.duels instanceof FakeDuelGateway
+      ? createDemoTools({ duels: remote.duels, activity, content })
+      : undefined;
+
   return {
     env, flags, clock, content, progress, outbox, ...remote, tts, stt, recorder, detectCapabilities, prefetchVoice,
-    conversation: new ScriptedConversationEngine(content), activity, sync,
+    conversation: new ScriptedConversationEngine(content), activity, sync, ...(demo ? { demo } : {}),
   };
 }

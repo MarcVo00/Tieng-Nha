@@ -39,7 +39,7 @@ export function createFakeServices(overrides: Partial<Services> = {}): Services 
   };
   const myFrame = async () => walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).equipped.frame ?? null;
   const base: Services = {
-    env: { VITE_WELCOME_MESSAGE: "", VITE_USE_FAKES: true, VITE_FAKE_SPEECH: true },
+    env: { VITE_WELCOME_MESSAGE: "", VITE_USE_FAKES: true, VITE_FAKE_SPEECH: true, VITE_DEMO: false },
     flags: { aiConversation: false, streakFreeze: false, humanAudio: false },
     clock,
     content,

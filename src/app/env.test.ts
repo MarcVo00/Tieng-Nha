@@ -13,3 +13,16 @@ describe("shouldRefuseFakes", () => {
   test("allows real mode in production", () =>
     expect(shouldRefuseFakes({ ...base, useFakes: false })).toBe(false));
 });
+
+describe("demo mode", () => {
+  const base = { prod: true, useFakes: true, hostname: "deploy-preview-1--tieng-nha.netlify.app" };
+  test("VITE_DEMO defaults to false and is read from the env", () => {
+    expect(parseEnv({ VITE_USE_FAKES: "true" }).VITE_DEMO).toBe(false);
+    expect(parseEnv({ VITE_USE_FAKES: "true", VITE_DEMO: "true" }).VITE_DEMO).toBe(true);
+  });
+  test("fakes are allowed on a public host only with the demo flag", () => {
+    expect(shouldRefuseFakes({ ...base, demo: true })).toBe(false);
+    expect(shouldRefuseFakes({ ...base, demo: false })).toBe(true);
+    expect(shouldRefuseFakes(base)).toBe(true);
+  });
+});

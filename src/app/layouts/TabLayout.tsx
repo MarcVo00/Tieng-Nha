@@ -5,6 +5,7 @@ import { EnergyIndicator } from "@/app/EnergyIndicator";
 import { SyncIndicator } from "@/app/SyncIndicator";
 import { fr } from "@/i18n/fr";
 import { InAppBrowserNotice } from "@/features/onboarding";
+import { useServices } from "@/app/ServicesProvider";
 import { Avatar, PageTransition, StreakFlame, TabBar, XpCounter } from "@/ui";
 
 export function TabLayout() {
@@ -14,9 +15,15 @@ export function TabLayout() {
   const snapshot = useAppState((s) => s.snapshot);
   const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
   const dueCount = useAppState((s) => s.dueCount);
+  const demo = useServices().env.VITE_DEMO;
 
   return (
     <div className="mx-auto min-h-dvh max-w-md px-5 pb-28">
+      {demo ? (
+        <p className="pointer-events-none fixed left-0 top-0 z-40 rounded-br-md bg-ink px-2 py-0.5 text-caption text-surface opacity-80">
+          {fr.demo.badge}
+        </p>
+      ) : null}
       <header className="flex items-center gap-3 py-3">
         <Link to="/me" aria-label={fr.app.header.profile} className="flex h-11 w-11 items-center justify-center rounded-full">
           <Avatar emoji={profile?.avatarEmoji ?? ""} size="sm" frame={frame} />

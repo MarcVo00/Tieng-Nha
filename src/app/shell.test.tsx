@@ -133,3 +133,16 @@ test("the selected voice pack is prefetched once ready, and again when the voice
   act(() => useAppState.getState().set({ settings: { ...useAppState.getState().settings, voice: "device" } }));
   expect(prefetch).toHaveBeenCalledTimes(2);
 });
+
+test("the « Mode démo » badge shows only in demo mode", async () => {
+  const off = await onboardedServices();
+  const view = renderAt("/", off);
+  await screen.findByRole("navigation");
+  expect(screen.queryByText("Mode démo")).toBeNull();
+  view.router.dispose();
+  document.body.innerHTML = "";
+
+  const on = await onboardedServices();
+  renderAt("/", { ...on, env: { ...on.env, VITE_DEMO: true } });
+  expect(await screen.findByText("Mode démo")).toBeInTheDocument();
+});

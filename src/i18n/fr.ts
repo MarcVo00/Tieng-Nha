@@ -19,6 +19,25 @@ export const fr = {
     },
     gained: (n: number) => `+${n} ⚡`,
   },
+  // --- demo (deploy previews only) ---
+  demo: {
+    badge: "Mode démo",
+    title: "Outils de test",
+    hint: "Visible uniquement dans la version de démonstration.",
+    coins: "+500 xu",
+    kimBai: "+20 Kim bài",
+    unlock: "Débloquer les duels",
+    challenge: "Recevoir un défi",
+    toast: {
+      coins: "500 xu ajoutés",
+      kimBai: "20 Kim bài ajoutés",
+      unlocked: "Duels débloqués",
+      alreadyUnlocked: "Les duels étaient déjà débloqués",
+      challenge: "Un défi t'attend dans l'arène",
+      noChallenge: "Termine d'abord au moins une leçon pour recevoir un défi",
+      error: "L'action a échoué, réessaie",
+    },
+  },
   // --- app ---
   app: {
     name: "Tiếng Nhà",

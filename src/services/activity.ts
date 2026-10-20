@@ -26,6 +26,8 @@ export type ActivityService = {
    * Returns the Kim bài added to the local wallet.
    */
   claimSettledDuels(duels: readonly Duel[]): Promise<number>;
+  /** Demo mode only: credits xu / Kim bài in the local journal (never synced). Non-negative integers. */
+  demoGrant(coins: number, kimBai: number): Promise<Wallet>;
 };
 
 export type BossOutcome = { bossId: string; won: boolean; livesLeft: number; bossHpLeft: number };
@@ -150,6 +152,12 @@ export function createActivityService(deps: {
       const run = claiming.then(() => claim(duels));
       claiming = run.catch(() => undefined);
       return run;
+    },
+    async demoGrant(coins, kimBai) {
+      const ok = (n: number) => Number.isInteger(n) && n >= 0;
+      if (!ok(coins) || !ok(kimBai)) return wallet();
+      await progress.appendEvent({ type: "demo_grant", refId: "demo", xp: 0, payload: { coins, kimBai } }, clock()); // local only: never enqueued
+      return wallet();
     },
     async finishExam({ attemptId, score, noSpeaking, boss }) {
       const best = (await snapshot()).examBest;

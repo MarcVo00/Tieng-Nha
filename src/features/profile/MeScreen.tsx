@@ -20,6 +20,7 @@ import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
 import { WardrobeSection } from "@/features/profile/WardrobeSection";
 import { RewardsSection } from "@/features/profile/RewardsSection";
 import { ReportProblemSheet } from "@/features/profile/ReportProblemSheet";
+import { DemoPanel } from "@/features/profile/DemoPanel";
 import { SettingsSection } from "@/features/profile/SettingsSection";
 
 function removeKey(key: string): void {
@@ -316,6 +317,8 @@ export function MeScreen() {
       <RewardsSection badges={badges} />
 
       <SettingsSection onReport={() => setReportOpen(true)} />
+
+      <DemoPanel />
 
       <section aria-labelledby="me-account" className="flex flex-col gap-3 pt-4">
         <h2 id="me-account" className="text-heading text-ink">

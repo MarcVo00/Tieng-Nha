@@ -12,6 +12,7 @@ const EnvSchema = z
     VITE_WELCOME_MESSAGE: z.string().default(""),
     VITE_USE_FAKES: bool,
     VITE_FAKE_SPEECH: bool,
+    VITE_DEMO: bool,
   })
   .superRefine((e, ctx) => {
     if (!e.VITE_USE_FAKES && (!e.VITE_SUPABASE_URL || !e.VITE_SUPABASE_ANON_KEY))
@@ -27,7 +28,7 @@ export function parseEnv(raw: Record<string, unknown>): Env {
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 
-/** True when a production build would run on fakes outside a local host (E2E previews on localhost). */
-export function shouldRefuseFakes(input: { prod: boolean; useFakes: boolean; hostname: string }): boolean {
-  return input.prod && input.useFakes && !LOCAL_HOSTS.has(input.hostname);
+/** True when a production build would run on fakes outside a local host (E2E previews on localhost); the demo build is the one allowed exception. */
+export function shouldRefuseFakes(input: { prod: boolean; useFakes: boolean; hostname: string; demo?: boolean }): boolean {
+  return input.prod && input.useFakes && !input.demo && !LOCAL_HOSTS.has(input.hostname);
 }

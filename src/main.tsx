@@ -18,6 +18,7 @@ if (
     prod: import.meta.env.PROD,
     useFakes: env.VITE_USE_FAKES,
     hostname: window.location.hostname,
+    demo: env.VITE_DEMO,
   })
 ) {
   // A public build must never run on fakes: refuse to start rather than pretend to sync.

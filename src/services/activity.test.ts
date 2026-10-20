@@ -207,3 +207,15 @@ describe("claimSettledDuels", () => {
     expect((await svc.getWallet()).kimBai).toBe(3);
   });
 });
+
+test("demoGrant appends a local-only demo_grant event and credits the wallet", async () => {
+  const { svc, progress, outbox } = setup();
+  const w = await svc.demoGrant(500, 20);
+  expect(w.coins).toBe(500);
+  expect(w.kimBai).toBe(20);
+  expect((await progress.listEvents()).map((e) => e.type)).toEqual(["demo_grant"]);
+  expect(await outbox.size()).toBe(0);
+  const same = await svc.demoGrant(-1, 2.5);
+  expect(same.coins).toBe(500);
+  expect((await progress.listEvents())).toHaveLength(1);
+});

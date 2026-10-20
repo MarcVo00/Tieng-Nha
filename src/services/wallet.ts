@@ -90,6 +90,13 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
       settledDuels.add(e.refId);
       continue;
     }
+    if (e.type === "demo_grant") {
+      // Demo mode only (local journal, never synced): non-negative integers only.
+      const { coins, kimBai } = e.payload;
+      if (typeof coins === "number" && Number.isInteger(coins) && coins >= 0) w.coins += coins;
+      if (typeof kimBai === "number" && Number.isInteger(kimBai) && kimBai >= 0) w.kimBai += kimBai;
+      continue;
+    }
     if (e.type === "badge_unlocked") {
       if (!unlocked.has(e.refId)) {
         w.coins += coinsForEvent(e, best);

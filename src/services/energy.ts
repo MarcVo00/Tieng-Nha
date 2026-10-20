@@ -3,7 +3,7 @@ import type { AppEvent, AppEventType, EnergyState, SessionKind } from "@/domain/
 export const ENERGY = { max: 5, refillMs: 10_800_000, cost: { lesson: 1, dialogue: 1, boss: 3 }, reviewGain: 1 } as const;
 
 /** Recorded in the local journal only: the server neither accepts nor needs them (energy is not checked server-side). */
-export const LOCAL_ONLY_EVENT_TYPES: readonly AppEventType[] = ["session_started"];
+export const LOCAL_ONLY_EVENT_TYPES: readonly AppEventType[] = ["session_started", "demo_grant"];
 
 const isKind = (v: unknown): v is SessionKind => v === "lesson" || v === "dialogue" || v === "boss";
 

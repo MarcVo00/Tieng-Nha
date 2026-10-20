@@ -38,7 +38,8 @@ export type AppEventType =
   | "session_started"
   | "item_purchased"
   | "item_equipped"
-  | "duel_settled";
+  | "duel_settled"
+  | "demo_grant";
 
 /** Payload shapes by event type (stored as JSON). */
 export type EventPayload = {
@@ -51,6 +52,7 @@ export type EventPayload = {
   item_purchased: { itemId: string };
   item_equipped: { slot: ItemSlot; itemId: string | null };
   duel_settled: { kimBai: number };
+  demo_grant: { coins: number; kimBai: number };
 };
 
 export type SessionKind = "lesson" | "dialogue" | "boss";

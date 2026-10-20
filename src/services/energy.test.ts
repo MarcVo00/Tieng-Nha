@@ -71,3 +71,8 @@ test("spending after a refill restarts the timer from that spend", () => {
   expect(e.current).toBe(4);
   expect(e.nextAt).toBe(at(5 * H));
 });
+
+test("demo_grant stays in the local journal like session_started", async () => {
+  const { LOCAL_ONLY_EVENT_TYPES } = await import("@/services/energy");
+  expect(LOCAL_ONLY_EVENT_TYPES).toContain("demo_grant");
+});

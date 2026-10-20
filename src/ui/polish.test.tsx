@@ -10,6 +10,7 @@ test("SectionTitle keeps a level-2 heading with the plain accessible name and hi
   expect(screen.getByRole("heading", { level: 2, name: "Badges" })).toHaveAttribute("id", "t");
   expect(screen.getByRole("region", { name: "Badges" })).toBeInTheDocument();
   expect(screen.getByText("Huy hiệu")).toHaveAttribute("aria-hidden", "true");
+  expect(screen.getByText("Huy hiệu")).toHaveAttribute("lang", "vi");
   expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
 });
 
@@ -32,6 +33,18 @@ test("primary button glints once when it becomes enabled, not on first render no
   expect(container.querySelectorAll("button > span[aria-hidden]")).toHaveLength(1);
 });
 
+test("every enable gives a fresh glint (enable, disable, enable)", () => {
+  const { rerender, container } = render(<Button disabled>Valider</Button>);
+  rerender(<Button>Valider</Button>);
+  const first = container.querySelector("button > span[aria-hidden]");
+  expect(first).not.toBeNull();
+  rerender(<Button disabled>Valider</Button>);
+  rerender(<Button>Valider</Button>);
+  const second = container.querySelector("button > span[aria-hidden]");
+  expect(second).not.toBeNull();
+  expect(second).not.toBe(first);
+});
+
 test("an enabled-from-start button never glints", () => {
   const { container } = render(<Button>Valider</Button>);
   expect(container.querySelector("button > span[aria-hidden]")).toBeNull();
@@ -42,5 +55,6 @@ test("DropNumber renders its text and re-renders with the new value", () => {
   expect(screen.getByText("120 xu")).toBeInTheDocument();
   rerender(<DropNumber>80 xu</DropNumber>);
   expect(screen.getByText("80 xu")).toBeInTheDocument();
+  expect(screen.getByText("80 xu").style.opacity).toBe("0"); // drop-in starts invisible, above its resting place
   expect(screen.queryByText("120 xu")).toBeNull();
 });

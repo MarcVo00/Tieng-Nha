@@ -27,7 +27,7 @@ function Shine() {
     <motion.span
       aria-hidden="true"
       className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -skew-x-12"
-      style={{ background: "linear-gradient(90deg, transparent, rgb(255 248 238 / 0.38), transparent)" }}
+      style={{ background: "linear-gradient(90deg, transparent, var(--shine), transparent)" }}
       initial={{ x: "-120%" }}
       animate={{ x: "420%" }}
       transition={{ duration: duration.celebrate, ease: ease.out }}
@@ -53,10 +53,10 @@ function Dots() {
 export function Button({ variant = "primary", size = "md", loading = false, fullWidth = false, className, disabled, children, type = "button", ...rest }: ButtonProps) {
   const reduced = useReducedMotion();
   const wasDisabled = useRef(disabled === true);
-  const [shine, setShine] = useState(false);
+  const [shine, setShine] = useState(0);
   useEffect(() => {
     const now = disabled === true;
-    if (variant === "primary" && wasDisabled.current && !now && !reduced) setShine(true);
+    if (variant === "primary" && wasDisabled.current && !now && !reduced) setShine((n) => n + 1);
     wasDisabled.current = now;
   }, [disabled, variant, reduced]);
   const greyed = variant === "primary" && disabled === true && !loading;
@@ -72,7 +72,7 @@ export function Button({ variant = "primary", size = "md", loading = false, full
       {...rest}
     >
       <span className={`inline-flex items-center justify-center gap-2 ${loading ? "opacity-0" : ""}`}>{children}</span>
-      {shine ? <Shine /> : null}
+      {shine > 0 ? <Shine key={shine} /> : null}
       {loading ? (
         <>
           <Dots />

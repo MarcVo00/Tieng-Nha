@@ -22,7 +22,7 @@ type Load =
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="mt-8">
-      <SectionTitle id={id} overline={fr.ui.overline.duels}>{title}</SectionTitle>
+      <SectionTitle id={id}>{title}</SectionTitle>
       <ul className="mt-3 flex list-none flex-col gap-3">{children}</ul>
     </section>
   );

@@ -7,6 +7,7 @@
   --color-error: #B4410F; --color-error-soft: #F7E0D2;
   --color-info: #2C4A7A; --color-streak: #D9531E;
   --color-scrim: rgb(31 26 23 / 0.35);
+  --shine: rgb(255 248 238 / 0.38); /* lacquer glint on the primary button, same in every theme */
   --color-paper: #F4E4C4; /* giấy điệp: the medallion characters stand on, same in both themes */
   --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; /* Dong Ho pigments (art-direction 2), same in every theme */
   --frame-bronze: #9A6A3A; --frame-jade: #2E7D6B; --frame-son-mai: var(--color-gold);

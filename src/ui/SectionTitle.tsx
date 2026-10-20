@@ -14,7 +14,7 @@ export function SectionTitle({ id, children, overline, className }: SectionTitle
   return (
     <div className={`flex flex-col ${className ?? ""}`}>
       {overline ? (
-        <span aria-hidden="true" className="text-caption font-semibold uppercase tracking-[0.18em] text-gold-ink">
+        <span lang="vi" aria-hidden="true" className="text-caption font-semibold uppercase tracking-[0.18em] text-gold-ink">
           {overline}
         </span>
       ) : null}

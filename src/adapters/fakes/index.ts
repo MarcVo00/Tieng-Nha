@@ -3,7 +3,7 @@ export { InMemoryProgressRepository } from "@/adapters/fakes/InMemoryProgressRep
 export { InMemoryOutbox } from "@/adapters/fakes/InMemoryOutbox";
 export { FakeEventSink } from "@/adapters/fakes/FakeEventSink";
 export { FakeLeaderboardRepository } from "@/adapters/fakes/FakeLeaderboardRepository";
-export { FakeAuthService } from "@/adapters/fakes/FakeAuthService";
+export { FakeAuthService, type FakeAuthOptions } from "@/adapters/fakes/FakeAuthService";
 export { FakeExamGateway } from "@/adapters/fakes/FakeExamGateway";
 export { FakeDuelGateway } from "@/adapters/fakes/FakeDuelGateway";
 export { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes/FakeSpeech";

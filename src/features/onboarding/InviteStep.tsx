@@ -25,7 +25,7 @@ type InviteStepProps = {
 };
 
 export function InviteStep({ mode = "signup", initialEmail = "", onBack, onSignIn, inviteCode, inviteError, session, onInviteChange, onAuthenticated }: InviteStepProps) {
-  const { auth } = useServices();
+  const { auth, env } = useServices();
   const t = fr.onboarding.invite;
   const [email, setEmail] = useState(session?.email ?? initialEmail);
   const [phase, setPhase] = useState<"email" | "code">("email");
@@ -139,6 +139,7 @@ export function InviteStep({ mode = "signup", initialEmail = "", onBack, onSignI
         <p role="status" className="min-h-[1.125rem] text-caption text-ink-muted">
           {resent ? t.resent : ""}
         </p>
+        {env.VITE_DEMO ? <p className="text-caption text-ink-muted">{t.demoHintCode}</p> : null}
       </form>
     );
   }
@@ -181,6 +182,7 @@ export function InviteStep({ mode = "signup", initialEmail = "", onBack, onSignI
           {fr.onboarding.signIn.back}
         </Button>
       ) : null}
+      {env.VITE_DEMO ? <p className="text-caption text-ink-muted">{t.demoHintInvite}</p> : null}
     </form>
   );
 }

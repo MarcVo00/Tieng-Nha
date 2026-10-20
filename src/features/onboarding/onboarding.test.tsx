@@ -556,3 +556,26 @@ describe("install step", () => {
     expect(failOnce).toBe(false);
   });
 });
+
+describe("demo hints", () => {
+  const demoEnv = (demo: boolean) => ({ ...createFakeServices().env, VITE_DEMO: demo });
+
+  test.each([false, true])("invite and code steps show the hint only in demo mode (demo=%s)", async (demo) => {
+    const { user } = setup({ env: demoEnv(demo) });
+    await user.click(await screen.findByRole("button", { name: "Commencer" }));
+    await screen.findByLabelText("Code d'invitation");
+    expect(screen.queryAllByText(/n'importe quel code d'invitation/)).toHaveLength(demo ? 1 : 0);
+    await user.type(screen.getByLabelText("Code d'invitation"), "x");
+    await user.type(screen.getByLabelText("E-mail"), "marc@example.com");
+    await user.click(screen.getByRole("button", { name: "Recevoir mon code" }));
+    await screen.findByLabelText("Code à 6 chiffres");
+    expect(screen.queryAllByText(/le code est 123456/)).toHaveLength(demo ? 1 : 0);
+  });
+
+  test.each([false, true])("sign-in screen shows the hint only in demo mode (demo=%s)", async (demo) => {
+    const { user } = setup({ env: demoEnv(demo) });
+    await user.click(await screen.findByRole("button", { name: "Déjà un compte ? Se connecter" }));
+    await screen.findByLabelText("Mot de passe");
+    expect(screen.queryAllByText(/Démo : utilise le compte/)).toHaveLength(demo ? 1 : 0);
+  });
+});

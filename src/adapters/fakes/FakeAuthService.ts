@@ -6,13 +6,22 @@ type Profile = { pseudo: string; avatarEmoji: string };
 
 const STORAGE_KEY = "tieng-nha.fake-auth";
 
-function storage(): Storage | null {
+function defaultStorage(): Pick<Storage, "getItem" | "setItem"> | null {
   try {
     return typeof sessionStorage === "undefined" ? null : sessionStorage;
   } catch {
     return null;
   }
 }
+
+export type FakeAuthOptions = {
+  /** Keep session and profile in storage so a reload or deep link stays signed in (app runtime only). */
+  persist?: boolean;
+  /** Where to persist; defaults to sessionStorage. The demo passes localStorage so the account survives a closed tab. */
+  storage?: Pick<Storage, "getItem" | "setItem">;
+  /** Accept any non-empty invite code instead of only TEST-CODE (demo only). */
+  anyInvite?: boolean;
+};
 
 export class FakeAuthService implements AuthService {
   otpRequests: string[] = [];
@@ -22,9 +31,20 @@ export class FakeAuthService implements AuthService {
   private knownEmails = new Set<string>();
   private listeners = new Set<(s: Session | null, event?: AuthEvent) => void>();
 
-  /** `persist` keeps session and profile in sessionStorage so a reload or deep link stays signed in (app runtime only). */
-  constructor(private readonly persist = false) {
-    const raw = persist ? storage()?.getItem(STORAGE_KEY) : null;
+  private readonly persist: boolean;
+  private readonly store: Pick<Storage, "getItem" | "setItem"> | null;
+  private readonly anyInvite: boolean;
+
+  constructor(options: FakeAuthOptions = {}) {
+    this.persist = options.persist ?? false;
+    this.anyInvite = options.anyInvite ?? false;
+    this.store = this.persist ? (options.storage ?? defaultStorage()) : null;
+    let raw: string | null = null;
+    try {
+      raw = this.store?.getItem(STORAGE_KEY) ?? null;
+    } catch {
+      // Blocked site data: start signed out.
+    }
     if (!raw) return;
     try {
       const saved = JSON.parse(raw) as { session: Session | null; profile: Profile | null; passwords?: Record<string, string>; knownEmails?: string[] };
@@ -40,7 +60,7 @@ export class FakeAuthService implements AuthService {
   private save(): void {
     if (!this.persist) return;
     try {
-      storage()?.setItem(STORAGE_KEY, JSON.stringify({ session: this.session, profile: this.profile, passwords: this.passwords, knownEmails: [...this.knownEmails] }));
+      this.store?.setItem(STORAGE_KEY, JSON.stringify({ session: this.session, profile: this.profile, passwords: this.passwords, knownEmails: [...this.knownEmails] }));
     } catch {
       // Storage unavailable: the fake simply stays in-memory.
     }
@@ -106,7 +126,7 @@ export class FakeAuthService implements AuthService {
 
   async joinGroup(inviteCode: string, pseudo: string, avatarEmoji: string): Promise<void> {
     this.requireSession();
-    if (inviteCode !== "TEST-CODE") throw new InvalidInviteError();
+    if (this.anyInvite ? !inviteCode.trim() : inviteCode !== "TEST-CODE") throw new InvalidInviteError();
     if (pseudo === "Taken") throw new PseudoTakenError();
     this.profile = { pseudo, avatarEmoji };
     this.save();

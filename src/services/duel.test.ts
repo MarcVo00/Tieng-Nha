@@ -1,5 +1,5 @@
 import type { Lesson, Round1Answer } from "@/domain/types";
-import { commonLessons, DUEL, duelDamage, duelOutcome, duelPrerequisites, duelTime, pickDuelQuestions, toDuelMs } from "@/services/duel";
+import { commonLessons, DUEL, duelDamage, duelOutcome, duelPrerequisites, duelTime, pickDuelQuestions, round1Blow, round2Blow, toDuelMs } from "@/services/duel";
 import { createRng } from "@/services/random";
 import { LOCAL_ONLY_EVENT_TYPES } from "@/services/energy";
 
@@ -109,3 +109,30 @@ describe("prerequisites and common lessons", () => {
 });
 
 test("duel_settled is synced", () => expect(LOCAL_ONLY_EVENT_TYPES).not.toContain("duel_settled"));
+
+describe("per-answer blows (shared by duelDamage and the replay)", () => {
+  test.each([
+    [{ correct: true, ms: 299 }, "hit", 10],
+    [{ correct: true, ms: 300 }, "critical", 15],
+    [{ correct: true, ms: 2999 }, "critical", 15],
+    [{ correct: true, ms: 3000 }, "hit", 10],
+    [{ correct: true, ms: 20000 }, "hit", 10],
+    [{ correct: true, ms: 20001 }, "miss", 0],
+    [{ correct: false, ms: 1000 }, "miss", 0],
+  ] as const)("round 1 %o → %s %i", (answer, kind, damage) => {
+    expect(round1Blow(answer)).toEqual({ kind, damage });
+  });
+
+  test("round 2: recognised = 15, otherwise a miss", () => {
+    expect(round2Blow({ correct: true })).toEqual({ kind: "hit", damage: DUEL.oral });
+    expect(round2Blow({ correct: false })).toEqual({ kind: "miss", damage: 0 });
+  });
+
+  test("duelDamage is the sum of the blows", () => {
+    const r1 = [{ correct: true, ms: 1000 }, { correct: true, ms: 100 }, { correct: false, ms: 1000 }, { correct: true, ms: 25000 }];
+    const r2 = [{ correct: true }, { correct: false }];
+    const sum = r1.reduce((s, a) => s + round1Blow(a).damage, 0) + r2.reduce((s, a) => s + round2Blow(a).damage, 0);
+    expect(duelDamage(r1, r2)).toBe(sum);
+    expect(sum).toBe(15 + 10 + 15);
+  });
+});

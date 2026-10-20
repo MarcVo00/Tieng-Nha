@@ -1,6 +1,6 @@
 import type { Duel, DuelRun } from "@/domain/types";
 import { outcomeOf } from "@/features/duels/duelsView";
-import { DUEL } from "@/services/duel";
+import { DUEL, round1Blow, round2Blow, type DuelBlow } from "@/services/duel";
 
 export type ReplayStep = {
   round: 1 | 2;
@@ -11,16 +11,6 @@ export type ReplayStep = {
   hpMe: number;
   hpThem: number;
 };
-
-type Blow = Pick<ReplayStep, "kind" | "damage">;
-
-/** Same rules as `duelDamage`, one answer at a time. */
-function round1Blow(a: { correct: boolean; ms: number }): Blow {
-  if (!a.correct || a.ms > DUEL.round1CapMs) return { kind: "miss", damage: 0 };
-  return a.ms >= DUEL.minMs && a.ms < DUEL.critUnderMs ? { kind: "critical", damage: DUEL.crit } : { kind: "hit", damage: DUEL.hit };
-}
-
-const round2Blow = (a: { correct: boolean }): Blow => (a.correct ? { kind: "hit", damage: DUEL.oral } : { kind: "miss", damage: 0 });
 
 /**
  * The replayed fight: question by question, the challenger first (Q1 of each, then Q2…), round 1 then round 2.
@@ -34,7 +24,7 @@ export function duelReplay(mine: DuelRun | null, theirs: DuelRun | null, meFirst
   const order: ("me" | "them")[] = meFirst ? ["me", "them"] : ["them", "me"];
   const runOf = (who: "me" | "them") => (who === "me" ? mine : theirs);
 
-  const play = (round: 1 | 2, count: number, blowAt: (run: DuelRun, i: number) => Blow | null) => {
+  const play = (round: 1 | 2, count: number, blowAt: (run: DuelRun, i: number) => DuelBlow | null) => {
     for (let i = 0; i < count; i++) {
       for (const attacker of order) {
         const run = runOf(attacker);

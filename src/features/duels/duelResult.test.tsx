@@ -162,14 +162,80 @@ test("a settled duel replays the fight blow by blow, then shows the bilan and pa
   await waitFor(async () => expect((await services.activity.getWallet()).kimBai).toBe(3));
 });
 
-test("« Passer » jumps straight to the bilan", async () => {
+test("« Passer » jumps straight to the bilan, moves the focus to the verdict and announces it", async () => {
   const services = makeServices();
   await unlock(services);
   const id = await settledDuel(services);
   renderAt(`/duel/${id}`, services);
   await skip();
-  expect(await screen.findByRole("heading", { name: R.headline.win })).toBeInTheDocument();
+  const heading = await screen.findByRole("heading", { name: R.headline.win });
   expect(screen.getByRole("meter", { name: R.hp("Bé Na", 25) })).toBeInTheDocument();
+  await waitFor(() => expect(heading).toHaveFocus());
+  expect(screen.getByText(R.verdictAnnounce(R.headline.win, 3))).toHaveAttribute("aria-live", "polite");
+});
+
+test("the round banners are announced", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const services = makeServices();
+  await unlock(services);
+  const id = await settledDuel(services);
+  renderAt(`/duel/${id}`, services);
+  await screen.findByRole("button", { name: R.skip });
+  expect(document.querySelector("[aria-live]")).toHaveTextContent(R.round1);
+});
+
+const confettiPieces = () => document.querySelectorAll("div.h-2.w-2").length;
+
+test("the confetti celebrate a win only the first time the result is shown on this device", async () => {
+  const services = makeServices();
+  await unlock(services);
+  const id = await settledDuel(services);
+  renderAt(`/duel/${id}`, services);
+  await skip();
+  await screen.findByRole("heading", { name: R.headline.win });
+  expect(confettiPieces()).toBeGreaterThan(0);
+  cleanup();
+
+  renderAt(`/duel/${id}`, services);
+  await skip();
+  await screen.findByRole("heading", { name: R.headline.win });
+  expect(confettiPieces()).toBe(0);
+});
+
+test("a failed Kim bài claim is tried again on the next visit", async () => {
+  const services = makeServices();
+  await unlock(services);
+  const id = await settledDuel(services);
+  const claim = vi.spyOn(services.activity, "claimSettledDuels").mockRejectedValueOnce(new Error("disk"));
+  renderAt(`/duel/${id}`, services);
+  await screen.findByRole("button", { name: R.skip });
+  await waitFor(() => expect(claim).toHaveBeenCalledTimes(1));
+  cleanup();
+  renderAt(`/duel/${id}`, services);
+  await screen.findByRole("button", { name: R.skip });
+  await waitFor(() => expect(claim).toHaveBeenCalledTimes(2));
+  await waitFor(async () => expect((await services.activity.getWallet()).kimBai).toBe(3));
+});
+
+test("leaving mid-replay leaves no timer behind", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const errors = vi.spyOn(console, "error");
+  const services = makeServices();
+  await unlock(services);
+  const id = await settledDuel(services);
+  renderAt(`/duel/${id}`, services);
+  await screen.findByRole("button", { name: R.skip });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(1500);
+  });
+  const setBeatTimers = vi.getTimerCount();
+  expect(setBeatTimers).toBeGreaterThan(0);
+  cleanup();
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(30_000);
+  });
+  expect(vi.getTimerCount()).toBe(0);
+  expect(errors).not.toHaveBeenCalled();
 });
 
 test("a loss names the winner", async () => {

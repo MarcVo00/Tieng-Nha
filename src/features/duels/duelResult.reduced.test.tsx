@@ -114,4 +114,10 @@ test("with reduced motion the bilan shows at once, with the final HP", async () 
   expect(await screen.findByRole("heading", { name: R.headline.win })).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: R.skip })).not.toBeInTheDocument();
   expect(screen.getByRole("meter", { name: R.hp("Bé Na", 25) })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: R.headline.win })).toHaveFocus();
+  // No entrance and no confetti: the bilan is simply there.
+  const bilan = screen.getByRole("region", { name: R.headline.win });
+  expect(bilan.style.opacity).toBe("1");
+  expect(bilan.style.transform).toBe("none");
+  expect(document.querySelectorAll("div.h-2.w-2")).toHaveLength(0);
 });

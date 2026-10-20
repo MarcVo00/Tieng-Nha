@@ -22,6 +22,7 @@ export type Verdict = "critical" | "hit" | "miss";
 
 export const runKey = (id: string): string => `tn-duel-run:${id}`;
 export const pendingKey = (id: string): string => `tn-duel-pending:${id}`;
+export const seenKey = (id: string): string => `tn-duel-seen:${id}`;
 
 export function newRecord(questions: DuelQuestions, seed: number): RunRecord {
   return { questions, seed, round1: [], round2: [], shownAt: null };
@@ -130,6 +131,10 @@ export const clearRun = (id: string): void => remove(runKey(id));
 export const readPending = (id: string): PendingRun | null => read(pendingKey(id), isPendingRun);
 export const savePending = (id: string, run: PendingRun): void => write(pendingKey(id), run);
 export const clearPending = (id: string): void => remove(pendingKey(id));
+const isTrue = (v: unknown): v is true => v === true;
+/** Whether this device has already shown the result of a finished duel (the celebration plays once). */
+export const wasResultSeen = (id: string): boolean => read(seenKey(id), isTrue) === true;
+export const markResultSeen = (id: string): void => write(seenKey(id), true);
 
 type KeyStorage = Pick<Storage, "length" | "key">;
 

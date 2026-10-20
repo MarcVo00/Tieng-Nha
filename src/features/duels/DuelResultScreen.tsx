@@ -11,6 +11,7 @@ import { lookOf } from "@/services/look";
 import { DUEL } from "@/services/duel";
 import { Avatar, Button, Confetti, duration, EmptyState, ease, FocusHeader, Icon, Skeleton, spring } from "@/ui";
 import { duelReplay, replayStats, verdictOf, type ReplayStats, type ReplayStep } from "@/features/duels/duelReplay";
+import { markResultSeen, wasResultSeen } from "@/features/duels/duelRunState";
 import { otherId } from "@/features/duels/duelsView";
 
 // Hero: the two equipped heroes face to face (mine bottom-left, theirs top-right, like a fight-game stage), then the
@@ -298,6 +299,10 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
   const beats = useMemo(() => (steps.length > 0 ? buildBeats(steps) : []), [steps]);
   const [beat, setBeat] = useState(() => (reduced || verdict === "cancelled" ? beats.length : 0));
   const done = beat >= beats.length;
+  // The celebration (confetti) plays only the first time this device shows the result.
+  const [firstView] = useState(() => !wasResultSeen(duel.id));
+  useEffect(() => markResultSeen(duel.id), [duel.id]);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   // The beat whose blow has landed: HP numbers and bars change on impact, not when the attacker sets off.
   const [landed, setLanded] = useState(-1);
   const meCtl = useAnimationControls();
@@ -323,9 +328,10 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
     return { hpMe: DUEL.hp, hpThem: DUEL.hp };
   }, [beat, beats, done, landed]);
 
-  // Final poses when the replay is skipped or never played.
+  // Final poses when the replay ends, is skipped or never played; focus moves to the verdict (« Passer » is gone).
   useEffect(() => {
     if (!done) return;
+    headingRef.current?.focus();
     meCtl.stop();
     themCtl.stop();
     stageCtl.stop();
@@ -369,11 +375,19 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
 
   const current = beats[beat];
   const front: Side = current?.type === "step" ? current.step.attacker : loser === "me" ? "them" : "me";
-  const announce = current?.type === "step" ? fr.duels.result.blow(current.step.attacker === "me" ? myName : theirName, current.step.kind, current.step.damage) : "";
   const reward = duel.myRun?.reward ?? 0;
   const won = verdict === "win" || verdict === "forfeitWin";
   const h = fr.duels.result.headline;
   const headline = verdict === "loss" ? h.loss(theirName) : h[verdict];
+  const announce = done
+    ? fr.duels.result.verdictAnnounce(headline, reward)
+    : current?.type === "step"
+      ? fr.duels.result.blow(current.step.attacker === "me" ? myName : theirName, current.step.kind, current.step.damage)
+      : current?.type === "banner"
+        ? current.round === 1
+          ? fr.duels.result.round1
+          : fr.duels.result.round2
+        : "";
   const mine = replayStats(duel.myRun);
   const theirs = replayStats(duel.theirRun);
   const tied = mine !== null && theirs !== null && mine.damage === theirs.damage && verdict !== "draw";
@@ -393,38 +407,42 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
         }
       />
 
-      <div className="px-5">
+      {/* The stage keeps its 320 px geometry; under 360 px viewports it is scaled down as a whole. */}
+      <div className="flex justify-center px-5 max-[359px]:-mb-14">
+        {/* Scaled on a static wrapper: the stage's own transform belongs to its shake. */}
+        <div className="w-80 shrink-0 origin-top max-[359px]:scale-[0.85]">
         <motion.div
           animate={stageCtl}
           role="group"
           aria-label={fr.duels.result.stage(myName, theirName)}
-          className="relative mx-auto mt-2 h-[23rem] w-80 max-w-full"
+          className="relative mt-2 h-[23rem] w-80"
         >
           <HpPlate name={theirName} hp={shown.hpThem} absent={absentThem} className="left-0 top-6" />
           <HpPlate name={myName} hp={shown.hpMe} absent={absentMe} className="bottom-6 right-0" />
           <Fighter side="them" look={theirLook} frame={theirFrame} absent={absentThem} controls={themCtl} front={front === "them"} label={theirName} />
           <Fighter side="me" look={myLook} frame={equipped?.frame ?? null} absent={absentMe} controls={meCtl} front={front === "me"} label={myName} />
           {current && !done ? <Effects beat={current} index={beat} /> : null}
-          <p aria-live="polite" className="sr-only">{announce}</p>
         </motion.div>
+        </div>
       </div>
+      <p aria-live="polite" className="sr-only">{announce}</p>
 
       {done ? (
         <motion.section
           aria-labelledby="duel-verdict"
           className="relative flex flex-col gap-6 px-5 pt-6"
-          initial={{ opacity: 0, y: 16 }}
+          initial={reduced ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: duration.base, ease: ease.out }}
         >
-          <Confetti fire={won} />
+          <Confetti fire={won && firstView} />
           <header className="flex flex-col items-center gap-2 text-center">
-            <h1 id="duel-verdict" className="text-title text-ink">{headline}</h1>
+            <h1 id="duel-verdict" ref={headingRef} tabIndex={-1} className="text-title text-ink outline-none">{headline}</h1>
             <p className="max-w-xs text-body text-ink-muted">{verdict === "cancelled" ? fr.duels.result.sub.cancelled : fr.duels.result.sub[verdict](theirName)}</p>
             {reward > 0 ? (
               <motion.p
                 className="mt-1 flex items-center gap-1.5 text-heading text-gold-ink tabular"
-                initial={{ opacity: 0, scale: 0.6 }}
+                initial={reduced ? false : { opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ ...spring.bouncy, delay: duration.base }}
               >
@@ -497,7 +515,7 @@ export function DuelResultScreen() {
   const myId = useAppState((s) => s.session?.userId) ?? "";
   const [load, setLoad] = useState<Load>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
-  const claimed = useRef(false);
+  const claimedFor = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -508,13 +526,16 @@ export function DuelResultScreen() {
         if (cancelled) return;
         if (!duel) return setLoad({ status: "notFound" });
         if (duel.status === "open" && duel.myRun === null) return setLoad({ status: "toPlay" });
-        if (duel.status !== "open" && !claimed.current) {
+        if (duel.status !== "open" && claimedFor.current !== duel.id) {
           // Opening a settled duel pays its Kim bài if the hub has not yet, so the bilan matches the balance.
-          claimed.current = true;
+          // A failed claim is retried on the next load (the wallet counts each duel once anyway).
+          claimedFor.current = duel.id;
           void activity
             .claimSettledDuels([duel])
             .then((added) => (added > 0 ? refresh() : undefined))
-            .catch(() => undefined);
+            .catch(() => {
+              if (claimedFor.current === duel.id) claimedFor.current = null;
+            });
         }
         const profile = await leaderboard.getPublicProfile(otherId(duel, myId)).catch(() => null);
         if (!cancelled) setLoad({ status: "ready", duel, theirLook: profile?.look ?? {}, theirFrame: profile?.frame ?? null });

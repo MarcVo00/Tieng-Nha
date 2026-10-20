@@ -544,6 +544,7 @@ export const fr = {
       absent: "—",
       reward: (n: number) => `+${n} Kim bài`,
       rewardLabel: "Kim bài gagnés",
+      verdictAnnounce: (headline: string, reward: number) => (reward > 0 ? `${headline} ${reward} Kim bài gagnés.` : headline),
       waiting: {
         title: (name: string) => `En attente de ${name}`,
         body: (name: string) => `Ton combat est envoyé. Il sera rejoué ici dès que ${name} aura joué : ses réponses restent secrètes jusque-là.`,

@@ -22,15 +22,23 @@ export const DUEL = {
 
 const ROUND1_TYPES: readonly string[] = ["translate_choose", "listen_choose", "tone_pick"];
 
-/** Round 1: correct = 10, or 15 when 300 <= ms < 3000; over 20 s is a miss. Round 2: correct = 15. */
+/** One answer as a blow: the single source of the damage rule (`duelDamage`, the replay, the bilan). */
+export type DuelBlow = { kind: "hit" | "critical" | "miss"; damage: number };
+
+/** Round 1: correct = 10, or 15 (critical) when 300 <= ms < 3000; wrong or over 20 s is a miss. */
+export function round1Blow(a: Round1Answer): DuelBlow {
+  if (!a.correct || a.ms > DUEL.round1CapMs) return { kind: "miss", damage: 0 };
+  return a.ms >= DUEL.minMs && a.ms < DUEL.critUnderMs ? { kind: "critical", damage: DUEL.crit } : { kind: "hit", damage: DUEL.hit };
+}
+
+/** Round 2: a recognised sentence = 15. */
+export function round2Blow(a: Round2Answer): DuelBlow {
+  return a.correct ? { kind: "hit", damage: DUEL.oral } : { kind: "miss", damage: 0 };
+}
+
+/** Total damage: the sum of the blows of both rounds. */
 export function duelDamage(round1: readonly Round1Answer[], round2: readonly Round2Answer[]): number {
-  let total = 0;
-  for (const a of round1) {
-    if (!a.correct || a.ms > DUEL.round1CapMs) continue;
-    total += a.ms >= DUEL.minMs && a.ms < DUEL.critUnderMs ? DUEL.crit : DUEL.hit;
-  }
-  for (const a of round2) if (a.correct) total += DUEL.oral;
-  return total;
+  return round1.reduce((sum, a) => sum + round1Blow(a).damage, 0) + round2.reduce((sum, a) => sum + round2Blow(a).damage, 0);
 }
 
 /** Round-1 time: sum of ms, each capped at 20000. */

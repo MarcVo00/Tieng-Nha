@@ -4,7 +4,7 @@ import { duelDamage, duelTime } from "@/services/duel";
 import { duelReplay, replayStats } from "@/features/duels/duelReplay";
 
 function run(round1: { correct: boolean; ms: number }[], round2: { correct: boolean }[]): DuelRun {
-  return { round1, round2, damage: duelDamage(round1, round2), timeMs: duelTime(round1), reward: null };
+  return { round1, round2, damage: duelDamage(round1, round2), timeMs: duelTime(round1), reward: null, claimed: false };
 }
 
 describe("duelReplay", () => {

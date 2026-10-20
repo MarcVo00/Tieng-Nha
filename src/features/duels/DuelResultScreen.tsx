@@ -11,7 +11,7 @@ import { lookOf } from "@/services/look";
 import { DUEL } from "@/services/duel";
 import { Avatar, Button, Confetti, duration, EmptyState, ease, FocusHeader, Icon, Skeleton, spring } from "@/ui";
 import { duelReplay, replayStats, verdictOf, type ReplayStats, type ReplayStep } from "@/features/duels/duelReplay";
-import { markResultSeen, wasResultSeen } from "@/features/duels/duelRunState";
+import { markResultSeen, wasResultSeen } from "@/app/usePendingDuels";
 import { otherId } from "@/features/duels/duelsView";
 
 // Hero: the two equipped heroes face to face (mine bottom-left, theirs top-right, like a fight-game stage), then the

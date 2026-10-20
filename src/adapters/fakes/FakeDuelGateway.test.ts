@@ -235,3 +235,16 @@ describe("incoming duels (a fake member challenges me)", () => {
     expect(d).toMatchObject({ status: "settled", winner: BOT, myRun: null });
   });
 });
+
+describe("claimed flag (mirrors duel_runs.claimed)", () => {
+  test("false until a duel_settled for that duel went through the journal", async () => {
+    const events = [...READY];
+    const gw = new FakeDuelGateway(async () => events, () => T0, {});
+    const id = gw.seedIncoming(q(), { from: BOT });
+    const a = answers(4, 1, true);
+    await gw.submitRun(id, a.r1, a.r2);
+    expect((await gw.list())[0]?.myRun).toMatchObject({ reward: 3, claimed: false });
+    events.push(ev("duel_settled", id));
+    expect((await gw.list())[0]?.myRun).toMatchObject({ reward: 3, claimed: true });
+  });
+});

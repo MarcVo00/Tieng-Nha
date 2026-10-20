@@ -163,7 +163,7 @@ describe("shop", () => {
 });
 
 describe("claimSettledDuels", () => {
-  const run = (reward: number | null) => ({ round1: [], round2: [], damage: 0, timeMs: 0, reward });
+  const run = (reward: number | null, claimed = false) => ({ round1: [], round2: [], damage: 0, timeMs: 0, reward, claimed });
   const duel = (id: string, status: Duel["status"], myRun: Duel["myRun"]): Duel => ({
     id, challenger: "me", opponent: "bot", opponentPseudo: "Bot", opponentAvatar: "x", createdAt: "2026-10-10T08:00:00.000Z",
     expiresAt: "2026-10-13T08:00:00.000Z", status, winner: null, seed: 1, questions: { round1: [], round2: [] }, myRun, theirRun: null,
@@ -177,10 +177,24 @@ describe("claimSettledDuels", () => {
     ]);
     expect(added).toBe(4);
     const events = (await progress.listEvents()).filter((e) => e.type === "duel_settled");
-    expect(events.map((e) => [e.refId, e.xp, e.payload])).toEqual([["d1", 0, { kimBai: 3 }], ["d2", 0, { kimBai: 1 }]]);
+    expect(events.map((e) => [e.refId, e.xp, e.payload])).toEqual([["d1", 0, { kimBai: 3, claimed: false }], ["d2", 0, { kimBai: 1, claimed: false }]]);
     expect(await outbox.size()).toBe(2);
     expect(appended.length).toBe(1);
     expect((await svc.getWallet()).kimBai).toBe(4);
+  });
+
+  test("device B (empty journal) mirrors a duel the server already credited: wallet shows it, payload says claimed", async () => {
+    const a = setup(); // device A: the server has not credited the duel yet
+    expect(await a.svc.claimSettledDuels([duel("d1", "settled", run(3, false))])).toBe(3);
+    expect((await a.progress.listEvents()).find((e) => e.refId === "d1")?.payload).toEqual({ kimBai: 3, claimed: false });
+
+    const b = setup(); // device B: fresh journal, the list now says claimed
+    expect((await b.svc.getWallet()).kimBai).toBe(0);
+    expect(await b.svc.claimSettledDuels([duel("d1", "settled", run(3, true))])).toBe(3);
+    expect((await b.progress.listEvents()).filter((e) => e.type === "duel_settled").map((e) => [e.refId, e.payload])).toEqual([["d1", { kimBai: 3, claimed: true }]]);
+    expect((await b.svc.getWallet()).kimBai).toBe(3);
+    expect(await b.svc.claimSettledDuels([duel("d1", "settled", run(3, true))])).toBe(0); // once per device
+    expect((await b.svc.getWallet()).kimBai).toBe(3);
   });
 
   test("is idempotent across calls and overlapping calls", async () => {

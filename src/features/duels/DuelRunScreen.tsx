@@ -53,7 +53,7 @@ const VERDICT_STYLE: Record<Verdict, string> = {
  */
 export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
   const { id = "" } = useParams();
-  const { content, duels, tts, stt, recorder, clock } = useServices();
+  const { content, duels, tts, stt, recorder } = useServices();
   const { settings, updateSettings } = useSettings();
   const navigate = useNavigate();
 
@@ -144,7 +144,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
       if (stored) return resume(stored);
       const duel = (await duels.list()).find((d) => d.id === id);
       if (!duel) return "notFound";
-      if (duel.myRun || duel.status !== "open" || Date.parse(duel.expiresAt) <= Date.parse(clock())) return "gone";
+      if (duel.myRun || duel.status !== "open") return "gone"; // trust the server status: list() already expires duels
       return newRecord(duel.questions, duel.seed);
     };
 
@@ -175,7 +175,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
     return () => {
       cancelled = true;
     };
-  }, [content, duels, clock, id, navigate, send, loadAttempt]);
+  }, [content, duels, id, navigate, send, loadAttempt]);
 
   const afterAnswer = useCallback(
     (next: RunRecord, round: 1 | 2) => {
@@ -398,7 +398,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
             </p>
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <div className="flex-1">
+            <div className="flex-1" aria-hidden="true">
               <ProgressBar value={left} label={fr.duels.run.timeBar} />
             </div>
             <p className="w-10 text-right text-caption tabular-nums text-ink-muted">{fr.duels.run.timeLeft(seconds)}</p>

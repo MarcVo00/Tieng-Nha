@@ -11,6 +11,17 @@ const RunSchema = z.object({
   damage: z.number(),
   timeMs: z.number(),
   reward: z.number().nullable(),
+  claimed: z.boolean(),
+});
+/** Postgres timestamps ("2026-10-10T08:00:00.123456+00:00", "2026-10-10 08:00:00+00") to ISO-Z; invalid ones are refused. */
+const IsoSchema = z.string().transform((v, ctx) => {
+  const normal = v.trim().replace(" ", "T").replace(/([+-]\d{2})$/, "$1:00");
+  const ms = Date.parse(normal);
+  if (Number.isNaN(ms)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "invalid timestamp" });
+    return z.NEVER;
+  }
+  return new Date(ms).toISOString();
 });
 const RefSchema = z.object({ lessonId: z.string(), exerciseId: z.string() });
 const DuelSchema = z.object({
@@ -19,8 +30,8 @@ const DuelSchema = z.object({
   opponent: z.string(),
   opponentPseudo: z.string(),
   opponentAvatar: z.string(),
-  createdAt: z.string(),
-  expiresAt: z.string(),
+  createdAt: IsoSchema,
+  expiresAt: IsoSchema,
   status: z.enum(["open", "settled", "cancelled"]),
   winner: z.string().nullable(),
   seed: z.number(),

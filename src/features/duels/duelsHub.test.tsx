@@ -59,7 +59,7 @@ function Where() {
 }
 
 function renderAt(route: string, services: Services) {
-  render(
+  return render(
     <ServicesProvider services={services}>
       <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
@@ -245,7 +245,7 @@ describe("hub lists", () => {
     const base = {
       challenger: "me", opponent: BE_NA, opponentPseudo: "Bé Na", opponentAvatar: "🌸", status: "settled" as const, winner: "me", seed: 1,
       questions: QUESTIONS, theirRun: null, expiresAt: "2026-10-30T00:00:00.000Z",
-      myRun: { round1: [], round2: [], damage: 0, timeMs: 0, reward: 3 },
+      myRun: { round1: [], round2: [], damage: 0, timeMs: 0, reward: 3, claimed: false },
     };
     // Postgres timestamps: not ISO-Z, so they are compared with Date.parse.
     const list: Duel[] = Array.from({ length: 12 }, (_, i) => ({ ...base, id: `d${i}`, createdAt: `2026-10-${String(i + 1).padStart(2, "0")} 08:00:00+00` }));
@@ -291,6 +291,18 @@ describe("hub lists", () => {
     renderAt("/duels", services);
     expect(await screen.findByRole("button", { name: fr.duels.hub.challengeWho("Bé Na") })).toBeDisabled();
     expect(screen.getByRole("button", { name: fr.duels.hub.challengeWho("Chú Tư") })).toBeEnabled();
+  });
+
+  test("the disabled challenge says why, also for screen readers", async () => {
+    const services = makeServices();
+    await unlock(services);
+    gateway(services).seedIncoming(QUESTIONS, { from: BE_NA });
+    renderAt("/duels", services);
+    const button = await screen.findByRole("button", { name: fr.duels.hub.challengeWho("Bé Na") });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription(fr.duels.hub.alreadyOpen);
+    expect(screen.getAllByText(fr.duels.hub.alreadyOpen)).toHaveLength(1);
+    expect(screen.getByRole("button", { name: fr.duels.hub.challengeWho("Chú Tư") })).not.toHaveAccessibleDescription();
   });
 });
 
@@ -353,6 +365,32 @@ describe("pending duels entry points", () => {
     expect(listed).toHaveLength(1); // the duel is there, played: that is why there is no banner
     await act(async () => undefined);
     expect(screen.queryByRole("link", { name: /Duel en attente/ })).not.toBeInTheDocument();
+  });
+
+  test("a settled duel whose result I have not seen is announced; the to-play banner keeps priority; seen clears it", async () => {
+    const services = makeServices();
+    await unlock(services);
+    const gw = gateway(services);
+    const id = gw.seedIncoming(QUESTIONS, { from: "bot_ba_ngoai" });
+    await gw.submitRun(id, QUESTIONS.round1.map(() => ({ correct: true, ms: 1000 })), QUESTIONS.round2.map(() => ({ correct: true })));
+    const first = renderAt("/", services);
+    const banner = await screen.findByRole("link", { name: fr.duels.resultBanner("Bà Ngoại") });
+    expect(banner).toHaveAttribute("href", `/duel/${id}`);
+    first.unmount();
+
+    gw.seedIncoming(QUESTIONS, { from: "bot_chu_tu" });
+    const second = renderAt("/", services);
+    expect(await screen.findByRole("link", { name: fr.duels.banner("Chú Tư", 0) })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: fr.duels.resultBanner("Bà Ngoại") })).not.toBeInTheDocument();
+    second.unmount();
+
+    localStorage.setItem(`tn-duel-seen:${id}`, "true");
+    const list = vi.spyOn(services.duels, "list");
+    renderAt("/", services);
+    await waitFor(() => expect(list).toHaveBeenCalled());
+    await list.mock.results[0]?.value;
+    await act(async () => undefined);
+    expect(screen.queryByRole("link", { name: /Résultat dispo/ })).not.toBeInTheDocument();
   });
 
   test("offline while creating: a lesson load that fails offline shows the offline message", async () => {

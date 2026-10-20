@@ -192,10 +192,16 @@ export function DuelsScreen() {
                 {ready.members.map((m) => (
                   <li key={m.userId} className="flex min-h-14 items-center gap-3 border-b border-line py-2">
                     <Avatar emoji={m.avatarEmoji} size="md" frame={m.frame} />
-                    <span className="min-w-0 flex-1 truncate text-body-strong text-ink">{m.pseudo}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-body-strong text-ink">{m.pseudo}</span>
+                      {busyWith.has(m.userId) ? (
+                        <span id={`duel-why-${m.userId}`} className="block text-caption text-ink-muted">{fr.duels.hub.alreadyOpen}</span>
+                      ) : null}
+                    </span>
                     <Button
                       variant="secondary"
                       aria-label={fr.duels.hub.challengeWho(m.pseudo)}
+                      aria-describedby={busyWith.has(m.userId) ? `duel-why-${m.userId}` : undefined}
                       disabled={busyWith.has(m.userId) || challenge.busy}
                       loading={challenging === m.userId}
                       onClick={() => onChallenge(m.userId)}

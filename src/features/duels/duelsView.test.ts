@@ -2,7 +2,7 @@ import type { Duel, DuelRun } from "@/domain/types";
 import { hoursLeft, otherId, outcomeOf, splitDuels } from "@/features/duels/duelsView";
 
 const NOW = "2026-10-10T10:00:00.000Z";
-const run = (reward: number | null): DuelRun => ({ round1: [], round2: [], damage: 0, timeMs: 0, reward });
+const run = (reward: number | null): DuelRun => ({ round1: [], round2: [], damage: 0, timeMs: 0, reward, claimed: false });
 const duel = (id: string, over: Partial<Duel> = {}): Duel => ({
   id, challenger: "me", opponent: "x", opponentPseudo: "X", opponentAvatar: "x", createdAt: "2026-10-09T10:00:00.000Z",
   expiresAt: "2026-10-12T10:00:00.000Z", status: "open", winner: null, seed: 1, questions: { round1: [], round2: [] }, myRun: null, theirRun: null, ...over,

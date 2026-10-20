@@ -8,7 +8,7 @@ import { clearCachedProfile, readCachedProfile, useAppState, useRefreshProgress,
 import { useServices } from "@/app/ServicesProvider";
 import { ThemeController } from "@/app/ThemeController";
 import { UpdatePrompt } from "@/app/UpdatePrompt";
-import { DuelSync } from "@/features/duels/DuelSync";
+import { DuelSync } from "@/features/duels";
 import { fr } from "@/i18n/fr";
 import { ToastViewport } from "@/ui";
 

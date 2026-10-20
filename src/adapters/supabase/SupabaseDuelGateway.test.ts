@@ -49,10 +49,10 @@ describe("submitRun", () => {
 });
 
 describe("list", () => {
-  const run = { round1: [{ correct: true, ms: 900 }], round2: [{ correct: true }], damage: 25, timeMs: 900, reward: 3 };
+  const run = { round1: [{ correct: true, ms: 900 }], round2: [{ correct: true }], damage: 25, timeMs: 900, reward: 3, claimed: false };
   const row = {
     id: "d1", challenger: "u1", opponent: "u2", opponentPseudo: "Bé Na", opponentAvatar: "🌸",
-    createdAt: "2026-10-10T08:00:00+00:00", expiresAt: "2026-10-13T08:00:00+00:00", status: "settled", winner: "u1", seed: 7,
+    createdAt: "2026-10-10T08:00:00.000Z", expiresAt: "2026-10-13T08:00:00.000Z", status: "settled", winner: "u1", seed: 7,
     questions, myRun: run, theirRun: { ...run, reward: 1 },
   };
 
@@ -61,6 +61,13 @@ describe("list", () => {
     const rpc = ok([row, open]);
     await expect(gateway(rpc).list()).resolves.toEqual([row, open]);
     expect(rpc).toHaveBeenCalledWith("list_duels");
+  });
+
+  test("normalises Postgres timestamps to ISO-Z and refuses invalid ones", async () => {
+    const pg = { ...row, createdAt: "2026-10-10T10:00:00.123456+02:00", expiresAt: "2026-10-13 08:00:00+00" };
+    const [d] = await gateway(ok([pg])).list();
+    expect(d).toMatchObject({ createdAt: "2026-10-10T08:00:00.123Z", expiresAt: "2026-10-13T08:00:00.000Z" });
+    await expect(gateway(ok([{ ...row, expiresAt: "soon" }])).list()).rejects.toThrow("invalid_duel_response");
   });
 
   test("an empty list, a malformed list and a network failure", async () => {

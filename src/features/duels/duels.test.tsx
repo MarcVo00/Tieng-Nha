@@ -246,6 +246,21 @@ describe("duel run", () => {
     expect(readRun(ID)?.seed).toBe(42);
   });
 
+  test("an open duel stays playable even if the phone clock says it expired (server status wins, no redirect loop)", async () => {
+    localStorage.removeItem(runKey(ID));
+    const services = createFakeServices();
+    vi.spyOn(services.duels, "list").mockResolvedValue([
+      {
+        id: ID, challenger: "someone", opponent: "me", opponentPseudo: "Linh", opponentAvatar: "🐉",
+        createdAt: "2020-10-20 08:00:00+00", expiresAt: "2020-10-23 08:00:00+00", status: "open", winner: null, seed: 5,
+        questions: QUESTIONS, myRun: null, theirRun: null,
+      },
+    ]);
+    renderRun(services);
+    expect(await screen.findByText("1/2")).toBeInTheDocument();
+    expect(screen.queryByText("écran de résultat")).not.toBeInTheDocument();
+  });
+
   test("a duel I already played goes straight to the result", async () => {
     localStorage.removeItem(runKey(ID));
     const services = createFakeServices();
@@ -253,7 +268,7 @@ describe("duel run", () => {
       {
         id: ID, challenger: "me", opponent: "x", opponentPseudo: "Linh", opponentAvatar: "🐉",
         createdAt: "2026-10-20 08:00:00+00", expiresAt: "2999-10-23 08:00:00+00", status: "open", winner: null, seed: 1,
-        questions: QUESTIONS, myRun: { round1: [], round2: [], damage: 0, timeMs: 0, reward: null }, theirRun: null,
+        questions: QUESTIONS, myRun: { round1: [], round2: [], damage: 0, timeMs: 0, reward: null, claimed: false }, theirRun: null,
       },
     ]);
     renderRun(services);

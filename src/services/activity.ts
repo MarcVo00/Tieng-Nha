@@ -21,7 +21,10 @@ export type ActivityService = {
   completeDialogue(i: { dialogueId: DialogueId; durationMs: number }): Promise<ActivityResult>;
   completeReview(i: { correctCount: number; total: number }): Promise<ActivityResult>;
   finishExam(i: { attemptId: string; score: number; noSpeaking: boolean; boss?: BossOutcome }): Promise<ActivityResult>;
-  /** Appends one `duel_settled` per settled duel with a reward not yet in the journal; returns the Kim bài added. */
+  /**
+   * Mirrors settled duels into the local journal: one `duel_settled` per rewarded duel not yet in it (ADR 0004).
+   * Returns the Kim bài added to the local wallet.
+   */
   claimSettledDuels(duels: readonly Duel[]): Promise<number>;
 };
 
@@ -71,6 +74,11 @@ export function createActivityService(deps: {
     for (const id of ids) if (!(await progress.getVocabProgress(id))) await progress.upsertVocabProgress(introduce(id, now));
   }
 
+  // Rule (ADR 0004): the wallet is a projection of the LOCAL journal, the server balance a projection of the SERVER journal.
+  // Each device mirrors every rewarded settled duel exactly once into its own journal, whether or not the server already
+  // credited it (`myRun.claimed`, set when any device's `duel_settled` was applied). The server credits `duel_runs.reward`
+  // only while `claimed` is false and ignores later events of the same duel, so a second device or a reinstall shows the
+  // reward locally without ever crediting it twice on the server. `claimed` is recorded in the payload for traceability.
   // Serialises claims so two overlapping calls cannot both see a duel as unclaimed.
   let claiming: Promise<unknown> = Promise.resolve();
   async function claim(duels: readonly Duel[]): Promise<number> {
@@ -80,7 +88,7 @@ export function createActivityService(deps: {
     for (const d of duels) {
       const reward = d.status === "settled" ? d.myRun?.reward : null;
       if (reward === null || reward === undefined || claimed.has(d.id)) continue;
-      await append(ev("duel_settled", d.id, 0, { kimBai: reward }));
+      await append(ev("duel_settled", d.id, 0, { kimBai: reward, claimed: d.myRun?.claimed ?? false }));
       claimed.add(d.id);
       added += reward;
       appended += 1;

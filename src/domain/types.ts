@@ -178,7 +178,10 @@ export type DuelQuestionRef = { lessonId: LessonId; exerciseId: string };
 export type DuelQuestions = { round1: DuelQuestionRef[]; round2: DuelQuestionRef[] };
 export type Round1Answer = { correct: boolean; ms: number };
 export type Round2Answer = { correct: boolean };
-export type DuelRun = { round1: Round1Answer[]; round2: Round2Answer[]; damage: number; timeMs: number; reward: number | null };
+export type DuelRun = { round1: Round1Answer[]; round2: Round2Answer[]; damage: number; timeMs: number; reward: number | null;
+  /** Server flag (`duel_runs.claimed`): the reward has already been credited to the server balance (possibly from another device). */
+  claimed: boolean;
+};
 export type DuelStatus = "open" | "settled" | "cancelled";
 export type Duel = {
   id: string;

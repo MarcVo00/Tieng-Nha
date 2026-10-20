@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(87);
+select plan(91);
 
 -- alice (A) and bob (B) duel; carol is in another group; dave lacks the prerequisites.
 insert into auth.users (id, email) values
@@ -162,21 +162,27 @@ select is(pg_temp.kb(), 0, 'duel_settled before settlement credits nothing');
 select pg_temp.login('b0000000-0000-0000-0000-000000000002');
 select is(json_array_length(public.list_duels()), 1, 'list: bob sees the duel');
 select is((select (public.list_duels())->0->>'theirRun'), null, 'list: alice''s run is hidden from bob before he plays');
-select is((public.submit_duel_run(pg_temp.did(), pg_temp.r1(8, true, 1000), pg_temp.r2(3, 2)))->>'status', 'settled', 'submit: second run settles the duel');
+select is((public.submit_duel_run(pg_temp.did(),
+  (select jsonb_agg(e || '{"evil":"x"}'::jsonb) from jsonb_array_elements(pg_temp.r1(8, true, 1000)) e),
+  (select jsonb_agg(e || '{"evil":"x"}'::jsonb) from jsonb_array_elements(pg_temp.r2(3, 2)) e)))->>'status', 'settled', 'submit: second run settles the duel');
 select is(pg_temp.err(public.submit_duel_run(pg_temp.did(), pg_temp.r1(8, true, 1000), pg_temp.r2(3, 2))), 'not_open', 'submit: settled duel is not open');
 reset role;
 select is((select damage || '/' || time_ms from public.duel_runs where duel_id = pg_temp.did() and user_id = 'a0000000-0000-0000-0000-000000000001'), '165/8000', 'server computed alice: 165 damage, 8000 ms');
 select is((select damage from public.duel_runs where duel_id = pg_temp.did() and user_id = 'b0000000-0000-0000-0000-000000000002'), 150, 'server computed bob: 150 damage');
+select is((select round1->0 from public.duel_runs where duel_id = pg_temp.did() and user_id = 'b0000000-0000-0000-0000-000000000002'), '{"correct":true,"ms":1000}'::jsonb, 'submit: round-1 answers are stored sanitized (extra keys dropped)');
+select is((select round2->0 from public.duel_runs where duel_id = pg_temp.did() and user_id = 'b0000000-0000-0000-0000-000000000002'), '{"correct":true}'::jsonb, 'submit: round-2 answers are stored sanitized (extra keys dropped)');
 select is((select winner from public.duels where id = pg_temp.did()), 'a0000000-0000-0000-0000-000000000001'::uuid, 'higher damage wins');
 select is((select string_agg(reward::text, '/' order by damage desc) from public.duel_runs where duel_id = pg_temp.did()), '3/1', 'win 3, loss 1');
 select pg_temp.login('a0000000-0000-0000-0000-000000000001');
 select is((select (public.list_duels())->0->'theirRun'->>'damage'), '150', 'list: both runs visible once settled');
 select is((select (public.list_duels())->0->>'opponentPseudo'), 'Bob', 'list: opponent pseudo');
 
+select is((select (public.list_duels())->0->'myRun'->>'claimed'), 'false', 'list: myRun.claimed is false before the reward is credited');
 -- duel_settled pays the server amount once
 select pg_temp.ev('duel_settled', pg_temp.did()::text, '{"kimBai": 99}', 50);
 select is(pg_temp.kb(), 3, 'duel_settled credits the server reward (3), not the client amount');
 select is(pg_temp.xp(), 0, 'duel_settled never gives XP');
+select is((select (public.list_duels())->0->'myRun'->>'claimed'), 'true', 'list: myRun.claimed is true once credited (what a second device reads)');
 select pg_temp.ev('duel_settled', pg_temp.did()::text, '{"kimBai": 3}');
 select is(pg_temp.kb(), 3, 'a second duel_settled for the same duel changes nothing');
 select pg_temp.ev('duel_settled', 'not-a-uuid', '{"kimBai": 3}');

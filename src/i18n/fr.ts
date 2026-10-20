@@ -459,8 +459,10 @@ export const fr = {
       challengeSub: "Choisis un adversaire du groupe.",
       challengeWho: (name: string) => `Défier ${name}`,
       membersLabel: "Membres du groupe",
+      alreadyOpen: "Duel déjà en cours",
     },
     banner: (name: string, more: number) => `Duel en attente contre ${name}${more > 0 ? ` (+${more})` : ""}`,
+    resultBanner: (name: string) => `Résultat dispo contre ${name}`,
     entry: { label: "Duels", pending: (n: number) => `${n} duel${n > 1 ? "s" : ""} à jouer` },
     run: {
       round1: "Manche 1 · QCM",

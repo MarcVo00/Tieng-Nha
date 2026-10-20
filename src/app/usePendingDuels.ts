@@ -2,13 +2,39 @@ import { useEffect, useState } from "react";
 import { useServices } from "@/app/ServicesProvider";
 import type { Duel } from "@/domain/types";
 
+const seenKey = (id: string): string => `tn-duel-seen:${id}`;
+
+/** Whether this device has already shown the result of a finished duel (the celebration plays once). */
+export function wasResultSeen(id: string): boolean {
+  try {
+    return localStorage.getItem(seenKey(id)) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function markResultSeen(id: string): void {
+  try {
+    localStorage.setItem(seenKey(id), "true");
+  } catch {
+    // storage unavailable: the result may be announced again, nothing worse
+  }
+}
+
+export type DuelSummary = {
+  /** Open duels I still have to play (not expired). */
+  pending: Duel[];
+  /** Settled duels whose result this device has not shown yet, newest first. */
+  unseen: Duel[];
+};
+
 /**
- * Open duels I still have to play (not expired), read quietly: offline or failing, the list is simply empty.
- * Used by the home banner and the « Duels » entry; the duels hub does its own, louder, loading.
+ * Reads my duels quietly (offline or failing: both lists are empty) for the home banner and the « Duels » entry;
+ * the duels hub does its own, louder, loading.
  */
-export function usePendingDuels(): Duel[] {
+export function useDuelSummary(): DuelSummary {
   const { duels, clock } = useServices();
-  const [pending, setPending] = useState<Duel[]>([]);
+  const [summary, setSummary] = useState<DuelSummary>({ pending: [], unseen: [] });
   useEffect(() => {
     let cancelled = false;
     duels
@@ -16,12 +42,22 @@ export function usePendingDuels(): Duel[] {
       .then((all) => {
         if (cancelled) return;
         const now = Date.parse(clock());
-        setPending(all.filter((d) => d.status === "open" && d.myRun === null && Date.parse(d.expiresAt) > now));
+        setSummary({
+          pending: all.filter((d) => d.status === "open" && d.myRun === null && Date.parse(d.expiresAt) > now),
+          unseen: all
+            .filter((d) => d.status === "settled" && !wasResultSeen(d.id))
+            .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)),
+        });
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
   }, [duels, clock]);
-  return pending;
+  return summary;
+}
+
+/** Open duels I still have to play (not expired). */
+export function usePendingDuels(): Duel[] {
+  return useDuelSummary().pending;
 }

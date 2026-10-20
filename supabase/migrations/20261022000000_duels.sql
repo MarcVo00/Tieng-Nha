@@ -266,6 +266,8 @@ declare
   v_me uuid := auth.uid();
   d public.duels%rowtype;
   v_status text;
+  v_r1 jsonb;
+  v_r2 jsonb;
 begin
   if v_me is null then raise exception 'not_authenticated'; end if;
   if p_duel is null then return json_build_object('ok', false, 'error', 'not_found'); end if;
@@ -300,8 +302,14 @@ begin
     return json_build_object('ok', false, 'error', 'bad_run');
   end if;
 
+  -- Store sanitized arrays only ({correct, ms} / {correct}); extra keys sent by the client are dropped.
+  select coalesce(jsonb_agg(jsonb_build_object('correct', (e.v->>'correct')::boolean, 'ms', (e.v->>'ms')::int) order by e.i), '[]'::jsonb)
+    into v_r1 from jsonb_array_elements(p_round1) with ordinality as e(v, i);
+  select coalesce(jsonb_agg(jsonb_build_object('correct', (e.v->>'correct')::boolean) order by e.i), '[]'::jsonb)
+    into v_r2 from jsonb_array_elements(p_round2) with ordinality as e(v, i);
+
   insert into public.duel_runs (duel_id, user_id, round1, round2, damage, time_ms)
-  values (p_duel, v_me, p_round1, p_round2, public.duel_damage(p_round1, p_round2), public.duel_time(p_round1));
+  values (p_duel, v_me, v_r1, v_r2, public.duel_damage(v_r1, v_r2), public.duel_time(v_r1));
 
   perform public.settle_duel(p_duel);
   select status into v_status from public.duels where id = p_duel;
@@ -333,11 +341,11 @@ begin
       'seed', d.seed,
       'questions', d.questions,
       'myRun', (select json_build_object('round1', r.round1, 'round2', r.round2, 'damage', r.damage,
-                                         'timeMs', r.time_ms, 'reward', r.reward)
+                                         'timeMs', r.time_ms, 'reward', r.reward, 'claimed', r.claimed)
                 from public.duel_runs r where r.duel_id = d.id and r.user_id = v_me),
       'theirRun', case when d.status = 'settled' then
                   (select json_build_object('round1', r.round1, 'round2', r.round2, 'damage', r.damage,
-                                            'timeMs', r.time_ms, 'reward', r.reward)
+                                            'timeMs', r.time_ms, 'reward', r.reward, 'claimed', r.claimed)
                    from public.duel_runs r where r.duel_id = d.id and r.user_id <> v_me)
                   else null end
     ) as j

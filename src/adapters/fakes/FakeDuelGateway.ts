@@ -112,10 +112,14 @@ export class FakeDuelGateway implements DuelGateway {
   async list(): Promise<Duel[]> {
     if (!this.online) throw new OfflineError();
     this.expire();
+    // Like the server's `duel_runs.claimed`: true once a `duel_settled` for that duel went through the app.
+    const claimedIds = new Set((await this.getMyEvents()).filter((e) => e.type === "duel_settled").map((e) => e.refId));
+    const mine = (d: { id: string }, run: DuelRun | undefined): DuelRun | null =>
+      run ? { ...structuredClone(run), claimed: run.reward !== null && claimedIds.has(d.id) } : null;
     return [...this.duels].reverse().map(({ runs, ...d }) => ({
       ...d,
       questions: structuredClone(d.questions),
-      myRun: structuredClone(runs.get(ME) ?? null),
+      myRun: mine(d, runs.get(ME)),
       theirRun: d.status === "settled" ? structuredClone(runs.get(this.other(d)) ?? null) : null,
     }));
   }
@@ -156,7 +160,7 @@ export class FakeDuelGateway implements DuelGateway {
   }
 
   private makeRun(round1: Round1Answer[], round2: Round2Answer[]): DuelRun {
-    return { round1: structuredClone(round1), round2: structuredClone(round2), damage: duelDamage(round1, round2), timeMs: duelTime(round1), reward: null };
+    return { round1: structuredClone(round1), round2: structuredClone(round2), damage: duelDamage(round1, round2), timeMs: duelTime(round1), reward: null, claimed: false };
   }
 
   private expire(): void {

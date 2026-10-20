@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { createFakeServices, FakeDuelGateway } from "@/adapters/fakes";
@@ -94,6 +94,27 @@ test("local 10 but server 4: serverBehind and no event", async () => {
   expect(await within(sheet).findByText(fr.arena.serverBehind)).toBeInTheDocument();
   expect(await events(services)).toHaveLength(0);
   expect(useAppState.getState().wallet?.kimBai).toBe(10);
+});
+
+test("a double confirm in the same frame buys exactly once, without an error", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  await earn(services, 10);
+  const user = setup(services);
+  await user.click(await cardButton("hat_tay_son"));
+  const sheet = await screen.findByRole("dialog");
+  await user.click(within(sheet).getByRole("button", { name: fr.arena.buy(6) }));
+  const confirm = await within(sheet).findByRole("button", { name: fr.shop.confirm.confirm });
+  fireEvent.click(confirm);
+  fireEvent.click(confirm);
+  await waitFor(() => expect(useAppState.getState().wallet?.equipped["hat"]).toBe("hat_tay_son"));
+  expect(await events(services)).toHaveLength(1);
+  expect(screen.queryByText(fr.arena.error)).not.toBeInTheDocument();
+});
+
+test("has a back link to the duels hub", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  setup(services);
+  expect(await screen.findByRole("link", { name: fr.arena.back })).toHaveAttribute("href", "/duels");
 });
 
 test("offline: needOnline and no event", async () => {

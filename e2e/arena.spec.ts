@@ -9,10 +9,11 @@ test("win Kim bài then buy the Tây Sơn headband", async ({ page }) => {
   await seedKimBai(page, 7);
   await page.goto("/arena");
 
-  const name = fr.shop.items["hat_tay_son"]?.name ?? "";
+  const name = fr.shop.items["hat_tay_son"]?.name;
+  if (!name) throw new Error("missing i18n name for hat_tay_son");
   await expect(page.getByText(fr.arena.balance(7), { exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: new RegExp(name) }).click();
+  await page.getByRole("button", { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) }).click();
   await page.getByRole("button", { name: fr.arena.buy(6) }).click();
   await page.getByRole("button", { name: fr.shop.confirm.confirm, exact: true }).click();
 

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
@@ -26,6 +27,7 @@ export function ArenaScreen() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const inFlight = useRef(false);
 
   const load = useCallback(() => {
     setFailed(false);
@@ -51,12 +53,13 @@ export function ArenaScreen() {
   // Kim bài purchase: refused (no event) unless online and min(local, server) covers the price.
   async function buy(item: ShopItem): Promise<void> {
     const current = useAppState.getState().wallet;
-    if (busy || item.slot === null || item.price === null || !current) return;
+    if (inFlight.current || busy || item.slot === null || item.price === null || !current) return;
     setMessage(null);
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       setMessage(fr.arena.needOnline);
       return;
     }
+    inFlight.current = true;
     setBusy(true);
     try {
       let server: number;
@@ -84,6 +87,7 @@ export function ArenaScreen() {
       await refresh().catch(() => undefined);
       setMessage(fr.arena.error);
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   }
@@ -100,6 +104,11 @@ export function ArenaScreen() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.base, ease: ease.out }} className="flex flex-col gap-6 pb-8">
+      <motion.div whileTap={tap} className="inline-block self-start">
+        <Link to="/duels" aria-label={fr.arena.back} className="flex h-11 w-11 items-center justify-center rounded-full text-ink-muted">
+          <Icon name="chevron-left" size={24} />
+        </Link>
+      </motion.div>
       <h1 className="sr-only">{fr.arena.title}</h1>
 
       <Card raised className="flex items-center gap-4 p-6">

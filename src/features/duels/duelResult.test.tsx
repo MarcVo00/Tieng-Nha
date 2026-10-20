@@ -192,18 +192,30 @@ test("a blow lands with ink, a hurt face and, for a critical, the vermilion « C
   expect(faceOf("Bé Na")).toBe("hurt");
   expect(faceOf("Linh")).toBe("idle");
   expect(screen.getByRole("meter", { name: R.hp("Bé Na", 85) })).toBeInTheDocument();
-  // Their critical: my ink leaves with my beat, my number keeps floating until the next beat starts.
-  await until(() => fxOf(2, "[data-fx='impact']") !== null);
+  // Their critical winds up: my ink has left with my beat; my number keeps floating, the very same node (no second pop).
+  const number = fxOf(1, "[data-fx='damage']");
+  await until(() => fxOf(2, "[data-fx='glint']") !== null);
   expect(fxOf(1, "[data-fx='impact']")).toBeNull();
-  expect(fxOf(1, "[data-fx='damage']")).not.toBeNull();
+  expect(fxOf(1, "[data-fx='damage']")).toBe(number);
+  // Their contact: my number has faded out by now and leaves.
+  await until(() => fxOf(2, "[data-fx='impact']") !== null);
+  expect(fxOf(1)).toBeNull();
   expect(faceOf("Linh")).toBe("hurt");
   expect(faceOf("Bé Na")).toBe("idle");
-  await until(() => document.querySelector("[data-fx-beat='3']") !== null);
-  expect(document.querySelector("[data-fx-beat='1']")).toBeNull();
-  // The FX layer stays within its node budget all along, and is gone with the verdict.
+  // All along: the FX layer within its node budget, and at every blow's contact at most 8 animated elements — the two
+  // fighters, the hit one's flash, the stage, its HP bar, plus ≤ 3 FX (ink, number, seal): no older number, no glint,
+  // no « Raté » fading in or out.
+  let seen = new Set<Element>();
   await until(() => {
     expect(fxNodes()).toBeLessThanOrEqual(30);
-    expect(document.querySelectorAll("[data-fx='impact']").length).toBeLessThanOrEqual(2);
+    const inks = [...document.querySelectorAll("[data-fx='impact']:not([data-kind='miss'])")];
+    if (inks.some((i) => !seen.has(i))) {
+      const fx = document.querySelectorAll("[data-fx-beat] [data-fx]:not([data-fx='miss'])");
+      expect(fx.length).toBeLessThanOrEqual(3);
+      expect(document.querySelectorAll("[data-fx='glint'], [data-fx='miss'][data-leaving='true']")).toHaveLength(0);
+      expect(4 + 1 + fx.length).toBeLessThanOrEqual(8);
+    }
+    seen = new Set(inks);
     return screen.queryByRole("heading", { name: R.headline.win }) !== null;
   });
   expect(document.querySelectorAll("[data-fx-beat]")).toHaveLength(0);
@@ -234,10 +246,19 @@ test("consecutive misses play as one beat: « Raté ×3 »", async () => {
   await gw.submitRun(id, [miss, miss, miss, { correct: true, ms: 5000 }], STRONG.round2);
   now = "2026-10-14T10:00:00.000Z"; // forfeit: only I attack
   await openReplay(services, id);
-  await until(() => screen.queryByText(R.misses(3)) !== null);
+  const spent = await until(() => screen.queryByText(R.misses(3)) !== null);
   expect(document.querySelector("[aria-live]")).toHaveTextContent(R.missed("Linh", 3));
   expect(document.querySelectorAll("[data-fx='impact'][data-kind='miss']")).toHaveLength(1);
-  expect(document.querySelectorAll("[data-fx='miss']")).toHaveLength(1);
+  const mark = document.querySelector("[data-fx='miss']");
+  expect(mark).toHaveAttribute("data-leaving", "false");
+  // Readable for at least `celebrate` (0.8 s), whatever the tempo: same node, not leaving, past the end of its beat.
+  const shown = await until(() => document.querySelector("[data-fx='miss'][data-leaving='true']") !== null || document.querySelector("[data-fx='miss']") !== mark);
+  expect(shown).toBeGreaterThanOrEqual(780);
+  expect(document.querySelector("[data-fx='miss']")).toBe(mark);
+  expect(screen.getByText(R.misses(3))).toHaveClass("text-ink");
+  // Then it fades out and leaves with the next beat.
+  const gone = await until(() => document.querySelector("[data-fx='miss']") === null);
+  expect(spent + shown + gone).toBeLessThan(4000);
 });
 
 test("« Passer » jumps straight to the bilan, moves the focus to the verdict and announces it", async () => {

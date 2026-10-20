@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { duration, ease, spring } from "@/ui/motion";
 import { FIGHT, type Tempo } from "@/ui/fight/fightTiming";
 import type { Vec } from "@/ui/fight/useFightBeat";
 
 // Đông Hồ print FX: a brush slash stamped on contact, ink droplets thrown in a fan along the blow, a vermilion seal.
-// One <svg> per impact (2 paths, ≤ 12 circles), mounted on contact and unmounted with its beat by the caller.
+// One <svg> per impact (2 paths, ≤ 12 circles), mounted on contact and unmounted with its beat by the caller. Each FX
+// takes the time it has left (`life`) so it has faded out before it is unmounted, and has a `reduced` path (fade only).
 
 export type ImpactKind = "hit" | "crit" | "ko" | "miss";
 
@@ -33,6 +34,12 @@ export function droplets(kind: ImpactKind, dir: Vec): Drop[] {
   });
 }
 
+/** The explicit `reduced` prop wins; otherwise the user's setting. */
+export function useFxReduced(prop: boolean | undefined): boolean {
+  const system = useReducedMotion() === true;
+  return prop ?? system;
+}
+
 type InkImpactProps = {
   kind: ImpactKind;
   /** Centre of the impact in the stage (px). */
@@ -41,14 +48,20 @@ type InkImpactProps = {
   /** Direction of the blow (any length); the droplets fly along it and the slash is mirrored for right-to-left blows. */
   dir?: Vec;
   tempo?: Tempo;
+  /** Seconds until the caller unmounts it (the end of its beat: hit-stop + recoil); it has faded out by then. */
+  life?: number;
+  /** Fade only: the slash is simply there, no stamp, no droplet. Defaults to the user's reduced-motion setting. */
+  reduced?: boolean;
 };
 
-export function InkImpact({ kind, x, y, dir = { x: 1, y: 0 }, tempo = 1 }: InkImpactProps) {
-  const life = (FIGHT.hitStop + duration.slow) / tempo;
-  const stamp = FIGHT.strike / tempo;
+export function InkImpact({ kind, x, y, dir = { x: 1, y: 0 }, tempo = 1, life: lifeProp, reduced: reducedProp }: InkImpactProps) {
+  const reduced = useFxReduced(reducedProp);
+  const life = lifeProp ?? (FIGHT.hitStop + FIGHT.recoil) / tempo;
+  const stamp = Math.min(FIGHT.strike / tempo, life / 3);
   const miss = kind === "miss";
   const slash = kind === "crit" ? VERMILION : INK;
-  const mirror = dir.x < 0 ? `scale(-1 1)` : "";
+  const mirror = dir.x < 0 ? "scale(-1 1)" : "";
+  const fade = { duration: life, times: [0, stamp / life, 0.6, 1], ease: "linear" } as const;
   return (
     <motion.svg
       data-fx="impact"
@@ -59,12 +72,9 @@ export function InkImpact({ kind, x, y, dir = { x: 1, y: 0 }, tempo = 1 }: InkIm
       height={SIZE}
       className="pointer-events-none absolute overflow-visible"
       style={{ left: x - C, top: y - C }}
-      initial={{ opacity: 0, scale: 0.6 }}
-      animate={{ opacity: [0, 1, 1, 0], scale: [0.6, 1.1, 1] }}
-      transition={{
-        opacity: { duration: life, times: [0, stamp / life, 0.7, 1], ease: "linear" },
-        scale: { duration: stamp * 2, times: [0, 0.5, 1], ease: ease.out },
-      }}
+      initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.6 }}
+      animate={reduced ? { opacity: [0, 1, 1, 0] } : { opacity: [0, 1, 1, 0], scale: [0.6, 1.1, 1] }}
+      transition={reduced ? fade : { opacity: fade, scale: { duration: stamp * 2, times: [0, 0.5, 1], ease: ease.out } }}
     >
       <g transform={`translate(${C} ${C}) ${mirror} translate(${-C} ${-C})`} opacity={miss ? 0.55 : 1}>
         <motion.path
@@ -73,7 +83,7 @@ export function InkImpact({ kind, x, y, dir = { x: 1, y: 0 }, tempo = 1 }: InkIm
           stroke={slash}
           strokeWidth={miss ? 4 : 7}
           strokeLinecap="round"
-          initial={{ pathLength: 0 }}
+          initial={{ pathLength: reduced ? 1 : 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: stamp, ease: ease.out }}
         />
@@ -83,39 +93,60 @@ export function InkImpact({ kind, x, y, dir = { x: 1, y: 0 }, tempo = 1 }: InkIm
           stroke={slash}
           strokeWidth={miss ? 2.5 : 4}
           strokeLinecap="round"
-          initial={{ pathLength: 0 }}
+          initial={{ pathLength: reduced ? 1 : 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: stamp, ease: ease.out, delay: stamp / 2 }}
         />
       </g>
-      {droplets(kind, dir).map((d, i) => (
-        <motion.circle
-          key={i}
-          cx={C}
-          cy={C}
-          r={d.r}
-          fill={d.fill}
-          stroke={PAPER}
-          strokeWidth={1}
-          initial={{ x: 0, y: 0, scale: 1 }}
-          animate={{ x: d.dx, y: d.dy, scale: 0.4 }}
-          transition={{ duration: FIGHT.recoil / tempo, ease: ease.out }}
-        />
-      ))}
+      {reduced
+        ? null
+        : droplets(kind, dir).map((d, i) => (
+            <motion.circle
+              key={i}
+              cx={C}
+              cy={C}
+              r={d.r}
+              fill={d.fill}
+              stroke={PAPER}
+              strokeWidth={1}
+              initial={{ x: 0, y: 0, scale: 1 }}
+              animate={{ x: d.dx, y: d.dy, scale: 0.4 }}
+              transition={{ duration: Math.min(FIGHT.recoil / tempo, life), ease: ease.out }}
+            />
+          ))}
     </motion.svg>
   );
 }
 
+type SealProps = {
+  children: ReactNode;
+  big?: boolean;
+  lang?: string;
+  /** Seconds until the caller unmounts it: it fades out over its last `FIGHT.strike`. */
+  life?: number;
+  /** Fade only (no stamp). Defaults to the user's reduced-motion setting. */
+  reduced?: boolean;
+};
+
 /** A vermilion seal stamped on the stage: « Chí mạng! » on a critical, « K.-O. » on the knock-out blow. */
-export function FightSeal({ children, big = false, lang }: { children: ReactNode; big?: boolean; lang?: string }) {
+export function FightSeal({ children, big = false, lang, life, reduced: reducedProp }: SealProps) {
+  const reduced = useFxReduced(reducedProp);
+  const fadeIn = life === undefined ? FIGHT.strike : Math.min(FIGHT.strike, life / 4);
+  const opacity =
+    life === undefined
+      ? { to: 1, transition: { duration: fadeIn } }
+      : {
+          to: [0, 1, 1, 0],
+          transition: { duration: life, times: [0, fadeIn / life, Math.max(fadeIn / life, 1 - FIGHT.strike / life), 1], ease: "linear" as const },
+        };
   return (
     <motion.span
       data-fx="seal"
       {...(lang ? { lang } : {})}
-      className={`pointer-events-none inline-block whitespace-nowrap rounded-sm border-2 border-paper bg-fx-vermilion px-2 py-0.5 text-paper shadow-card ${big ? "text-title" : "text-heading"}`}
-      initial={{ opacity: 0, scale: 1.6, rotate: -6 }}
-      animate={{ opacity: 1, scale: 1, rotate: -6 }}
-      transition={{ scale: spring.bouncy, opacity: { duration: FIGHT.strike } }}
+      className={`pointer-events-none inline-block -rotate-6 whitespace-nowrap rounded-sm border-2 border-paper bg-fx-vermilion px-2 py-0.5 text-paper shadow-card ${big ? "text-title" : "text-heading"}`}
+      initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 1.6 }}
+      animate={reduced ? { opacity: opacity.to } : { opacity: opacity.to, scale: 1 }}
+      transition={reduced ? opacity.transition : { scale: spring.bouncy, opacity: opacity.transition }}
     >
       {children}
     </motion.span>
@@ -141,20 +172,24 @@ export function CritGlint({ tempo = 1 }: { tempo?: Tempo }) {
   );
 }
 
-/** « Raté » brushed near the attacker: muted text and a short ink stroke, no pill. */
-export function MissMark({ children }: { children: ReactNode }) {
-  const tone = "text-ink-muted";
+/**
+ * « Raté » brushed near the attacker: ink text and a short muted stroke, no pill. It fades in over `FIGHT.strike`, then
+ * holds still (no running animation) whatever the tempo; the caller sets `leaving` once it has been readable long
+ * enough (≈ `duration.celebrate`) and it fades out over `FIGHT.strike`.
+ */
+export function MissMark({ children, leaving = false }: { children: ReactNode; leaving?: boolean }) {
   return (
     <motion.span
       data-fx="miss"
+      data-leaving={leaving ? "true" : "false"}
       className="pointer-events-none flex flex-col items-center"
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: [0, 1, 1, 0], y: [6, 0, -2, -6] }}
-      transition={{ duration: duration.celebrate, times: [0, 0.2, 0.75, 1], ease: ease.out }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: leaving ? 0 : 1 }}
+      transition={{ duration: FIGHT.strike, ease: ease.out }}
     >
-      <span className={`whitespace-nowrap text-body-strong ${tone}`}>{children}</span>
+      <span className="whitespace-nowrap text-body-strong text-ink">{children}</span>
       <svg aria-hidden="true" viewBox="0 0 48 6" width={40} height={5}>
-        <path d="M2 4 C14 1 32 1 46 3" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className={tone} />
+        <path d="M2 4 C14 1 32 1 46 3" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="text-ink-muted" />
       </svg>
     </motion.span>
   );

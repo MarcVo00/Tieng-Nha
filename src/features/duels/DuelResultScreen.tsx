@@ -136,76 +136,105 @@ function Fighter({ side, look, frame, absent, controls, expression, pose, front,
   );
 }
 
+/** When each beat's contact happens (seconds), and the index of the next beat that has one. From the schedule only. */
+function contactPlan(beats: readonly ReplayBeat[]): { at: (number | null)[]; next: (number | null)[] } {
+  const at = beats.map((b) => (b.type === "blow" || b.type === "misses" || b.type === "flurry" ? b.start + b.impact : null));
+  const next = beats.map((_, j) => {
+    for (let k = j + 1; k < beats.length; k++) if (at[k] !== null) return k;
+    return null;
+  });
+  return { at, next };
+}
+
 /**
- * The FX of one beat, positioned from constants. Contact FX mount on contact (`landed`) and leave with the beat; only
- * the damage number keeps floating through the next beat (`previous`), then leaves too.
+ * The fight FX on stage: one flat list keyed by beat and role, so a node never remounts when its beat ends (a damage
+ * number keeps floating through the next beat instead of popping twice). Lifetimes come from the schedule:
+ * - ink, seals, glint: their own beat only, fading out by its end;
+ * - the damage number: from its contact to the next contact (≤ `FIGHT.number`), faded by then, so at most 8 elements
+ *   animate around a contact (2 fighters, a flash, the stage, an HP bar, ink, number, seal);
+ * - « Raté »: from its contact until the first beat that starts `duration.celebrate` later, whatever the tempo (idle
+ *   while it holds), then it fades out over `FIGHT.strike`, gone before that beat's contact.
  */
-function Effects({ beat, index, landed, previous }: { beat: ReplayBeat; index: number; landed: boolean; previous: boolean }) {
+function fightFx(beats: readonly ReplayBeat[], beat: number, landed: number, plan: ReturnType<typeof contactPlan>): ReactNode[] {
   const r = fr.duels.result;
-  const place = (p: Vec, child: ReactNode, key: string) => (
-    <div key={`${key}-${index}`} className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2" style={at(p)}>
+  const items: ReactNode[] = [];
+  const layer = (j: number, key: string, child: ReactNode) =>
+    items.push(
+      <div key={`${key}-${j}`} data-fx-beat={j} className="pointer-events-none absolute inset-0 z-30">
+        {child}
+      </div>,
+    );
+  const place = (p: Vec, child: ReactNode) => (
+    <div className="absolute -translate-x-1/2 -translate-y-1/2" style={at(p)}>
       {child}
     </div>
   );
-  if (previous && beat.type !== "blow") return null;
-  if (beat.type === "banner") {
-    return (
-      <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center">
-        <motion.p
-          className="whitespace-nowrap rounded-md bg-surface px-4 py-2 text-heading text-ink shadow-raised"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1, 1, 0.96] }}
-          transition={{ duration: beat.length, times: [0, 0.2, 0.8, 1], ease: ease.out }}
-        >
-          {beat.round === 1 ? r.round1 : r.round2}
-        </motion.p>
-      </div>
-    );
+  for (let j = 0; j <= beat && j < beats.length; j++) {
+    const b = beats[j];
+    if (!b) continue;
+    const own = j === beat;
+    const hit = landed >= j;
+    const contact = plan.at[j] ?? 0;
+    const left = b.start + b.length - contact; // time from the contact to the end of the beat
+    if (b.type === "banner" && own) {
+      layer(
+        j,
+        "banner",
+        <div className="flex h-full items-center justify-center">
+          <motion.p
+            className="whitespace-nowrap rounded-md bg-surface px-4 py-2 text-heading text-ink shadow-raised"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1, 1, 0.96] }}
+            transition={{ duration: b.length, times: [0, 0.2, 0.8, 1], ease: ease.out }}
+          >
+            {b.round === 1 ? r.round1 : r.round2}
+          </motion.p>
+        </div>,
+      );
+    }
+    if ((b.type === "misses" || b.type === "flurry") && hit) {
+      // Readable long enough: until the first beat starting `celebrate` after the contact (or the end).
+      let leaveAt = beats.length;
+      for (let k = j + 1; k < beats.length; k++) {
+        if ((beats[k]?.start ?? 0) >= contact + duration.celebrate) {
+          leaveAt = k;
+          break;
+        }
+      }
+      // Fading out at the start of that beat, gone by its own contact (the fade is shorter than any wind-up).
+      const leaveContact = plan.at[leaveAt] ?? null;
+      if (beat < leaveAt || (beat === leaveAt && !(leaveContact !== null && landed >= leaveAt))) {
+        const leaving = beat === leaveAt;
+        if (b.type === "flurry") {
+          layer(j, "flurry", <div className="flex h-full items-center justify-center"><MissMark leaving={leaving}>{r.flurry(b.steps.length)}</MissMark></div>);
+        } else {
+          for (const m of b.misses) {
+            if (own) layer(j, `miss-ink-${m.attacker}`, <InkImpact kind="miss" {...besideOf(m.attacker)} dir={TOWARD[m.attacker]} tempo={b.tempo} life={left} />);
+            // Just under the attacker's medallion, on the page: the previous blow's number may still float above its head.
+            layer(j, `miss-mark-${m.attacker}`, place({ x: BODY[m.attacker].x, y: MAT_AT[m.attacker].top + MAT + 16 }, <MissMark leaving={leaving}>{r.misses(m.count)}</MissMark>));
+          }
+        }
+      }
+    }
+    if (b.type !== "blow") continue;
+    const { attacker, kind, damage } = b.step;
+    const defender = other(attacker);
+    const crit = kind === "critical";
+    const t = TOWARD[attacker];
+    const n = Math.hypot(t.x, t.y);
+    if (own && crit && !hit) layer(j, "glint", place({ x: BODY[attacker].x + (t.x / n) * 34, y: BODY[attacker].y + (t.y / n) * 34 }, <CritGlint tempo={b.tempo} />));
+    if (!hit) continue;
+    const nextContact = plan.next[j] ?? null;
+    if (nextContact === null || landed < nextContact) {
+      const until = nextContact === null ? Infinity : (plan.at[nextContact] ?? Infinity) - contact;
+      layer(j, "dmg", place({ x: BODY[defender].x, y: BODY[defender].y - 86 }, <DamageNumber value={damage} critical={crit} tempo={b.tempo} life={until} />));
+    }
+    if (!own) continue;
+    layer(j, "ink", <InkImpact kind={b.ko ? "ko" : crit ? "crit" : "hit"} {...BODY[defender]} dir={t} tempo={b.tempo} life={left} />);
+    if (b.ko) layer(j, "ko", place({ x: BODY[defender].x, y: BODY[defender].y + 30 }, <FightSeal big life={left}>{r.ko}</FightSeal>));
+    else if (crit) layer(j, "seal", place({ x: BODY[defender].x, y: BODY[defender].y + 40 }, <FightSeal lang="vi" life={left}>{r.critSeal}</FightSeal>));
   }
-  if (beat.type === "finale") return null;
-  if (beat.type === "flurry") {
-    return landed ? (
-      <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center">
-        <MissMark>{r.flurry(beat.steps.length)}</MissMark>
-      </div>
-    ) : null;
-  }
-  if (beat.type === "misses") {
-    if (!landed) return null;
-    return (
-      <>
-        {beat.misses.map((m) => (
-          <div key={`miss-${m.attacker}-${index}`} className="contents">
-            <InkImpact kind="miss" {...besideOf(m.attacker)} dir={TOWARD[m.attacker]} tempo={beat.tempo} />
-            {/* Just under the attacker's medallion, on the page: the previous blow's number may still float above its head. */}
-            {place({ x: BODY[m.attacker].x, y: MAT_AT[m.attacker].top + MAT + 16 }, <MissMark>{r.misses(m.count)}</MissMark>, `mark-${m.attacker}`)}
-          </div>
-        ))}
-      </>
-    );
-  }
-  const { attacker, kind, damage } = beat.step;
-  const defender = other(attacker);
-  const crit = kind === "critical";
-  const t = TOWARD[attacker];
-  const n = Math.hypot(t.x, t.y);
-  if (previous) return place({ x: BODY[defender].x, y: BODY[defender].y - 86 }, <DamageNumber value={damage} critical={crit} tempo={beat.tempo} />, "dmg");
-  return (
-    <>
-      {crit && !landed ? place({ x: BODY[attacker].x + (t.x / n) * 34, y: BODY[attacker].y + (t.y / n) * 34 }, <CritGlint tempo={beat.tempo} />, "glint") : null}
-      {landed ? (
-        <>
-          <InkImpact kind={beat.ko ? "ko" : crit ? "crit" : "hit"} {...BODY[defender]} dir={t} tempo={beat.tempo} />
-          {place({ x: BODY[defender].x, y: BODY[defender].y - 86 }, <DamageNumber value={damage} critical={crit} tempo={beat.tempo} />, "dmg")}
-          {beat.ko ? (
-            place({ x: BODY[defender].x, y: BODY[defender].y + 30 }, <FightSeal big>{r.ko}</FightSeal>, "ko")
-          ) : crit ? (
-            place({ x: BODY[defender].x, y: BODY[defender].y + 40 }, <FightSeal lang="vi">{r.critSeal}</FightSeal>, "seal")
-          ) : null}
-        </>
-      ) : null}
-    </>
-  );
+  return items;
 }
 
 function Stats({ mine, theirs, theirName }: { mine: ReplayStats | null; theirs: ReplayStats | null; theirName: string }) {
@@ -334,7 +363,8 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
       // The winner hops twice while the loser bows.
       void ctl(winner).body.start({
         y: [0, -10, 0, -10, 0],
-        transition: { duration: duration.slow * 2, delay: duration.base, times: [0, 0.25, 0.5, 0.75, 1], ease: ease.out },
+        // Delay + hops = the finale (`celebrate`), so the verdict never cuts a hop in the air.
+        transition: { duration: duration.celebrate - duration.base, delay: duration.base, times: [0, 0.25, 0.5, 0.75, 1], ease: ease.out },
       });
     }
     // Timers aim at the schedule's absolute times, so render latency never piles up over the fight.
@@ -370,8 +400,7 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
   const mine = replayStats(duel.myRun);
   const theirs = replayStats(duel.theirRun);
   const tied = mine !== null && theirs !== null && mine.damage === theirs.damage && verdict !== "draw";
-  // FX of the current beat and of the previous one (its damage number is still floating), unmounted afterwards.
-  const fx = done ? [] : [beat - 1, beat].filter((i) => i >= 0);
+  const plan = useMemo(() => contactPlan(beats), [beats]);
 
   return (
     <div className="pb-10">
@@ -423,14 +452,7 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
                 label={nameOf(side)}
               />
             ))}
-            {fx.map((i) => {
-              const b = beats[i];
-              return b ? (
-                <div key={`fx-${i}`} data-fx-beat={i} className="pointer-events-none absolute inset-0 z-30">
-                  <Effects beat={b} index={i} landed={landed >= i} previous={i < beat} />
-                </div>
-              ) : null;
-            })}
+            {done ? null : fightFx(beats, beat, landed, plan)}
           </motion.div>
         </div>
       </div>

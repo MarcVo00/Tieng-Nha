@@ -33,10 +33,16 @@ export type BlowTiming = {
   attackerLength: number;
 };
 
+/**
+ * Options of a beat. `compact`: the boss fight's short wind-up (`duration.instant`, the rest unchanged) so the next
+ * exercise never waits on it.
+ */
+export type BeatOptions = { ko?: boolean; tempo?: Tempo; compact?: boolean };
+
 /** Beat timings of a landed blow. A critical winds up longer (`slow`) and holds its frame twice as long. */
-export function blowTiming(kind: BlowKind, opts: { ko?: boolean; tempo?: Tempo } = {}): BlowTiming {
+export function blowTiming(kind: BlowKind, opts: BeatOptions = {}): BlowTiming {
   const t = opts.tempo ?? 1;
-  const anticipation = (kind === "crit" ? duration.slow : FIGHT.anticipation) / t;
+  const anticipation = (opts.compact === true ? duration.instant : kind === "crit" ? duration.slow : FIGHT.anticipation) / t;
   const strike = FIGHT.strike / t;
   const hitStop = (opts.ko === true ? FIGHT.koHitStop : kind === "crit" ? FIGHT.critHitStop : FIGHT.hitStop) / t;
   const recoil = FIGHT.recoil / t;

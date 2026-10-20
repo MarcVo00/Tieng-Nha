@@ -6,6 +6,7 @@ import {
   blowTiming,
   DamageNumber,
   dodgeKeyframes,
+  FightSeal,
   droplets,
   FIGHT,
   FighterSprite,
@@ -74,12 +75,30 @@ describe("beat keyframes", () => {
 
   test("the defender does not move before the contact, holds the jolt, is thrown back, then returns", () => {
     const k = recoilKeyframes("hit", REACH);
-    expect(k.x?.slice(0, 2)).toEqual([0, 0]);
+    expect(k.x?.slice(0, 2)).toEqual([null, 0]);
     expect(k.x?.[2]).toBe(k.x?.[3]);
     expect(Math.abs(k.x?.[4] ?? 0)).toBeGreaterThan(Math.abs(k.x?.[3] ?? 0));
     expect(k.x?.at(-1)).toBe(0);
     expect(Math.abs(recoilKeyframes("crit", REACH).x?.[4] ?? 0)).toBeGreaterThan(Math.abs(k.x?.[4] ?? 0));
     expect(close(timesOf(k)[1] ?? 0, blowTiming("hit").impact / blowTiming("hit").length)).toBe(true);
+  });
+
+  test("a fighter still moving is never snapped: the fighters' beats start from their current values", () => {
+    for (const k of [strikeKeyframes("hit", REACH), recoilKeyframes("crit", REACH), missKeyframes(REACH), dodgeKeyframes(REACH)]) {
+      for (const p of ["x", "y", "rotate", "scaleX", "scaleY"] as const) if (k[p]) expect(k[p]?.[0]).toBeNull();
+    }
+    // The stage and the flash start from rest on purpose: they are always at rest between beats.
+    expect(shakeKeyframes("hit").x?.[0]).toBe(0);
+  });
+
+  test("compact (boss): an 80 ms wind-up, the rest unchanged", () => {
+    const c = blowTiming("hit", { compact: true });
+    const n = blowTiming("hit");
+    expect(c.anticipation).toBe(duration.instant);
+    expect(blowTiming("crit", { compact: true }).anticipation).toBe(duration.instant);
+    expect([c.strike, c.hitStop, c.recoil, c.settle]).toEqual([n.strike, n.hitStop, n.recoil, n.settle]);
+    expect(close(durationOf(strikeKeyframes("hit", REACH, { compact: true })), c.attackerLength)).toBe(true);
+    expect(close(durationOf(recoilKeyframes("hit", REACH, { compact: true })), c.length)).toBe(true);
   });
 
   test("times are increasing and only transform/opacity are animated", () => {
@@ -114,7 +133,7 @@ describe("beat keyframes", () => {
 
   test("the blows from the right mirror the ones from the left", () => {
     const back = { x: -REACH.x, y: -REACH.y };
-    expect(strikeKeyframes("hit", back).x).toEqual(strikeKeyframes("hit", REACH).x?.map((v) => -v || 0));
+    expect(strikeKeyframes("hit", back).x).toEqual(strikeKeyframes("hit", REACH).x?.map((v) => (v === null ? null : -v || 0)));
     expect(strikeKeyframes("hit", back).rotate?.[2]).toBe(-(strikeKeyframes("hit", REACH).rotate?.[2] ?? 0));
   });
 });
@@ -140,6 +159,27 @@ describe("InkImpact", () => {
       expect(d.dx).toBeGreaterThan(0);
     }
     expect(droplets("crit", { x: 1, y: 0 }).some((d) => d.fill.includes("gold"))).toBe(true);
+  });
+});
+
+describe("reduced paths (explicit prop)", () => {
+  test("InkImpact: no droplets, the slash simply there", () => {
+    const { container } = render(<InkImpact kind="ko" x={0} y={0} reduced />);
+    expect(container.querySelectorAll("circle")).toHaveLength(0);
+    expect(container.querySelectorAll("path")).toHaveLength(2);
+    expect((container.querySelector("svg") as SVGElement).style.transform).toBe("");
+  });
+  test("DamageNumber: a fade only, no pop and no rise", () => {
+    const { container } = render(<DamageNumber value={10} critical={false} reduced />);
+    expect((container.querySelector("[data-fx='damage']") as HTMLElement).style.transform).toBe("");
+    const moving = render(<DamageNumber value={10} critical={false} reduced={false} />);
+    expect((moving.container.querySelector("[data-fx='damage']") as HTMLElement).style.transform).toContain("scale(1.4)");
+  });
+  test("FightSeal: a fade only, no stamp", () => {
+    const { container } = render(<FightSeal reduced>K.-O.</FightSeal>);
+    expect((container.querySelector("[data-fx='seal']") as HTMLElement).style.transform).toBe("");
+    const stamped = render(<FightSeal reduced={false}>K.-O.</FightSeal>);
+    expect((stamped.container.querySelector("[data-fx='seal']") as HTMLElement).style.transform).toContain("scale(1.6)");
   });
 });
 
@@ -173,6 +213,26 @@ describe("FighterSprite", () => {
     expect(container.querySelector("[data-pose='bow']")).not.toBeNull();
     rerender(<FighterSprite look={{}} facing={-1} expression="ko" size={100} pose="salute" />);
     expect(container.querySelector("[data-hat='on']")).not.toBeNull();
+  });
+
+  test("any art as children (the boss): picked from the expression, square, no hat", () => {
+    const art = (e: string) => <img alt="" src={`/boss-${e}.svg`} data-art={e} />;
+    const { container, rerender } = render(
+      <FighterSprite facing={-1} expression="idle" size={96} ratio={1} pose="stand">
+        {art}
+      </FighterSprite>,
+    );
+    expect(container.querySelector("[data-art='idle']")).not.toBeNull();
+    expect((container.firstElementChild as HTMLElement).style.height).toBe("96px");
+    expect(container.querySelector("[data-face]")).toBeNull();
+    rerender(
+      <FighterSprite facing={-1} expression="ko" size={96} ratio={1} pose="salute">
+        {art}
+      </FighterSprite>,
+    );
+    expect(container.querySelector("[data-art='ko']")).not.toBeNull();
+    expect(container.querySelector("[data-pose='salute']")).not.toBeNull();
+    expect(container.querySelector("[data-hat]")).toBeNull();
   });
 
   test("a character without a hat has nothing to drop", () => {

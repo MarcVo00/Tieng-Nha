@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useAnimationControls, useReducedMotion, type AnimationControls, type Transition } from "motion/react";
 import { ease } from "@/ui/motion";
-import { blowTiming, missTiming, type BlowKind, type Tempo } from "@/ui/fight/fightTiming";
+import { blowTiming, missTiming, type BeatOptions, type BlowKind, type Tempo } from "@/ui/fight/fightTiming";
 
 // One fight beat on two fighters and the stage: anticipation → strike → hit-stop → recoil → settle. The hit-stop is a
 // value held between two keyframes, never a timer pause, so a beat is a single animation per element. Positions come
@@ -20,7 +20,11 @@ export function useFighterControls(): FighterControls {
 
 /** Animated properties of a beat: transform and opacity only. */
 export type FightProp = "x" | "y" | "rotate" | "scaleX" | "scaleY" | "opacity";
-export type Keyframes = { [K in FightProp]?: number[] } & { transition: Transition };
+/** `null` as a first keyframe starts from the current value (a fighter still settling from the previous beat). */
+export type Frames = number[] | [null, ...number[]];
+export type Keyframes = { [K in FightProp]?: Frames } & { transition: Transition };
+/** From the current value, so a beat never snaps a fighter that is still moving. */
+const fromHere = (values: number[]): [null, ...number[]] => [null, ...values.slice(1)];
 
 const unit = (v: Vec): Vec => {
   const n = Math.hypot(v.x, v.y) || 1;
@@ -39,7 +43,7 @@ const JOLT = 4; // px on contact, held during the hit-stop
 const JOLT_AT = 0.25;
 
 /** The attacker: crouch backwards, rush to the contact, hold the frame, settle back. `reach` goes to the defender. */
-export function strikeKeyframes(kind: BlowKind, reach: Vec, opts: { ko?: boolean; tempo?: Tempo } = {}): Keyframes {
+export function strikeKeyframes(kind: BlowKind, reach: Vec, opts: BeatOptions = {}): Keyframes {
   const t = blowTiming(kind, opts);
   const u = unit(reach);
   const d = sign(reach);
@@ -48,17 +52,17 @@ export function strikeKeyframes(kind: BlowKind, reach: Vec, opts: { ko?: boolean
   const times = [0, t.anticipation / T, t.impact / T, (t.impact + t.hitStop) / T, 1];
   const ds = [0, -WIND_UP, contact, contact, 0];
   return {
-    x: along(u, ds, "x"),
-    y: along(u, ds, "y"),
-    scaleX: [1, 1.04, 0.97, 0.97, 1],
-    scaleY: [1, 0.94, 1.06, 1.06, 1],
-    rotate: [0, -4 * d, 6 * d, 6 * d, 0],
+    x: fromHere(along(u, ds, "x")),
+    y: fromHere(along(u, ds, "y")),
+    scaleX: fromHere([1, 1.04, 0.97, 0.97, 1]),
+    scaleY: fromHere([1, 0.94, 1.06, 1.06, 1]),
+    rotate: fromHere([0, -4 * d, 6 * d, 6 * d, 0]),
     transition: { duration: T, times, ease: [ease.inOut, ease.in, "linear", ease.out] },
   };
 }
 
 /** The defender: still until the contact, a small jolt held through the hit-stop, thrown back, springs back. */
-export function recoilKeyframes(kind: BlowKind, reach: Vec, opts: { ko?: boolean; tempo?: Tempo } = {}): Keyframes {
+export function recoilKeyframes(kind: BlowKind, reach: Vec, opts: BeatOptions = {}): Keyframes {
   const t = blowTiming(kind, opts);
   const u = unit(reach);
   const d = sign(reach);
@@ -68,22 +72,22 @@ export function recoilKeyframes(kind: BlowKind, reach: Vec, opts: { ko?: boolean
   const times = [0, t.impact / T, (t.impact + t.hitStop * JOLT_AT) / T, stop / T, (stop + t.recoil * 0.35) / T, 1];
   const ds = [0, 0, JOLT, JOLT, k.push, 0];
   return {
-    x: along(u, ds, "x"),
-    y: along(u, ds, "y"),
-    rotate: [0, 0, 2 * d, 2 * d, k.tilt * d, 0],
+    x: fromHere(along(u, ds, "x")),
+    y: fromHere(along(u, ds, "y")),
+    rotate: fromHere([0, 0, 2 * d, 2 * d, k.tilt * d, 0]),
     transition: { duration: T, times, ease: ["linear", ease.out, "linear", ease.out, ease.inOut] },
   };
 }
 
 /** The paper plate over the hit fighter flashes 0 → 0.7 → 0 during the hit-stop (instead of blinking the fighter). */
-export function flashKeyframes(kind: BlowKind, opts: { ko?: boolean; tempo?: Tempo } = {}): Keyframes {
+export function flashKeyframes(kind: BlowKind, opts: BeatOptions = {}): Keyframes {
   const t = blowTiming(kind, opts);
   const T = t.impact + t.hitStop;
   return { opacity: [0, 0, 0.7, 0], transition: { duration: T, times: [0, t.impact / T, (t.impact + t.hitStop * JOLT_AT) / T, 1], ease: "linear" } };
 }
 
 /** The stage shakes once during the hit-stop: ±4 px, a critical or a K.-O. ±8 px twice. */
-export function shakeKeyframes(kind: BlowKind, opts: { ko?: boolean; tempo?: Tempo } = {}): Keyframes {
+export function shakeKeyframes(kind: BlowKind, opts: BeatOptions = {}): Keyframes {
   const t = blowTiming(kind, opts);
   const big = kind === "crit" || opts.ko === true;
   const amp = big ? [8, -8, 8, -8] : [4, -4];
@@ -100,9 +104,9 @@ export function missKeyframes(reach: Vec, tempo: Tempo = 1): Keyframes {
   const d = sign(reach);
   const ds = [0, -WIND_UP, 26, 18, 0];
   return {
-    x: along(u, ds, "x"),
-    y: along(u, ds, "y").map((v, i) => (i === 2 ? v - 8 : i === 3 ? v + 6 : v)),
-    rotate: [0, -4 * d, 18 * d, -6 * d, 0],
+    x: fromHere(along(u, ds, "x")),
+    y: fromHere(along(u, ds, "y").map((v, i) => (i === 2 ? v - 8 : i === 3 ? v + 6 : v))),
+    rotate: fromHere([0, -4 * d, 18 * d, -6 * d, 0]),
     transition: { duration: length, times: [0, 0.2, 0.45, 0.75, 1], ease: [ease.inOut, ease.in, ease.out, ease.inOut] },
   };
 }
@@ -110,13 +114,14 @@ export function missKeyframes(reach: Vec, tempo: Tempo = 1): Keyframes {
 /** The defender sidesteps a miss: 12 px away from the blow and back. */
 export function dodgeKeyframes(reach: Vec, tempo: Tempo = 1): Keyframes {
   const { length } = missTiming(tempo);
-  return { x: [0, 0, 12 * sign(reach), 0], transition: { duration: length, times: [0, 0.3, 0.55, 1], ease: [ease.out, ease.out, ease.inOut] } };
+  return { x: [null, 0, 12 * sign(reach), 0], transition: { duration: length, times: [0, 0.3, 0.55, 1], ease: [ease.out, ease.out, ease.inOut] } };
 }
 
 export type BlowBeat = {
   kind: BlowKind;
   ko?: boolean;
   tempo?: Tempo;
+  compact?: boolean;
   attacker: FighterControls;
   defender: FighterControls;
   stage?: AnimationControls;
@@ -133,7 +138,7 @@ export function useFightBeat() {
   const reduced = useReducedMotion() === true;
   const blow = useCallback(
     (b: BlowBeat) => {
-      const opts = { ko: b.ko === true, tempo: b.tempo ?? 1 };
+      const opts: BeatOptions = { ko: b.ko === true, tempo: b.tempo ?? 1, compact: b.compact === true };
       void b.defender.flash.start(flashKeyframes(b.kind, opts));
       if (!reduced) {
         void b.attacker.body.start(strikeKeyframes(b.kind, b.reach, opts));

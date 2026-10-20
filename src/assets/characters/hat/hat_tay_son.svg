@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Bandeau de Tây Sơn : deux longs pans vermillon qui flottent derrière, noués à la tempe -->
+    <path d="M39 61 Q27 50 9 52 Q17 56 14 63 Q27 59 38 67 Z" fill="#B23A2A"/>
+    <path d="M38 66 Q24 70 13 87 Q22 84 25 90 Q30 76 40 70 Z" fill="#B23A2A"/>
+    <!-- large bande vermillon nouée sur le front, cheveux visibles dessus et dessous -->
+    <path d="M37.5 69 Q60 55 82.5 69 L81.5 60 Q60 45 38.5 60 Z" fill="#B23A2A"/>
+    <path d="M40.5 64.5 Q60 51.5 79.5 64.5" fill="none" stroke-width="1.2"/>
+    <!-- nœud à la tempe -->
+    <ellipse cx="38.5" cy="65" rx="4.2" ry="5" fill="#B23A2A"/>
+    <!-- petit emblème or au centre -->
+    <circle cx="60" cy="57.2" r="3.6" fill="#D9A93A" stroke-width="1.6"/>
+    <circle cx="60" cy="57.2" r="0.9" fill="#1F1A17" stroke="none"/>
+  </g>
+</svg>

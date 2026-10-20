@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Tenue de lutteur du hội vật : pantalon noir serré -->
+    <path d="M44 124 L76 124 L74 134 L76 150 L62 150 L60 137 L58 150 L44 150 L46 134 Z" fill="#1F1A17"/>
+    <!-- avant-bras bandés de tissu noir, liens crème -->
+    <path d="M34 104 L26 117 L34 122 L38.5 114.5 Z M86 104 L94 117 L86 122 L81.5 114.5 Z" fill="#1F1A17"/>
+    <path d="M30 112 L36 116 M28.5 116 L33.5 119 M90 112 L84 116 M91.5 116 L86.5 119" fill="none" stroke="#F4E4C4" stroke-width="1.2"/>
+    <!-- chemise crème aux manches retroussées au coude, jamais le torse nu -->
+    <path d="M41 94 L32.5 106.5 L39.5 112.5 L41 110 Z M79 94 L87.5 106.5 L80.5 112.5 L79 110 Z" fill="#F4E4C4"/>
+    <path d="M40 94 Q60 86 80 94 L80 124 L40 124 Z" fill="#F4E4C4"/>
+    <path d="M54 91 L60 99 L66 91" fill="none" stroke-width="1.4"/>
+    <!-- gilet court sans manches indigo, ouvert -->
+    <path d="M52 89.5 Q44 90 38.5 94 L36.5 102 L40 108 L39 121 L54 121 L55.5 104 Z" fill="#2B4E6E"/>
+    <path d="M68 89.5 Q76 90 81.5 94 L83.5 102 L80 108 L81 121 L66 121 L64.5 104 Z" fill="#2B4E6E"/>
+    <!-- large ceinture de soie vermillon nouée sur le côté, pans pendants (seule zone détaillée) -->
+    <path d="M38.5 118 L81.5 118 L82 127 L38 127 Z" fill="#B23A2A"/>
+    <path d="M44 126 Q41 135 37 145 L43.5 143.5 Q46.5 135 48 127 Z" fill="#B23A2A" stroke-width="2"/>
+    <path d="M48.5 126 Q51.5 135 51.5 146 L57 143 Q55 134 52 126 Z" fill="#B23A2A" stroke-width="2"/>
+    <path d="M42 117 Q47.5 115 53 117 L53 128 Q47.5 130 42 128 Z" fill="#B23A2A" stroke-width="2"/>
+    <path d="M44.5 119.5 L44.5 125.5 M50.5 119.5 L50.5 125.5 M40 136 L44.5 135 M51 135.5 L54.5 134.5" fill="none" stroke-width="1.1"/>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Bâton de Bình Định : long bâton de bois sombre, à peine incliné, tenu dans la main droite (92,122) -->
+    <g transform="rotate(3 92 122)">
+      <rect x="89" y="18" width="6" height="133" rx="3" fill="#1F1A17"/>
+      <!-- bagues or aux deux bouts -->
+      <path d="M88.6 23 L95.4 23 L95.4 29 L88.6 29 Z M88.6 139 L95.4 139 L95.4 145 L88.6 145 Z" fill="#D9A93A" stroke-width="1.6"/>
+    </g>
+    <!-- le poing qui le tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

@@ -154,3 +154,27 @@ export async function seedBadges(page: Page, ids: string[]): Promise<void> {
     await new Promise((res) => { tx.oncomplete = res; });
   }, ids);
 }
+
+/** Writes `dialogue_completed` events straight into the local event log. Call after onboarding, then reload. */
+export async function seedDialoguesCompleted(page: Page, ids: string[]): Promise<void> {
+  await page.evaluate(async (ids) => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open("tieng-nha");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const tx = db.transaction("events", "readwrite");
+    ids.forEach((id, i) => {
+      tx.objectStore("events").put({
+        clientId: crypto.randomUUID(),
+        schemaVersion: 1,
+        type: "dialogue_completed",
+        refId: id,
+        xp: 10,
+        payload: { durationMs: 1000 },
+        createdAt: new Date(Date.now() - (ids.length - i) * 60000).toISOString(),
+      });
+    });
+    await new Promise((res) => { tx.oncomplete = res; });
+  }, ids);
+}

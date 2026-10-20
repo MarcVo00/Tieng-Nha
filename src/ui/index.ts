@@ -8,7 +8,7 @@ export { TryOnSheet } from "@/ui/TryOnSheet";
 export { FeedbackSheet } from "@/ui/FeedbackSheet";
 export { ProgressBar } from "@/ui/ProgressBar";
 export { Hearts } from "@/ui/Hearts";
-export { Avatar, fxSpill } from "@/ui/Avatar";
+export { Avatar, fxSpill, frameRing } from "@/ui/Avatar";
 export { Character } from "@/ui/Character";
 export { HeroMedallion } from "@/ui/HeroMedallion";
 export { ProfileFx, type ProfileFxId } from "@/ui/ProfileFx";

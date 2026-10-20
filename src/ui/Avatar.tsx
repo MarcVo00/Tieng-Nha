@@ -30,6 +30,8 @@ const FRAME = {
 } as const;
 
 const isFrame = (id: string | null | undefined): id is keyof typeof FRAME => id != null && Object.hasOwn(FRAME, id);
+/** The ring classes of an equipped shop frame (empty for none or an unknown one): for medallions drawn outside Avatar. */
+export const frameRing = (frame: string | null | undefined): string => (isFrame(frame) ? FRAME[frame] : "");
 
 export function Avatar({ emoji, size = "md", ring = "none", frame, fx, look, still = false }: AvatarProps) {
   const decoration = isFrame(frame) ? FRAME[frame] : RING[ring];

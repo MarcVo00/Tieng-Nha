@@ -120,4 +120,14 @@ test("with reduced motion the bilan shows at once, with the final HP", async () 
   expect(bilan.style.opacity).toBe("1");
   expect(bilan.style.transform).toBe("none");
   expect(document.querySelectorAll("div.h-2.w-2")).toHaveLength(0);
+  // Final poses, static: the loser bows with closed eyes, its hat lies beside it, unrotated; no fight FX at all.
+  const loser = screen.getByRole("img", { name: "Bé Na" });
+  expect(loser.querySelector("[data-pose='bow']")).not.toBeNull();
+  expect(loser.querySelector("[data-expression]")).toHaveAttribute("data-expression", "ko");
+  const hat = loser.querySelector<HTMLElement>("[data-hat='fallen']");
+  expect(hat?.style.opacity).toBe("1");
+  expect(hat?.style.transform).not.toContain("rotate");
+  expect(screen.getByRole("img", { name: "Linh" }).querySelector("[data-expression]")).toHaveAttribute("data-expression", "idle");
+  expect(document.querySelectorAll("[data-fx-beat], [data-fx='impact'], [data-fx='seal']")).toHaveLength(0);
+  expect(document.querySelector(".will-change-transform")).toBeNull();
 });

@@ -121,33 +121,20 @@ test("an open duel I have not played goes to the run", async () => {
 });
 
 test("a settled duel replays the fight blow by blow, then shows the bilan and pays the Kim bài once", async () => {
-  vi.useFakeTimers({ shouldAdvanceTime: true });
+  vi.useFakeTimers({ shouldAdvanceTime: false });
   const services = makeServices();
   await unlock(services);
   const id = await settledDuel(services);
-  renderAt(`/duel/${id}`, services);
+  await openReplay(services, id);
 
-  expect(await screen.findByRole("button", { name: R.skip })).toBeInTheDocument();
   expect(screen.getByRole("group", { name: R.stage("Linh", "Bé Na") })).toBeInTheDocument();
   expect(screen.queryByRole("heading", { name: R.headline.win })).not.toBeInTheDocument();
   // First blow: mine (I challenged), a critical one. The HP drops on impact, not when the attacker sets off.
-  await act(async () => {
-    await vi.advanceTimersByTimeAsync(1200);
-  });
-  expect(await screen.findByText(R.blow("Linh", "critical", 15))).toBeInTheDocument();
+  await until(() => screen.queryByText(R.blow("Linh", "critical", 15)) !== null);
   expect(screen.getByRole("meter", { name: R.hp("Bé Na", 100) })).toBeInTheDocument();
-  await act(async () => {
-    await vi.advanceTimersByTimeAsync(400);
-  });
-  expect(screen.getByRole("meter", { name: R.hp("Bé Na", 85) })).toBeInTheDocument();
+  await until(() => screen.queryByRole("meter", { name: R.hp("Bé Na", 85) }) !== null, 600);
 
-  // Each beat schedules the next one after rendering: advance beat by beat.
-  for (let i = 0; i < 40; i++) {
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(1000);
-    });
-  }
-  expect(await screen.findByRole("heading", { name: R.headline.win })).toBeInTheDocument();
+  await until(() => screen.queryByRole("heading", { name: R.headline.win }) !== null);
   expect(screen.queryByRole("button", { name: R.skip })).not.toBeInTheDocument();
   const table = screen.getByRole("table", { name: R.statsLabel });
   const row = (label: string) => within(table).getByRole("row", { name: new RegExp(`^${label}`) });
@@ -159,7 +146,98 @@ test("a settled duel replays the fight blow by blow, then shows the bilan and pa
   expect(screen.getByRole("meter", { name: R.hp("Linh", 45) })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: new RegExp(R.rematch) })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: R.back })).toBeInTheDocument();
+  vi.useRealTimers();
   await waitFor(async () => expect((await services.activity.getWallet()).kimBai).toBe(3));
+});
+
+const advance = async (ms: number) =>
+  act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+/** Fake time in 20 ms steps (React renders between steps), until `done` holds; returns the time spent. */
+async function until(done: () => boolean, maxMs = 12_000): Promise<number> {
+  let t = 0;
+  while (!done()) {
+    if (t > maxMs) throw new Error("timed out");
+    await advance(20);
+    t += 20;
+  }
+  return t;
+}
+const fxNodes = () => [...document.querySelectorAll("[data-fx-beat]")].reduce((n, el) => n + el.querySelectorAll("*").length, 0);
+const faceOf = (name: string) => screen.getByRole("img", { name }).querySelector("[data-expression]")?.getAttribute("data-expression");
+const fxOf = (beat: number, sel = "*") => document.querySelector(`[data-fx-beat='${beat}'] ${sel}`);
+
+async function openReplay(services: Services, id: string) {
+  renderAt(`/duel/${id}`, services);
+  await until(() => screen.queryByRole("button", { name: R.skip }) !== null);
+}
+
+test("a blow lands with ink, a hurt face and, for a critical, the vermilion « Chí mạng! » seal; its FX leave two beats later", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await unlock(services);
+  await openReplay(services, await settledDuel(services));
+  // My critical winds up (gold glint), nothing has landed yet.
+  await until(() => fxOf(1, "[data-fx='glint']") !== null);
+  expect(fxOf(1, "[data-fx='impact']")).toBeNull();
+  expect(faceOf("Bé Na")).toBe("idle");
+  expect(screen.getByRole("meter", { name: R.hp("Bé Na", 100) })).toBeInTheDocument();
+  // Contact: ink slash and 10 droplets, the seal, the number, the hurt face, the HP drop, all at once.
+  await until(() => fxOf(1, "[data-fx='impact']") !== null);
+  expect(fxOf(1, "[data-fx='impact'][data-kind='crit']")).not.toBeNull();
+  expect(document.querySelectorAll("[data-fx-beat='1'] circle")).toHaveLength(10);
+  expect(screen.getByText(R.critSeal)).toHaveAttribute("lang", "vi");
+  expect(fxOf(1, "[data-fx='damage']")).toHaveTextContent("−15");
+  expect(faceOf("Bé Na")).toBe("hurt");
+  expect(faceOf("Linh")).toBe("idle");
+  expect(screen.getByRole("meter", { name: R.hp("Bé Na", 85) })).toBeInTheDocument();
+  // Their critical: my ink leaves with my beat, my number keeps floating until the next beat starts.
+  await until(() => fxOf(2, "[data-fx='impact']") !== null);
+  expect(fxOf(1, "[data-fx='impact']")).toBeNull();
+  expect(fxOf(1, "[data-fx='damage']")).not.toBeNull();
+  expect(faceOf("Linh")).toBe("hurt");
+  expect(faceOf("Bé Na")).toBe("idle");
+  await until(() => document.querySelector("[data-fx-beat='3']") !== null);
+  expect(document.querySelector("[data-fx-beat='1']")).toBeNull();
+  // The FX layer stays within its node budget all along, and is gone with the verdict.
+  await until(() => {
+    expect(fxNodes()).toBeLessThanOrEqual(30);
+    expect(document.querySelectorAll("[data-fx='impact']").length).toBeLessThanOrEqual(2);
+    return screen.queryByRole("heading", { name: R.headline.win }) !== null;
+  });
+  expect(document.querySelectorAll("[data-fx-beat]")).toHaveLength(0);
+});
+
+test("the replay ends on the verdict within 9 s: the loser bows, its hat falls, the winner stands", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await unlock(services);
+  await openReplay(services, await settledDuel(services));
+  const spent = await until(() => screen.queryByRole("heading", { name: R.headline.win }) !== null);
+  expect(spent).toBeLessThanOrEqual(9000);
+  const loser = screen.getByRole("img", { name: "Bé Na" });
+  expect(loser.querySelector("[data-pose='bow']")).not.toBeNull();
+  expect(loser.querySelector("[data-hat='fallen']")).not.toBeNull();
+  expect(faceOf("Bé Na")).toBe("ko");
+  expect(screen.getByRole("img", { name: "Linh" }).querySelector("[data-pose='stand']")).not.toBeNull();
+  expect(faceOf("Linh")).toBe("idle");
+});
+
+test("consecutive misses play as one beat: « Raté ×3 »", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await unlock(services);
+  const gw = gateway(services);
+  const id = gw.seedIncoming(QUESTIONS, { from: BE_NA, theirRun: false });
+  const miss = { correct: false, ms: 5000 };
+  await gw.submitRun(id, [miss, miss, miss, { correct: true, ms: 5000 }], STRONG.round2);
+  now = "2026-10-14T10:00:00.000Z"; // forfeit: only I attack
+  await openReplay(services, id);
+  await until(() => screen.queryByText(R.misses(3)) !== null);
+  expect(document.querySelector("[aria-live]")).toHaveTextContent(R.missed("Linh", 3));
+  expect(document.querySelectorAll("[data-fx='impact'][data-kind='miss']")).toHaveLength(1);
+  expect(document.querySelectorAll("[data-fx='miss']")).toHaveLength(1);
 });
 
 test("« Passer » jumps straight to the bilan, moves the focus to the verdict and announces it", async () => {
@@ -172,6 +250,7 @@ test("« Passer » jumps straight to the bilan, moves the focus to the verdict a
   expect(screen.getByRole("meter", { name: R.hp("Bé Na", 25) })).toBeInTheDocument();
   await waitFor(() => expect(heading).toHaveFocus());
   expect(screen.getByText(R.verdictAnnounce(R.headline.win, 3))).toHaveAttribute("aria-live", "polite");
+  expect(screen.getByText(`${R.rewardLabel}\u202f: 3`)).toBeInTheDocument();
 });
 
 test("the round banners are announced", async () => {

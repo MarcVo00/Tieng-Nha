@@ -148,6 +148,13 @@ Si tu ne le fais pas : fais inscrire les personnes **quelques-unes à la fois**,
 5. Copie l'URL finale et retourne à l'**étape 3.3** (Site URL et Redirect URLs de Supabase) si ce n'est pas fait.
 6. URL de production, à compléter : `<URL à compléter>`
 
+### Version démo (deploy preview)
+
+Une version de démonstration (faux serveur, adversaires de duel automatiques, vraie voix et vrai micro, panneau « Outils de test » dans l'écran Moi, pastille « Mode démo ») tourne sur le **deploy preview** de la PR ouverte « Démo (ne pas fusionner) », issue de la branche `demo`. Ses variables (`VITE_USE_FAKES=true`, `VITE_DEMO=true`, `VITE_FAKE_SPEECH=false`) sont fixées dans `netlify.toml`, section `[context.deploy-preview.environment]` ; le contexte de production n'est pas modifié. Le garde-fou ci-dessus ne s'applique qu'en l'absence de `VITE_DEMO=true`.
+
+- Pour rafraîchir la démo : fusionne `main` dans `demo`, puis pousse `demo`.
+- Ne fusionne **jamais** cette PR dans `main`.
+
 ---
 
 ## Étape 6 : secrets GitHub (keep-alive)

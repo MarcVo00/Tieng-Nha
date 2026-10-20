@@ -3,6 +3,10 @@
   publish = "dist"
 [build.environment]
   NODE_VERSION = "20"
+[context.deploy-preview.environment]
+  VITE_USE_FAKES = "true"
+  VITE_DEMO = "true"
+  VITE_FAKE_SPEECH = "false"
 [[headers]]
   for = "/sw.js"
   [headers.values]

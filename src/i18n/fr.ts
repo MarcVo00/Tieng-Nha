@@ -612,13 +612,18 @@ export const fr = {
     intro: {
       kicker: "Boss final",
       loadError: { title: "Le test n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
+      legendLabel: "La légende",
       rulesLabel: "Comment ça se passe",
-      rules: (hp: number, lives: number) => [
-        `Thủy Tinh a ${hp} PV\u202f: chaque bonne réponse lui en retire 1`,
-        `Tu as ${lives} vies\u202f: chaque erreur t'en coûte 1`,
-        "Pas de correction pendant le combat\u202f: tu la verras à la fin",
-        "3 essais par jour\u202f; le certificat s'obtient en le battant",
-      ],
+      rules: {
+        hp: (hp: number) => `${hp} gouttes`,
+        hpBody: "Chaque bonne réponse lui en retire une.",
+        lives: (lives: number) => `${lives} vies`,
+        livesBody: "Chaque erreur t'en coûte une.",
+        noCorrection: "Pas de correction",
+        noCorrectionBody: "Tu la verras à la fin.",
+        noCorrectionAria: "Pinceau barré",
+        tries: "3 essais par jour ; le certificat s'obtient en le battant.",
+      },
       won: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
       locked: {
         title: "Thủy Tinh t'attend au bout du parcours",
@@ -634,6 +639,10 @@ export const fr = {
     },
     run: {
       bossHp: (name: string, hp: number, max: number) => `PV de ${name}\u202f: ${hp} sur ${max}`,
+      stage: (name: string) => `Combat contre ${name}`,
+      hero: "Ton h\u00e9ros",
+      ko: "K.-O.",
+      skip: "Passer",
       hit: (hpLeft: number) => `Touché\u202f! Il lui reste ${hpLeft} PV`,
       miss: (livesLeft: number) => `Aïe\u202f! Il te reste ${livesLeft} vie${livesLeft > 1 ? "s" : ""}`,
       quit: {
@@ -652,6 +661,10 @@ export const fr = {
       won: (name: string) => `${name} est vaincu\u202f!`,
       lost: (name: string) => `${name} a gagné cette fois`,
       damage: (dealt: number, hp: number) => `Tu lui as infligé ${dealt} dégâts sur ${hp}`,
+      loot: "Butin",
+      lootBadges: (n: number) => `${n} badge${n > 1 ? "s" : ""}`,
+      lootShow: "Voir le butin",
+      lootHide: "Masquer le butin",
       livesLeft: (n: number, max: number) => `${n} vie${n > 1 ? "s" : ""} sur ${max} gardée${n > 1 ? "s" : ""}`,
       correctionLabel: "Correction",
       showCorrection: "Voir la correction",

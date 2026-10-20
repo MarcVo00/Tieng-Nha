@@ -1,17 +1,32 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { motion, useAnimationControls, type AnimationControls } from "motion/react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEntryState } from "@/app/useEntryState";
-import { useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
+import { useAppState, useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import type { Boss, Capabilities, ExamQuestion, VocabId, VocabItem } from "@/domain/types";
+import type { Boss, Capabilities, ExamQuestion, Look, VocabId, VocabItem } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import type { GradeResult } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import { answer, bossMention, buildDeck, fightScore, outOfQuestions, startFight, type Fight } from "@/services/bossFight";
 import { FINAL_BOSS_ID } from "@/services/tree";
 import { seedFromString } from "@/services/random";
-import { Button, ConfirmDialog, duration, EmptyState, FocusHeader, Hearts, ProgressBar, Skeleton } from "@/ui";
-import { BossPortrait } from "@/features/exam/BossPortrait";
+import { lookOf } from "@/services/look";
+import { Button, ConfirmDialog, duration, ease, EmptyState, FocusHeader, Hearts, Motif, Skeleton, spring, tap, WaterDropHp } from "@/ui";
+import {
+  DamageNumber,
+  FIGHT,
+  FighterSprite,
+  FightSeal,
+  InkImpact,
+  useFightBeat,
+  useFighterControls,
+  type FighterControls,
+  type FighterPose,
+  type Vec,
+} from "@/ui/fight";
+import type { Expression } from "@/ui/characterLayers";
+import { BossSprite } from "@/features/exam/BossPortrait";
 import {
   clearAttemptMark,
   INTERRUPTED_STATE,
@@ -28,7 +43,103 @@ type Load =
   | { status: "error" }
   | { status: "ready"; deck: ExamQuestion[]; boss: Boss; vocabIndex: ReadonlyMap<VocabId, VocabItem> };
 
-// Hierarchy: the boss portrait + HP bar are the hero, the current exercise is the one action, lives sit in the header.
+
+// The stage is a fixed 320 px ring (centred): positions are constants, never measured during a beat (audit §C.3).
+const HERO = 64; // px wide, 4:3
+const BOSS = 96; // px, square art
+/** From the hero's resting place to the boss's (centres, px): the hero rushes 30 % of it. */
+const REACH: Vec = { x: 224, y: 0 };
+/** The boss's wave rolls from its side to the hero's (px, negative: leftwards). */
+const WAVE_TRAVEL = -112;
+/** The wave starts just left of the boss (48 px wide, in the 320 px ring). */
+const WAVE_LEFT = 320 - 4 - BOSS - 48;
+
+type Fx = { id: number; kind: "ink" | "ko" | "dmg" | "wave"; life: number };
+
+type StageProps = {
+  boss: Boss;
+  defeated: boolean;
+  look: Look;
+  heroFace: Expression;
+  bossFace: Expression;
+  bossPose: FighterPose;
+  veiled: boolean;
+  fx: readonly Fx[];
+  hero: FighterControls;
+  bossCtl: FighterControls;
+  stage: AnimationControls;
+  reduced: boolean;
+  live: boolean;
+};
+
+/**
+ * The fight strip (audit §C.2): the player's hero on the left facing Thủy Tinh on the right, each on a paper mat, a
+ * calm wave motif behind. FX are mounted for their beat and unmounted by the caller (≤ 30 nodes).
+ */
+function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled, fx, hero, bossCtl, stage, reduced, live }: StageProps) {
+  return (
+    <div role="group" aria-label={fr.exam.run.stage(boss.name)} className="relative mx-5 h-28">
+      {/* Backdrop clipped to the strip; the fighters and their FX may spill over its edge. */}
+      <div aria-hidden="true" className="absolute inset-0 overflow-hidden rounded-lg bg-surface-2">
+        <div className="absolute inset-0 text-info">
+          <Motif kind="waves" />
+        </div>
+        <motion.div className="absolute inset-0 bg-scrim" initial={false} animate={{ opacity: veiled ? 1 : 0 }} transition={{ duration: duration.base }} />
+      </div>
+      <motion.div className={`relative mx-auto h-full w-full max-w-[20rem] ${live ? "will-change-transform" : ""}`} animate={stage}>
+        {/* Paper medallions stay put like mats (giấy điệp): only the fighters move. */}
+        <span aria-hidden="true" className="absolute bottom-2 left-1.5 h-[4.75rem] w-[4.75rem] rounded-full border-2 border-line bg-paper" />
+        <span aria-hidden="true" className="absolute bottom-1 right-0.5 h-[6.25rem] w-[6.25rem] rounded-full border-2 border-line bg-paper" />
+        <div role="img" aria-label={fr.exam.run.hero} data-fighter="hero" className="absolute bottom-2.5 left-3 z-10">
+          <FighterSprite look={look} facing={1} expression={heroFace} size={HERO} controls={hero} live={live} />
+        </div>
+        <div role="img" aria-label={fr.exam.boss.aria(boss.name, boss.title, defeated)} className="absolute bottom-2 right-1 z-10">
+          <BossSprite illustration={boss.illustration} size={BOSS} facing={-1} expression={bossFace} pose={bossPose} controls={bossCtl} live={live} />
+        </div>
+        {/* FX layer anchored on the boss box: impact, damage number, seal. */}
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-2 right-1 z-20 h-24 w-24">
+          {fx.map((f) =>
+            f.kind === "ink" ? (
+              <InkImpact key={f.id} kind="hit" x={BOSS / 2} y={BOSS / 2 - 4} life={f.life} reduced={reduced} />
+            ) : f.kind === "ko" ? (
+              <span key={f.id}>
+                <InkImpact kind="ko" x={BOSS / 2} y={BOSS / 2 - 4} life={f.life} reduced={reduced} />
+                <span className="absolute right-full top-8 translate-x-1/2">
+                  <FightSeal big life={f.life} reduced={reduced}>
+                    {fr.exam.run.ko}
+                  </FightSeal>
+                </span>
+              </span>
+            ) : f.kind === "dmg" ? (
+              <span key={f.id} className="absolute left-1/2 top-0 -translate-x-1/2">
+                <DamageNumber value={1} critical={false} life={f.life} reduced={reduced} />
+              </span>
+            ) : null,
+          )}
+        </div>
+        {fx.some((f) => f.kind === "wave") ? (
+          <motion.svg
+            key={fx.find((f) => f.kind === "wave")?.id}
+            data-fx="wave"
+            aria-hidden="true"
+            viewBox="0 0 48 24"
+            width={48}
+            height={24}
+            className="pointer-events-none absolute bottom-8 z-20 text-info"
+            style={{ left: WAVE_LEFT }}
+            initial={{ x: 0, opacity: 0 }}
+            animate={{ x: WAVE_TRAVEL, opacity: [0, 1, 1, 0] }}
+            transition={{ duration: duration.base, ease: ease.in, opacity: { duration: duration.base, times: [0, 0.2, 0.8, 1] } }}
+          >
+            <path d="M0 18c6-12 18-12 24 0s18 12 24 0M0 6c6-12 18-12 24 0s18 12 24 0" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" />
+          </motion.svg>
+        ) : null}
+      </motion.div>
+    </div>
+  );
+}
+
+// Hierarchy: the fight stage (hero vs boss, water-drop HP) is the hero, the current exercise is the one action, lives sit in the header.
 function ExamRun({ run }: { run: RunState }) {
   const { content, exam, activity, clock, tts, stt, recorder } = useServices();
   const { settings } = useSettings();
@@ -45,6 +156,25 @@ function ExamRun({ run }: { run: RunState }) {
   const [saveError, setSaveError] = useState(false);
   const [quitting, setQuitting] = useState(false);
 
+  const equipped = useAppState((st) => st.wallet?.equipped);
+  const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const beat = useFightBeat();
+  const heroCtl = useFighterControls();
+  const bossCtl = useFighterControls();
+  const stageCtl = useAnimationControls();
+  const [heroFace, setHeroFace] = useState<Expression>("idle");
+  const [bossFace, setBossFace] = useState<Expression>("idle");
+  const [bossPose, setBossPose] = useState<FighterPose>("stand");
+  const [veiled, setVeiled] = useState(false);
+  const [fx, setFx] = useState<Fx[]>([]);
+  const [ending, setEnding] = useState(false);
+  /** HP and lives as drawn: held at their old values until the blow (or the wave) lands, then released (null). */
+  const [held, setHeld] = useState<{ hp: number; lives: number } | null>(null);
+  const fxSeq = useRef(0);
+  const timers = useRef(new Set<number>());
+  /** The end of the fight: the K.-O. (or the boss's triumph) plays until this opens — by itself or on a tap. */
+  const gate = useRef<{ done: Promise<void>; open: () => void } | null>(null);
+
   const outcomes = useRef<QuestionOutcome[]>([]);
   const handled = useRef<number>(-1); // one result per question
   const finishing = useRef(false); // finishExam runs at most once per run
@@ -52,10 +182,95 @@ function ExamRun({ run }: { run: RunState }) {
 
   useEffect(() => {
     mounted.current = true;
+    const pending = timers.current;
     return () => {
       mounted.current = false;
+      pending.forEach((t) => window.clearTimeout(t));
+      pending.clear();
     };
   }, []);
+
+  /** Runs `fn` in `seconds` (beat schedule), unless the screen is gone. */
+  const later = useCallback((fn: () => void, seconds: number) => {
+    const t = window.setTimeout(() => {
+      timers.current.delete(t);
+      if (mounted.current) fn();
+    }, Math.round(seconds * 1000));
+    timers.current.add(t);
+  }, []);
+  /** Mounts an FX for `life` seconds, then unmounts it (the budget: FX nodes go away with their beat). */
+  const showFx = useCallback(
+    (kind: Fx["kind"], life: number) => {
+      const id = ++fxSeq.current;
+      setFx((all) => [...all, { id, kind, life }]);
+      later(() => setFx((all) => all.filter((f) => f.id !== id)), life);
+    },
+    [later],
+  );
+  const closeGate = useCallback(
+    (seconds: number) => {
+      let open: () => void = () => undefined;
+      const done = new Promise<void>((resolve) => {
+        open = () => {
+          resolve();
+          if (mounted.current) setEnding(false);
+        };
+      });
+      gate.current = { done, open };
+      setEnding(true);
+      later(open, seconds);
+    },
+    [later],
+  );
+
+  /** A right answer: the hero rushes at the boss (compact beat), ink on contact, a drop detaches; the K.-O. on the last one. */
+  const playHit = useCallback(
+    (ko: boolean) => {
+      const t = beat.blow({ kind: "hit", ko, compact: true, attacker: heroCtl, defender: bossCtl, stage: stageCtl, reach: REACH });
+      const after = t.length - t.impact;
+      later(() => {
+        showFx(ko ? "ko" : "ink", after);
+        showFx("dmg", FIGHT.number);
+        setBossFace(ko && beat.reduced ? "ko" : "hurt");
+        setHeld(null); // the drop detaches on contact
+      }, t.impact);
+      if (ko) {
+        // Hit-stop held (reduced motion: no hold, a fade), then Thủy Tinh bows from its feet with its salute art; the stage veils.
+        later(() => {
+          setBossFace("ko");
+          setBossPose("bow");
+          setVeiled(true);
+        }, beat.reduced ? t.impact : t.impact + t.hitStop);
+        closeGate(t.impact + t.hitStop + duration.slow);
+      } else {
+        later(() => setBossFace((f) => (f === "hurt" ? "idle" : f)), t.length);
+      }
+    },
+    [beat, heroCtl, bossCtl, stageCtl, later, showFx, closeGate],
+  );
+
+  /** A wrong answer: the boss throws a wave at the hero, who winces and steps back; a heart breaks (Hearts). */
+  const playMiss = useCallback(
+    (lost: boolean) => {
+      setHeroFace("hurt");
+      if (beat.reduced) setHeld(null);
+      else {
+        later(() => setHeld(null), duration.base); // the heart breaks when the wave lands
+        showFx("wave", duration.base);
+        void heroCtl.body.start({ x: [null, 0, -8, 0], transition: { duration: duration.slow, times: [0, 0.55, 0.7, 1], ease: ease.out } });
+      }
+      if (lost) {
+        later(() => {
+          if (!beat.reduced) void bossCtl.body.start({ rotate: -10, transition: spring.bouncy });
+          setVeiled(true);
+        }, duration.base);
+        closeGate(duration.celebrate);
+      } else {
+        later(() => setHeroFace((f) => (f === "hurt" ? "idle" : f)), duration.slow);
+      }
+    },
+    [beat, heroCtl, bossCtl, later, showFx, closeGate],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -127,6 +342,8 @@ function ExamRun({ run }: { run: RunState }) {
           },
         };
         clearAttemptMark();
+        await gate.current?.done; // the K.-O. plays out (or is skipped) before the result
+        if (!mounted.current) return;
         navigate("/exam/result", { state, replace: true });
       } catch {
         finishing.current = false; // nothing was committed: the learner may retry
@@ -150,16 +367,17 @@ function ExamRun({ run }: { run: RunState }) {
         { score: r.skipped ? 0 : r.score, correct: r.correct, skipped: !!r.skipped, expected: r.expected },
       ];
       if (next.status === "fighting" && next.answers.length >= deck.length) next = outOfQuestions(next);
+      setHeld({ hp: fight.bossHp, lives: fight.lives });
       setFight(next);
-      if (next.status !== "fighting") {
-        const over = next;
-        // Let the last hit / heart animation play before the result.
-        setTimeout(() => {
-          if (mounted.current) void finish(over, boss, deck);
-        }, duration.slow * 1000);
-      }
+      // The beat runs beside the next exercise, which never waits for it.
+      if (r.correct && !r.skipped) playHit(next.status === "won");
+      else playMiss(next.status === "lost" && next.lives <= 0);
+      // Out of questions with lives left: no blow ends it, a short pause before the result.
+      if (next.status !== "fighting" && !gate.current) closeGate(duration.slow);
+      // Saving starts at once; the navigation waits for the end of the K.-O.
+      if (next.status !== "fighting") void finish(next, boss, deck);
     },
-    [load, fight, finish],
+    [load, fight, finish, playHit, playMiss, closeGate],
   );
 
   const goBack = () => {
@@ -195,31 +413,62 @@ function ExamRun({ run }: { run: RunState }) {
   const { deck, boss } = load;
   const question = fight.status === "fighting" ? deck[fight.answers.length] : undefined;
   const last = fight.answers[fight.answers.length - 1];
-  const hits = boss.hp - fight.bossHp;
+  const hp = held?.hp ?? fight.bossHp;
+  const lives = held?.lives ?? fight.lives;
 
   return (
     <div className="pb-8">
       {saving ? (
         <div className="flex items-center justify-end px-5 py-3">
-          <Hearts count={fight.lives} max={boss.playerLives} />
+          <Hearts count={lives} max={boss.playerLives} />
         </div>
       ) : (
         <FocusHeader
           onClose={() => setQuitting(true)}
           closeLabel={fr.exam.run.quit.aria}
-          right={<Hearts count={fight.lives} max={boss.playerLives} />}
+          right={<Hearts count={lives} max={boss.playerLives} />}
         />
       )}
 
-      <div className="flex items-center gap-4 px-5 pt-2">
-        <BossPortrait boss={boss} size={88} hits={hits} defeated={fight.status === "won"} />
-        <div className="min-w-0 flex-1 space-y-2">
-          <p lang="vi" className="text-heading text-ink">
-            {boss.name}
-          </p>
-          <ProgressBar value={fight.bossHp / boss.hp} label={fr.exam.run.bossHp(boss.name, fight.bossHp, boss.hp)} />
-        </div>
+      <FightStage
+        boss={boss}
+        defeated={fight.status === "won"}
+        look={look}
+        heroFace={heroFace}
+        bossFace={bossFace}
+        bossPose={bossPose}
+        veiled={veiled}
+        fx={fx}
+        hero={heroCtl}
+        bossCtl={bossCtl}
+        stage={stageCtl}
+        reduced={beat.reduced}
+        live={fight.status === "fighting" || ending}
+      />
+      <div className="flex items-center justify-between gap-3 px-5 pt-2">
+        <p lang="vi" className="whitespace-nowrap text-body-strong text-ink">
+          {boss.name}
+        </p>
+        <WaterDropHp value={hp} max={boss.hp} label={fr.exam.run.bossHp(boss.name, hp, boss.hp)} reduced={beat.reduced} />
       </div>
+      <p aria-live="polite" className="sr-only">
+        {last ? (last.correct ? fr.exam.run.hit(fight.bossHp) : fr.exam.run.miss(fight.lives)) : ""}
+      </p>
+
+      {ending ? (
+        // The end of the fight is a celebration: never blocking, a tap anywhere skips to the result.
+        <motion.button
+          type="button"
+          aria-label={fr.exam.run.skip}
+          className="fixed inset-0 z-40 flex items-end justify-center pb-10"
+          whileTap="pressed"
+          onClick={() => gate.current?.open()}
+        >
+          <motion.span variants={{ pressed: tap }} className="rounded-md bg-surface px-5 py-3 text-body-strong text-ink shadow-raised" aria-hidden="true">
+            {fr.exam.run.skip}
+          </motion.span>
+        </motion.button>
+      ) : null}
 
       {saving ? (
         saveError ? (
@@ -235,10 +484,7 @@ function ExamRun({ run }: { run: RunState }) {
           </div>
         )
       ) : (
-        <div className="px-5 pt-4">
-          <p aria-live="polite" className="h-5 pb-2 text-caption text-ink-muted">
-            {last ? (last.correct ? fr.exam.run.hit(fight.bossHp) : fr.exam.run.miss(fight.lives)) : ""}
-          </p>
+        <div className="px-5 pt-5">
           {question ? (
             <ExerciseHost
               exercise={question.exercise}

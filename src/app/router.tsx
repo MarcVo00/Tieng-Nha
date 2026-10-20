@@ -27,6 +27,7 @@ const ExamRunScreen = lazy(() => import("@/features/exam").then((m) => ({ defaul
 const ExamResultScreen = lazy(() => import("@/features/exam").then((m) => ({ default: m.ExamResultScreen })));
 const DuelsScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelsScreen })));
 const DuelRunScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelRunScreen })));
+const DuelResultScreen = lazy(() => import("@/features/duels").then((m) => ({ default: m.DuelResultScreen })));
 
 function screen(Screen: ComponentType): ReactNode {
   return (
@@ -57,6 +58,7 @@ const focusRoutes: RouteObject[] = [
   { path: "dialogue/:id", element: screen(DialogueScreen) },
   { path: "exam/run", element: screen(ExamRunScreen) },
   { path: "exam/result", element: screen(ExamResultScreen) },
+  { path: "duel/:id", element: screen(DuelResultScreen) },
   { path: "duel/:id/run", element: screen(DuelRunScreen) },
 ];
 

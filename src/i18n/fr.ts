@@ -54,6 +54,7 @@ export const fr = {
   // --- ui ---
   ui: {
     close: "Fermer",
+    overline: { badges: "Huy hiệu", wardrobe: "Tủ đồ", rewards: "Quà", settings: "Cài đặt", account: "Tài khoản", shop: "Cửa hàng", arena: "Đấu trường", duels: "Thách đấu" },
     button: { loading: "Chargement en cours" },
     feedback: {
       sheetLabel: "Résultat de ta réponse",
@@ -67,7 +68,12 @@ export const fr = {
     progress: { label: "Progression" },
     streak: (days: number) => `${days} ${days > 1 ? "jours" : "jour"} de suite`,
     xp: { unit: "XP", label: (value: number) => `${value} XP`, gain: (n: number) => `${n} XP gagnés` },
-    badge: { locked: "Pas encore débloqué" },
+    badge: {
+      locked: "Pas encore débloqué",
+      more: (n: number) => `+${n} à découvrir`,
+      none: "Ta première médaille t'attend.",
+    },
+    rare: "Hiếm",
     toast: { dismiss: "Fermer la notification" },
     speaker: { play: "Écouter", slow: "Écouter lentement" },
     mic: { idle: "Appuie pour parler", listening: "Je t'écoute…", processing: "Un instant…" },
@@ -356,6 +362,7 @@ export const fr = {
       body: "Les mots ont été ajoutés à tes révisions.",
       retry: "Réessayer",
       back: "Retour",
+      line: "Cố lên!",
     },
     saving: { title: "On enregistre ta leçon…" },
     saveError: { title: "Ta leçon n'a pas pu être enregistrée", body: "Tes réponses sont gardées. Réessaie dans un instant." },
@@ -374,6 +381,8 @@ export const fr = {
     empty: {
       title: "Rien à réviser aujourd'hui — reviens demain\u202f!",
       none: "Termine une leçon pour commencer tes révisions.",
+      line: "Mai gặp lại nhé!",
+      lineNone: "Bắt đầu nào!",
       next: (days: number) => (days <= 1 ? "Prochaine révision\u202f: demain" : `Prochaine révision\u202f: dans ${days} jours`),
     },
     recordFailed: "Certaines réponses n'ont pas pu être enregistrées.",
@@ -517,6 +526,7 @@ export const fr = {
         title: "Manche 2\u202f: à voix haute\u202f!",
         body: "Dis chaque phrase clairement. Tu as 30 secondes par phrase, et chaque bonne prononciation frappe fort.",
         start: "Je suis prêt",
+        line: "Nói to lên!",
       },
       hit: "Touché\u202f!",
       critical: "Critique\u202f!",
@@ -555,8 +565,13 @@ export const fr = {
       me: "Toi",
       round1: "Manche 1 — QCM",
       round2: "Manche 2 — oral",
-      critical: "Critique\u202f!",
+      /** The vermilion seal of a critical blow (Vietnamese, as on a Đông Hồ print). */
+      critSeal: "Chí mạng!",
       miss: "Raté",
+      misses: (n: number) => (n > 1 ? `Raté ×${n}` : "Raté"),
+      missed: (name: string, n: number) => (n > 1 ? `${name} rate ${n} coups` : `${name} rate son coup`),
+      flurry: (n: number) => `Encore ${n} coup${n > 1 ? "s" : ""}`,
+      flurryAnnounce: (n: number) => `Encore ${n} coup${n > 1 ? "s" : ""} échangé${n > 1 ? "s" : ""}.`,
       forfeit: "Forfait",
       ko: "K.-O.",
       hp: (name: string, hp: number) => `PV de ${name}\u202f: ${hp} sur 100`,
@@ -607,13 +622,18 @@ export const fr = {
     intro: {
       kicker: "Boss final",
       loadError: { title: "Le test n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
+      legendLabel: "La légende",
       rulesLabel: "Comment ça se passe",
-      rules: (hp: number, lives: number) => [
-        `Thủy Tinh a ${hp} PV\u202f: chaque bonne réponse lui en retire 1`,
-        `Tu as ${lives} vies\u202f: chaque erreur t'en coûte 1`,
-        "Pas de correction pendant le combat\u202f: tu la verras à la fin",
-        "3 essais par jour\u202f; le certificat s'obtient en le battant",
-      ],
+      rules: {
+        hp: (hp: number) => `${hp} gouttes`,
+        hpBody: "Chaque bonne réponse lui en retire une.",
+        lives: (lives: number) => `${lives} vies`,
+        livesBody: "Chaque erreur t'en coûte une.",
+        noCorrection: "Pas de correction",
+        noCorrectionBody: "Tu la verras à la fin.",
+        noCorrectionAria: "Pinceau barré",
+        tries: "3 essais par jour ; le certificat s'obtient en le battant.",
+      },
       won: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
       locked: {
         title: "Thủy Tinh t'attend au bout du parcours",
@@ -629,6 +649,11 @@ export const fr = {
     },
     run: {
       bossHp: (name: string, hp: number, max: number) => `PV de ${name}\u202f: ${hp} sur ${max}`,
+      stage: (name: string) => `Combat contre ${name}`,
+      hero: "Ton h\u00e9ros",
+      /** The player's win, stamped on the strip (Vietnamese, as on a Đông Hồ print): never a mark on the bowing boss. */
+      win: "Thắng!",
+      skip: "Passer",
       hit: (hpLeft: number) => `Touché\u202f! Il lui reste ${hpLeft} PV`,
       miss: (livesLeft: number) => `Aïe\u202f! Il te reste ${livesLeft} vie${livesLeft > 1 ? "s" : ""}`,
       quit: {
@@ -647,6 +672,10 @@ export const fr = {
       won: (name: string) => `${name} est vaincu\u202f!`,
       lost: (name: string) => `${name} a gagné cette fois`,
       damage: (dealt: number, hp: number) => `Tu lui as infligé ${dealt} dégâts sur ${hp}`,
+      loot: "Butin",
+      lootBadges: (n: number) => `${n} badge${n > 1 ? "s" : ""}`,
+      lootShow: "Voir le butin",
+      lootHide: "Masquer le butin",
       livesLeft: (n: number, max: number) => `${n} vie${n > 1 ? "s" : ""} sur ${max} gardée${n > 1 ? "s" : ""}`,
       correctionLabel: "Correction",
       showCorrection: "Voir la correction",
@@ -708,6 +737,7 @@ export const fr = {
     lessonDot: (n: number, done: boolean) => `Leçon ${n}\u202f: ${done ? "terminée" : "pas encore terminée"}`,
     lessonsSummary: (n: number) => `${n} sur 10`,
     badgesTitle: "Badges",
+    noBadges: "Pas encore de badge.",
     examTitle: "Boss final",
     bossWon: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
     bossWonNoLives: "Boss final vaincu ✓",

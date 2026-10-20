@@ -38,7 +38,7 @@ function setup(route = "/leaderboard", services: Services = createFakeServices({
 }
 
 const row = (userId: string, pseudo: string, xp: number, isMe = false): LeaderboardRow => ({
-  userId, pseudo, avatarEmoji: "🌸", xp, streak: 0, lessonsDone: 1, frame: null, isMe,
+  userId, pseudo, avatarEmoji: "🌸", xp, streak: 0, lessonsDone: 1, frame: null, look: {}, isMe,
 });
 
 beforeEach(() => {
@@ -183,6 +183,8 @@ test("a profile shows its lesson count and boss victory", async () => {
   expect(await screen.findByRole("heading", { level: 1, name: "Xuân" })).toBeInTheDocument();
   expect(await screen.findByText(fr.publicProfile.bossWon("Thủy Tinh", 4, 5))).toBeInTheDocument();
   expect(screen.getByText(fr.publicProfile.lessonsSummary(2))).toBeInTheDocument();
+  expect(screen.queryAllByText(fr.ui.badge.locked, { exact: false })).toHaveLength(0);
+  await userEvent.click(screen.getByRole("button", { expanded: false, name: /à découvrir/ }));
   expect(screen.getAllByText(fr.ui.badge.locked, { exact: false }).length).toBeGreaterThan(0);
 });
 
@@ -252,4 +254,12 @@ test("a profile shows the hero it wears", async () => {
   await screen.findByRole("heading", { level: 1, name: "Xuân" });
   expect(document.querySelector('[data-look~="hat_thuy_tinh"]')).not.toBeNull();
   expect(screen.queryByText("🐯")).toBeNull();
+});
+
+test("members wear their hero, not an emoji", async () => {
+  setup();
+  const podium = await screen.findByRole("list", { name: fr.leaderboard.podiumLabel });
+  expect(podium.querySelectorAll("[data-look]").length).toBeGreaterThan(0);
+  expect(podium).not.toHaveTextContent("🐢");
+  expect(screen.getByRole("list", { name: fr.leaderboard.listLabel })).not.toHaveTextContent("🐯");
 });

@@ -55,11 +55,17 @@ test("shows the header and all 13 badges, unlocked first", async () => {
   await setup();
   expect(screen.getByText("Marc")).toBeInTheDocument();
   expect(screen.getByText(fr.leaderboard.xp(120))).toBeInTheDocument();
-  const items = await screen.findAllByRole("listitem");
-  const badgeItems = items.filter((li) => within(li).queryByRole("button") && !within(li).queryByRole("heading", { level: 3 }));
-  expect(badgeItems).toHaveLength(13);
-  expect(badgeItems[0]).toHaveTextContent(/./);
+  const badgeItems = (await screen.findAllByRole("listitem")).filter((li) => within(li).queryByRole("button") && !within(li).queryByRole("heading", { level: 3 }));
+  // Earned medals first; the 12 locked ones stay folded behind « +12 à découvrir ».
+  expect(badgeItems).toHaveLength(1);
   expect(within(badgeItems[0] as HTMLElement).queryByText(fr.ui.badge.locked, { exact: false })).toBeNull();
+  const more = screen.getByRole("button", { name: fr.ui.badge.more(12) });
+  expect(more).toHaveAttribute("aria-expanded", "false");
+  expect(more).toHaveTextContent(fr.ui.badge.more(12));
+  await userEvent.click(more);
+  expect(more).toHaveAttribute("aria-expanded", "true");
+  const all = screen.getAllByRole("listitem").filter((li) => within(li).queryByRole("button") && !within(li).queryByRole("heading", { level: 3 }));
+  expect(all).toHaveLength(13);
 });
 
 test("theme change persists in the stored settings", async () => {
@@ -480,6 +486,13 @@ describe("wardrobe section", () => {
     await setupWardrobe([]);
     expect(await screen.findByRole("heading", { name: fr.wardrobe.title })).toBeInTheDocument();
     expect(screen.getByText(fr.wardrobe.empty)).toBeInTheDocument();
+  });
+
+  test("the worn starter hero shows « Équipé » alone, never beside a disabled « Équiper »", async () => {
+    await setupWardrobe([]);
+    const section = (await screen.findByRole("heading", { name: fr.wardrobe.title })).closest("section") as HTMLElement;
+    expect(within(section).getByText(fr.rewards.equipped)).toBeInTheDocument();
+    expect(within(section).queryByRole("button", { name: fr.shop.tryOn.equip })).toBeNull();
   });
 
   test("lists owned cosmetics by slot and equips then removes them", async () => {

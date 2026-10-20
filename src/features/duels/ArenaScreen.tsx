@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
@@ -6,9 +6,11 @@ import { useServices } from "@/app/ServicesProvider";
 import { useEquipToggle } from "@/app/useEquipToggle";
 import { OfflineError } from "@/domain/errors";
 import type { ShopItem } from "@/domain/types";
-import { characterSlotOf, lookOf } from "@/services/look";
+import { characterSlotOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
+import { rareEntriesOf } from "@/app/useRareEntries";
 import { fr } from "@/i18n/fr";
-import { Button, Card, duration, EmptyState, ease, HeroMedallion, Icon, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
+import { BalanceLine, Button, duration, EmptyState, ease, Icon, RareShowcase, SectionTitle, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
 
 // Hierarchy: the Kim bài balance is the hero (gold, big). Below, the three arena outfits as try-on cards.
 // The one action is inside the sheet (buy / wear). Buying is safe: online, and both the local wallet and the
@@ -19,8 +21,7 @@ export function ArenaScreen() {
   const refresh = useRefreshProgress();
   const equipToggle = useEquipToggle();
   const wallet = useAppState((s) => s.wallet);
-  const equipped = useAppState((s) => s.wallet?.equipped);
-  const baseLook = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const baseLook = useHeroLook();
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [trying, setTrying] = useState<ShopItem | null>(null);
@@ -111,13 +112,7 @@ export function ArenaScreen() {
       </motion.div>
       <h1 className="sr-only">{fr.arena.title}</h1>
 
-      <Card raised className="flex items-center gap-4 p-6">
-        <Icon name="medal" size={48} className="shrink-0 text-gold" />
-        <div>
-          <p className="tabular text-display text-gold-ink">{wallet ? fr.arena.balance(wallet.kimBai) : "…"}</p>
-          <p className="text-caption text-ink-muted">{fr.arena.balanceCaption}</p>
-        </div>
-      </Card>
+      <BalanceLine icon="medal" value={wallet ? fr.arena.balance(wallet.kimBai) : "…"} caption={fr.arena.balanceCaption} />
 
       <p className="text-body text-ink-muted">{fr.arena.intro}</p>
 
@@ -132,41 +127,8 @@ export function ArenaScreen() {
         <Skeleton lines={4} />
       ) : (
         <section aria-labelledby="arena-list" className="flex flex-col gap-3">
-          <h2 id="arena-list" className="text-heading text-ink">{fr.arena.list}</h2>
-          <ul className="grid list-none grid-cols-2 gap-3">
-            {arena.map((item) => {
-              const text = fr.shop.items[item.id];
-              const slot = characterSlotOf(item);
-              if (!text || slot === null) return null;
-              const owned = wallet.inventory.includes(item.id);
-              const on = wallet.equipped[slot] === item.id;
-              return (
-                <li key={item.id}>
-                  <motion.button
-                    type="button"
-                    whileTap={tap}
-                    disabled={busy}
-                    onClick={() => tryOn(item)}
-                    className="flex h-full w-full flex-col items-center gap-2 rounded-md bg-surface p-3 text-center shadow-card disabled:opacity-60"
-                  >
-                    <HeroMedallion look={{ ...baseLook, [slot]: item.id }} size={112} ring={owned ? "gold" : "neutral"} />
-                    <h3 className="text-body-strong text-ink">
-                      <span className="sr-only">{fr.shop.tryOn.prefix} </span>
-                      {text.name}
-                    </h3>
-                    {owned ? (
-                      <span className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</span>
-                    ) : (
-                      <span className="tabular inline-flex items-center gap-1 text-caption text-gold-ink">
-                        <Icon name="medal" size={16} className="text-gold" />
-                        {fr.duels.kimBai(item.price ?? 0)}
-                      </span>
-                    )}
-                  </motion.button>
-                </li>
-              );
-            })}
-          </ul>
+          <SectionTitle id="arena-list" overline={fr.ui.overline.arena}>{fr.arena.list}</SectionTitle>
+          <RareShowcase entries={rareEntriesOf({ items: arena, wallet, baseLook, busy, onOpen: tryOn, currency: { icon: "medal", label: fr.duels.kimBai } })} />
         </section>
       )}
 

@@ -1,6 +1,13 @@
 import type { ReactNode } from "react";
+import type { Look } from "@/domain/types";
+import { HeroMedallion } from "@/ui/HeroMedallion";
+import { Motif } from "@/ui/Motif";
+import type { Expression } from "@/ui/characterLayers";
 
-type EmptyStateProps = { title: string; body?: string; illustration?: "bowl" | "lantern" | "boat"; action?: ReactNode };
+/** A staged moment: the hero centred on a cloud-patterned page, a Vietnamese line, then the sentence and the action. */
+type Scene = { look: Look; line: string; expression?: Expression; overline?: string; heading?: "h1" | "h2"; /** "reward" turns the line gold: only for a real reward moment. */ tone?: "plain" | "reward" };
+
+type EmptyStateProps = { title: string; body?: string; illustration?: "bowl" | "lantern" | "boat"; action?: ReactNode; scene?: Scene };
 
 const ART = {
   bowl: (
@@ -31,7 +38,30 @@ const ART = {
   ),
 } as const;
 
-export function EmptyState({ title, body, illustration = "bowl", action }: EmptyStateProps) {
+// Hierarchy (scene): the hero is the moment; the Vietnamese line speaks for them; one full-width action.
+function SceneState({ title, body, action, scene }: Omit<EmptyStateProps, "scene" | "illustration"> & { scene: Scene }) {
+  const Heading = scene.heading ?? "h2";
+  return (
+    <div className="relative flex min-h-[60dvh] flex-col items-center justify-center gap-3 px-5 py-8 text-center text-ink">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-ink" style={{ maskImage: "linear-gradient(to bottom, black 55%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black 55%, transparent)" }}>
+        <Motif kind="clouds" />
+      </div>
+      <div className="relative flex flex-col items-center gap-3">
+        <HeroMedallion look={scene.look} size={160} expression={scene.expression ?? "idle"} />
+        {scene.overline ? <p className="text-caption text-ink-muted">{scene.overline}</p> : null}
+        <p lang="vi" className={`text-title ${scene.tone === "reward" ? "text-gold-ink" : "text-ink"}`}>
+          {scene.line}
+        </p>
+        <Heading className="text-heading text-ink">{title}</Heading>
+        {body ? <p className="max-w-xs text-body text-ink-muted">{body}</p> : null}
+        {action ? <div className="flex w-full max-w-sm flex-col gap-2 pt-3 [&>*]:w-full">{action}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+export function EmptyState({ title, body, illustration = "bowl", action, scene }: EmptyStateProps) {
+  if (scene) return <SceneState title={title} {...(body ? { body } : {})} {...(action ? { action } : {})} scene={scene} />;
   return (
     <div className="flex flex-col items-start gap-3 px-5 py-8">
       <svg viewBox="0 0 72 72" width={96} height={96} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

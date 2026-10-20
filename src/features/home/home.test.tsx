@@ -81,3 +81,17 @@ test("the path token wears the equipped hero, and the default hero before the wa
   useAppState.setState({ wallet: { ...(await services.activity.getWallet()), equipped: { hat: "hat_thuy_tinh" } } });
   await waitFor(() => expect(token.querySelector('[data-look~="hat_thuy_tinh"]')).not.toBeNull());
 });
+
+test("a perfect lesson shows three gold stars", async () => {
+  const services = createFakeServices();
+  await services.activity.completeLesson({ lessonId: "l05", mistakes: 0, durationMs: 1000, vocabIds: [] });
+  const { container } = render(
+    <ServicesProvider services={services}>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <HomeScreen />
+      </MemoryRouter>
+    </ServicesProvider>,
+  );
+  await screen.findByRole("link", { name: /Au café.*terminée sans faute/ });
+  expect(container.querySelector("[data-stars]")).toHaveAttribute("data-stars", "3");
+});

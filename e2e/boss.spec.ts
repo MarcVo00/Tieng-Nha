@@ -107,6 +107,10 @@ async function startBossFight(page: Page): Promise<void> {
   await page.goto("/exam");
   await page.getByRole("button", { name: fr.exam.intro.start }).click();
   await expect(page.getByRole("progressbar", { name: /Thủy Tinh/ })).toBeVisible();
+  // The fight stage: the player's hero facing Thủy Tinh.
+  const stage = page.getByRole("group", { name: fr.exam.run.stage("Thủy Tinh") });
+  await expect(stage.getByRole("img", { name: fr.exam.run.hero })).toBeVisible();
+  await expect(stage.getByRole("img", { name: "Thủy Tinh, le dieu des eaux" })).toBeVisible();
 }
 
 test("boss lost: the result screen shows and stays on /exam/result", async ({ page }) => {
@@ -117,6 +121,8 @@ test("boss lost: the result screen shows and stays on /exam/result", async ({ pa
   await page.waitForTimeout(800); // a bounce back to the intro would happen while the run screen leaves
   await expect(page).toHaveURL(/\/exam\/result$/);
   await expect(lost).toBeVisible();
+  await expect(page.getByText(fr.exam.result.damage(0, 15))).toBeVisible();
+  await expect(page.getByRole("button", { name: fr.exam.result.retry(2) })).toBeVisible();
 });
 
 test("boss won: the result screen shows and stays on /exam/result", async ({ page }) => {
@@ -127,4 +133,7 @@ test("boss won: the result screen shows and stays on /exam/result", async ({ pag
   await page.waitForTimeout(800);
   await expect(page).toHaveURL(/\/exam\/result$/);
   await expect(won).toBeVisible();
+  // The defeated boss bows beside the hero; the certificate follows.
+  await expect(page.getByRole("img", { name: "Thủy Tinh, le dieu des eaux — vaincu" })).toBeVisible();
+  await expect(page.getByRole("img", { name: /Certificat de réussite/ })).toBeVisible();
 });

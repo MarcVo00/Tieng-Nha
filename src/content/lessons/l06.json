@@ -3,6 +3,7 @@
   "contentVersion": 3,
   "title": "Manger",
   "description": "Parle de nourriture : les plats qu'on mange partout à Sài Gòn (phở, cơm tấm, bánh mì, hủ tiếu), les verbes manger et boire, et les couverts.",
+  "tagline": "Phở, bánh mì",
   "emoji": "🍜",
   "dialogueId": "d06",
   "vocab": [

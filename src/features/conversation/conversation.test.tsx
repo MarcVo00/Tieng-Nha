@@ -9,6 +9,7 @@ import type { BadgeDef } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { RecognitionError } from "@/ports";
 import { DialogueScreen } from "@/features/conversation";
+import { TYPING_MS } from "@/features/conversation/useDialogue";
 
 const SLOW = { timeout: 5000 };
 const HOME = "page d'accueil";
@@ -195,6 +196,12 @@ describe("DialogueScreen", () => {
   });
 
   it("replays from the start with a second, single completion", async () => {
+    // The fake voice is instant, so the wall-clock cost is the NPC typing indicator (TYPING_MS per line, ~12 lines
+    // over two runs). Collapse exactly that delay; every other timer keeps its real duration.
+    const realSetTimeout = globalThis.setTimeout;
+    const timers = vi.spyOn(globalThis, "setTimeout").mockImplementation(((fn: TimerHandler, ms?: number, ...args: unknown[]) =>
+      realSetTimeout(fn, ms === TYPING_MS ? 0 : ms, ...args)) as typeof setTimeout);
+    onTestFinished(() => timers.mockRestore());
     const { completeDialogue } = setup();
     await userEvent.click(await optionButton(/Cho tui một ly cà phê sữa đá/));
     await userEvent.click(await optionButton(/Cảm ơn em/));

@@ -3,7 +3,7 @@ import type { ReactNode, SVGProps } from "react";
 export type IconName =
   | "home" | "review" | "trophy" | "user" | "close" | "check" | "cross" | "speaker" | "turtle" | "mic" | "stop"
   | "flag" | "chevron-right" | "chevron-left" | "lock" | "star" | "flame" | "refresh" | "settings" | "share"
-  | "download" | "chat" | "play" | "eye" | "eye-off" | "bolt" | "coin" | "swords" | "medal";
+  | "download" | "chat" | "play" | "eye" | "eye-off" | "bolt" | "coin" | "swords" | "medal" | "chevron-up" | "chevron-down";
 
 // 24x24 grid, 2px round strokes. Paths are drawn by hand; `flame` is the only filled glyph.
 const PATHS: Record<IconName, ReactNode> = {
@@ -21,6 +21,8 @@ const PATHS: Record<IconName, ReactNode> = {
   flag: <><path d="M6 21V4" /><path d="M6 4.5h11l-2 4 2 4H6" /></>,
   "chevron-right": <path d="M9.5 5.5 16 12l-6.5 6.5" />,
   "chevron-left": <path d="M14.5 5.5 8 12l6.5 6.5" />,
+  "chevron-up": <path d="M5.5 14.5 12 8l6.5 6.5" />,
+  "chevron-down": <path d="M5.5 9.5 12 16l6.5-6.5" />,
   lock: <><rect x="5" y="10.5" width="14" height="10" rx="2.5" /><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" /><path d="M12 14.5v2.5" /></>,
   star: <path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7l1-5.9L3.5 9.7l5.9-.8L12 3.5Z" />,
   flame: <path d="M12.5 2.5c.4 3-1.2 4.6-2.8 6.4C8.3 10.5 7 12.2 7 14.8a5 5 0 0 0 10 0c0-2.1-.9-3.5-1.9-4.8-.3 1.4-1 2.2-1.8 2.6.5-3.4-.1-7.5-.8-10.1Z" fill="currentColor" />,

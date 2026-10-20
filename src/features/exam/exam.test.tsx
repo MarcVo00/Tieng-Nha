@@ -16,6 +16,7 @@ import { seedFromString } from "@/services/random";
 import { ExamIntroScreen, ExamResultScreen, ExamRunScreen } from "@/features/exam";
 import { markAttempt, type ResultState, type RunState } from "@/features/exam/examState";
 import { PRINT_CSS } from "@/ui/Certificate";
+import { duration } from "@/ui/motion";
 
 const TEST_TIMEOUT = 90_000;
 const ATTEMPT: RunState = { attemptId: "attempt-fixed", remainingToday: 2 };
@@ -94,8 +95,19 @@ describe("intro", () => {
     renderExam({ entry: "/exam" });
     expect(await screen.findByRole("heading", { name: "Thủy Tinh" })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Thủy Tinh, le dieu des eaux" })).toBeInTheDocument();
-    expect(screen.getByText(/Mỵ Nương/)).toBeInTheDocument();
-    for (const rule of fr.exam.intro.rules(15, 5)) expect(screen.getByText(rule)).toBeInTheDocument();
+    // The legend sits in a scroll cartouche, left-aligned.
+    const legend = screen.getByRole("region", { name: fr.exam.intro.legendLabel });
+    expect(within(legend).getByText(/Mỵ Nương/)).toBeInTheDocument();
+    expect(legend.querySelectorAll("[data-scroll-roll]")).toHaveLength(2);
+    // The rules are shown, not listed: 15 drops, 5 hearts, a crossed-out brush — no bullet list.
+    const rules = screen.getByRole("region", { name: fr.exam.intro.rulesLabel });
+    expect(within(rules).queryByRole("list")).toBeNull();
+    expect(rules.querySelectorAll("[data-rule]")).toHaveLength(3);
+    expect(rules.querySelectorAll("[data-drop='full']")).toHaveLength(15);
+    expect(within(rules).getByRole("img", { name: fr.ui.hearts(5, 5) })).toBeInTheDocument();
+    expect(within(rules).getByText(fr.exam.intro.rules.hp(15))).toBeInTheDocument();
+    expect(within(rules).getByText(fr.exam.intro.rules.lives(5))).toBeInTheDocument();
+    expect(screen.getByText(fr.exam.intro.rules.tries)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: fr.exam.intro.start })).toBeEnabled();
   });
 
@@ -284,6 +296,112 @@ describe("run", () => {
     return { recognizer, finishExam, submit, deck };
   }
 
+  /** Opens a fight against a boss with the given HP / lives (to reach the end in one answer). */
+  function setupShortFight(over: { hp?: number; playerLives?: number }) {
+    useAppState.setState({ settings: withCapabilities(false), wallet: null });
+    markAttempt("pending", ATTEMPT.attemptId);
+    const services = createFakeServices();
+    const boss = { ...bossFixture, ...over };
+    vi.spyOn(services.content, "getBoss").mockResolvedValue(boss);
+    const finishExam = vi.spyOn(services.activity, "finishExam");
+    const deck = buildDeck(examPoolFixture, boss, seedFromString(ATTEMPT.attemptId), false);
+    renderExam({ services, entry: { pathname: "/exam/run", state: ATTEMPT } });
+    return { deck, finishExam };
+  }
+
+  test("the stage shows the player's hero facing Thủy Tinh, the HP as 15 water drops (no progress bar)", async () => {
+    setupShortFight({});
+    const hp = await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) });
+    expect(hp.querySelectorAll("[data-drop='full']")).toHaveLength(15);
+    expect(hp.querySelector("[data-progress-fill]")).toBeNull();
+    const stage = screen.getByRole("group", { name: fr.exam.run.stage("Thủy Tinh") });
+    expect(within(stage).getByRole("img", { name: fr.exam.run.hero })).toBeInTheDocument();
+    expect(within(stage).getByRole("img", { name: "Thủy Tinh, le dieu des eaux" })).toBeInTheDocument();
+    // The hero is drawn from the equipped look (layers), the boss from its art.
+    expect(stage.querySelector("[data-fighter='hero'] [data-layer='base']")).not.toBeNull();
+    expect(stage.querySelector("[data-fighter='boss'] img")).not.toBeNull();
+  });
+
+  test("a right answer is a hit: ink on the boss, a drop detaches, the next exercise never waits for the beat", async () => {
+    const { deck } = setupShortFight({});
+    const [first, second] = deck;
+    if (!first || !second) throw new Error("deck too short");
+    await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) });
+    await answerQuestion(first, true);
+    // The next exercise comes in while the beat (460 ms) still plays: the ink has not landed or not yet gone. The
+    // 150 ms budget itself is measured in the browser (perf trace: ≈ 115 ms at 1×, 125–139 ms at 4× CPU); a jsdom
+    // wall clock under a loaded test run is not a reliable stopwatch.
+    await waitFor(() => expect(document.querySelector(`[data-exercise-id="${second.exercise.id}"]`)).not.toBeNull(), { interval: 5 });
+    const beatRunning = screen.queryByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) }) !== null || document.querySelector("[data-fx='impact']") !== null;
+    expect(beatRunning).toBe(true);
+    // The drop detaches on contact, with the ink on the boss.
+    expect(await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 14, 15) })).toBeInTheDocument();
+    await waitFor(() => expect(document.querySelector("[data-fx='impact'][data-kind='hit']")).not.toBeNull());
+    expect(document.querySelector("[data-fx='glint']")).toBeNull();
+  });
+
+  test("a wrong answer: a wave rolls toward the hero, who winces, and a heart breaks", async () => {
+    const { deck } = setupShortFight({});
+    const [first] = deck;
+    if (!first) throw new Error("deck too short");
+    await screen.findByRole("img", { name: fr.ui.hearts(5, 5) });
+    await answerQuestion(first, false);
+    expect(document.querySelector("[data-fx='wave']")).not.toBeNull();
+    expect(document.querySelector("[data-fighter='hero'] [data-expression]")).toHaveAttribute("data-expression", "hurt");
+    // The heart breaks when the wave lands.
+    expect(await screen.findByRole("img", { name: fr.ui.hearts(4, 5) })).toBeInTheDocument();
+  });
+
+  test("the last hit plays a short K.-O. (the bowing, defeated boss) that a tap skips to the result", async () => {
+    const { deck, finishExam } = setupShortFight({ hp: 1 });
+    const [first] = deck;
+    if (!first) throw new Error("deck too short");
+    await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 1, 1) });
+    await answerQuestion(first, true);
+    expect(await screen.findByRole("img", { name: "Thủy Tinh, le dieu des eaux — vaincu" })).toBeInTheDocument();
+    // Respect: the win is stamped over the strip, not on the boss; the last ink splashes beside him, not on his face.
+    const seal = await screen.findByText(fr.exam.run.win);
+    expect(seal).toHaveAttribute("lang", "vi");
+    const bossBox = document.querySelector("[data-fighter='boss']")?.closest("[role='img']")?.parentElement?.querySelector("[data-fx-layer='boss']");
+    expect(bossBox).not.toBeNull();
+    expect(bossBox?.contains(seal)).toBe(false);
+    const ink = document.querySelector<SVGElement>("[data-fx='impact'][data-kind='ko']");
+    expect(ink).not.toBeNull();
+    expect(parseFloat(ink?.style.left ?? "0") + 96).toBeLessThanOrEqual(24); // its box ends at the boss box's left edge + 24 px
+    await waitFor(() => expect(document.querySelector("[data-fighter='boss'] [data-pose]")).toHaveAttribute("data-pose", "bow"));
+    expect(document.querySelector("[data-fighter='boss'] [data-expression]")).toHaveAttribute("data-expression", "ko");
+    await waitFor(() => expect(finishExam).toHaveBeenCalledTimes(1));
+    // « Passer » takes the focus as the ending starts, so the keyboard can skip it too.
+    expect(screen.getByRole("button", { name: fr.exam.run.skip })).toHaveFocus();
+    await userEvent.click(screen.getByRole("button", { name: fr.exam.run.skip }));
+    expect(await screen.findByRole("heading", { level: 1, name: fr.exam.result.won("Thủy Tinh") })).toBeInTheDocument();
+  });
+
+  test("losing the last life: the boss raises its trident, then the result shows by itself", async () => {
+    const { deck } = setupShortFight({ playerLives: 1 });
+    const [first] = deck;
+    if (!first) throw new Error("deck too short");
+    await screen.findByRole("img", { name: fr.ui.hearts(1, 1) });
+    await answerQuestion(first, false);
+    expect(await screen.findByRole("button", { name: fr.exam.run.skip })).toBeInTheDocument();
+    // The trident goes up (the boss body leans back -10°) and the stage veils.
+    const body = document.querySelector<HTMLElement>("[data-fighter='boss'] [data-expression] > span");
+    await waitFor(() => expect(body?.style.transform ?? "").toContain("rotate(-10deg)"), { timeout: 1500 });
+    expect(document.querySelector("[data-veil]")).toHaveAttribute("data-veil", "on");
+    expect(await screen.findByRole("heading", { level: 1, name: fr.exam.result.lost("Thủy Tinh") }, { timeout: 3000 })).toBeInTheDocument();
+  });
+
+  test("two quick hits never show two damage numbers at once", async () => {
+    const { deck } = setupShortFight({});
+    const [a, b] = deck;
+    if (!a || !b) throw new Error("deck too short");
+    await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) });
+    await answerQuestion(a, true);
+    await answerQuestion(b, true);
+    await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 13, 15) });
+    expect(document.querySelectorAll("[data-fx='damage']")).toHaveLength(1);
+  });
+
   test(
     "15 right answers beat Thủy Tinh with 5 lives: score 100, one saved finish",
     async () => {
@@ -338,10 +456,67 @@ describe("result", () => {
     expect(screen.queryByText(/ xu$/)).not.toBeInTheDocument();
   });
 
-  test("shows the reward of a newly unlocked badge", async () => {
+  test("coins and badges are grouped in one « Butin » line that unfolds to the badge rewards", async () => {
     const badge = { id: "exam_passed", title: "Vainqueur de Thủy Tinh", description: "Bats le boss final.", icon: "📜", rule: { kind: "exam_score", gte: 70 }, reward: "frame_son_mai" } as const;
-    renderExam({ entry: { pathname: "/exam/result", state: { ...failedState(2), newBadges: [badge] } } });
+    renderExam({ entry: { pathname: "/exam/result", state: { ...failedState(2), coinsGained: 50, newBadges: [badge] } } });
+    const loot = await screen.findByRole("region", { name: fr.exam.result.loot });
+    expect(within(loot).getByText(fr.shop.gained(50))).toBeInTheDocument();
+    expect(within(loot).getByText(fr.exam.result.lootBadges(1))).toBeInTheDocument();
+    expect(screen.queryByText(fr.rewards.gained("cadre", "Laque dorée"))).not.toBeInTheDocument();
+    await userEvent.click(within(loot).getByRole("button", { name: fr.exam.result.lootShow }));
     expect(await screen.findByText(fr.rewards.gained("cadre", "Laque dorée"))).toBeInTheDocument();
+    expect(within(loot).getByRole("button", { name: fr.exam.result.lootHide })).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("no loot, no « Butin » line", async () => {
+    renderExam({ entry: { pathname: "/exam/result", state: failedState(2) } });
+    await screen.findByRole("heading", { name: fr.exam.result.lost("Thủy Tinh") });
+    expect(screen.queryByRole("region", { name: fr.exam.result.loot })).toBeNull();
+  });
+
+  test("a victory is staged: the bowing boss, then the title, one counter, then the certificate", async () => {
+    const won = result({ score: 92, won: true, livesLeft: 4, bossHpLeft: 0 });
+    renderExam({ entry: { pathname: "/exam/result", state: { ...won, xpGained: 30, coinsGained: 50 } } });
+    const headline = await screen.findByRole("heading", { level: 1, name: fr.exam.result.won("Thủy Tinh") });
+    const boss = screen.getByRole("img", { name: "Thủy Tinh, le dieu des eaux — vaincu" });
+    const counter = screen.getByText(fr.ui.xp.label(120));
+    const certificate = screen.getByRole("img", { name: /Certificat/ });
+    const before = (a: Element, b: Element) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    expect(before(boss, headline)).toBe(true);
+    expect(before(headline, counter)).toBe(true);
+    expect(before(counter, certificate)).toBe(true);
+    // One counter only: the coins wait in the « Butin » line, after the headline.
+    expect(within(screen.getByRole("region", { name: fr.exam.result.loot })).getByText(fr.shop.gained(50))).toBeInTheDocument();
+    // The boss bows from its feet with its own « defeated » art, not a tilted tile.
+    expect(boss.querySelector("[data-fighter='boss']")).not.toBeNull();
+    await waitFor(() => expect(boss.querySelector("[data-pose]")).toHaveAttribute("data-pose", "bow"));
+    expect(boss.querySelector("[data-expression]")).toHaveAttribute("data-expression", "ko");
+  });
+
+  test("the victory timing: the boss bows first, then the title fades in, the certificate only after the title", async () => {
+    renderExam({ entry: { pathname: "/exam/result", state: { ...result({ score: 92, won: true, livesLeft: 4, bossHpLeft: 0 }), xpGained: 30 } } });
+    const step = (n: string) => document.querySelector<HTMLElement>(`[data-step="${n}"]`);
+    const opacity = (n: string) => parseFloat(step(n)?.style.opacity ?? "1");
+    const pose = () => document.querySelector("[data-fighter='boss'] [data-pose]")?.getAttribute("data-pose");
+    const t0 = performance.now();
+    // First frame: the boss still stands, nothing else is shown yet.
+    expect(pose()).toBe("stand");
+    expect(opacity("title")).toBe(0);
+    expect(opacity("actions")).toBe(0);
+    await waitFor(() => expect(pose()).toBe("bow"));
+    expect(opacity("title")).toBe(0); // the bow comes first (after duration.base, the title only after duration.slow)
+    // The title is fully in only after slow + base, the certificate only after slow + 3 × base (lower bounds: robust to a slow run).
+    await waitFor(() => expect(opacity("title")).toBe(1), { interval: 10, timeout: 2000 });
+    expect(performance.now() - t0).toBeGreaterThanOrEqual((duration.slow + duration.base) * 1000 - 20);
+    await waitFor(() => expect(opacity("actions")).toBe(1), { timeout: 2000 });
+    expect(performance.now() - t0).toBeGreaterThanOrEqual((duration.slow + duration.base * 3) * 1000 - 20);
+  });
+
+  test("a defeat is not staged: the title and « Réessayer » are there at once", async () => {
+    renderExam({ entry: { pathname: "/exam/result", state: result({ score: 36, won: false, livesLeft: 0, bossHpLeft: 6 }) } });
+    await screen.findByRole("heading", { level: 1, name: fr.exam.result.lost("Thủy Tinh") });
+    for (const n of ["title", "counter", "actions"]) expect(document.querySelector<HTMLElement>(`[data-step="${n}"]`)?.style.opacity ?? "").not.toBe("0");
+    expect(screen.getByRole("button", { name: fr.exam.result.retry(2) })).toBeVisible();
   });
 
   test("a result saved by a previous client without coinsGained still renders", async () => {
@@ -469,6 +644,33 @@ describe("certificate on the result page", () => {
     expect(screen.queryByRole("button", { name: fr.exam.result.download })).not.toBeInTheDocument();
   });
 });
+
+/** Answers the exercise on screen (no voice capabilities: no speaking question), rightly or wrongly. */
+async function answerQuestion(q: ExamQuestion, right: boolean): Promise<void> {
+  await waitFor(() => expect(document.querySelector(`[data-exercise-id="${q.exercise.id}"]`)).not.toBeNull());
+  const ex = q.exercise;
+  switch (ex.type) {
+    case "listen_choose": {
+      const label = (ex.vocabId === "v_ca_phe_sua_da") === right ? /café au lait glacé/ : /thé glacé/;
+      await userEvent.click(await screen.findByRole("button", { name: label }));
+      break;
+    }
+    case "tone_pick":
+      await userEvent.click(await screen.findByRole("button", { name: right ? fr.ui.tones[ex.answerTone] : fr.ui.tones[ex.answerTone === "ngang" ? "sac" : "ngang"] }));
+      break;
+    case "translate_choose":
+      await userEvent.click(await screen.findByRole("button", { name: right ? ex.answerVi : (ex.distractorsVi[0] ?? "") }));
+      break;
+    case "word_order": {
+      const bank = within(await screen.findByRole("group", { name: fr.exercises.wordOrder.bank }));
+      for (const token of right ? ex.tokensVi : [...ex.tokensVi].reverse()) await userEvent.click(bank.getByRole("button", { name: token }));
+      break;
+    }
+    default:
+      throw new Error(`unexpected ${ex.type}`);
+  }
+  await userEvent.click(screen.getByRole("button", { name: fr.exercises.verify }));
+}
 
 /** jsdom has no 2D canvas nor object URLs: stub them and record the drawn texts. */
 function mockCanvas() {

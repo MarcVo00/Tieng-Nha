@@ -6,13 +6,14 @@ export const PATH_WIDTH = 320;
 const MAIN_OFFSETS = [-40, 0, 40, 0] as const;
 const ROW_HEIGHT = { lesson: 136, dialogue: 92, exam: 168 } as const;
 const PAD = 24;
+const MILESTONE_EVERY = 3;
 
 export type BossInfo = Pick<Boss, "name" | "illustration">;
 
 export type LessonState = "done" | "available" | "locked";
 
 export type PathNode =
-  | { kind: "lesson"; key: string; lesson: LessonSummary; order: number; state: LessonState; perfect: boolean; next: boolean; offset: number; cy: number; height: number; size: 64 }
+  | { kind: "lesson"; key: string; lesson: LessonSummary; order: number; state: LessonState; perfect: boolean; stars: 0 | 1 | 2 | 3; milestone: boolean; next: boolean; offset: number; cy: number; height: number; size: 64 }
   | { kind: "dialogue"; key: string; lesson: LessonSummary; done: boolean; offset: number; cy: number; height: number; size: 48 }
   | { kind: "exam"; key: string; boss: BossInfo; locked: boolean; best: number | null; next: boolean; offset: number; cy: number; height: number; size: 64 };
 
@@ -51,7 +52,10 @@ export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: Pro
   lessons.forEach((lesson, i) => {
     const state = lessonStateOf(lessons, i, done);
     const offset = mainOffset(mainCount++);
-    drafts.push({ kind: "lesson", key: lesson.id, lesson, order: i + 1, state, perfect: perfect.has(lesson.id), next: i === nextIndex, offset, height: ROW_HEIGHT.lesson, size: 64 });
+    const isPerfect = perfect.has(lesson.id);
+    // Stars: 1 = completed, 2 = completed and its dialogue played, 3 = perfect (no mistake).
+    const stars = state !== "done" ? 0 : isPerfect ? 3 : dialoguesDone.has(lesson.dialogueId) ? 2 : 1;
+    drafts.push({ kind: "lesson", key: lesson.id, lesson, order: i + 1, state, perfect: isPerfect, stars, milestone: (i + 1) % MILESTONE_EVERY === 0, next: i === nextIndex, offset, height: ROW_HEIGHT.lesson, size: 64 });
     if (state === "done") {
       // The dialogue sits between its lesson and the next stop, nudged toward the middle of the curve.
       const dOffset = Math.round((offset + mainOffset(mainCount)) / 2) || 24;

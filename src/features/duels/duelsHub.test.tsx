@@ -289,20 +289,18 @@ describe("hub lists", () => {
     await unlock(services);
     gateway(services).seedIncoming(QUESTIONS, { from: BE_NA });
     renderAt("/duels", services);
-    expect(await screen.findByRole("button", { name: fr.duels.hub.challengeWho("Bé Na") })).toBeDisabled();
-    expect(screen.getByRole("button", { name: fr.duels.hub.challengeWho("Chú Tư") })).toBeEnabled();
+    expect(await screen.findByRole("button", { name: fr.duels.hub.challengeWho("Chú Tư") })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: fr.duels.hub.challengeWho("Bé Na") })).toBeNull();
   });
 
-  test("the disabled challenge says why, also for screen readers", async () => {
+  test("the unavailable challenge shows the reason once, instead of a disabled button", async () => {
     const services = makeServices();
     await unlock(services);
     gateway(services).seedIncoming(QUESTIONS, { from: BE_NA });
     renderAt("/duels", services);
-    const button = await screen.findByRole("button", { name: fr.duels.hub.challengeWho("Bé Na") });
-    expect(button).toBeDisabled();
-    expect(button).toHaveAccessibleDescription(fr.duels.hub.alreadyOpen);
+    await screen.findByRole("button", { name: fr.duels.hub.challengeWho("Chú Tư") });
+    expect(screen.queryByRole("button", { name: fr.duels.hub.challengeWho("Bé Na") })).toBeNull();
     expect(screen.getAllByText(fr.duels.hub.alreadyOpen)).toHaveLength(1);
-    expect(screen.getByRole("button", { name: fr.duels.hub.challengeWho("Chú Tư") })).not.toHaveAccessibleDescription();
   });
 });
 

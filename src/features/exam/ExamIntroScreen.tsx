@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useEntryState } from "@/app/useEntryState";
@@ -10,7 +10,7 @@ import { EXAM_PASS } from "@/services/exam";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
-import { Button, Card, EmptyState, Icon, Motif, ProgressBar, Skeleton } from "@/ui";
+import { Button, Card, EmptyState, Hearts, Icon, Motif, ProgressBar, Skeleton, WaterDropHp } from "@/ui";
 import { BossPortrait } from "@/features/exam/BossPortrait";
 import { isInterruptedState, markAttempt, type RunState } from "@/features/exam/examState";
 
@@ -27,6 +27,76 @@ function useOnline(): boolean {
     };
   }, []);
   return online;
+}
+
+/** A wooden roller of the scroll (cuộn giấy), drawn at each end of the cartouche. */
+function ScrollRoll() {
+  return (
+    <svg data-scroll-roll aria-hidden="true" viewBox="0 0 320 14" preserveAspectRatio="none" className="-mx-2 block h-3.5 w-[calc(100%+1rem)] text-frame-bronze">
+      <rect x="6" y="3" width="308" height="8" rx="4" fill="currentColor" stroke="var(--fx-ink)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+/** The legend on a paper scroll between two rollers, left-aligned (audit §B9). Paper keeps its light palette in dark mode. */
+function ScrollCartouche({ label, children }: { label: string; children: string }) {
+  const id = useId();
+  return (
+    <section aria-labelledby={id} className="relative px-1">
+      <ScrollRoll />
+      <div data-theme="light" className="relative overflow-hidden bg-paper px-5 py-4 shadow-card">
+        <div aria-hidden="true" className="absolute inset-0 text-ink">
+          <Motif kind="clouds" />
+        </div>
+        <p id={id} className="relative text-caption uppercase tracking-[0.08em] text-ink-muted">{label}</p>
+        <p className="relative pt-1 text-body text-ink">{children}</p>
+      </div>
+      <ScrollRoll />
+    </section>
+  );
+}
+
+/** A brush with a stroke through it: no correction during the fight. */
+function NoBrush() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 32 32" width={32} height={32} className="text-ink">
+      <path d="M21 4 L11 20" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+      <path d="M11 20 C7 21 6 25 5 28 C9 27 12 25 13 22 Z" fill="currentColor" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" />
+      <path d="M5 5 L27 27" fill="none" stroke="var(--color-primary)" strokeWidth={2.5} strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** The rules shown, not listed (audit §B9): the 15 drops he holds, the 5 hearts you keep, the brush put away. */
+function Rules({ hp, lives }: { hp: number; lives: number }) {
+  const r = fr.exam.intro.rules;
+  return (
+    <section aria-labelledby="exam-rules" className="flex flex-col gap-3">
+      <h2 id="exam-rules" className="text-heading text-ink">{fr.exam.intro.rulesLabel}</h2>
+      <div data-rule="hp" className="flex flex-col gap-2 rounded-md bg-surface px-4 py-3 shadow-card">
+        <WaterDropHp value={hp} max={hp} decorative />
+        <p className="text-body text-ink">
+          <span className="text-body-strong tabular">{r.hp(hp)}</span> {r.hpBody}
+        </p>
+      </div>
+      <div className="grid grid-cols-[3fr_2fr] gap-3">
+        <div data-rule="lives" className="flex flex-col gap-2 rounded-md bg-surface px-4 py-3 shadow-card">
+          <Hearts count={lives} max={lives} />
+          <p className="text-caption text-ink-muted">
+            <span className="block text-body-strong text-ink tabular">{r.lives(lives)}</span>
+            {r.livesBody}
+          </p>
+        </div>
+        <div data-rule="no-correction" className="flex flex-col gap-2 rounded-md bg-surface px-4 py-3 shadow-card">
+          <NoBrush />
+          <p className="text-caption text-ink-muted">
+            <span className="block text-body-strong text-ink">{r.noCorrection}</span>
+            {r.noCorrectionBody}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 // Hero: the boss portrait (or the lock while the skill tree keeps it locked). One action: Commencer.
@@ -145,12 +215,11 @@ export function ExamIntroScreen() {
         <p className="text-caption text-gold-ink">{fr.exam.intro.kicker}</p>
         {unlocked ? (
           <>
-            <BossPortrait boss={boss} size={176} hits={0} defeated={false} />
+            <BossPortrait boss={boss} size={176} />
             <h1 lang="vi" className="text-title text-ink">
               {boss.name}
             </h1>
             <p className="text-body-strong text-ink-muted">{boss.title}</p>
-            <p className="text-body text-ink">{boss.legend}</p>
           </>
         ) : (
           <h1 lang="vi" className="text-title text-ink">
@@ -171,17 +240,9 @@ export function ExamIntroScreen() {
 
       {unlocked ? (
         <>
-          <section aria-label={fr.exam.intro.rulesLabel} className="flex flex-col gap-3">
-            <h2 className="text-heading text-ink">{fr.exam.intro.rulesLabel}</h2>
-            <ul className="flex flex-col gap-2 text-body text-ink">
-              {fr.exam.intro.rules(boss.hp, boss.playerLives).map((rule) => (
-                <li key={rule} className="flex gap-3">
-                  <span aria-hidden="true" className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                  {rule}
-                </li>
-              ))}
-            </ul>
-          </section>
+          <ScrollCartouche label={fr.exam.intro.legendLabel}>{boss.legend}</ScrollCartouche>
+
+          <Rules hp={boss.hp} lives={boss.playerLives} />
 
           <div className="flex flex-col gap-2">
             <Button size="lg" fullWidth loading={starting} disabled={!online || !canFight} aria-describedby={!canFight ? "boss-no-energy" : undefined} onClick={() => void start()}>
@@ -202,6 +263,7 @@ export function ExamIntroScreen() {
                 ) : null}
               </div>
             ) : null}
+            <p className="text-caption text-ink-muted">{fr.exam.intro.rules.tries}</p>
             {!online ? <p className="text-caption text-ink-muted">{fr.exam.intro.offline}</p> : null}
             {error ? (
               <p role="alert" className="text-body-strong text-error">

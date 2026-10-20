@@ -51,7 +51,9 @@ export class DexieProgressRepository implements ProgressRepository {
   }
   async getCachedLeaderboard(period: "week" | "all"): Promise<{ rows: LeaderboardRow[]; fetchedAt: string } | undefined> {
     const row = await this.db.kv.get(lbKey(period));
-    return row?.value as { rows: LeaderboardRow[]; fetchedAt: string } | undefined;
+    const cached = row?.value as { rows: LeaderboardRow[]; fetchedAt: string } | undefined;
+    // Rows cached before heroes existed carry no look: they read as the default hero.
+    return cached && { ...cached, rows: cached.rows.map((r) => ({ ...r, look: r.look ?? {} })) };
   }
   async cacheLeaderboard(period: "week" | "all", rows: LeaderboardRow[], fetchedAt: string): Promise<void> {
     await this.db.kv.put({ key: lbKey(period), value: { rows, fetchedAt } });

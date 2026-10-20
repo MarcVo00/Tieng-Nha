@@ -3,6 +3,7 @@
   "contentVersion": 4,
   "title": "Se présenter",
   "description": "Présente-toi : ton prénom, ton pays, ce que tu apprends. Tu peux enfin dire « enchanté(e) » à une famille vietnamienne !",
+  "tagline": "Enchanté(e) !",
   "emoji": "🤝",
   "dialogueId": "d10",
   "vocab": [

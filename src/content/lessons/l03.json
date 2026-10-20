@@ -3,6 +3,7 @@
   "contentVersion": 3,
   "title": "Les chiffres",
   "description": "Compte de un à dix, puis découvre « cent » (trăm) et « mille » (ngàn), très utiles pour les prix et les numéros de téléphone.",
+  "tagline": "Jusqu’à mille",
   "emoji": "🔢",
   "dialogueId": "d03",
   "vocab": [

@@ -64,7 +64,7 @@ test("lists exactly the 3 Kim bài items with a balance", async () => {
   await earn(services, 10);
   setup(services);
   for (const id of IDS) expect(await cardButton(id)).toBeInTheDocument();
-  expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(3);
+  expect(document.querySelectorAll("[data-rare]")).toHaveLength(3);
   expect(screen.getAllByText(fr.arena.balance(10)).length).toBeGreaterThan(0);
   expect(screen.queryByText(name("streak_freeze"))).not.toBeInTheDocument();
 });

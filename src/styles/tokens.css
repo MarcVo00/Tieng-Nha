@@ -7,6 +7,7 @@
   --color-error: #B4410F; --color-error-soft: #F7E0D2;
   --color-info: #2C4A7A; --color-streak: #D9531E;
   --color-scrim: rgb(31 26 23 / 0.35);
+  --shine: rgb(255 248 238 / 0.38); /* lacquer glint on the primary button, same in every theme */
   --color-paper: #F4E4C4; /* giấy điệp: the medallion characters stand on, same in both themes */
   --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; /* Dong Ho pigments (art-direction 2), same in every theme */
   --frame-bronze: #9A6A3A; --frame-jade: #2E7D6B; --frame-son-mai: var(--color-gold);
@@ -53,4 +54,23 @@
   --shadow-card: 0 1px 0 var(--color-line), 0 6px 16px -8px rgb(80 40 20 / 0.18);
   --shadow-raised: 0 2px 0 var(--color-line), 0 14px 30px -12px rgb(80 40 20 / 0.28);
   color-scheme: light;
+}
+/* Lacquer objects (rare items) keep the dark palette whatever the app theme: mirror of data-theme="light". */
+:root [data-theme="dark"],
+[data-theme="dark"] {
+  --color-bg: #15110F; --color-surface: #1F1916; --color-surface-2: #2A221E; --color-line: #3A302A;
+  --color-ink: #F3EADB; --color-ink-muted: #B5A895;
+  --color-primary: #E0574A; --color-primary-hover: #EA6D61; --color-on-primary: #1A0F0D;
+  --color-gold: #E3B34F; --color-gold-ink: #E3B34F;
+  --color-success: #5DBB93; --color-success-soft: #1E3229;
+  --color-error: #F08A4B; --color-error-soft: #3A2418;
+  --color-info: #8FB0E0; --color-streak: #F07A3C;
+  --color-scrim: rgb(0 0 0 / 0.55);
+  --color-paper: #F4E4C4; /* giấy điệp: the medallion characters stand on, same in both themes */
+  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; /* Dong Ho pigments (art-direction 2), same in every theme */
+  --frame-bronze: #C79563; --frame-jade: #5DBB9E; --frame-son-mai: var(--color-gold);
+  --tone-ngang: #B8C2CC; --tone-huyen: #8FB0E0; --tone-sac: #E8A54B; --tone-hoi: #C9A3E6; --tone-nga: #6CC4CF; --tone-nang: #C9A27E;
+  --shadow-card: 0 1px 0 var(--color-line), 0 6px 16px -8px rgb(0 0 0 / 0.5);
+  --shadow-raised: 0 2px 0 var(--color-line), 0 14px 30px -12px rgb(0 0 0 / 0.5);
+  color-scheme: dark;
 }

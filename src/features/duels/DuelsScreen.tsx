@@ -5,9 +5,9 @@ import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useChallenge } from "@/app/useChallenge";
 import { OfflineError } from "@/domain/errors";
-import type { Duel, LeaderboardRow } from "@/domain/types";
+import type { Duel, LeaderboardRow, Look } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { Avatar, Button, Card, duration, EmptyState, ease, Icon, Skeleton, tap } from "@/ui";
+import { Avatar, Button, Card, duration, EmptyState, ease, Icon, SectionTitle, Skeleton, tap } from "@/ui";
 import { readPending, readRun, unsentDuelIds } from "@/features/duels/duelRunState";
 import { hoursLeft, otherId, outcomeOf, splitDuels } from "@/features/duels/duelsView";
 
@@ -19,21 +19,24 @@ type Load =
   | { status: "offline" | "error" }
   | { status: "ready"; duels: Duel[]; members: LeaderboardRow[]; membersFailed: boolean };
 
+/** The starter hero, for an opponent who is not in the member list. */
+const DEFAULT_LOOK: Look = {};
+
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="mt-8">
-      <h2 id={id} className="text-heading text-ink">{title}</h2>
+      <SectionTitle id={id}>{title}</SectionTitle>
       <ul className="mt-3 flex list-none flex-col gap-3">{children}</ul>
     </section>
   );
 }
 
-function DuelRow({ duel, to, title, caption, trailing }: { duel: Duel; to: string; title: string; caption: string; trailing?: ReactNode }) {
+function DuelRow({ duel, to, title, caption, trailing, look }: { duel: Duel; to: string; title: string; caption: string; trailing?: ReactNode; look?: Look | undefined }) {
   return (
     <motion.li whileTap={tap}>
       <Card raised>
         <Link to={to} className="flex min-h-14 items-center gap-3 p-3">
-          <Avatar emoji={duel.opponentAvatar} size="md" />
+          <Avatar emoji={duel.opponentAvatar} size="md" look={look ?? DEFAULT_LOOK} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-body-strong text-ink">{title}</span>
             <span className="block truncate text-caption text-ink-muted">{caption}</span>
@@ -91,6 +94,9 @@ export function DuelsScreen() {
   // Local runs are re-read with every load of the list.
   const unsent = useMemo(() => new Set(load.status === "loading" ? [] : unsentDuelIds()), [load]);
   const busyWith = useMemo(() => new Set((ready?.duels ?? []).filter((d) => d.status === "open").map((d) => otherId(d, myId))), [ready, myId]);
+
+  // Duels only carry the opponent's emoji: their hero comes from the member list (the starter hero when they are not listed).
+  const lookOfOpponent = (d: Duel): Look => ready?.members.find((m) => m.userId === otherId(d, myId))?.look ?? DEFAULT_LOOK;
 
   const onChallenge = (userId: string) => {
     setChallenging(userId);
@@ -164,6 +170,7 @@ export function DuelsScreen() {
                   <DuelRow
                     key={d.id}
                     duel={d}
+                    look={lookOfOpponent(d)}
                     to={`/duel/${d.id}/run`}
                     title={fr.duels.hub.versus(d.opponentPseudo)}
                     caption={pending ? fr.duels.hub.unsentHint : fr.duels.hub.timeLeft(hoursLeft(d, clock()))}
@@ -184,6 +191,7 @@ export function DuelsScreen() {
                 <DuelRow
                   key={d.id}
                   duel={d}
+                  look={lookOfOpponent(d)}
                   to={`/duel/${d.id}`}
                   title={fr.duels.hub.waitingFor(d.opponentPseudo)}
                   caption={fr.duels.hub.timeLeft(hoursLeft(d, clock()))}
@@ -193,7 +201,7 @@ export function DuelsScreen() {
           ) : null}
 
           <section aria-labelledby="duels-challenge" className="mt-8">
-            <h2 id="duels-challenge" className="text-heading text-ink">{fr.duels.hub.challengeTitle}</h2>
+            <SectionTitle id="duels-challenge" overline={fr.ui.overline.duels}>{fr.duels.hub.challengeTitle}</SectionTitle>
             <p className="text-caption text-ink-muted">{fr.duels.hub.challengeSub}</p>
             {challenge.message ? <p role="alert" className="mt-3 rounded-md bg-surface-2 p-3 text-body text-ink">{challenge.message}</p> : null}
             {ready.membersFailed ? (
@@ -206,23 +214,24 @@ export function DuelsScreen() {
               <ul aria-label={fr.duels.hub.membersLabel} className="mt-3 list-none">
                 {ready.members.map((m) => (
                   <li key={m.userId} className="flex min-h-14 items-center gap-3 border-b border-line py-2">
-                    <Avatar emoji={m.avatarEmoji} size="md" frame={m.frame} />
+                    <Avatar emoji={m.avatarEmoji} size="md" frame={m.frame} look={m.look ?? DEFAULT_LOOK} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-body-strong text-ink">{m.pseudo}</span>
-                      {busyWith.has(m.userId) ? (
-                        <span id={`duel-why-${m.userId}`} className="block text-caption text-ink-muted">{fr.duels.hub.alreadyOpen}</span>
-                      ) : null}
                     </span>
-                    <Button
-                      variant="secondary"
-                      aria-label={fr.duels.hub.challengeWho(m.pseudo)}
-                      aria-describedby={busyWith.has(m.userId) ? `duel-why-${m.userId}` : undefined}
-                      disabled={busyWith.has(m.userId) || challenge.busy}
-                      loading={challenging === m.userId}
-                      onClick={() => onChallenge(m.userId)}
-                    >
-                      {fr.duels.challenge}
-                    </Button>
+                    {busyWith.has(m.userId) ? (
+                      // One state, one label: the unavailable « Défier » button gives way to the reason.
+                      <span className="shrink-0 rounded-full bg-surface-2 px-3 py-1 text-caption text-ink-muted">{fr.duels.hub.alreadyOpen}</span>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        aria-label={fr.duels.hub.challengeWho(m.pseudo)}
+                        disabled={challenge.busy}
+                        loading={challenging === m.userId}
+                        onClick={() => onChallenge(m.userId)}
+                      >
+                        {fr.duels.challenge}
+                      </Button>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -237,6 +246,7 @@ export function DuelsScreen() {
                   <DuelRow
                     key={d.id}
                     duel={d}
+                    look={lookOfOpponent(d)}
                     to={`/duel/${d.id}`}
                     title={fr.duels.hub.versus(d.opponentPseudo)}
                     caption={fr.duels.hub.outcome[outcomeOf(d, myId)]}

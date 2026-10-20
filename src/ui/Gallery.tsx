@@ -6,7 +6,7 @@ import type { Look, Tone } from "@/domain/types";
 
 import {
   Avatar, BadgeMedal, Button, Card, Character, Confetti, ConfirmDialog, EmptyState, FeedbackSheet, FocusHeader, Hearts, Icon, MicButton, Motif,
-  ProgressBar, ReportButton, Sheet, Skeleton, SpeakerButton, StreakFlame, TabBar, ToastViewport, ToneButton, ToneMark, useToast, XpCounter,
+  ProgressBar, ReportButton, SectionTitle, Sheet, Skeleton, SpeakerButton, StreakFlame, TabBar, ToastViewport, ToneButton, ToneMark, useToast, XpCounter,
   type IconName,
 } from "@/ui";
 
@@ -32,7 +32,7 @@ const VI_SAMPLES = ["Cà phê sữa đá", "Bao nhiêu tiền?", g.longVi];
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-heading text-ink">{title}</h2>
+      <SectionTitle>{title}</SectionTitle>
       {children}
     </section>
   );

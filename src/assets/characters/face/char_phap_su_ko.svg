@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- yeux fermés en arcs doux : le salut après le combat -->
+    <path d="M49 72 Q53 75.5 57 72"/>
+    <path d="M63 72 Q67 75.5 71 72"/>
+    <!-- traits de cils à l'extérieur -->
+    <path d="M49 72 L47.4 71 M71 72 L72.6 71"/>
+    <!-- sceau vermillon au front -->
+    <path d="M60 63.5 L62 66 L60 68.5 L58 66 Z" fill="#B23A2A" stroke="none"/>
+    <!-- petit sourire respectueux -->
+    <path d="M57 82.5 Q60 84.8 63 82.5"/>
+    <!-- joues vermillon -->
+    <circle cx="46" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+  </g>
+</svg>

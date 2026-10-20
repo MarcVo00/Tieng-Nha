@@ -239,7 +239,7 @@ describe("dark legends section and try-on", () => {
     expect(buttons).toHaveLength(NAMES.length);
     // The price is part of the accessible name (not hidden by an aria-label).
     expect(buttons[0]).toHaveAccessibleName(/xu$/);
-    expect(within(section).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(NAMES.map((n) => `${fr.shop.tryOn.prefix} ${n}`));
+    buttons.forEach((b, i) => expect(b.textContent).toContain(`${fr.shop.tryOn.prefix} ${NAMES[i] ?? ""}`));
     const ids = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien"];
     buttons.forEach((b, i) => expect(b.querySelector("[data-look]")?.getAttribute("data-look")).toContain(ids[i]));
   });

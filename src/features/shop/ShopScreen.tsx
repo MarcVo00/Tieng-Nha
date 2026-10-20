@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
 import { useEquipToggle } from "@/app/useEquipToggle";
-import { characterSlotOf, lookOf } from "@/services/look";
+import { characterSlotOf } from "@/services/look";
+import { useHeroLook } from "@/app/useHeroLook";
+import { rareEntriesOf } from "@/app/useRareEntries";
 import { fr } from "@/i18n/fr";
-import { Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
+import { BalanceLine, Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, RareShowcase, SectionTitle, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
@@ -40,8 +42,7 @@ export function ShopScreen() {
   const equipToggle = useEquipToggle();
   const [trying, setTrying] = useState<ShopItem | null>(null);
   const [tryOpen, setTryOpen] = useState(false);
-  const equipped = useAppState((s) => s.wallet?.equipped);
-  const baseLook = useMemo(() => lookOf(equipped ?? {}), [equipped]);
+  const baseLook = useHeroLook();
 
   useEffect(() => {
     let cancelled = false;
@@ -210,13 +211,7 @@ export function ShopScreen() {
     <div className="flex flex-col gap-8 pb-8">
       <h1 className="sr-only">{fr.shop.title}</h1>
 
-      <Card raised className="flex items-center gap-4 p-6">
-        <Icon name="coin" size={48} className="shrink-0 text-gold" />
-        <div>
-          <p className="tabular text-display text-gold-ink">{wallet ? fr.shop.balance(wallet.coins) : "…"}</p>
-          <p className="text-caption text-ink-muted">{fr.shop.balanceCaption}</p>
-        </div>
-      </Card>
+      <BalanceLine icon="coin" value={wallet ? fr.shop.balance(wallet.coins) : "…"} caption={fr.shop.balanceCaption} />
 
       {failed || walletFailed ? (
         <EmptyState
@@ -230,25 +225,21 @@ export function ShopScreen() {
       ) : (
         <>
           <section aria-labelledby="shop-play" className="flex flex-col gap-3">
-            <h2 id="shop-play" className="text-heading text-ink">
+            <SectionTitle id="shop-play" overline={fr.ui.overline.shop}>
               {fr.shop.playTitle}
-            </h2>
+            </SectionTitle>
             <ul className="flex list-none flex-col gap-3">{play.map((i) => card(i, wallet))}</ul>
           </section>
           {characters.length > 0 ? (
             <section aria-labelledby="shop-characters" className="flex flex-col gap-3">
-              <h2 id="shop-characters" className="text-heading text-ink">
-                {fr.shop.characters.title}
-              </h2>
+              <SectionTitle id="shop-characters">{fr.shop.characters.title}</SectionTitle>
               <ul className="grid list-none grid-cols-2 gap-3">{characters.map((i) => themedCard(i, wallet))}</ul>
             </section>
           ) : null}
           {themes.map((t) => (
             <section key={t.id} aria-labelledby={`shop-theme-${t.id}`} className="flex flex-col gap-3">
-              <h2 id={`shop-theme-${t.id}`} className="text-heading text-ink">
-                {fr.shop.themes[t.id]}
-              </h2>
-              <ul className="grid list-none grid-cols-2 gap-3">{t.items.map((i) => themedCard(i, wallet))}</ul>
+              <SectionTitle id={`shop-theme-${t.id}`}>{fr.shop.themes[t.id]}</SectionTitle>
+              <RareShowcase entries={rareEntriesOf({ items: t.items, wallet, baseLook, busy, onOpen: tryOn, currency: { icon: "coin", label: fr.shop.balance } })} />
             </section>
           ))}
           <p className="text-caption text-ink-muted">

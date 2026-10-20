@@ -51,7 +51,8 @@ test("buy and play as the wandering blade", async ({ page }) => {
 
   await page.getByRole("link", { name: fr.app.tabs.me }).click();
   await page.getByRole("link", { name: fr.shop.open }).click();
-  await expect(page.getByText(fr.shop.balance(200), { exact: true })).toBeVisible();
+  // Scoped to the balance paragraph: the 200 xu price chips of other items read the same.
+  await expect(page.locator("p").getByText(fr.shop.balance(200), { exact: true })).toBeVisible();
 
   const blade = fr.shop.items.char_kiem_khach!;
   await page.getByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} ${blade.name}`) }).click();

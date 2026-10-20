@@ -3,6 +3,7 @@
   "contentVersion": 3,
   "title": "Se déplacer",
   "description": "Prends un xe ôm (moto-taxi) : demande où se trouve un endroit, indique la direction et dis au chauffeur de s'arrêter.",
+  "tagline": "En xe ôm",
   "emoji": "🛵",
   "dialogueId": "d08",
   "vocab": [

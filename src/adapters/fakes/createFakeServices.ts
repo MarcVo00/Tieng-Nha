@@ -20,6 +20,7 @@ import { ScriptedConversationEngine } from "@/adapters/conversation";
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
 import { walletAt } from "@/services/wallet";
+import { lookOf } from "@/services/look";
 
 export function createFakeServices(overrides: Partial<Services> = {}, options: { duelStorage?: Pick<Storage, "getItem" | "setItem"> } = {}): Services {
   // Dependent fakes are built from the overridden instances so callers can inject e.g. a Dexie-backed progress repo.
@@ -38,6 +39,7 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
     return { userId: "me", pseudo: profile?.pseudo ?? "Moi", avatarEmoji: profile?.avatarEmoji ?? "🐉" };
   };
   const myFrame = async () => walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).equipped.frame ?? null;
+  const myLook = async () => lookOf(walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).equipped);
   const base: Services = {
     env: { VITE_WELCOME_MESSAGE: "", VITE_USE_FAKES: true, VITE_FAKE_SPEECH: true, VITE_DEMO: false },
     flags: { aiConversation: false, streakFreeze: false, humanAudio: false },
@@ -46,7 +48,7 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
     progress,
     outbox,
     sink,
-    leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), me, clock, myFrame),
+    leaderboard: new FakeLeaderboardRepository(() => progress.listEvents(), me, clock, myFrame, myLook),
     auth,
     exam: new FakeExamGateway(clock),
     duels: new FakeDuelGateway(() => progress.listEvents(), clock, {

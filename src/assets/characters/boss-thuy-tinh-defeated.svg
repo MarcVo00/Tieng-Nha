@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>Boss — Thủy Tinh salue après le combat (Đông Hồ simplifié)</title>
+  <!-- Version « vaincu » : un salut de maître, pas une défaite. Même gabarit que boss-thuy-tinh.svg ;
+       il incline la tête, joint le poing et la paume devant lui, son trident planté à côté ; la couronne a glissé. -->
+  <defs>
+    <pattern id="hatch-boss-defeated" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="64" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#2B4E6E" stroke-width="3" stroke-linecap="round" opacity="0.4">
+    <!-- l'eau se retire et s'apaise -->
+    <path d="M20 156 Q32 150 44 156 Q56 162 68 156"/>
+    <path d="M132 156 Q144 150 156 156 Q168 162 180 156"/>
+  </g>
+
+  <g id="layer-weapon" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- trident planté droit à côté de lui -->
+    <path d="M164 186 L164 70" fill="none"/>
+    <path d="M150 84 Q150 66 164 62 Q178 66 178 84 M164 62 L164 52" fill="none"/>
+    <path d="M158 52 L164 42 L170 52 Z" fill="#D9A93A"/>
+  </g>
+
+  <g id="layer-body" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- robe en cloche (xanh chàm), buste penché -->
+    <path d="M56 184 Q50 134 70 108 Q100 98 130 108 Q150 134 144 184 Z" fill="#2B4E6E"/>
+    <!-- bas de robe en vagues : la seule zone à motif -->
+    <path d="M56 184 L56 164 Q68 154 80 164 Q92 174 104 164 Q116 154 128 164 Q140 174 144 164 L144 184 Z" fill="#F4E4C4"/>
+    <path d="M56 184 L56 164 Q68 154 80 164 Q92 174 104 164 Q116 154 128 164 Q140 174 144 164 L144 184 Z" fill="url(#hatch-boss-defeated)" stroke="none"/>
+    <!-- ceinture or -->
+    <path d="M66 128 Q100 136 134 128 L136 140 Q100 148 64 140 Z" fill="#D9A93A"/>
+    <!-- bras ramenés devant : le poing dans la paume, le salut des maîtres -->
+    <path d="M72 108 Q58 122 70 134 L94 136 L94 124 L80 122 Q84 114 84 110 Z" fill="#2B4E6E"/>
+    <path d="M128 108 Q142 122 130 134 L106 136 L106 124 L120 122 Q116 114 116 110 Z" fill="#2B4E6E"/>
+    <ellipse cx="106" cy="130" rx="8" ry="9" fill="#9CC3BB"/>
+    <circle cx="95" cy="130" r="7" fill="#9CC3BB"/>
+    <path d="M91 127 L97 127 M91 132 L97 132" fill="none" stroke-width="1.5"/>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" transform="translate(0 14) rotate(-5 100 76)">
+    <!-- visage bleu-vert, tête inclinée -->
+    <circle cx="100" cy="76" r="28" fill="#9CC3BB"/>
+    <!-- barbe en vagues -->
+    <path d="M78 86 Q84 110 100 112 Q116 110 122 86 Q114 96 100 96 Q86 96 78 86 Z" fill="#F4E4C4"/>
+    <path d="M86 100 Q92 96 98 100 M102 100 Q108 96 114 100" fill="none" stroke-width="1.5"/>
+    <!-- sourcils apaisés, yeux fermés : il salue -->
+    <path d="M82 68 Q89 65.5 96 68 M118 68 Q111 65.5 104 68" fill="none" stroke-width="2.5"/>
+    <path d="M84 76 Q90 81 96 76 M104 76 Q110 81 116 76" fill="none" stroke-width="2.5"/>
+    <path d="M95 88 Q100 90.5 105 88" fill="none" stroke-width="2"/>
+    <!-- couronne or qui a glissé de travers -->
+    <g transform="rotate(14 100 58) translate(6 3)">
+      <path d="M76 56 L80 32 L90 48 L100 26 L110 48 L120 32 L124 56 Q100 62 76 56 Z" fill="#D9A93A"/>
+      <circle cx="100" cy="44" r="3" fill="#B23A2A" stroke-width="1.5"/>
+    </g>
+  </g>
+</svg>

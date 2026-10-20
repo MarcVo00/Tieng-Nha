@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { characterLayers } from "@/ui/characterLayers";
+import { characterLayers, expressionFace } from "@/ui/characterLayers";
 import { Avatar, BadgeMedal, Character, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
 
 test("Button shows loading state and is disabled", () => {
@@ -213,6 +213,29 @@ describe("Character layers", () => {
     expect(characterLayers({ character: "char_future" })).toEqual(characterLayers({}));
     expect(characterLayers({ character: "constructor" })).toEqual(characterLayers({}));
     expect(characterLayers({ character: "__proto__" })).toEqual(characterLayers({}));
+  });
+  test("an expression swaps only the face layer", () => {
+    const idle = characterLayers({ character: "char_kiem_khach" });
+    const hurt = characterLayers({ character: "char_kiem_khach" }, "hurt");
+    expect(hurt.map((l) => l.slot)).toEqual(idle.map((l) => l.slot));
+    const face = (layers: typeof idle) => layers.find((l) => l.slot === "face")?.src;
+    expect(face(hurt)).not.toBe(face(idle));
+    expect(face(characterLayers({}, "ko"))).not.toBe(face(characterLayers({}, "hurt")));
+    expect(hurt.filter((l) => l.slot !== "face")).toEqual(idle.filter((l) => l.slot !== "face"));
+    expect(characterLayers({}, "idle")).toEqual(characterLayers({}));
+  });
+  test("a face without that expression keeps its idle face", () => {
+    const known = new Set(["face/hero", "face/hero_hurt"]);
+    const has = (key: string) => known.has(key);
+    expect(expressionFace("hero", "hurt", has)).toBe("hero_hurt");
+    expect(expressionFace("hero", "ko", has)).toBe("hero");
+    expect(expressionFace("hero", "idle", has)).toBe("hero");
+  });
+  test("Character draws the expression's face", () => {
+    const { container } = render(<Character look={{}} size={80} expression="ko" />);
+    const face = container.querySelector("[data-layer='face']");
+    expect(face?.getAttribute("src")).toBe(characterLayers({}, "ko").find((l) => l.slot === "face")?.src);
+    expect(face?.getAttribute("data-expression")).toBe("ko");
   });
   test("data-look lists the character id", () => {
     const { container } = render(<Character look={{ character: "char_phap_su", hat: "hat_thuy_tinh" }} size={80} />);

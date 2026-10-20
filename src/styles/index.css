@@ -14,3 +14,14 @@ body { font-family: "Be Vietnam Pro", system-ui, sans-serif; min-height: 100dvh;
 /* Programmatic focus (headings with tabindex="-1") is for screen readers: no ring. Keyboard focus stays on controls. */
 [tabindex="-1"]:focus-visible { outline: none; }
 .tabular { font-variant-numeric: tabular-nums; }
+
+/* Static textures (audit A9): inline SVG tiles, no filter/turbulence, painted once on a fixed layer behind the app. */
+:root {
+  --texture: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><path d='M43 21q-6 -3 -11 -2M70 14q-5 4 -10 2M29 6q3 2 6 1M10 32q3 -4 6 -2M74 17q-4 2 -8 1M8 30q-3 0 -5 0M55 20q-7 0 -13 0M73 89q-4 -1 -7 -1M49 14q-7 -4 -13 -2M81 28q6 1 12 0M61 76q6 0 12 0M33 25q-4 0 -8 0M69 65q5 0 10 0M79 11q3 -2 6 -1M45 21q6 -4 12 -2M87 11q6 1 13 0M90 46q6 -3 12 -2M13 36q-6 -4 -12 -2M91 41q6 2 12 1M87 46q2 1 5 0M23 80q3 -4 6 -2M29 38q-4 2 -7 1M52 65q-3 3 -6 1M53 72q-5 2 -9 1M72 37q5 2 11 1M31 21q-3 -2 -6 -1' fill='none' stroke='%238a6a3a' stroke-opacity='.09' stroke-width='.7' stroke-linecap='round'/></svg>");
+  --texture-wash: radial-gradient(120% 60% at 50% 0%, rgb(255 244 220 / 0.55), transparent 70%);
+}
+:root.dark {
+  --texture: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='134' height='134'><g fill='%23e3b34f'><circle cx='62' cy='62' r='0.5' fill-opacity='0.14'/><circle cx='49' cy='70' r='0.8' fill-opacity='0.1'/><circle cx='40' cy='110' r='0.8' fill-opacity='0.2'/><circle cx='84' cy='35' r='0.5' fill-opacity='0.14'/><circle cx='103' cy='104' r='1' fill-opacity='0.14'/><circle cx='29' cy='126' r='1' fill-opacity='0.1'/><circle cx='51' cy='20' r='0.6' fill-opacity='0.14'/><circle cx='44' cy='31' r='0.8' fill-opacity='0.2'/><circle cx='16' cy='29' r='0.5' fill-opacity='0.2'/><circle cx='41' cy='28' r='0.8' fill-opacity='0.2'/><circle cx='9' cy='21' r='0.6' fill-opacity='0.2'/><circle cx='99' cy='41' r='0.8' fill-opacity='0.14'/><circle cx='96' cy='124' r='0.5' fill-opacity='0.1'/><circle cx='127' cy='122' r='1' fill-opacity='0.14'/><circle cx='82' cy='24' r='0.6' fill-opacity='0.1'/><circle cx='90' cy='70' r='1' fill-opacity='0.2'/><circle cx='44' cy='8' r='0.6' fill-opacity='0.2'/><circle cx='95' cy='40' r='0.5' fill-opacity='0.2'/><circle cx='79' cy='26' r='0.8' fill-opacity='0.2'/><circle cx='96' cy='45' r='0.8' fill-opacity='0.1'/><circle cx='87' cy='60' r='0.6' fill-opacity='0.1'/><circle cx='105' cy='61' r='0.6' fill-opacity='0.2'/></g></svg>");
+  --texture-wash: radial-gradient(110% 55% at 50% -5%, rgb(150 52 38 / 0.22), transparent 70%), radial-gradient(140% 90% at 50% 120%, rgb(0 0 0 / 0.45), transparent 65%);
+}
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: var(--texture), var(--texture-wash); }

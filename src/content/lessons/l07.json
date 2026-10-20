@@ -3,6 +3,7 @@
   "contentVersion": 3,
   "title": "Au marché",
   "description": "Fais tes courses au marché : demande le prix, dis que c'est trop cher, demande un petit rabais et achète un kilo de fruits.",
+  "tagline": "Marchander",
   "emoji": "🥭",
   "dialogueId": "d07",
   "vocab": [

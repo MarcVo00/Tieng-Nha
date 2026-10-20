@@ -1,14 +1,15 @@
 import { ContentNotFoundError, OfflineError } from "@/domain/errors";
-import type { AppEvent, LeaderboardRow, PublicProfile } from "@/domain/types";
+import type { AppEvent, LeaderboardRow, Look, PublicProfile } from "@/domain/types";
 import type { LeaderboardRepository } from "@/ports";
 
 type Me = { userId: string; pseudo: string; avatarEmoji: string };
 
 const BOTS: Array<Omit<LeaderboardRow, "isMe">> = [
-  { userId: "bot_ba_ngoai", pseudo: "Bà Ngoại", avatarEmoji: "🐢", xp: 120, streak: 5, lessonsDone: 3, frame: null },
-  { userId: "bot_chu_tu", pseudo: "Chú Tư", avatarEmoji: "🛵", xp: 85, streak: 2, lessonsDone: 2, frame: null },
-  { userId: "bot_be_na", pseudo: "Bé Na", avatarEmoji: "🌸", xp: 40, streak: 1, lessonsDone: 1, frame: null },
-  { userId: "bot_anh_hai", pseudo: "Anh Hai", avatarEmoji: "🐯", xp: 15, streak: 0, lessonsDone: 1, frame: null },
+  // Each fake member wears a different hero (characters and cosmetics from the shop catalogue), so the demo shows variety.
+  { userId: "bot_ba_ngoai", pseudo: "Bà Ngoại", avatarEmoji: "🐢", xp: 120, streak: 5, lessonsDone: 3, frame: "frame_jade", look: { character: "char_phap_su", accessory: "acc_thuan_thien" } },
+  { userId: "bot_chu_tu", pseudo: "Chú Tư", avatarEmoji: "🛵", xp: 85, streak: 2, lessonsDone: 2, frame: null, look: { character: "char_kiem_khach", hat: "hat_tay_son", outfit: "outfit_hoi_vat" } },
+  { userId: "bot_be_na", pseudo: "Bé Na", avatarEmoji: "🌸", xp: 40, streak: 1, lessonsDone: 1, frame: null, look: { hat: "hat_thuy_tinh", aura: "aura_waves" } },
+  { userId: "bot_anh_hai", pseudo: "Anh Hai", avatarEmoji: "🐯", xp: 15, streak: 0, lessonsDone: 1, frame: null, look: { outfit: "outfit_son_tinh", accessory: "acc_con_vo" } },
 ];
 
 /** Lessons/dialogues each fake member has done (consistent with `lessonsDone` above); duels use them as prerequisites. */
@@ -68,6 +69,8 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
     private readonly now: () => string = () => new Date().toISOString(),
     /** Frame item id the player has equipped (derived from the local journal by the composition root). */
     private readonly getMyFrame: () => Promise<string | null> = async () => null,
+    /** Hero look the player has equipped (derived from the local journal by the composition root). */
+    private readonly getMyLook: () => Promise<Look> = async () => ({}),
   ) {}
 
   async list(period: "week" | "all"): Promise<LeaderboardRow[]> {
@@ -78,7 +81,7 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
     const myXp = mine.reduce((sum, e) => sum + e.xp, 0);
     const lessonsDone = new Set(events.filter((e) => e.type === "lesson_completed").map((e) => e.refId)).size;
     const me = typeof this.me === "function" ? await this.me() : this.me;
-    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, frame: await this.getMyFrame(), isMe: true };
+    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, frame: await this.getMyFrame(), look: await this.getMyLook(), isMe: true };
     return [...BOTS.map((b) => ({ ...b, isMe: false })), meRow].sort((a, b) => b.xp - a.xp);
   }
 
@@ -99,7 +102,7 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
       examBest: null,
       frame: bot.frame,
       fx: null,
-      look: {},
+      look: { ...bot.look },
     };
   }
 }

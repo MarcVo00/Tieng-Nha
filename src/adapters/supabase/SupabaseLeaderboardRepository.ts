@@ -27,7 +27,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
     const col = period === "week" ? "xp_week" : "xp_total";
     const { data, error } = await this.db
       .from("leaderboard")
-      .select("user_id,pseudo,avatar_emoji,xp_week,xp_total,streak,lessons_done_count,equipped_frame")
+      .select("user_id,pseudo,avatar_emoji,xp_week,xp_total,streak,lessons_done_count,equipped_frame,equipped")
       .order(col, { ascending: false })
       .limit(100);
     if (error) throw mapError(error);
@@ -42,6 +42,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
         streak: r.streak ?? 0,
         lessonsDone: r.lessons_done_count ?? 0,
         frame: r.equipped_frame ?? null,
+        look: lookFrom(r.equipped),
         isMe: r.user_id === me,
       });
     }

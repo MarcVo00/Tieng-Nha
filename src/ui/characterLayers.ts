@@ -23,8 +23,17 @@ function urlOf(slot: string, id: string): string | undefined {
   return URLS.get(`${slot}/${id}`);
 }
 
+/** The face a fighter shows: idle, hurt on impact, eyes closed (bow, salute) at the end of a fight. */
+export type Expression = "idle" | "hurt" | "ko";
+
+/** The face file id for an expression: `<faceId>_<expression>` when that file exists, else the idle face. */
+export function expressionFace(faceId: string, expression: Expression, has: (key: string) => boolean): string {
+  const id = `${faceId}_${expression}`;
+  return expression !== "idle" && has(`face/${id}`) ? id : faceId;
+}
+
 /** Layers bottom to top: aura, shadow, base, face, outfit, hat, accessory. Unknown ids fall back to the defaults. */
-export function characterLayers(look: Look): { slot: string; src: string }[] {
+export function characterLayers(look: Look, expression: Expression = "idle"): { slot: string; src: string }[] {
   const layers: { slot: string; src: string }[] = [];
   const push = (slot: string, src: string | undefined) => {
     if (src) layers.push({ slot, src });
@@ -33,7 +42,7 @@ export function characterLayers(look: Look): { slot: string; src: string }[] {
   push("shadow", urlOf("shadow", "hero"));
   const d = (look.character !== undefined && Object.hasOwn(CHARACTERS, look.character) ? CHARACTERS[look.character] : undefined) ?? HERO;
   push("base", urlOf("base", d.base));
-  push("face", urlOf("face", d.face));
+  push("face", urlOf("face", expressionFace(d.face, expression, (key) => URLS.has(key))));
   push("outfit", urlOf("outfit", look.outfit ?? "") ?? urlOf("outfit", d.outfit));
   push("hat", urlOf("hat", look.hat ?? "") ?? (d.hat === null ? undefined : urlOf("hat", d.hat)));
   if (look.accessory) push("accessory", urlOf("accessory", look.accessory));

@@ -54,6 +54,9 @@ const WAVE_TRAVEL = -112;
 /** The wave starts just left of the boss (48 px wide, in the 320 px ring). */
 const WAVE_LEFT = 320 - 4 - BOSS - 48;
 
+/** Where the K.-O. ink lands, in the boss box (px): beside his feet, on the medallion edge. */
+const KO_INK = { x: -28, y: BOSS - 18 } as const;
+
 type Fx = { id: number; kind: "ink" | "ko" | "dmg" | "wave"; life: number };
 
 type StageProps = {
@@ -84,7 +87,7 @@ function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled
         <div className="absolute inset-0 text-info">
           <Motif kind="waves" />
         </div>
-        <motion.div className="absolute inset-0 bg-scrim" initial={false} animate={{ opacity: veiled ? 1 : 0 }} transition={{ duration: duration.base }} />
+        <motion.div data-veil={veiled ? "on" : "off"} className="absolute inset-0 bg-scrim" initial={false} animate={{ opacity: veiled ? 1 : 0 }} transition={{ duration: duration.base }} />
       </div>
       <motion.div className={`relative mx-auto h-full w-full max-w-[20rem] ${live ? "will-change-transform" : ""}`} animate={stage}>
         {/* Paper medallions stay put like mats (giấy điệp): only the fighters move. */}
@@ -96,20 +99,24 @@ function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled
         <div role="img" aria-label={fr.exam.boss.aria(boss.name, boss.title, defeated)} className="absolute bottom-2 right-1 z-10">
           <BossSprite illustration={boss.illustration} size={BOSS} facing={-1} expression={bossFace} pose={bossPose} controls={bossCtl} live={live} />
         </div>
-        {/* FX layer anchored on the boss box: impact, damage number, seal. */}
-        <div aria-hidden="true" className="pointer-events-none absolute bottom-2 right-1 z-20 h-24 w-24">
+        {/* The player's win, stamped over the strip between the fighters, never on the bowing boss. */}
+        {fx.map((f) =>
+          f.kind === "ko" ? (
+            <span key={f.id} aria-hidden="true" className="pointer-events-none absolute left-[10.25rem] top-1 z-30 -translate-x-1/2">
+              <FightSeal big lang="vi" life={f.life} reduced={reduced}>
+                {fr.exam.run.win}
+              </FightSeal>
+            </span>
+          ) : null,
+        )}
+        {/* FX layer anchored on the boss box: impact, damage number. */}
+        <div aria-hidden="true" data-fx-layer="boss" className="pointer-events-none absolute bottom-2 right-1 z-20 h-24 w-24">
           {fx.map((f) =>
             f.kind === "ink" ? (
               <InkImpact key={f.id} kind="hit" x={BOSS / 2} y={BOSS / 2 - 4} life={f.life} reduced={reduced} />
             ) : f.kind === "ko" ? (
-              <span key={f.id}>
-                <InkImpact kind="ko" x={BOSS / 2} y={BOSS / 2 - 4} life={f.life} reduced={reduced} />
-                <span className="absolute right-full top-8 translate-x-1/2">
-                  <FightSeal big life={f.life} reduced={reduced}>
-                    {fr.exam.run.ko}
-                  </FightSeal>
-                </span>
-              </span>
+              // The last blow splashes beside him, at the edge of his medallion: no slash across a legend's face.
+              <InkImpact key={f.id} kind="ko" x={KO_INK.x} y={KO_INK.y} life={f.life} reduced={reduced} />
             ) : f.kind === "dmg" ? (
               <span key={f.id} className="absolute left-1/2 top-0 -translate-x-1/2">
                 <DamageNumber value={1} critical={false} life={f.life} reduced={reduced} />
@@ -169,8 +176,16 @@ function ExamRun({ run }: { run: RunState }) {
   const [fx, setFx] = useState<Fx[]>([]);
   const [ending, setEnding] = useState(false);
   /** HP and lives as drawn: held at their old values until the blow (or the wave) lands, then released (null). */
-  const [held, setHeld] = useState<{ hp: number; lives: number } | null>(null);
+  const [held, setHeld] = useState<{ hp: number; lives: number; seq: number } | null>(null);
+  const heldSeq = useRef(0);
+  /** Releases the hold taken for answer `seq` only: a later answer's hold stays until its own contact. */
+  const release = useCallback((seq: number) => setHeld((h) => (h?.seq === seq ? null : h)), []);
   const fxSeq = useRef(0);
+  const skipRef = useRef<HTMLButtonElement | null>(null);
+  // The ending is a celebration a keyboard or screen-reader user can skip too: focus « Passer » when it starts.
+  useEffect(() => {
+    if (ending) skipRef.current?.focus();
+  }, [ending]);
   const timers = useRef(new Set<number>());
   /** The end of the fight: the K.-O. (or the boss's triumph) plays until this opens — by itself or on a tap. */
   const gate = useRef<{ done: Promise<void>; open: () => void } | null>(null);
@@ -202,7 +217,8 @@ function ExamRun({ run }: { run: RunState }) {
   const showFx = useCallback(
     (kind: Fx["kind"], life: number) => {
       const id = ++fxSeq.current;
-      setFx((all) => [...all, { id, kind, life }]);
+      // At most one damage number at a time: a new one replaces the previous.
+      setFx((all) => [...all.filter((f) => kind !== "dmg" || f.kind !== "dmg"), { id, kind, life }]);
       later(() => setFx((all) => all.filter((f) => f.id !== id)), life);
     },
     [later],
@@ -225,14 +241,14 @@ function ExamRun({ run }: { run: RunState }) {
 
   /** A right answer: the hero rushes at the boss (compact beat), ink on contact, a drop detaches; the K.-O. on the last one. */
   const playHit = useCallback(
-    (ko: boolean) => {
+    (ko: boolean, seq: number) => {
       const t = beat.blow({ kind: "hit", ko, compact: true, attacker: heroCtl, defender: bossCtl, stage: stageCtl, reach: REACH });
       const after = t.length - t.impact;
       later(() => {
         showFx(ko ? "ko" : "ink", after);
         showFx("dmg", FIGHT.number);
         setBossFace(ko && beat.reduced ? "ko" : "hurt");
-        setHeld(null); // the drop detaches on contact
+        release(seq); // the drop detaches on contact
       }, t.impact);
       if (ko) {
         // Hit-stop held (reduced motion: no hold, a fade), then Thủy Tinh bows from its feet with its salute art; the stage veils.
@@ -246,16 +262,16 @@ function ExamRun({ run }: { run: RunState }) {
         later(() => setBossFace((f) => (f === "hurt" ? "idle" : f)), t.length);
       }
     },
-    [beat, heroCtl, bossCtl, stageCtl, later, showFx, closeGate],
+    [beat, heroCtl, bossCtl, stageCtl, later, showFx, closeGate, release],
   );
 
   /** A wrong answer: the boss throws a wave at the hero, who winces and steps back; a heart breaks (Hearts). */
   const playMiss = useCallback(
-    (lost: boolean) => {
+    (lost: boolean, seq: number) => {
       setHeroFace("hurt");
-      if (beat.reduced) setHeld(null);
+      if (beat.reduced) release(seq);
       else {
-        later(() => setHeld(null), duration.base); // the heart breaks when the wave lands
+        later(() => release(seq), duration.base); // the heart breaks when the wave lands
         showFx("wave", duration.base);
         void heroCtl.body.start({ x: [null, 0, -8, 0], transition: { duration: duration.slow, times: [0, 0.55, 0.7, 1], ease: ease.out } });
       }
@@ -269,7 +285,7 @@ function ExamRun({ run }: { run: RunState }) {
         later(() => setHeroFace((f) => (f === "hurt" ? "idle" : f)), duration.slow);
       }
     },
-    [beat, heroCtl, bossCtl, later, showFx, closeGate],
+    [beat, heroCtl, bossCtl, later, showFx, closeGate, release],
   );
 
   useEffect(() => {
@@ -367,11 +383,12 @@ function ExamRun({ run }: { run: RunState }) {
         { score: r.skipped ? 0 : r.score, correct: r.correct, skipped: !!r.skipped, expected: r.expected },
       ];
       if (next.status === "fighting" && next.answers.length >= deck.length) next = outOfQuestions(next);
-      setHeld({ hp: fight.bossHp, lives: fight.lives });
+      const seq = ++heldSeq.current;
+      setHeld({ hp: fight.bossHp, lives: fight.lives, seq });
       setFight(next);
       // The beat runs beside the next exercise, which never waits for it.
-      if (r.correct && !r.skipped) playHit(next.status === "won");
-      else playMiss(next.status === "lost" && next.lives <= 0);
+      if (r.correct && !r.skipped) playHit(next.status === "won", seq);
+      else playMiss(next.status === "lost" && next.lives <= 0, seq);
       // Out of questions with lives left: no blow ends it, a short pause before the result.
       if (next.status !== "fighting" && !gate.current) closeGate(duration.slow);
       // Saving starts at once; the navigation waits for the end of the K.-O.
@@ -419,7 +436,8 @@ function ExamRun({ run }: { run: RunState }) {
   return (
     <div className="pb-8">
       {saving ? (
-        <div className="flex items-center justify-end px-5 py-3">
+        // Same height as FocusHeader (44 px close button): the stage must not jump when saving starts.
+        <div className="flex min-h-[4.25rem] items-center justify-end px-5 py-3">
           <Hearts count={lives} max={boss.playerLives} />
         </div>
       ) : (
@@ -462,6 +480,7 @@ function ExamRun({ run }: { run: RunState }) {
           aria-label={fr.exam.run.skip}
           className="fixed inset-0 z-40 flex items-end justify-center pb-10"
           whileTap="pressed"
+          ref={skipRef}
           onClick={() => gate.current?.open()}
         >
           <motion.span variants={{ pressed: tap }} className="rounded-md bg-surface px-5 py-3 text-body-strong text-ink shadow-raised" aria-hidden="true">

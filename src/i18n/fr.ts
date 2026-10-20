@@ -641,7 +641,8 @@ export const fr = {
       bossHp: (name: string, hp: number, max: number) => `PV de ${name}\u202f: ${hp} sur ${max}`,
       stage: (name: string) => `Combat contre ${name}`,
       hero: "Ton h\u00e9ros",
-      ko: "K.-O.",
+      /** The player's win, stamped on the strip (Vietnamese, as on a Đông Hồ print): never a mark on the bowing boss. */
+      win: "Thắng!",
       skip: "Passer",
       hit: (hpLeft: number) => `Touché\u202f! Il lui reste ${hpLeft} PV`,
       miss: (livesLeft: number) => `Aïe\u202f! Il te reste ${livesLeft} vie${livesLeft > 1 ? "s" : ""}`,

@@ -134,6 +134,9 @@ function Loot({ coins, badges }: { coins: number; badges: ResultState["newBadges
   );
 }
 
+/** Victory duo sizes (px): the hero (4:3) is not dwarfed by the boss, whose bow stays inside its 112 px medallion. */
+const DUO = { hero: 96, boss: 88 } as const;
+
 /** Entrance delays of the victory sequence (s): the bow first, then the title, the counter, the certificate. */
 const STEP = [0, duration.slow, duration.slow + duration.base, duration.slow + duration.base * 2] as const;
 
@@ -160,8 +163,11 @@ function ResultContent({ state }: { state: ResultState }) {
   const pseudo = profile?.pseudo ?? "";
   const mention = state.mention === "presque" ? null : state.mention;
   const certificate = won && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking } : null;
+  // Only a victory is staged; a defeat shows everything at once (« Réessayer » must be there right away).
   const enter = (step: 1 | 2 | 3) =>
-    reduced
+    !won
+      ? {}
+      : reduced
       ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: duration.fast } }
       : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: duration.base, ease: ease.out, delay: STEP[step] } };
 
@@ -180,18 +186,21 @@ function ResultContent({ state }: { state: ResultState }) {
       <Confetti fire={won} />
 
       <header className="relative flex flex-col items-center gap-3 text-center">
-        <div className="relative flex h-36 items-end justify-center gap-6">
-          <div role="img" aria-label={fr.exam.run.hero} data-fighter="hero" className="relative pb-2">
+        {/* The winner stands as tall as the bowing legend: two paper medallions of the same size. */}
+        <div className="relative flex items-end justify-center gap-5">
+          <div role="img" aria-label={fr.exam.run.hero} data-fighter="hero" className="relative pb-1">
             {/* Paper medallions as on the stage: the ink outlines stay readable on the dark lacquer. */}
-            <span aria-hidden="true" className="absolute bottom-0 left-1/2 h-[5.5rem] w-[5.5rem] -translate-x-1/2 rounded-full border-2 border-line bg-paper" />
-            <FighterSprite look={look} facing={1} expression="idle" size={72} />
+            <span aria-hidden="true" className="absolute bottom-0 left-1/2 h-28 w-28 -translate-x-1/2 rounded-full border-2 border-line bg-paper" />
+            <FighterSprite look={look} facing={1} expression="idle" size={DUO.hero} />
           </div>
-          <div role="img" aria-label={fr.exam.boss.aria(boss.name, boss.title, won)} className="relative pb-1.5">
-            <span aria-hidden="true" className="absolute bottom-0 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full border-2 border-line bg-paper" />
-            <BossSprite illustration={boss.illustration} size={128} facing={-1} expression={won ? "ko" : "idle"} pose={won && bowed ? "bow" : "stand"} />
+          <div role="img" aria-label={fr.exam.boss.aria(boss.name, boss.title, won)} className="relative h-28 w-28 overflow-hidden rounded-full border-2 border-line bg-paper">
+            {/* The bow happens inside the medallion. */}
+            <span className="absolute bottom-2 left-[56%] -translate-x-1/2">
+              <BossSprite illustration={boss.illustration} size={DUO.boss} facing={-1} expression={won ? "ko" : "idle"} pose={won && bowed ? "bow" : "stand"} />
+            </span>
           </div>
         </div>
-        <motion.div className="flex flex-col items-center gap-2" {...enter(1)}>
+        <motion.div data-step="title" className="flex flex-col items-center gap-2" {...enter(1)}>
           <h1 className="text-title text-ink">{won ? fr.exam.result.won(boss.name) : fr.exam.result.lost(boss.name)}</h1>
           {won ? (
             <>
@@ -205,13 +214,13 @@ function ResultContent({ state }: { state: ResultState }) {
             <p className="text-body text-ink-muted">{fr.exam.result.damage(boss.hp - boss.bossHpLeft, boss.hp)}</p>
           )}
         </motion.div>
-        <motion.div className="flex w-full flex-col items-center gap-3" {...enter(2)}>
+        <motion.div data-step="counter" className="flex w-full flex-col items-center gap-3" {...enter(2)}>
           {state.xpGained > 0 ? <XpCounter value={xpTotal ?? state.xpGained} delta={state.xpGained} /> : null}
           <Loot coins={state.coinsGained ?? 0} badges={state.newBadges} />
         </motion.div>
       </header>
 
-      <motion.div {...enter(3)}>
+      <motion.div data-step="actions" {...enter(3)}>
         {certificate ? (
           <section aria-label={fr.exam.result.certificate} className="flex flex-col gap-4">
             <Certificate {...certificate} />

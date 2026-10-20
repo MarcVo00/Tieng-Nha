@@ -178,3 +178,25 @@ export async function seedDialoguesCompleted(page: Page, ids: string[]): Promise
     await new Promise((res) => { tx.oncomplete = res; });
   }, ids);
 }
+
+/** Writes one `duel_settled` event (unique refId) worth `amount` Kim bài, like the fake duel balance counts them. Call after onboarding, then reload. */
+export async function seedKimBai(page: Page, amount: number): Promise<void> {
+  await page.evaluate(async (amount) => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open("tieng-nha");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const tx = db.transaction("events", "readwrite");
+    tx.objectStore("events").put({
+      clientId: crypto.randomUUID(),
+      schemaVersion: 1,
+      type: "duel_settled",
+      refId: `seed-duel-${crypto.randomUUID()}`,
+      xp: 0,
+      payload: { kimBai: amount },
+      createdAt: new Date(Date.now() - 60000).toISOString(),
+    });
+    await new Promise((res) => { tx.oncomplete = res; });
+  }, amount);
+}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
+import { useHeroLook } from "@/app/useHeroLook";
 import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
@@ -19,6 +20,7 @@ export function LessonScreen() {
   const { settings, updateSettings } = useSettings();
   const run = useLessonRun(id);
   const dueCount = useAppState((s) => s.dueCount);
+  const heroLook = useHeroLook();
   const [quitting, setQuitting] = useState(false);
   const [reportRef, setReportRef] = useState<string | null>(null);
 
@@ -107,16 +109,16 @@ export function LessonScreen() {
         <EmptyState
           title={fr.lessons.failed.title}
           body={fr.lessons.failed.body}
-          illustration="bowl"
+          scene={{ look: heroLook, line: fr.lessons.failed.line, expression: "hurt" }}
           action={
-            <div className="flex gap-2">
-              <Button onClick={() => void run.restart()} disabled={run.failPending}>
+            <>
+              <Button size="lg" onClick={() => void run.restart()} disabled={run.failPending}>
                 {fr.lessons.failed.retry}
               </Button>
               <Button variant="secondary" onClick={goHome} disabled={run.failPending}>
                 {fr.lessons.failed.back}
               </Button>
-            </div>
+            </>
           }
         />
       ) : null}

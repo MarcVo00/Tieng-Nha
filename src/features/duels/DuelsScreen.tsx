@@ -19,6 +19,9 @@ type Load =
   | { status: "offline" | "error" }
   | { status: "ready"; duels: Duel[]; members: LeaderboardRow[]; membersFailed: boolean };
 
+/** The starter hero, for an opponent who is not in the member list. */
+const DEFAULT_LOOK: Look = {};
+
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="mt-8">
@@ -33,7 +36,7 @@ function DuelRow({ duel, to, title, caption, trailing, look }: { duel: Duel; to:
     <motion.li whileTap={tap}>
       <Card raised>
         <Link to={to} className="flex min-h-14 items-center gap-3 p-3">
-          <Avatar emoji={duel.opponentAvatar} size="md" look={look} />
+          <Avatar emoji={duel.opponentAvatar} size="md" look={look ?? DEFAULT_LOOK} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-body-strong text-ink">{title}</span>
             <span className="block truncate text-caption text-ink-muted">{caption}</span>
@@ -92,8 +95,8 @@ export function DuelsScreen() {
   const unsent = useMemo(() => new Set(load.status === "loading" ? [] : unsentDuelIds()), [load]);
   const busyWith = useMemo(() => new Set((ready?.duels ?? []).filter((d) => d.status === "open").map((d) => otherId(d, myId))), [ready, myId]);
 
-  // Duels only carry the opponent's emoji: their hero comes from the member list (emoji stays the fallback).
-  const lookOfOpponent = (d: Duel): Look | undefined => ready?.members.find((m) => m.userId === otherId(d, myId))?.look;
+  // Duels only carry the opponent's emoji: their hero comes from the member list (the starter hero when they are not listed).
+  const lookOfOpponent = (d: Duel): Look => ready?.members.find((m) => m.userId === otherId(d, myId))?.look ?? DEFAULT_LOOK;
 
   const onChallenge = (userId: string) => {
     setChallenging(userId);
@@ -211,23 +214,24 @@ export function DuelsScreen() {
               <ul aria-label={fr.duels.hub.membersLabel} className="mt-3 list-none">
                 {ready.members.map((m) => (
                   <li key={m.userId} className="flex min-h-14 items-center gap-3 border-b border-line py-2">
-                    <Avatar emoji={m.avatarEmoji} size="md" frame={m.frame} look={m.look} />
+                    <Avatar emoji={m.avatarEmoji} size="md" frame={m.frame} look={m.look ?? DEFAULT_LOOK} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-body-strong text-ink">{m.pseudo}</span>
-                      {busyWith.has(m.userId) ? (
-                        <span id={`duel-why-${m.userId}`} className="block text-caption text-ink-muted">{fr.duels.hub.alreadyOpen}</span>
-                      ) : null}
                     </span>
-                    <Button
-                      variant="secondary"
-                      aria-label={fr.duels.hub.challengeWho(m.pseudo)}
-                      aria-describedby={busyWith.has(m.userId) ? `duel-why-${m.userId}` : undefined}
-                      disabled={busyWith.has(m.userId) || challenge.busy}
-                      loading={challenging === m.userId}
-                      onClick={() => onChallenge(m.userId)}
-                    >
-                      {fr.duels.challenge}
-                    </Button>
+                    {busyWith.has(m.userId) ? (
+                      // One state, one label: the unavailable « Défier » button gives way to the reason.
+                      <span className="shrink-0 rounded-full bg-surface-2 px-3 py-1 text-caption text-ink-muted">{fr.duels.hub.alreadyOpen}</span>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        aria-label={fr.duels.hub.challengeWho(m.pseudo)}
+                        disabled={challenge.busy}
+                        loading={challenging === m.userId}
+                        onClick={() => onChallenge(m.userId)}
+                      >
+                        {fr.duels.challenge}
+                      </Button>
+                    )}
                   </li>
                 ))}
               </ul>

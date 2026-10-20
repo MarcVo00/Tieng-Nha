@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSettings, voiceRateOf } from "@/app/appState";
+import { useHeroLook } from "@/app/useHeroLook";
 import { useServices } from "@/app/ServicesProvider";
 import { OfflineError } from "@/domain/errors";
 import type { Capabilities, Exercise, VocabId, VocabItem } from "@/domain/types";
@@ -55,6 +56,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
   const { id = "" } = useParams();
   const { content, duels, tts, stt, recorder } = useServices();
   const { settings, updateSettings } = useSettings();
+  const heroLook = useHeroLook();
   const navigate = useNavigate();
 
   const hasStt = useRef(settings.capabilities?.stt ?? false); // fixed for the run
@@ -377,17 +379,17 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
       <FocusHeader onClose={() => setQuitting(true)} closeLabel={fr.duels.run.quit.aria} />
 
       {waitingIntro ? (
-        <motion.div
-          className="px-5 pt-10 text-center"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0, transition: { duration: duration.base, ease: ease.out } }}
-        >
-          <p className="text-caption text-ink-muted">{fr.duels.run.round2}</p>
-          <h1 className="pt-2 text-title text-ink">{fr.duels.run.round2Intro.title}</h1>
-          <p className="mx-auto max-w-xs pt-3 text-body text-ink-muted">{fr.duels.run.round2Intro.body}</p>
-          <div className="pt-8">
-            <Button onClick={() => setIntroDone(true)}>{fr.duels.run.round2Intro.start}</Button>
-          </div>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { duration: duration.base, ease: ease.out } }}>
+          <EmptyState
+            title={fr.duels.run.round2Intro.title}
+            body={fr.duels.run.round2Intro.body}
+            scene={{ look: heroLook, line: fr.duels.run.round2Intro.line, overline: fr.duels.run.round2, heading: "h1" }}
+            action={
+              <Button size="lg" onClick={() => setIntroDone(true)}>
+                {fr.duels.run.round2Intro.start}
+              </Button>
+            }
+          />
         </motion.div>
       ) : (
         <div className="px-5 pt-2">

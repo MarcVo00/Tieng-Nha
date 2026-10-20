@@ -183,6 +183,8 @@ test("a profile shows its lesson count and boss victory", async () => {
   expect(await screen.findByRole("heading", { level: 1, name: "Xuân" })).toBeInTheDocument();
   expect(await screen.findByText(fr.publicProfile.bossWon("Thủy Tinh", 4, 5))).toBeInTheDocument();
   expect(screen.getByText(fr.publicProfile.lessonsSummary(2))).toBeInTheDocument();
+  expect(screen.queryAllByText(fr.ui.badge.locked, { exact: false })).toHaveLength(0);
+  await userEvent.click(screen.getByRole("button", { expanded: false, name: /à découvrir/ }));
   expect(screen.getAllByText(fr.ui.badge.locked, { exact: false }).length).toBeGreaterThan(0);
 });
 

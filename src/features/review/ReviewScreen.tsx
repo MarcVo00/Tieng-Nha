@@ -5,6 +5,7 @@ import { useServices } from "@/app/ServicesProvider";
 import type { LeitnerBox, VocabProgress } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { addDaysIso, daysBetween, parisDay } from "@/services/time";
+import { useHeroLook } from "@/app/useHeroLook";
 import { Button, Card, EmptyState, Skeleton, duration, ease } from "@/ui";
 
 const BOXES: readonly LeitnerBox[] = [1, 2, 3, 4, 5];
@@ -18,6 +19,7 @@ export function ReviewScreen() {
   const { progress, clock } = useServices();
   const navigate = useNavigate();
   const reduced = useReducedMotion();
+  const heroLook = useHeroLook();
   const [load, setLoad] = useState<Load>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
 
@@ -68,7 +70,7 @@ export function ReviewScreen() {
       <EmptyState
         title={first ? fr.review.empty.title : fr.review.empty.none}
         {...(first ? { body: fr.review.empty.next(days) } : {})}
-        illustration="lantern"
+        scene={{ look: heroLook, line: first ? fr.review.empty.line : fr.review.empty.lineNone }}
       />
     );
   }

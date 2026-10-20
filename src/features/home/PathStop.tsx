@@ -12,9 +12,9 @@ const SHAKE = [0, -6, 6, -4, 4, 0];
 /** 1 to 3 gold stars under a completed lesson (3 = perfect); the missing ones stay as faint outlines. */
 function Stars({ count }: { count: number }) {
   return (
-    <span aria-hidden="true" data-stars={count} className="absolute left-1/2 top-full mt-1 flex -translate-x-1/2 gap-0.5">
+    <span aria-hidden="true" data-stars={count} className="absolute left-1/2 top-full mt-1 flex -translate-x-1/2 gap-0.5 rounded-full bg-bg px-1.5 py-0.5">
       {[1, 2, 3].map((n) => (
-        <Icon key={n} name="star" size={14} className={n <= count ? "text-gold" : "text-line"} {...(n <= count ? { fill: "currentColor" } : {})} />
+        <Icon key={n} name="star" size={14} className={n <= count ? "text-gold" : "text-ink-muted opacity-50"} {...(n <= count ? { fill: "currentColor" } : {})} />
       ))}
     </span>
   );

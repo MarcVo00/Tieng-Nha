@@ -58,3 +58,39 @@ test("DropNumber renders its text and re-renders with the new value", () => {
   expect(screen.getByText("80 xu").style.opacity).toBe("0"); // drop-in starts invisible, above its resting place
   expect(screen.queryByText("120 xu")).toBeNull();
 });
+
+test("RareShowcase: lacquer surface, first card featured, Vietnamese seal hidden from assistive tech", async () => {
+  const { RareShowcase } = await import("@/ui");
+  const entry = (id: string, name: string) => ({ id, look: {}, name, desc: "d", owned: false, status: <span>60 xu</span>, disabled: false, onOpen: () => undefined });
+  const { container } = render(<RareShowcase entries={[entry("a", "Couronne"), entry("b", "Armure")]} />);
+  const cards = container.querySelectorAll("li[data-theme='dark']");
+  expect(cards).toHaveLength(2);
+  expect(cards[0]).toHaveAttribute("data-rare", "featured");
+  expect(cards[1]).toHaveAttribute("data-rare", "row");
+  const seal = container.querySelector("li span[lang='vi']");
+  expect(seal).toHaveTextContent("Hiếm");
+  expect(seal).toHaveAttribute("aria-hidden", "true");
+  expect(screen.getByRole("button", { name: /Essayer Couronne/ })).toBeEnabled();
+});
+
+test("EmptyState scene shows the hero, a Vietnamese line and full-width actions", async () => {
+  const { EmptyState } = await import("@/ui");
+  const { container } = render(<EmptyState title="Plus de vies" scene={{ look: {}, line: "Cố lên!", expression: "hurt", heading: "h1" }} action={<Button>Réessayer</Button>} />);
+  expect(screen.getByRole("heading", { level: 1, name: "Plus de vies" })).toBeInTheDocument();
+  expect(screen.getByText("Cố lên!")).toHaveAttribute("lang", "vi");
+  expect(container.querySelector("[data-expression='hurt']")).not.toBeNull();
+  expect(screen.getByRole("button", { name: "Réessayer" })).toBeInTheDocument();
+});
+
+test("BadgeShelf folds the locked badges behind a real disclosure button", async () => {
+  const { BadgeShelf } = await import("@/ui");
+  const { default: userEvent } = await import("@testing-library/user-event");
+  const badges = [{ id: "a", icon: "☕", title: "Un" }, { id: "b", icon: "☕", title: "Deux" }, { id: "c", icon: "☕", title: "Trois" }];
+  render(<BadgeShelf badges={badges} unlocked={new Set(["a"])} />);
+  expect(screen.queryByText("Deux")).toBeNull();
+  const more = screen.getByRole("button", { name: "2 badges à découvrir" });
+  expect(more).toHaveAttribute("aria-expanded", "false");
+  await userEvent.click(more);
+  expect(more).toHaveAttribute("aria-expanded", "true");
+  expect(screen.getByText("Deux", { exact: false })).toBeInTheDocument();
+});

@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { fr } from "@/i18n/fr";
-import { Icon } from "@/ui/icons";
 import { spring } from "@/ui/motion";
 
 type BadgeMedalProps = {
@@ -20,19 +19,21 @@ export function BadgeMedal({ icon, title, unlocked, size = "sm", reward }: Badge
         initial={unlocked ? { scale: 0 } : false}
         animate={{ scale: 1 }}
         transition={spring.bouncy}
-        className={`relative flex items-center justify-center rounded-full border-4 leading-none ${dim} ${unlocked ? "border-gold bg-surface shadow-card" : "border-line bg-surface-2"}`}
+        className={`relative flex items-center justify-center rounded-full leading-none ${dim} ${unlocked ? "border-4 border-gold bg-surface shadow-card" : "border-2 border-dashed border-gold bg-transparent"}`}
       >
         {unlocked ? (
-          <span aria-hidden="true">{icon}</span>
-        ) : (
           <>
-            <span aria-hidden="true" className="opacity-30 grayscale">
-              {icon}
-            </span>
-            <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-surface text-ink-muted shadow-card">
-              <Icon name="lock" size={14} />
-            </span>
+            <span aria-hidden="true">{icon}</span>
+            {/* Ribbon tails under the medal. */}
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 12" width={24} height={12} className="absolute -bottom-2.5 left-1/2 -z-10 -translate-x-1/2 fill-primary">
+              <path d="M2 0h8v12l-4-3-4 3ZM14 0h8v12l-4-3-4 3Z" />
+            </svg>
           </>
+        ) : (
+          // An empty inlay in the lacquer: a faint silhouette of the badge, kept static.
+          <span aria-hidden="true" className="opacity-20 grayscale">
+            {icon}
+          </span>
         )}
       </motion.div>
       <figcaption className={`max-w-24 text-center text-caption ${unlocked ? "text-ink" : "text-ink-muted"}`}>

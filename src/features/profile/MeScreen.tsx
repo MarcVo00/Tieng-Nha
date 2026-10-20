@@ -13,7 +13,7 @@ import { bossMention, livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS } from "@/services/exam";
 import { fr } from "@/i18n/fr";
 import {
-  Avatar, fxSpill, BadgeMedal, Button, Card, Certificate, ConfirmDialog, DropNumber, Icon, SectionTitle, Sheet, StreakFlame, downloadCertificate, tap, useToast,
+  Avatar, fxSpill, BadgeMedal, BadgeShelf, Button, Card, Certificate, ConfirmDialog, DropNumber, Icon, SectionTitle, Sheet, StreakFlame, downloadCertificate, tap, useToast,
   type CertificateProps,
 } from "@/ui";
 import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
@@ -301,15 +301,7 @@ export function MeScreen() {
           {badges ? <span className="tabular text-caption text-ink-muted">{fr.profile.badges.count(sortedBadges.filter((b) => unlockedIds.has(b.id)).length, sortedBadges.length)}</span> : null}
         </div>
         {badgesFailed ? <p className="mt-3 text-body text-ink-muted">{fr.profile.badges.loadError}</p> : null}
-        <ul className="mt-3 grid list-none grid-cols-3 gap-4">
-          {sortedBadges.map((b) => (
-            <li key={b.id} className="flex justify-center">
-              <motion.button type="button" whileTap={tap} onClick={() => setBadge(b)} className="min-h-11 rounded-md p-1">
-                <BadgeMedal icon={b.icon} title={b.title} unlocked={unlockedIds.has(b.id)} />
-              </motion.button>
-            </li>
-          ))}
-        </ul>
+        {badges ? <BadgeShelf badges={sortedBadges} unlocked={unlockedIds} onSelect={(b) => setBadge(sortedBadges.find((x) => x.id === b.id) ?? null)} /> : null}
       </section>
 
       <WardrobeSection />

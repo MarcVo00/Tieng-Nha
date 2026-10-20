@@ -10,7 +10,7 @@ import { FINAL_BOSS_ID } from "@/services/tree";
 import { livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS } from "@/services/exam";
 import { fr } from "@/i18n/fr";
-import { Avatar, fxSpill, BadgeMedal, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
+import { Avatar, fxSpill, BadgeShelf, SectionTitle, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
 
 // Hero: avatar + pseudo, with the XP number beside it. The ten lesson dots are the quiet story of progress.
 
@@ -183,14 +183,8 @@ export function PublicProfileScreen() {
       </section>
 
       <section className="mt-8" aria-labelledby="pp-badges">
-        <h2 id="pp-badges" className="text-heading text-ink">{fr.publicProfile.badgesTitle}</h2>
-        <ul className="mt-3 grid list-none grid-cols-3 gap-4">
-          {badges.map((b) => (
-            <li key={b.id} className="flex justify-center">
-              <BadgeMedal icon={b.icon} title={b.title} unlocked={unlocked.has(b.id)} />
-            </li>
-          ))}
-        </ul>
+        <SectionTitle id="pp-badges" overline={fr.ui.overline.badges}>{fr.publicProfile.badgesTitle}</SectionTitle>
+        <BadgeShelf badges={badges} unlocked={unlocked} none={fr.publicProfile.noBadges} />
       </section>
 
       <Card className="mt-8 p-4">

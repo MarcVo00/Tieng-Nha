@@ -59,17 +59,21 @@ export function WardrobeSection() {
         return (
           <div key={slot} className="flex flex-col gap-2">
             <h3 className="text-body-strong text-ink-muted">{fr.wardrobe.slots[slot]}</h3>
-            <ul className="grid list-none grid-cols-2 gap-3">
+            <ul className={`grid list-none gap-3 ${inSlot.length + (slot === "character" ? 1 : 0) > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
               {slot === "character" ? (
                 <Card as="li" className="flex flex-col items-center gap-2 p-4 text-center">
                   <HeroMedallion look={starterLook} size={96} />
                   <h4 id="wardrobe-starter" className="text-body-strong text-ink">
                     {fr.shop.characters.starter}
                   </h4>
-                  <p className={`text-caption text-gold-ink ${wallet.equipped.character === undefined ? "" : "invisible"}`}>{fr.rewards.equipped}</p>
-                  <Button variant="secondary" fullWidth disabled={busy || wallet.equipped.character === undefined} aria-describedby="wardrobe-starter" onClick={() => void toggle("hero", "character", true, fr.wardrobe.starterToast)}>
-                    {fr.shop.tryOn.equip}
-                  </Button>
+                  {wallet.equipped.character === undefined ? (
+                    // Already worn: the status alone, never beside a disabled « Équiper ».
+                    <p className="mt-auto text-body-strong text-gold-ink">{fr.rewards.equipped}</p>
+                  ) : (
+                    <Button variant="secondary" fullWidth disabled={busy} aria-describedby="wardrobe-starter" className="mt-auto" onClick={() => void toggle("hero", "character", true, fr.wardrobe.starterToast)}>
+                      {fr.shop.tryOn.equip}
+                    </Button>
+                  )}
                 </Card>
               ) : null}
               {inSlot.map((item) => {
@@ -82,11 +86,15 @@ export function WardrobeSection() {
                     <h4 id={`wardrobe-${item.id}`} className="text-body-strong text-ink">
                       {text.name}
                     </h4>
-                    <p className={`text-caption text-gold-ink ${on ? "" : "invisible"}`}>{fr.rewards.equipped}</p>
-                    {on && slot === "character" ? null : (
-                      <Button variant="secondary" fullWidth disabled={busy} aria-describedby={`wardrobe-${item.id}`} onClick={() => void toggle(item.id, slot, on)}>
-                        {on ? fr.shop.tryOn.unequip : fr.shop.tryOn.equip}
-                      </Button>
+                    {on && slot === "character" ? (
+                      <p className="mt-auto text-body-strong text-gold-ink">{fr.rewards.equipped}</p>
+                    ) : (
+                      <>
+                        <p className={`mt-auto text-caption text-gold-ink ${on ? "" : "invisible"}`}>{fr.rewards.equipped}</p>
+                        <Button variant="secondary" fullWidth disabled={busy} aria-describedby={`wardrobe-${item.id}`} onClick={() => void toggle(item.id, slot, on)}>
+                          {on ? fr.shop.tryOn.unequip : fr.shop.tryOn.equip}
+                        </Button>
+                      </>
                     )}
                   </Card>
                 );

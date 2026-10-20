@@ -7,7 +7,7 @@ import type { EnergyState, ShopItem, Wallet } from "@/domain/types";
 import { useEquipToggle } from "@/app/useEquipToggle";
 import { characterSlotOf, lookOf } from "@/services/look";
 import { fr } from "@/i18n/fr";
-import { Button, Card, ConfirmDialog, DropNumber, EmptyState, HeroMedallion, Icon, SectionTitle, Skeleton, tap, TryOnSheet, useToast } from "@/ui";
+import { BalanceLine, Button, Card, ConfirmDialog, EmptyState, HeroMedallion, Icon, RareShowcase, SectionTitle, Skeleton, tap, TryOnSheet, useToast, type RareEntry } from "@/ui";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
@@ -206,19 +206,41 @@ export function ShopScreen() {
     );
   }
 
+  // Themed pieces are the rare ones: shown on the lacquer showcase, the first one large.
+  function rareEntries(list: ShopItem[], w: Wallet): RareEntry[] {
+    const out: RareEntry[] = [];
+    for (const item of list) {
+      const text = fr.shop.items[item.id];
+      const slot = characterSlotOf(item);
+      if (!text || slot === null) continue;
+      const owned = w.inventory.includes(item.id);
+      const on = w.equipped[slot] === item.id;
+      out.push({
+        id: item.id,
+        look: { ...baseLook, [slot]: item.id },
+        name: text.name,
+        desc: text.desc,
+        owned,
+        disabled: busy,
+        onOpen: () => tryOn(item),
+        status: owned ? (
+          <span className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</span>
+        ) : (
+          <span className="tabular inline-flex items-center gap-1 text-caption text-gold-ink">
+            <Icon name="coin" size={16} className="text-gold" />
+            {fr.shop.balance(item.price ?? 0)}
+          </span>
+        ),
+      });
+    }
+    return out;
+  }
+
   return (
     <div className="flex flex-col gap-8 pb-8">
       <h1 className="sr-only">{fr.shop.title}</h1>
 
-      <Card raised className="flex items-center gap-4 p-6">
-        <Icon name="coin" size={48} className="shrink-0 text-gold" />
-        <div>
-          <p className="tabular text-display text-gold-ink">
-            <DropNumber>{wallet ? fr.shop.balance(wallet.coins) : "…"}</DropNumber>
-          </p>
-          <p className="text-caption text-ink-muted">{fr.shop.balanceCaption}</p>
-        </div>
-      </Card>
+      <BalanceLine icon="coin" value={wallet ? fr.shop.balance(wallet.coins) : "…"} caption={fr.shop.balanceCaption} />
 
       {failed || walletFailed ? (
         <EmptyState
@@ -246,7 +268,7 @@ export function ShopScreen() {
           {themes.map((t) => (
             <section key={t.id} aria-labelledby={`shop-theme-${t.id}`} className="flex flex-col gap-3">
               <SectionTitle id={`shop-theme-${t.id}`}>{fr.shop.themes[t.id]}</SectionTitle>
-              <ul className="grid list-none grid-cols-2 gap-3">{t.items.map((i) => themedCard(i, wallet))}</ul>
+              <RareShowcase entries={rareEntries(t.items, wallet)} />
             </section>
           ))}
           <p className="text-caption text-ink-muted">

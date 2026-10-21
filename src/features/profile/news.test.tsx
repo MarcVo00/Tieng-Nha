@@ -87,6 +87,17 @@ describe("changelog content", () => {
     );
   });
 
+  test("French typography: a plain or no-break space before ? ! : ; is refused, U+202F is accepted", () => {
+    const base = changelog.entries[0]!;
+    const withItem = (item: string) => ChangelogFileSchema.safeParse({ contentVersion: 1, entries: [{ ...base, items: [item] }] }).success;
+    expect(withItem("Deux manches : un QCM")).toBe(false);
+    expect(withItem("Deux manches : un QCM")).toBe(false);
+    expect(withItem("Quoi ?")).toBe(false);
+    expect(withItem("Deux manches : un QCM")).toBe(true);
+    expect(ChangelogFileSchema.safeParse({ contentVersion: 1, entries: [{ ...base, title: "Titre !" }] }).success).toBe(false);
+    for (const e of changelog.entries) for (const t of [e.title, ...e.items]) expect(t).not.toMatch(/[ \u00a0][?!:;]/);
+  });
+
   test("1.10.0 is newer than 1.9.0 (numeric, not alphabetical)", () => {
     const base = changelog.entries[0]!;
     const ok = ChangelogFileSchema.safeParse({

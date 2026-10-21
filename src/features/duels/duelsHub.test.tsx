@@ -491,4 +491,25 @@ describe("Arène tab badge", () => {
     expect(tab).toHaveAttribute("href", "/leaderboard");
     expect(tab).toHaveAttribute("aria-current", "page");
   });
+  test("the layout fetches the pending duels once for the tab badge and the segments", async () => {
+    const services = makeServices();
+    await unlock(services);
+    gateway(services).seedIncoming(QUESTIONS, { from: "bot_ba_ngoai" });
+    const list = vi.spyOn(services.duels, "list");
+    render(
+      <ServicesProvider services={services}>
+        <MemoryRouter initialEntries={["/leaderboard"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route element={<TabLayout />}>
+              <Route path="/leaderboard" element={<LeaderboardScreen />} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </ServicesProvider>,
+    );
+    const segment = await screen.findByRole("link", { name: new RegExp(`^${fr.app.arenaNav.duels}.*${fr.duels.entry.pending(1)}`) });
+    expect(segment).toBeInTheDocument();
+    await screen.findByRole("link", { name: new RegExp(`Arène.*${fr.duels.entry.pending(1)}`) });
+    expect(list).toHaveBeenCalledTimes(1);
+  });
 });

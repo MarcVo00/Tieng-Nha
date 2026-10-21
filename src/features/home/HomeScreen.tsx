@@ -11,7 +11,7 @@ import { lookOf } from "@/services/look";
 import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
 import { PathStop } from "@/features/home/PathStop";
 import { HeroToken } from "@/features/home/HeroToken";
-import { buildPathLayout, PATH_WIDTH, type PathLayout } from "@/features/home/pathLayout";
+import { buildPathLayout, PATH_MARGIN, PATH_WIDTH, type PathLayout } from "@/features/home/pathLayout";
 
 // Hero: the winding path with the next stop pulsing. One primary action: the next stop.
 // Secondary: the review card on top. Loading: skeleton stops. Error: retry.
@@ -58,7 +58,7 @@ function heroLabel(layout: PathLayout): string {
 
 function SkeletonStops() {
   return (
-    <div className="mx-auto flex flex-col gap-10 py-6" style={{ width: PATH_WIDTH }} aria-hidden="true">
+    <div className="flex flex-col gap-10 py-6" style={{ width: PATH_WIDTH, marginInline: PATH_MARGIN }} aria-hidden="true">
       {[-40, 0, 40].map((offset) => (
         <div key={offset} className="flex items-center gap-4" style={{ transform: `translateX(${offset}px)` }}>
           <div className="h-16 w-16 shrink-0 rounded-full bg-surface-2" />
@@ -147,7 +147,7 @@ export function HomeScreen() {
         {layout === null ? (
           <SkeletonStops />
         ) : (
-          <div className="relative mx-auto" style={{ width: PATH_WIDTH, height: layout.height }}>
+          <div className="relative" style={{ width: PATH_WIDTH, height: layout.height, marginInline: PATH_MARGIN }}>
             <svg className="absolute inset-0 text-line" width={PATH_WIDTH} height={layout.height} viewBox={`0 0 ${PATH_WIDTH} ${layout.height}`} fill="none" aria-hidden="true" focusable="false">
               <defs>
                 <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width={PATH_WIDTH} height={layout.height}>

@@ -2,6 +2,14 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "1.5.2",
+      "date": "2026-10-21",
+      "title": "Petits écrans",
+      "items": [
+        "L'appli ne déborde plus sur les téléphones étroits."
+      ]
+    },
+    {
       "version": "1.5.1",
       "date": "2026-10-21",
       "title": "Chrono de l'énergie",

@@ -17,7 +17,7 @@ const DROP = "M6 1 C6 1 1 7.5 1 10.5 A5 5 0 0 0 11 10.5 C11 7.5 6 1 6 1 Z";
 
 function Drop({ filled }: { filled: boolean }) {
   return (
-    <svg viewBox="0 0 12 16" width={12} height={16} aria-hidden="true" className="block overflow-visible">
+    <svg viewBox="0 0 12 16" width={12} height={16} aria-hidden="true" className="block h-full w-full overflow-visible">
       <path d={DROP} fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.5} strokeLinejoin="round" />
       {/* A small paper wave inside the drop: Thủy Tinh's signature. */}
       {filled ? <path d="M3.4 11 c1-1 1.8-1 2.6 0 s1.6 1 2.6 0" fill="none" stroke="var(--color-paper)" strokeWidth={1.2} strokeLinecap="round" /> : null}
@@ -37,7 +37,7 @@ export function WaterDropHp({ value, max, label, decorative = false, reduced: re
   return (
     <span {...a11y} className="inline-flex items-center gap-0.5">
       {Array.from({ length: max }, (_, i) => (
-        <span key={i} data-drop={i < value ? "full" : "empty"} className="relative block h-4 w-3 text-line">
+        <span key={i} data-drop={i < value ? "full" : "empty"} className="relative block h-4 w-2.5 text-line min-[360px]:w-3">
           <Drop filled={false} />
           <AnimatePresence initial={false}>
             {i < value ? (

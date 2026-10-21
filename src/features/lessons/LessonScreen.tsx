@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
-import { useCountdown } from "@/app/useCountdown";
+import { useResumeAtZero } from "@/app/useCountdown";
 import { useHeroLook } from "@/app/useHeroLook";
 import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
@@ -20,7 +20,7 @@ export function LessonScreen() {
   const { tts, stt, recorder, reporter } = useServices();
   const { settings, updateSettings } = useSettings();
   const run = useLessonRun(id);
-  const remaining = useCountdown(run.load.status === "no-energy" ? run.load.nextAt : null);
+  const remaining = useResumeAtZero(run.load.status === "no-energy" ? run.load.nextAt : null, run.reload);
   const dueCount = useAppState((s) => s.dueCount);
   const heroLook = useHeroLook();
   const [quitting, setQuitting] = useState(false);

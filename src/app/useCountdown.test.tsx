@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { createFakeServices } from "@/adapters/fakes";
 import { ServicesProvider } from "@/app/ServicesProvider";
-import { useCountdown } from "@/app/useCountdown";
+import { useCountdown, useResumeAtZero } from "@/app/useCountdown";
 
 const START = Date.parse("2026-10-21T10:00:00.000Z");
 const TARGET = new Date(START + 10_000).toISOString();
@@ -58,4 +58,37 @@ test("clears its interval on unmount", () => {
   expect(vi.getTimerCount()).toBe(1);
   unmount();
   expect(vi.getTimerCount()).toBe(0);
+});
+
+test("stops its interval once the target is reached", () => {
+  const { result } = renderHook(() => useCountdown(TARGET), { wrapper });
+  act(() => void vi.advanceTimersByTime(10_000));
+  expect(result.current).toBe(0);
+  expect(vi.getTimerCount()).toBe(0);
+});
+
+test("useResumeAtZero resumes exactly once when the countdown ends, then stays quiet", async () => {
+  const resume = vi.fn();
+  const { result } = renderHook(() => useResumeAtZero(TARGET, resume), { wrapper });
+  act(() => void vi.advanceTimersByTime(9000));
+  expect(resume).not.toHaveBeenCalled();
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(1000);
+  });
+  expect(result.current).toBe(0);
+  expect(resume).toHaveBeenCalledTimes(1);
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(5000);
+  });
+  expect(resume).toHaveBeenCalledTimes(1);
+  expect(vi.getTimerCount()).toBe(0);
+});
+
+test("useResumeAtZero does nothing without a target", async () => {
+  const resume = vi.fn();
+  renderHook(() => useResumeAtZero(null, resume), { wrapper });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(5000);
+  });
+  expect(resume).not.toHaveBeenCalled();
 });

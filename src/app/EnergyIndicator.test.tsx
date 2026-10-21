@@ -71,3 +71,9 @@ test("one point short of full shows no second line", async () => {
   expect(dialog).toHaveTextContent(fr.energy.nextIn("02:14:00"));
   expect(dialog).not.toHaveTextContent(fr.energy.fullIn("02:14:00"));
 });
+
+test("the accessible name says « moins d'une minute » instead of 0 min", () => {
+  expect(fr.energy.labelWithWait(3, 5, 0, 0)).toContain("dans moins d'une minute");
+  expect(fr.energy.labelWithWait(3, 5, 0, 1)).toContain("dans 1 min");
+  expect(fr.energy.labelWithWait(3, 5, 2, 0)).toContain("dans 2 h 0 min");
+});

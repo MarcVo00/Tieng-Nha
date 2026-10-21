@@ -8,7 +8,7 @@ export const fr = {
     full: "Énergie au maximum",
     next: (h: number, m: number) => `+1 ⚡ dans ${h > 0 ? `${h} h ` : ""}${m} min`,
     /** Minute-precision phrase for the header button, so screen readers are not told the time every second. */
-    labelWithWait: (n: number, max: number, h: number, m: number) => `Énergie\u202f: ${n} sur ${max}, +1 ⚡ dans ${h > 0 ? `${h} h ` : ""}${m} min`,
+    labelWithWait: (n: number, max: number, h: number, m: number) => `Énergie\u202f: ${n} sur ${max}, +1 ⚡ dans ${h === 0 && m === 0 ? "moins d'une minute" : `${h > 0 ? `${h} h ` : ""}${m} min`}`,
     nextIn: (countdown: string) => `+1 ⚡ dans ${countdown}`,
     fullIn: (countdown: string) => `Énergie pleine dans ${countdown}`,
     review: "Réviser (+1 ⚡)",

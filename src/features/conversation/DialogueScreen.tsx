@@ -7,7 +7,7 @@ import { formatCountdown } from "@/services/energy";
 import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bubble";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
-import { useCountdown } from "@/app/useCountdown";
+import { useResumeAtZero } from "@/app/useCountdown";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
 import { BadgeMedal, rewardProp, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
@@ -110,7 +110,7 @@ export function DialogueScreen() {
   const dueCount = useAppState((s) => s.dueCount);
   const reduced = useReducedMotion();
   const d = useDialogue(id);
-  const remaining = useCountdown(d.noEnergy?.nextAt ?? null);
+  const remaining = useResumeAtZero(d.noEnergy?.nextAt ?? null, d.reload);
   const [quitting, setQuitting] = useState(false);
   const [reportRef, setReportRef] = useState<string | null>(null);
   const endRef = useRef<HTMLLIElement>(null);

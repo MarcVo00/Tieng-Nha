@@ -6,6 +6,7 @@ import { THEME_KEY } from "@/domain/storageKeys";
 import { OfflineError } from "@/domain/errors";
 import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useUnseenNews } from "@/app/useNews";
 import type { BadgeDef, Boss } from "@/domain/types";
 import { lookOf } from "@/services/look";
 import { FINAL_BOSS_ID } from "@/services/tree";
@@ -98,6 +99,7 @@ function BadgeSheet({ badge, unlocked, onClose }: { badge: BadgeDef | null; unlo
 export function MeScreen() {
   const { auth, progress, content, sync, outbox } = useServices();
   const navigate = useNavigate();
+  const unseenNews = useUnseenNews();
   const toast = useToast();
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
@@ -279,6 +281,24 @@ export function MeScreen() {
           {fr.arena.meEntry}
         </span>
         {kimBai !== null ? <DropNumber className="tabular text-gold-ink">{fr.arena.balance(kimBai)}</DropNumber> : null}
+      </Link>
+
+      <Link
+        to="/news"
+        className="flex min-h-11 items-center justify-between gap-3 rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
+      >
+        <span className="flex items-center gap-2">
+          <Icon name="flag" size={24} className="text-ink-muted" />
+          {fr.news.meRow(__APP_VERSION__)}
+        </span>
+        {unseenNews ? (
+          <>
+            <span aria-hidden="true" data-testid="news-dot" className="h-2.5 w-2.5 rounded-full bg-primary" />
+            <span className="sr-only">{fr.news.unseen}</span>
+          </>
+        ) : (
+          <Icon name="chevron-right" size={20} className="text-ink-muted" />
+        )}
       </Link>
 
       <section aria-labelledby="me-badges">

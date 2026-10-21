@@ -7,6 +7,7 @@ import { fr } from "@/i18n/fr";
 import { useHeroLook } from "@/app/useHeroLook";
 import { InAppBrowserNotice } from "@/features/onboarding";
 import { useServices } from "@/app/ServicesProvider";
+import { useUnseenNews } from "@/app/useNews";
 import { usePendingDuels } from "@/app/usePendingDuels";
 import { Avatar, PageTransition, StreakFlame, TabBar, XpCounter } from "@/ui";
 
@@ -21,6 +22,7 @@ export function TabLayout() {
   const dueCount = useAppState((s) => s.dueCount);
   // Re-read on every route change so the badge follows the duels I play or settle.
   const pendingDuels = usePendingDuels(pathname).length;
+  const unseenNews = useUnseenNews();
   const demo = useServices().env.VITE_DEMO;
 
   return (
@@ -62,7 +64,7 @@ export function TabLayout() {
             alsoActiveOn: ["/duels", "/arena", "/u"],
           },
           { to: "/shop", label: fr.app.tabs.shop, icon: "coin" },
-          { to: "/me", label: fr.app.tabs.me, icon: "user" },
+          { to: "/me", label: fr.app.tabs.me, icon: "user", dot: unseenNews, dotLabel: fr.news.unseen, alsoActiveOn: ["/news"] },
         ]}
       />
     </div>

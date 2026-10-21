@@ -831,6 +831,17 @@ export const fr = {
     starterToast: "Héros de départ choisi\u202f!",
     slots: { character: "Personnages", hat: "Chapeaux", outfit: "Tenues", accessory: "Accessoires", aura: "Auras" } as Record<string, string>,
   },
+  news: {
+    title: "Nouveautés",
+    back: "Retour au profil",
+    lead: "Ce qui a changé dans l'appli, version après version.",
+    listLabel: "Versions",
+    version: (v: string) => `Version ${v}`,
+    current: "Ta version",
+    meRow: (v: string) => `Nouveautés · v${v}`,
+    unseen: "Nouveau",
+    error: { title: "Les nouveautés n'ont pas pu s'ouvrir", body: "Rien de grave. Réessaie dans un instant." },
+  },
   profile: {
     title: "Mon profil",
     editAria: "Modifier mon profil",

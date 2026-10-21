@@ -3,6 +3,8 @@ import { EXAM_PASS } from "@/services/exam";
 import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
 
 export const PATH_WIDTH = 320;
+/** Centres the fixed-width path even when the screen is narrower than it (auto margins would push it off to the right). */
+export const PATH_MARGIN = `calc((100% - ${PATH_WIDTH}px) / 2)`;
 const MAIN_OFFSETS = [-40, 0, 40, 0] as const;
 const ROW_HEIGHT = { lesson: 136, dialogue: 92, exam: 168 } as const;
 const PAD = 24;

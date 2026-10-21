@@ -34,6 +34,7 @@ Tu es un sous-agent chargé d'**une seule tâche** du plan `docs/superpowers/pla
 - Tailwind : la palette par défaut est désactivée ; `bg-white`, `text-gray-500` n'existent pas → utiliser `bg-surface`, `text-ink-muted`.
 - Supabase : n'utilise que les fonctions RPC et tables décrites spec §5 ; jamais la clé `service_role` côté client.
 - Dexie v4 : schéma déclaré dans `adapters/dexie/db.ts` uniquement ; toute modification = nouvelle `version(n)`.
+- **Shell : le chemin du dépôt contient une espace (`…/IT Projects/VietLearn`).** Toujours mettre les chemins et variables entre guillemets (`mkdir -p "$S"`, jamais `mkdir -p $S`) : sinon la commande coupe le chemin en deux et agit sur `…/Downloads/IT` (incident du 2026-10-21 : un `rm -rf` non quoté a supprimé un dossier de l'utilisateur hors du dépôt). **Jamais de `rm -rf` sur un chemin hors du dépôt ou du dossier de travail `.superpowers/`**, et toujours `ls` la cible avant de supprimer. Préférer des chemins relatifs au dépôt.
 
 ## 5. Rapport de fin de tâche (format obligatoire)
 ```

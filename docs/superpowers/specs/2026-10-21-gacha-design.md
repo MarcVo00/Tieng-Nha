@@ -1,6 +1,6 @@
 # Gacha « Xin xăm » par thème — conception
 
-> Statut : **brouillon** (2026-10-21), à valider par Marc. Livraison visée : semaine du 26 octobre (avant l'anniversaire du 29 si possible, sinon juste après).
+> Statut : **validé** par Marc le 2026-10-21 (taux, garanties et prix acceptés ; panoplie complète : on continue de tirer, les doublons rendent des xu). Livraison visée : semaine du 26 octobre (avant l'anniversaire du 29 si possible, sinon juste après).
 > Les points marqués *(appel du concepteur)* sont des choix de Claude, à corriger librement.
 > Complète la [spec Héros et cosmétiques](2026-10-18-hero-cosmetics-design.md) et la [spec Duels et arène](2026-10-19-duels-arena-design.md).
 
@@ -44,7 +44,7 @@ Déroulé (style estampe Đông Hồ, uniquement `transform`/`opacity`, durées 
   - Le compteur avance **à chaque objet tiré** (un ×10 = 10). Dans un ×10, si les 9 premiers sont communs, le 10ᵉ est forcé au moins Rare.
   - **Légendaire garanti** au plus tard au **40ᵉ tirage** sans légendaire dans ce thème (compteur par joueur et par thème, remis à zéro à chaque légendaire, affiché : « Légendaire garanti dans 23 tirages »).
 - **Doublons** : convertis automatiquement en xu (table ci-dessus).
-- **Panoplie complète** *(appel du concepteur)* : quand tout le thème est possédé, la bannière affiche « Panoplie complète ! » et le tirage se désactive, pour ne pas dépenser pour rien.
+- **Panoplie complète** (décision de Marc) : le tirage reste possible ; comme tout est déjà possédé, chaque objet tiré est un doublon et rend des xu. La bannière affiche « Panoplie complète ! » et rappelle que les tirages ne donnent plus que des xu.
 
 - **Hasard et tests** *(appel du concepteur)* : le serveur tire avec `random()` ; les règles (taux, garanties, doublons) sont écrites pour recevoir une **liste de tirages** injectée, côté SQL comme côté TS, ce qui permet de tester exactement les mêmes cas des deux côtés (pas de reproduction de la même suite aléatoire).
 - **Animation = décor** : « Passer » et « Tout révéler » ne changent rien : les résultats sont fixés dès la réponse du serveur.
@@ -90,7 +90,7 @@ Le hasard est tiré **côté serveur** (pas de triche par le client) ; le tirage
 - Catalogue `shop_item` : ajout de `rarity` (`common|rare|epic|legendary|null`) ; les cosmétiques du xu-shop passent `price = null` (plus d'achat direct ; le test de parité suit). Nouvelle fonction `gacha_banner(theme)` : coût 1×/10×, taux, seuil de garantie.
 - Table `gacha_pulls` : `id`, `user_id`, `theme`, `count`, `cost`, `results jsonb` (`[{ itemId, rarity, duplicate, refund }]`), `created_at`, `claimed bool`.
 - `user_stats` : `gacha_pity jsonb` (compteur par thème).
-- RPC `gacha_pull(p_theme, p_count)` (security definer, `auth.uid()`, jamais de `raise` métier → `{ ok:false, error }`) : vérifie le solde **serveur** ≥ coût, tire selon les taux + garanties, débite, crédite les doublons, ajoute les nouveaux objets à l'inventaire, enregistre le tirage, renvoie les résultats. Refus : `not_enough`, `unknown_theme`, `complete`, `bad_count`.
+- RPC `gacha_pull(p_theme, p_count)` (security definer, `auth.uid()`, jamais de `raise` métier → `{ ok:false, error }`) : vérifie le solde **serveur** ≥ coût, tire selon les taux + garanties, débite, crédite les doublons, ajoute les nouveaux objets à l'inventaire, enregistre le tirage, renvoie les résultats. Refus : `not_enough`, `unknown_theme`, `bad_count`.
 - **Journal d'événements (ADR 0004)** : comme pour les duels, l'appli ajoute ensuite un événement **`gacha_pulled`** (`refId` = id du tirage, `payload` = coût, objets, remboursements) pour que son portefeuille local reflète le tirage ; le serveur l'ignore (déjà appliqué) sauf pour marquer `claimed`. Un tirage n'est **compté qu'une fois** côté appli (par `refId`).
 - **Reprise après coupure** *(appel du concepteur)* : l'appli génère un identifiant de tirage (`pullId`, uuid) et l'envoie à `gacha_pull` ; la RPC est **idempotente** sur cet id (un second appel renvoie les mêmes résultats sans re-débiter). Au démarrage et au retour du réseau, l'appli liste les tirages **non encaissés** (`list_gacha_pulls()` → ceux où `claimed = false`), ajoute leurs événements `gacha_pulled` et affiche un récapitulatif « Tirage récupéré ». Aucun xu n'est jamais perdu.
 - **Serveur autoritaire** : `gacha_pull` écrit directement `coins`, `inventory` et `gacha_pity` dans `user_stats` (comme les achats en Kim bài) ; le trigger `apply_event` ne fait, pour `gacha_pulled`, que passer `claimed` à vrai (jamais de double application). Le portefeuille de l'appli rejoue `gacha_pulled` : −coût, +remboursements, +objets nouveaux.
@@ -106,14 +106,14 @@ Le hasard est tiré **côté serveur** (pas de triche par le client) ; le tirage
 
 ## 9. Tests et Definition of Done
 
-- pgTAP : taux (distribution sur N tirages avec graine), garanties (×10 rare+, légendaire au 40ᵉ), doublons → xu, `complete`, `not_enough`, inventaire, RLS.
+- pgTAP : taux (distribution sur N tirages avec graine), garanties (×10 rare+, légendaire au 40ᵉ), doublons → xu, panoplie complète (tout en xu), `not_enough`, inventaire, RLS.
 - Unitaires : règles, portefeuille (`gacha_pulled` une seule fois), écrans (mouvement réduit, Passer, ×10 Tout révéler).
 - e2e (faux) : tirer ×1 puis ×10, voir les révélations, l'objet nouveau dans la penderie, le solde.
 - Dessins : planche des 6 nouveaux objets sur les 3 personnages ; bâtonnets/tube/autel lisibles en clair/sombre.
 - Perf : trace 4× CPU sans tâche longue pendant l'animation.
 
-## 10. Questions ouvertes pour Marc
+## 10. Décisions de Marc (2026-10-21)
 
-1. Les **taux** (60/28/10/2) et la **garantie** (légendaire au 40ᵉ) te conviennent ?
-2. Les **prix** (40 xu / 360 xu les 10) ?
-3. Quand la panoplie est **complète** : bouton désactivé (proposé) ou tirages qui ne donnent que des xu ?
+- Taux 60/28/10/2, légendaire garanti au 40ᵉ tirage, au moins un rare par ×10 : validés.
+- Prix 40 xu / 360 xu les dix : validés.
+- Panoplie complète : on peut continuer à tirer ; les doublons rendent des xu.

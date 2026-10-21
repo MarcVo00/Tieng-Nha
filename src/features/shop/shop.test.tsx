@@ -108,7 +108,7 @@ test("recharges the energy from the header sheet", async () => {
   await winExams(services, 1);
   await services.activity.startSession("boss", "boss_thuy_tinh"); // 5 -> 2
   const user = setup(services, <EnergyIndicator />);
-  await user.click(await screen.findByRole("button", { name: fr.energy.label(2, 5) }));
+  await user.click(await screen.findByRole("button", { name: fr.energy.labelWithWait(2, 5, 3, 0) }));
   await user.click(await screen.findByRole("button", { name: fr.shop.refill(30) }));
   const dialog = await screen.findByRole("alertdialog");
   await user.click(within(dialog).getByRole("button", { name: fr.shop.confirm.confirm }));
@@ -121,7 +121,7 @@ test("the refill confirmation is the only modal: Tab cycles its two buttons and 
   await winExams(services, 1);
   await services.activity.startSession("boss", "boss_thuy_tinh");
   const user = setup(services, <EnergyIndicator />);
-  await user.click(await screen.findByRole("button", { name: fr.energy.label(2, 5) }));
+  await user.click(await screen.findByRole("button", { name: fr.energy.labelWithWait(2, 5, 3, 0) }));
   await user.click(await screen.findByRole("button", { name: fr.shop.refill(30) }));
   const dialog = await screen.findByRole("alertdialog");
   await waitFor(() => expect(screen.queryByRole("dialog", { name: fr.energy.title })).toBeNull());
@@ -137,14 +137,14 @@ test("the refill confirmation is the only modal: Tab cycles its two buttons and 
   await user.keyboard("{Escape}");
   await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
   expect(useAppState.getState().energy?.current).toBe(2);
-  expect(screen.getByRole("button", { name: fr.energy.label(2, 5) })).toHaveFocus();
+  expect(screen.getByRole("button", { name: fr.energy.labelWithWait(2, 5, 3, 0) })).toHaveFocus();
 });
 
 test("hides the sheet refill when the player is too poor", async () => {
   const services = createFakeServices({ clock: () => NOW });
   await services.activity.startSession("boss", "boss_thuy_tinh");
   const user = setup(services, <EnergyIndicator />);
-  await user.click(await screen.findByRole("button", { name: fr.energy.label(2, 5) }));
+  await user.click(await screen.findByRole("button", { name: fr.energy.labelWithWait(2, 5, 3, 0) }));
   await screen.findByRole("dialog", { name: fr.energy.title });
   expect(screen.queryByRole("button", { name: fr.shop.refill(30) })).toBeNull();
 });

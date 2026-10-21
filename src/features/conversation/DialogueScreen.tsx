@@ -3,10 +3,11 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Dialogue } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { waitParts } from "@/services/energy";
+import { formatCountdown } from "@/services/energy";
 import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bubble";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useResumeAtZero } from "@/app/useCountdown";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
 import { BadgeMedal, rewardProp, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
@@ -105,10 +106,11 @@ function ResultCard({ result, onHome, onReplay }: { result: ActivityResult; onHo
 export function DialogueScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { reporter, clock } = useServices();
+  const { reporter } = useServices();
   const dueCount = useAppState((s) => s.dueCount);
   const reduced = useReducedMotion();
   const d = useDialogue(id);
+  const remaining = useResumeAtZero(d.noEnergy?.nextAt ?? null, d.reload);
   const [quitting, setQuitting] = useState(false);
   const [reportRef, setReportRef] = useState<string | null>(null);
   const endRef = useRef<HTMLLIElement>(null);
@@ -142,7 +144,7 @@ export function DialogueScreen() {
       <div className="flex min-h-dvh flex-col">
         <FocusHeader progress={0} onClose={goHome} closeLabel={fr.conversation.quit.aria} />
         <NoEnergy
-          wait={d.noEnergy.nextAt ? waitParts(clock(), d.noEnergy.nextAt) : null}
+          wait={remaining !== null ? formatCountdown(remaining) : null}
           canReview={dueCount > 0}
           onReview={() => navigate("/review")}
           onBack={goHome}

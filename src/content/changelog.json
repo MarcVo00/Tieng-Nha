@@ -2,6 +2,14 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "1.5.1",
+      "date": "2026-10-21",
+      "title": "Chrono de l'énergie",
+      "items": [
+        "Un compte à rebours montre quand ton énergie revient, à la seconde près."
+      ]
+    },
+    {
       "version": "1.5.0",
       "date": "2026-10-21",
       "title": "Combats et nouveau look",

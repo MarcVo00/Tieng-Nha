@@ -3,7 +3,8 @@ import { Button } from "@/ui/Button";
 import { EmptyState } from "@/ui/EmptyState";
 
 type NoEnergyProps = {
-  wait: { hours: number; minutes: number } | null;
+  /** Live `HH:MM:SS` until the next point, or null when unknown. */
+  wait: string | null;
   /** False when no word is due: reviewing would lead nowhere, so only the wait is offered. */
   canReview: boolean;
   onReview: () => void;
@@ -19,10 +20,10 @@ export function NoEnergy({ wait, canReview, onReview, onBack }: NoEnergyProps) {
       body={
         canReview
           ? wait
-            ? fr.energy.empty.body(wait.hours, wait.minutes)
+            ? fr.energy.empty.body(wait)
             : fr.energy.empty.bodyNoWait
           : wait
-            ? fr.energy.empty.waitOnly(wait.hours, wait.minutes)
+            ? fr.energy.empty.waitOnly(wait)
             : fr.energy.empty.later
       }
       action={

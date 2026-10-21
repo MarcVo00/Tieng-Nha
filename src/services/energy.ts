@@ -50,7 +50,21 @@ export function energyAt(events: readonly AppEvent[], nowIso: string, refills: r
   return { current, max: ENERGY.max, nextAt: current >= ENERGY.max ? null : new Date(anchor + ENERGY.refillMs).toISOString() };
 }
 
-export function waitParts(nowIso: string, nextAt: string): { hours: number; minutes: number } {
-  const minutes = Math.max(0, Math.ceil((Date.parse(nextAt) - Date.parse(nowIso)) / 60_000));
+/** `HH:MM:SS`, zero-padded; hours may exceed 24. Negative or non-finite input reads 00:00:00. */
+export function formatCountdown(ms: number): string {
+  const total = Number.isFinite(ms) ? Math.max(0, Math.ceil(ms / 1000)) : 0;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(Math.floor(total / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`;
+}
+
+/** Whole minutes (rounded up) left in a wait, split for a minute-precision phrase. */
+export function waitParts(ms: number): { hours: number; minutes: number } {
+  const minutes = Math.max(0, Math.ceil(ms / 60_000));
   return { hours: Math.floor(minutes / 60), minutes: minutes % 60 };
+}
+
+/** Time until the gauge is full: the wait for the next point plus one full period per further point needed. */
+export function msUntilFull(msToNext: number, energy: EnergyState): number {
+  const further = Math.max(0, energy.max - energy.current - 1);
+  return Math.max(0, msToNext) + further * ENERGY.refillMs;
 }

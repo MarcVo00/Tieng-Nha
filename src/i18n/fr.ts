@@ -42,7 +42,8 @@ export const fr = {
   app: {
     name: "Tiếng Nhà",
     loading: "Chargement…",
-    tabs: { learn: "Apprendre", review: "Révision", leaderboard: "Classement", me: "Moi" },
+    tabs: { learn: "Apprendre", review: "Révision", arena: "Arène", shop: "Boutique", me: "Moi" },
+    arenaNav: { label: "Classement ou duels", leaderboard: "Classement", duels: "Duels" },
     header: { profile: "Ouvrir mon profil" },
     sync: { pending: (n: number) => `${n} ${n > 1 ? "événements" : "événement"} en attente de synchronisation` },
     update: { available: "Nouvelle version disponible", action: "Mettre à jour" },
@@ -444,7 +445,7 @@ export const fr = {
   },
   // --- arena (Kim bài shop) ---
   arena: {
-    title: "Arène",
+    title: "Boutique d'arène",
     intro: "Ici, les Kim bài gagnés en duel s'échangent contre des tenues de guerriers du Sud.",
     balance: (n: number) => `${n} Kim bài`,
     balanceCaption: "Gagnés en duel",
@@ -457,10 +458,10 @@ export const fr = {
     bought: "Acheté\u202f! Bien vu, guerrier.",
     error: "L'achat n'a pas pu se faire. Réessaie dans un instant.",
     loadError: "L'arène n'a pas pu s'ouvrir. Réessaie dans un instant.",
-    entry: "Arène",
+    entry: "Boutique d'arène",
     entryHint: "Dépense tes Kim bài en tenues de guerrier",
     list: "Les tenues de l'arène",
-    meEntry: "Arène",
+    meEntry: "Boutique d'arène",
   },
   // --- duels ---
   duels: {
@@ -514,7 +515,7 @@ export const fr = {
     },
     banner: (name: string, more: number) => `Duel en attente contre ${name}${more > 0 ? ` (+${more})` : ""}`,
     resultBanner: (name: string) => `Résultat dispo contre ${name}`,
-    entry: { label: "Duels", pending: (n: number) => `${n} duel${n > 1 ? "s" : ""} à jouer` },
+    entry: { pending: (n: number) => `${n} duel${n > 1 ? "s" : ""} à jouer` },
     run: {
       round1: "Manche 1 · QCM",
       round2: "Manche 2 · À l'oral",

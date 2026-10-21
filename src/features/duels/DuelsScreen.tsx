@@ -4,10 +4,11 @@ import { motion } from "motion/react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useChallenge } from "@/app/useChallenge";
+import { usePendingDuels } from "@/app/usePendingDuels";
 import { OfflineError } from "@/domain/errors";
 import type { Duel, LeaderboardRow, Look } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { Avatar, Button, Card, duration, EmptyState, ease, Icon, SectionTitle, Skeleton, tap } from "@/ui";
+import { Avatar, Button, Card, duration, EmptyState, ease, Icon, SectionTitle, SegmentedNav, Skeleton, tap } from "@/ui";
 import { readPending, readRun, unsentDuelIds } from "@/features/duels/duelRunState";
 import { hoursLeft, otherId, outcomeOf, splitDuels } from "@/features/duels/duelsView";
 
@@ -55,6 +56,7 @@ export function DuelsScreen() {
   const myId = useAppState((s) => s.session?.userId) ?? "";
   const kimBai = useAppState((s) => s.wallet?.kimBai ?? 0);
   const challenge = useChallenge();
+  const toPlayCount = usePendingDuels().length;
   const [load, setLoad] = useState<Load>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
   const [challenging, setChallenging] = useState<string | null>(null);
@@ -105,7 +107,15 @@ export function DuelsScreen() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.base, ease: ease.out }} className="pb-8">
-      <div className="flex items-center gap-3">
+      <SegmentedNav
+        label={fr.app.arenaNav.label}
+        current="/duels"
+        items={[
+          { to: "/leaderboard", label: fr.app.arenaNav.leaderboard },
+          { to: "/duels", label: fr.app.arenaNav.duels, badge: toPlayCount, badgeLabel: fr.duels.entry.pending(toPlayCount) },
+        ]}
+      />
+      <div className="mt-3 flex items-center gap-3">
         <h1 className="flex-1 text-title text-ink">{fr.duels.title}</h1>
         <p className="tabular flex items-center gap-1.5 text-body-strong text-gold-ink">
           <Icon name="medal" size={22} />

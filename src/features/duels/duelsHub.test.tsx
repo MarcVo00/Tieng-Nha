@@ -15,6 +15,7 @@ import type { Duel, DuelQuestions, Settings } from "@/domain/types";
 import { DUEL_ERRORS } from "@/ports";
 import { DuelsScreen } from "@/features/duels";
 import { newRecord, saveRun } from "@/features/duels/duelRunState";
+import { TabLayout } from "@/app/layouts/TabLayout";
 import { HomeScreen } from "@/features/home";
 import { LeaderboardScreen, PublicProfileScreen } from "@/features/leaderboard";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
@@ -425,23 +426,37 @@ describe("pending duels entry points", () => {
     expect(pills.filter((p) => p.className.includes("bg-primary"))).toHaveLength(1);
   });
 
-  test("the leaderboard «\u202fDuels\u202f» entry counts the duels to play", async () => {
+  test("the segmented control counts the duels to play and the old header entry is gone", async () => {
     const services = makeServices();
     await unlock(services);
     gateway(services).seedIncoming(QUESTIONS, { from: "bot_ba_ngoai" });
     gateway(services).seedIncoming(QUESTIONS, { from: "bot_chu_tu" });
     renderAt("/leaderboard", services);
-    const entry = await screen.findByRole("link", { name: new RegExp(fr.duels.entry.pending(2)) });
-    expect(entry).toHaveAttribute("href", "/duels");
+    const nav = await screen.findByRole("navigation", { name: fr.app.arenaNav.label });
+    expect(within(nav).getByRole("link", { name: fr.app.arenaNav.leaderboard })).toHaveAttribute("aria-current", "page");
+    const duelsLink = await within(nav).findByRole("link", { name: new RegExp(`^${fr.app.arenaNav.duels}.*${fr.duels.entry.pending(2)}`) });
+    expect(duelsLink).toHaveAttribute("href", "/duels");
+    expect(duelsLink).not.toHaveAttribute("aria-current");
+    expect(screen.getAllByRole("link", { name: /duels/i })).toHaveLength(1);
   });
 
-  test("offline, the entry stays quiet", async () => {
+  test("offline, the segmented control stays quiet", async () => {
     const services = makeServices();
     await unlock(services);
     gateway(services).seedIncoming(QUESTIONS);
     gateway(services).online = false;
     renderAt("/leaderboard", services);
-    expect(await screen.findByRole("link", { name: fr.duels.entry.label })).toBeInTheDocument();
+    const nav = await screen.findByRole("navigation", { name: fr.app.arenaNav.label });
+    expect(within(nav).getByRole("link", { name: fr.app.arenaNav.duels })).toBeInTheDocument();
+  });
+
+  test("on the duels hub the Duels segment is current and Classement links back", async () => {
+    const services = makeServices();
+    await unlock(services);
+    renderAt("/duels", services);
+    const nav = await screen.findByRole("navigation", { name: fr.app.arenaNav.label });
+    expect(within(nav).getByRole("link", { name: fr.app.arenaNav.duels })).toHaveAttribute("aria-current", "page");
+    expect(within(nav).getByRole("link", { name: fr.app.arenaNav.leaderboard })).toHaveAttribute("href", "/leaderboard");
   });
 });
 
@@ -452,5 +467,28 @@ describe("arena entry", () => {
     renderAt("/duels", services);
     const link = await screen.findByRole("link", { name: new RegExp(fr.arena.entry) });
     expect(link).toHaveAttribute("href", "/arena");
+  });
+});
+
+describe("Arène tab badge", () => {
+  test("the bottom bar counts the duels to play with the same source as the banner", async () => {
+    const services = makeServices();
+    await unlock(services);
+    gateway(services).seedIncoming(QUESTIONS, { from: "bot_ba_ngoai" });
+    gateway(services).seedIncoming(QUESTIONS, { from: "bot_chu_tu" });
+    render(
+      <ServicesProvider services={services}>
+        <MemoryRouter initialEntries={["/duels"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            <Route element={<TabLayout />}>
+              <Route path="/duels" element={<p>hub</p>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </ServicesProvider>,
+    );
+    const tab = await screen.findByRole("link", { name: new RegExp(`Arène.*${fr.duels.entry.pending(2)}`) });
+    expect(tab).toHaveAttribute("href", "/leaderboard");
+    expect(tab).toHaveAttribute("aria-current", "page");
   });
 });

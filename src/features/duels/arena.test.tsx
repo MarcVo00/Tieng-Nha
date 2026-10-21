@@ -181,3 +181,9 @@ test("« Moi » shows the Kim bài balance", async () => {
   setup(services, "/me");
   expect(await screen.findByText(fr.arena.balance(7))).toBeInTheDocument();
 });
+
+test("the page is titled Boutique d'arène", async () => {
+  const services = createFakeServices({ clock: () => NOW });
+  setup(services);
+  expect(await screen.findByRole("heading", { name: "Boutique d'arène" })).toBeInTheDocument();
+});

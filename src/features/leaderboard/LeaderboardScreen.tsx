@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
-import { Link } from "react-router-dom";
 import { useServices } from "@/app/ServicesProvider";
 import { usePendingDuels } from "@/app/usePendingDuels";
 import { OfflineError } from "@/domain/errors";
 import type { LeaderboardRow as Row } from "@/domain/types";
 import { fr } from "@/i18n/fr";
-import { Button, EmptyState, Icon, Skeleton, duration, ease, spring, tap } from "@/ui";
+import { Button, EmptyState, Icon, SegmentedNav, Skeleton, duration, ease, spring, tap } from "@/ui";
 import { LeaderboardRow } from "@/features/leaderboard/LeaderboardRow";
 import { Podium } from "@/features/leaderboard/Podium";
 import { usePullToRefresh } from "@/features/leaderboard/usePullToRefresh";
@@ -120,23 +119,16 @@ export function LeaderboardScreen() {
 
   return (
     <div className="pb-20">
-      <div className="flex items-center gap-2">
+      <SegmentedNav
+        label={fr.app.arenaNav.label}
+        current="/leaderboard"
+        items={[
+          { to: "/leaderboard", label: fr.app.arenaNav.leaderboard },
+          { to: "/duels", label: fr.app.arenaNav.duels, badge: pendingDuels, badgeLabel: fr.duels.entry.pending(pendingDuels) },
+        ]}
+      />
+      <div className="mt-3 flex items-center gap-2">
         <h1 className="flex-1 text-title text-ink">{fr.leaderboard.title}</h1>
-        <motion.div whileTap={tap}>
-          <Link
-            to="/duels"
-            aria-label={pendingDuels > 0 ? `${fr.duels.entry.label}, ${fr.duels.entry.pending(pendingDuels)}` : fr.duels.entry.label}
-            className="relative flex min-h-11 items-center gap-1.5 rounded-full px-3 text-body-strong text-primary"
-          >
-            <Icon name="swords" size={22} />
-            {fr.duels.entry.label}
-            {pendingDuels > 0 ? (
-              <span aria-hidden="true" className="tabular flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-caption text-primary-on">
-                {pendingDuels}
-              </span>
-            ) : null}
-          </Link>
-        </motion.div>
         <motion.button
           type="button"
           whileTap={tap}

@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { createFakeServices } from "@/adapters/fakes";
@@ -41,7 +41,8 @@ test("unauthenticated user is redirected to /welcome", async () => {
 test("onboarded user sees the tab bar", async () => {
   renderAt("/", await onboardedServices());
   expect(await screen.findByRole("navigation")).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: /classement/i })).toBeInTheDocument();
+  const tabs = within(screen.getByRole("navigation", { name: /navigation principale/i })).getAllByRole("link").map((l) => l.getAttribute("href"));
+  expect(tabs).toEqual(["/", "/review", "/leaderboard", "/shop", "/me"]);
 });
 
 test("focus routes hide the tab bar", async () => {

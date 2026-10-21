@@ -5,7 +5,7 @@ import { onboard } from "./helpers";
 test("switching the leaderboard period never blocks the next page transition", async ({ page }) => {
   await onboard(page);
 
-  await page.getByRole("link", { name: fr.app.tabs.leaderboard }).click();
+  await page.getByRole("link", { name: fr.app.tabs.arena }).click();
   await expect(page.getByRole("heading", { name: fr.leaderboard.title })).toBeVisible();
   await page.getByRole("tab", { name: fr.leaderboard.all }).click();
   await expect(page.getByRole("list", { name: fr.leaderboard.podiumLabel })).toBeVisible();

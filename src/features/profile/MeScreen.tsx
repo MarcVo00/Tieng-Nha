@@ -101,7 +101,6 @@ export function MeScreen() {
   const toast = useToast();
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
-  const coins = useAppState((s) => s.wallet?.coins ?? null);
   const kimBai = useAppState((s) => s.wallet?.kimBai ?? null);
   const frame = useAppState((s) => s.wallet?.equipped.frame ?? null);
   const fx = useAppState((s) => s.wallet?.equipped.profile_fx ?? null);
@@ -270,17 +269,6 @@ export function MeScreen() {
           </Button>
         ) : null}
       </Card>
-
-      <Link
-        to="/shop"
-        className="flex min-h-11 items-center justify-between gap-3 rounded-md border-2 border-line bg-surface px-5 py-3 text-body-strong text-ink"
-      >
-        <span className="flex items-center gap-2">
-          <Icon name="coin" size={24} className="text-gold" />
-          {fr.shop.open}
-        </span>
-        {coins !== null ? <DropNumber className="tabular text-gold-ink">{fr.shop.balance(coins)}</DropNumber> : null}
-      </Link>
 
       <Link
         to="/arena"

@@ -17,8 +17,7 @@ test("a badge reward frame can be equipped from Moi", async ({ page }) => {
 
 test("the shop no longer sells frames", async ({ page }) => {
   await onboard(page);
-  await page.getByRole("link", { name: fr.app.tabs.me }).click();
-  await page.getByRole("link", { name: fr.shop.open }).click();
+  await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
 
   await expect(page.getByText(fr.rewards.hint)).toBeVisible();
   await expect(page.getByText(fr.shop.items.frame_bronze!.name)).toHaveCount(0);
@@ -29,8 +28,7 @@ test("buy and wear the crown of the tides", async ({ page }) => {
   await seedLessonsCompleted(page, ["l01", "l02", "l03", "l04"], { perfect: true });
   await page.reload();
 
-  await page.getByRole("link", { name: fr.app.tabs.me }).click();
-  await page.getByRole("link", { name: fr.shop.open }).click();
+  await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
 
   const crown = fr.shop.items.hat_thuy_tinh!;
   await page.getByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} ${crown.name}`) }).click();
@@ -49,8 +47,7 @@ test("buy and play as the wandering blade", async ({ page }) => {
   await seedBadges(page, ["first_lesson", "five_lessons", "streak_3", "perfect_lesson", "first_dialogue"]);
   await page.reload();
 
-  await page.getByRole("link", { name: fr.app.tabs.me }).click();
-  await page.getByRole("link", { name: fr.shop.open }).click();
+  await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
   // Scoped to the balance paragraph: the 200 xu price chips of other items read the same.
   await expect(page.locator("p").getByText(fr.shop.balance(200), { exact: true })).toBeVisible();
 

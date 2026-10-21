@@ -32,7 +32,7 @@ export type DuelSummary = {
  * Reads my duels quietly (offline or failing: both lists are empty) for the home banner and the « Duels » entry;
  * the duels hub does its own, louder, loading.
  */
-export function useDuelSummary(): DuelSummary {
+export function useDuelSummary(refreshKey = ""): DuelSummary {
   const { duels, clock } = useServices();
   const [summary, setSummary] = useState<DuelSummary>({ pending: [], unseen: [] });
   useEffect(() => {
@@ -53,11 +53,11 @@ export function useDuelSummary(): DuelSummary {
     return () => {
       cancelled = true;
     };
-  }, [duels, clock]);
+  }, [duels, clock, refreshKey]);
   return summary;
 }
 
 /** Open duels I still have to play (not expired). */
-export function usePendingDuels(): Duel[] {
-  return useDuelSummary().pending;
+export function usePendingDuels(refreshKey = ""): Duel[] {
+  return useDuelSummary(refreshKey).pending;
 }

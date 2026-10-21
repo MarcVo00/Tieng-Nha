@@ -18,6 +18,7 @@ const ReviewRunScreen = lazy(() => import("@/features/review").then((m) => ({ de
 const LeaderboardScreen = lazy(() => import("@/features/leaderboard").then((m) => ({ default: m.LeaderboardScreen })));
 const PublicProfileScreen = lazy(() => import("@/features/leaderboard").then((m) => ({ default: m.PublicProfileScreen })));
 const ShopScreen = lazy(() => import("@/features/shop").then((m) => ({ default: m.ShopScreen })));
+const NewsScreen = lazy(() => import("@/features/profile").then((m) => ({ default: m.NewsScreen })));
 const MeScreen = lazy(() => import("@/features/profile").then((m) => ({ default: m.MeScreen })));
 const LessonScreen = lazy(() => import("@/features/lessons").then((m) => ({ default: m.LessonScreen })));
 const LessonDoneScreen = lazy(() => import("@/features/lessons").then((m) => ({ default: m.LessonDoneScreen })));
@@ -45,6 +46,7 @@ const tabRoutes: RouteObject[] = [
   { path: "review", element: screen(ReviewScreen) },
   { path: "leaderboard", element: screen(LeaderboardScreen) },
   { path: "me", element: screen(MeScreen) },
+  { path: "news", element: screen(NewsScreen) },
   { path: "shop", element: screen(ShopScreen) },
   { path: "u/:userId", element: screen(PublicProfileScreen) },
   { path: "exam", element: screen(ExamIntroScreen) },

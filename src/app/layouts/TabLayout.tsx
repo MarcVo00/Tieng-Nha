@@ -7,6 +7,8 @@ import { fr } from "@/i18n/fr";
 import { useHeroLook } from "@/app/useHeroLook";
 import { InAppBrowserNotice } from "@/features/onboarding";
 import { useServices } from "@/app/ServicesProvider";
+import { useUnseenNews } from "@/app/useNews";
+import { PendingDuelsContext, usePendingDuels } from "@/app/usePendingDuels";
 import { Avatar, PageTransition, StreakFlame, TabBar, XpCounter } from "@/ui";
 
 export function TabLayout() {
@@ -18,6 +20,9 @@ export function TabLayout() {
   const frame = equipped?.frame ?? null;
   const look = useHeroLook();
   const dueCount = useAppState((s) => s.dueCount);
+  // Re-read on every route change so the badge follows the duels I play or settle.
+  const pendingDuels = usePendingDuels(pathname);
+  const unseenNews = useUnseenNews();
   const demo = useServices().env.VITE_DEMO;
 
   return (
@@ -42,7 +47,7 @@ export function TabLayout() {
       <main>
         <AnimatePresence mode="wait">
         <PageTransition key={pathname} variant="tab">
-          {outlet}
+          <PendingDuelsContext.Provider value={pendingDuels}>{outlet}</PendingDuelsContext.Provider>
         </PageTransition>
       </AnimatePresence>
       </main>
@@ -50,8 +55,16 @@ export function TabLayout() {
         items={[
           { to: "/", label: fr.app.tabs.learn, icon: "home" },
           { to: "/review", label: fr.app.tabs.review, icon: "review", badge: dueCount },
-          { to: "/leaderboard", label: fr.app.tabs.leaderboard, icon: "trophy" },
-          { to: "/me", label: fr.app.tabs.me, icon: "user" },
+          {
+            to: "/leaderboard",
+            label: fr.app.tabs.arena,
+            icon: "trophy",
+            badge: pendingDuels.length,
+            badgeLabel: fr.duels.entry.pending(pendingDuels.length),
+            alsoActiveOn: ["/duels", "/arena", "/u"],
+          },
+          { to: "/shop", label: fr.app.tabs.shop, icon: "coin" },
+          { to: "/me", label: fr.app.tabs.me, icon: "user", dot: unseenNews, dotLabel: fr.news.unseen, alsoActiveOn: ["/news"] },
         ]}
       />
     </div>

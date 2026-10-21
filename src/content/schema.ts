@@ -148,3 +148,30 @@ export const ShopItemSchema = z
   })
   .strict();
 export const ShopFileSchema = z.object({ contentVersion: z.number().int().min(1), items: z.array(ShopItemSchema).min(1) }).strict();
+
+/** French typography: a thin no-break space (U+202F) before ? ! : ; — never a plain or no-break space. */
+const NO_PLAIN_SPACE_BEFORE_PUNCT = /[ \u00a0][?!:;]/;
+const frenchText = z.string().min(1).refine((t) => !NO_PLAIN_SPACE_BEFORE_PUNCT.test(t), { message: "use U+202F before ? ! : ;" });
+
+const semverParts = (v: string): number[] => v.split(".").map(Number);
+const newerThan = (a: string, b: string): boolean => {
+  const [x, y] = [semverParts(a), semverParts(b)];
+  for (let i = 0; i < 3; i++) if ((x[i] ?? 0) !== (y[i] ?? 0)) return (x[i] ?? 0) > (y[i] ?? 0);
+  return false;
+};
+export const ChangelogEntrySchema = z
+  .object({
+    version: z.string().regex(/^\d+\.\d+\.\d+$/),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((d) => new Date(`${d}T00:00:00Z`).toISOString().startsWith(d), { message: "not a real date" }),
+    title: frenchText,
+    items: z.array(frenchText).min(1),
+  })
+  .strict();
+/** Newest first, strictly decreasing versions. */
+export const ChangelogFileSchema = z
+  .object({ contentVersion: z.number().int().min(1), entries: z.array(ChangelogEntrySchema).min(1) })
+  .strict()
+  .refine((f) => f.entries.every((e, i, all) => {
+      const prev = all[i - 1];
+      return prev === undefined || newerThan(prev.version, e.version);
+    }), { message: "changelog must be newest first" });

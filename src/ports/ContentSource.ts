@@ -1,4 +1,4 @@
-import type { BadgeDef, Boss, Dialogue, DialogueId, ExamQuestion, Lesson, LessonId, LessonSummary, ShopItem, Tree, VocabId, VocabItem } from "@/domain/types";
+import type { BadgeDef, Boss, ChangelogEntry, Dialogue, DialogueId, ExamQuestion, Lesson, LessonId, LessonSummary, ShopItem, Tree, VocabId, VocabItem } from "@/domain/types";
 export interface ContentSource {
   listLessons(): Promise<LessonSummary[]>; // ordered l01..l10
   getLesson(id: LessonId): Promise<Lesson>; // throws ContentNotFoundError
@@ -8,5 +8,6 @@ export interface ContentSource {
   getTree(): Promise<Tree>;
   getBoss(id: string): Promise<Boss>; // throws ContentNotFoundError
   getShop(): Promise<ShopItem[]>;
+  getChangelog(): Promise<ChangelogEntry[]>; // newest first
   getVocabIndex(): Promise<ReadonlyMap<VocabId, VocabItem>>; // every vocab of every lesson
 }

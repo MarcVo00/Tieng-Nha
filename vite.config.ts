@@ -2,7 +2,10 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA, type ManifestOptions } from "vite-plugin-pwa";
 import type { Plugin } from "vite";
+import { readFileSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
+
+const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf-8")) as { version: string };
 
 // Android paints an installed app's navigation bar with the manifest colours, and a manifest holds one colour only:
 // one manifest per theme, picked before first paint by the inline script in index.html (and by ThemeController).
@@ -47,6 +50,7 @@ function themedManifests(): Plugin {
 }
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [
     react(),
     VitePWA({

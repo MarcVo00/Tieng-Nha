@@ -1,6 +1,7 @@
 import type { Services } from "@/app/services";
 import badgesFile from "@/content/badges.json";
-import { BadgesFileSchema } from "@/content/schema";
+import changelogFile from "@/content/changelog.json";
+import { BadgesFileSchema, ChangelogFileSchema } from "@/content/schema";
 import { lessonFixture } from "@/adapters/fakes/seed/lesson";
 import { dialogueFixture } from "@/adapters/fakes/seed/dialogue";
 import { examPoolFixture } from "@/adapters/fakes/seed/exam";
@@ -30,7 +31,7 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
   const sink = overrides.sink ?? new FakeEventSink();
   const content =
     overrides.content ??
-    new InMemoryContentSource([lessonFixture], [dialogueFixture], examPoolFixture, BadgesFileSchema.parse(badgesFile).badges, treeFixture, [bossFixture], shopFixture);
+    new InMemoryContentSource([lessonFixture], [dialogueFixture], examPoolFixture, BadgesFileSchema.parse(badgesFile).badges, treeFixture, [bossFixture], shopFixture, ChangelogFileSchema.parse(changelogFile).entries);
   const sync = createSyncService({ outbox, sink });
   const auth = overrides.auth ?? new FakeAuthService();
   // The player's own row follows the profile chosen during onboarding (falls back to a fixed persona before it exists).

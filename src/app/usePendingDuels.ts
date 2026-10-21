@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useServices } from "@/app/ServicesProvider";
 import type { Duel } from "@/domain/types";
 
@@ -32,10 +32,11 @@ export type DuelSummary = {
  * Reads my duels quietly (offline or failing: both lists are empty) for the home banner and the « Duels » entry;
  * the duels hub does its own, louder, loading.
  */
-export function useDuelSummary(): DuelSummary {
+export function useDuelSummary(refreshKey = "", enabled = true): DuelSummary {
   const { duels, clock } = useServices();
   const [summary, setSummary] = useState<DuelSummary>({ pending: [], unseen: [] });
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     duels
       .list()
@@ -53,11 +54,16 @@ export function useDuelSummary(): DuelSummary {
     return () => {
       cancelled = true;
     };
-  }, [duels, clock]);
+  }, [duels, clock, refreshKey, enabled]);
   return summary;
 }
 
-/** Open duels I still have to play (not expired). */
-export function usePendingDuels(): Duel[] {
-  return useDuelSummary().pending;
+/** Set by the tab layout: the one fetch of the pending duels, shared by the tab badge and the Arène segments. */
+export const PendingDuelsContext = createContext<Duel[] | null>(null);
+
+/** Open duels I still have to play (not expired). Inside the tab layout, reads the layout's single fetch. */
+export function usePendingDuels(refreshKey = ""): Duel[] {
+  const shared = useContext(PendingDuelsContext);
+  const own = useDuelSummary(refreshKey, shared === null);
+  return shared ?? own.pending;
 }

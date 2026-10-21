@@ -105,12 +105,14 @@ export function ArenaScreen() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.base, ease: ease.out }} className="flex flex-col gap-6 pb-8">
-      <motion.div whileTap={tap} className="inline-block self-start">
-        <Link to="/duels" aria-label={fr.arena.back} className="flex h-11 w-11 items-center justify-center rounded-full text-ink-muted">
-          <Icon name="chevron-left" size={24} />
-        </Link>
-      </motion.div>
-      <h1 className="sr-only">{fr.arena.title}</h1>
+      <div className="flex items-center gap-1">
+        <motion.div whileTap={tap}>
+          <Link to="/duels" aria-label={fr.arena.back} className="flex h-11 w-11 items-center justify-center rounded-full text-ink-muted">
+            <Icon name="chevron-left" size={24} />
+          </Link>
+        </motion.div>
+        <h1 className="text-title text-ink">{fr.arena.title}</h1>
+      </div>
 
       <BalanceLine icon="medal" value={wallet ? fr.arena.balance(wallet.kimBai) : "…"} caption={fr.arena.balanceCaption} />
 

@@ -3,11 +3,10 @@ import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { useRefreshProgress, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useCountdown } from "@/app/useCountdown";
 import { fr } from "@/i18n/fr";
-import { waitParts } from "@/services/energy";
+import { formatCountdown, msUntilFull, waitParts } from "@/services/energy";
 import { Button, ConfirmDialog, Icon, Sheet, tap, useToast } from "@/ui";
-
-const MINUTE_MS = 60_000;
 
 // Hierarchy: the gauge is a quiet header chip (icon + number); the sheet's hero is the five pips, then one line of
 // explanation, the next refill, and a single secondary-weight action to review (the way to earn energy back).
@@ -23,8 +22,8 @@ export function EnergyIndicator() {
   const [buying, setBuying] = useState(false);
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const [, setTick] = useState(0);
   const nextAt = energy?.nextAt ?? null;
+  const remaining = useCountdown(nextAt);
 
   // Refresh the state when the next point is due, so the gauge fills without a reload.
   useEffect(() => {
@@ -71,15 +70,9 @@ export function EnergyIndicator() {
     triggerRef.current?.focus();
   }
 
-  // Keep the countdown honest while the sheet is open.
-  useEffect(() => {
-    if (!open) return;
-    const timer = setInterval(() => setTick((t) => t + 1), MINUTE_MS);
-    return () => clearInterval(timer);
-  }, [open]);
-
   if (energy === null) return null;
-  const wait = nextAt === null ? null : waitParts(clock(), nextAt);
+  const wait = remaining === null ? null : waitParts(remaining);
+  const fullIn = remaining === null ? null : msUntilFull(remaining, energy);
 
   const canRefill = energy.current < energy.max && refillPrice !== null && coins !== null && coins >= refillPrice;
 
@@ -89,7 +82,7 @@ export function EnergyIndicator() {
         ref={triggerRef}
         type="button"
         whileTap={tap}
-        aria-label={fr.energy.label(energy.current, energy.max)}
+        aria-label={wait ? fr.energy.labelWithWait(energy.current, energy.max, wait.hours, wait.minutes) : fr.energy.label(energy.current, energy.max)}
         onClick={() => setOpen(true)}
         className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full"
       >
@@ -97,6 +90,11 @@ export function EnergyIndicator() {
         <span className="tabular text-body-strong text-ink" aria-hidden="true">
           {energy.current}
         </span>
+        {remaining !== null ? (
+          <span className="tabular hidden text-caption text-ink-muted min-[360px]:inline" aria-hidden="true">
+            {formatCountdown(remaining)}
+          </span>
+        ) : null}
       </motion.button>
       <Sheet open={open} onClose={() => setOpen(false)} label={fr.energy.title}>
         <div className="flex flex-col gap-4">
@@ -107,7 +105,14 @@ export function EnergyIndicator() {
             ))}
           </div>
           <p className="text-body text-ink-muted">{fr.energy.explain}</p>
-          <p className="text-body-strong text-ink">{wait ? fr.energy.next(wait.hours, wait.minutes) : fr.energy.full}</p>
+          {remaining !== null && fullIn !== null ? (
+            <div className="flex flex-col gap-1">
+              <p className="tabular text-heading text-ink">{fr.energy.nextIn(formatCountdown(remaining))}</p>
+              {fullIn > remaining ? <p className="tabular text-body text-ink-muted">{fr.energy.fullIn(formatCountdown(fullIn))}</p> : null}
+            </div>
+          ) : (
+            <p className="text-body-strong text-ink">{fr.energy.full}</p>
+          )}
           <div className="flex flex-wrap items-center gap-3 pt-1">
             {dueCount > 0 ? (
               <Link

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
+import { useCountdown } from "@/app/useCountdown";
 import { useHeroLook } from "@/app/useHeroLook";
 import { useServices } from "@/app/ServicesProvider";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
-import { waitParts } from "@/services/energy";
+import { formatCountdown } from "@/services/energy";
 import { Button, ConfirmDialog, EmptyState, FocusHeader, Hearts, NoEnergy, ReportSheet, Skeleton } from "@/ui";
 import { LESSON_HEARTS, liveVocab, useLessonRun } from "@/features/lessons/useLessonRun";
 import { VocabDeck } from "@/features/lessons/VocabDeck";
@@ -16,9 +17,10 @@ import { VocabDeck } from "@/features/lessons/VocabDeck";
 export function LessonScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { tts, stt, recorder, reporter, clock } = useServices();
+  const { tts, stt, recorder, reporter } = useServices();
   const { settings, updateSettings } = useSettings();
   const run = useLessonRun(id);
+  const remaining = useCountdown(run.load.status === "no-energy" ? run.load.nextAt : null);
   const dueCount = useAppState((s) => s.dueCount);
   const heroLook = useHeroLook();
   const [quitting, setQuitting] = useState(false);
@@ -57,11 +59,10 @@ export function LessonScreen() {
   }
 
   if (run.load.status === "no-energy") {
-    const { nextAt } = run.load;
     return (
       <div className="pb-8">
         <FocusHeader progress={0} onClose={goHome} closeLabel={fr.lessons.quit.aria} />
-        <NoEnergy wait={nextAt ? waitParts(clock(), nextAt) : null} canReview={dueCount > 0} onReview={() => navigate("/review")} onBack={goHome} />
+        <NoEnergy wait={remaining !== null ? formatCountdown(remaining) : null} canReview={dueCount > 0} onReview={() => navigate("/review")} onBack={goHome} />
       </div>
     );
   }

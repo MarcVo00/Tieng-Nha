@@ -1,5 +1,5 @@
 import type { AppEvent } from "@/domain/types";
-import { ENERGY, energyAt, waitParts } from "@/services/energy";
+import { ENERGY, energyAt, formatCountdown, msUntilFull, waitParts } from "@/services/energy";
 
 const H = 3_600_000;
 const T0 = Date.parse("2026-10-14T08:00:00.000Z");
@@ -50,11 +50,30 @@ test("events are replayed in time order whatever the input order", () => {
 });
 
 test("waitParts rounds up to the minute and never goes negative", () => {
-  expect(waitParts(at(0), at(2 * H + 13 * 60_000 + 1))).toEqual({ hours: 2, minutes: 14 });
-  expect(waitParts(at(0), at(59_000))).toEqual({ hours: 0, minutes: 1 });
-  expect(waitParts(at(10), at(0))).toEqual({ hours: 0, minutes: 0 });
-  expect(ENERGY.max).toBe(5);
+  expect(waitParts(2 * H + 13 * 60_000 + 1)).toEqual({ hours: 2, minutes: 14 });
+  expect(waitParts(59_000)).toEqual({ hours: 0, minutes: 1 });
+  expect(waitParts(-10)).toEqual({ hours: 0, minutes: 0 });
 });
+
+test("formatCountdown pads, rolls past 24 h and clamps negatives", () => {
+  expect(formatCountdown(0)).toBe("00:00:00");
+  expect(formatCountdown(9_000)).toBe("00:00:09");
+  expect(formatCountdown(2 * H + 41 * 60_000 + 7_000)).toBe("02:41:07");
+  expect(formatCountdown(27 * H + 5 * 60_000 + 9_000)).toBe("27:05:09");
+  expect(formatCountdown(1_001)).toBe("00:00:02");
+  expect(formatCountdown(-5_000)).toBe("00:00:00");
+  expect(formatCountdown(Number.NaN)).toBe("00:00:00");
+});
+
+test("msUntilFull adds one period per further point needed", () => {
+  const e = (current: number) => ({ current, max: ENERGY.max, nextAt: "x" });
+  expect(msUntilFull(1_000, e(4))).toBe(1_000);
+  expect(msUntilFull(1_000, e(3))).toBe(1_000 + ENERGY.refillMs);
+  expect(msUntilFull(1_000, e(0))).toBe(1_000 + 4 * ENERGY.refillMs);
+  expect(msUntilFull(-1_000, e(4))).toBe(0);
+  expect(msUntilFull(5, { current: 5, max: 5, nextAt: null })).toBe(5);
+});
+
 
 test("an event dated in the future (clock moved back) is treated as happening now", () => {
   expect(energyAt([start("lesson", 2 * H)], at(0))).toEqual({ current: 4, max: 5, nextAt: at(3 * H) });

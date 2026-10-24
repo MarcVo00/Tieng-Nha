@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { runGachaPull, useRecoveredPulls } from "@/app/useGachaPulls";
@@ -72,7 +72,10 @@ export function ShopScreen() {
   const [serverCoins, setServerCoins] = useState<number | null>(null);
   const [pity, setPity] = useState<Record<string, number>>({});
   const [pulling, setPulling] = useState<PullCount | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  // A failure message is only true for the balance and network it was raised with: it carries their key and disappears when they change.
+  const [notice, setNotice] = useState<{ text: string; key: string } | null>(null);
+  const serverRef = useRef<number | null>(null);
+  const reachableRef = useRef(true);
   const [ratesOpen, setRatesOpen] = useState(false);
   const [shown, setShown] = useState<{ pull: GachaPull; recovered: boolean } | null>(null);
   const recoveredPulls = useRecoveredPulls((s) => s.recovered);
@@ -102,11 +105,16 @@ export function ShopScreen() {
   const checkServer = useCallback(async (): Promise<number | null> => {
     try {
       const coins = await gacha.balance();
+      serverRef.current = coins;
+      reachableRef.current = true;
       setServerCoins(coins);
       setReachable(true);
       return coins;
     } catch (e) {
-      if (e instanceof OfflineError) setReachable(false);
+      if (e instanceof OfflineError) {
+        reachableRef.current = false;
+        setReachable(false);
+      }
       return null;
     }
   }, [gacha]);
@@ -114,6 +122,19 @@ export function ShopScreen() {
   useEffect(() => {
     void checkServer();
   }, [checkServer, navOnline]);
+
+  // Coming back to the app is a chance the server is reachable again (it is also re-checked at every tap).
+  useEffect(() => {
+    const again = () => {
+      if (document.visibilityState !== "hidden") void checkServer();
+    };
+    window.addEventListener("focus", again);
+    document.addEventListener("visibilitychange", again);
+    return () => {
+      window.removeEventListener("focus", again);
+      document.removeEventListener("visibilitychange", again);
+    };
+  }, [checkServer]);
 
   // Pity per theme from the journal; each pull's own result then replaces it with the server value.
   const themeIds = items === null ? "" : [...new Set(items.filter(isGachaItem).map((i) => i.theme ?? ""))].join(",");
@@ -187,8 +208,12 @@ export function ShopScreen() {
     }
   }
 
-  // One pull: the server balance is checked first (min of local and server), then the idempotent pull runs; the server
-  // result is mirrored into the journal by `runGachaPull`. Nothing is spent on a refusal.
+  const noticeKey = (): string => `${useAppState.getState().wallet?.coins}|${serverRef.current}|${navigator.onLine && reachableRef.current}`;
+  const fail = (text: string) => setNotice({ text, key: noticeKey() });
+
+  // One pull: the server balance is checked first (min of local and server; this also re-tests a server that was
+  // unreachable), then the idempotent pull runs; the server result is mirrored into the journal by `runGachaPull`.
+  // Nothing is spent on a refusal. « Il te manque N xu » is never stored: the banner derives it from the balances.
   async function pull(theme: string, count: PullCount): Promise<void> {
     const cost = gachaCost(count);
     if (cost === null || busy || pulling !== null) return;
@@ -196,30 +221,27 @@ export function ShopScreen() {
     setPulling(count);
     try {
       const server = await checkServer();
-      if (server === null) {
-        setNotice(fr.gacha.offline);
-        return;
-      }
+      if (server === null) return; // the banner says why (offline)
       const have = Math.min(useAppState.getState().wallet?.coins ?? 0, server);
-      if (have < cost) {
-        setNotice(fr.gacha.missing(cost - have));
-        return;
-      }
+      if (have < cost) return;
       const res = await runGachaPull(services, theme, count);
       await refresh().catch(() => undefined);
       if (!res.ok) {
-        setNotice(res.error === "not_enough" ? fr.gacha.missing(Math.max(cost - have, 1)) : fr.gacha.error);
+        if (res.error === "not_enough") await checkServer(); // the real balance, not a guess
+        else fail(fr.gacha.error);
         return;
       }
+      serverRef.current = res.coins;
       setServerCoins(res.coins);
       setPity((p) => ({ ...p, [theme]: res.pity }));
       presentPull(res.pull, false);
     } catch (e) {
       if (e instanceof OfflineError) {
+        reachableRef.current = false;
         setReachable(false);
-        setNotice(fr.gacha.interrupted);
+        fail(fr.gacha.interrupted);
       } else {
-        setNotice(fr.gacha.error);
+        fail(fr.gacha.error);
       }
     } finally {
       setPulling(null);
@@ -241,7 +263,8 @@ export function ShopScreen() {
     group.items.push(i);
   }
   const asked = asking ? fr.shop.items[asking.id] : undefined;
-  const online = navOnline && reachable;
+  const currentKey = `${wallet?.coins}|${serverCoins}|${navOnline && reachable}`;
+  const liveNotice = notice !== null && notice.key === currentKey ? notice.text : null;
 
   function card(item: ShopItem, w: Wallet) {
     const text = fr.shop.items[item.id];
@@ -298,16 +321,18 @@ export function ShopScreen() {
                 items={t.items}
                 inventory={wallet.inventory}
                 baseLook={baseLook}
-                pity={pity[t.id] ?? 0}
-                coins={serverCoins === null ? wallet.coins : Math.min(wallet.coins, serverCoins)}
-                online={online}
+                pity={pity[t.id] ?? null}
+                localCoins={wallet.coins}
+                serverCoins={serverCoins}
+                online={navOnline}
+                unreachable={!reachable}
                 pulling={pulling}
-                notice={notice}
+                notice={liveNotice}
                 onPull={(count) => void pull(t.id, count)}
                 onRates={() => setRatesOpen(true)}
               />
               <div className="flex flex-col gap-3">
-                <h3 className="text-body-strong text-ink-muted">{fr.gacha.setTitle}</h3>
+                <SectionTitle id={`shop-set-${t.id}`}>{fr.gacha.setTitle}</SectionTitle>
                 <GachaSet items={t.items} inventory={wallet.inventory} baseLook={baseLook} busy={busy || pulling !== null} onOpen={tryOn} />
               </div>
             </section>

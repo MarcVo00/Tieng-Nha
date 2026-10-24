@@ -28,8 +28,11 @@ export function GachaSync() {
         const recovered = await recoverGachaPulls({ gacha, activity });
         // Already claimed in the journal: announce even if the screen left meanwhile (only the re-run loop stops).
         if (recovered.length > 0) {
-          push(recovered);
-          for (let i = 0; i < recovered.length; i++) show({ title: fr.gacha.recovered, body: fr.gacha.recoveredBody });
+          // Two overlapping runs (StrictMode double mount, `online` during a start) can return the same pull: announce it once.
+          const known = new Set(useRecoveredPulls.getState().recovered.map((p) => p.id));
+          const fresh = recovered.filter((p) => !known.has(p.id));
+          push(fresh);
+          for (let i = 0; i < fresh.length; i++) show({ title: fr.gacha.recovered, body: fr.gacha.recoveredBody });
         }
       } finally {
         running = false;

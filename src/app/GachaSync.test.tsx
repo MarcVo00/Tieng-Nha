@@ -1,3 +1,4 @@
+import { StrictMode } from "react";
 import { act, cleanup, render } from "@testing-library/react";
 import { createFakeServices, type FakeGachaGateway } from "@/adapters/fakes";
 import { GachaSync } from "@/app/GachaSync";
@@ -103,4 +104,21 @@ test("a recovery that finishes after the component unmounted still announces and
   expect((await services.activity.getWallet()).coins).toBe(60); // claimed
   expect(useRecoveredPulls.getState().recovered.map((p) => p.id)).toEqual(["lost"]);
   expect(useToastStore.getState().toasts.map((t) => t.title)).toEqual([fr.gacha.recovered]);
+});
+
+test("StrictMode double mount announces one recovered pull once", async () => {
+  const { services, gacha } = setup();
+  await services.activity.demoGrant(100, 0);
+  await gacha.pull("lost", THEME, 1);
+  render(
+    <StrictMode>
+      <ServicesProvider services={services}>
+        <GachaSync />
+      </ServicesProvider>
+    </StrictMode>,
+  );
+  await flush();
+  await flush();
+  expect(useToastStore.getState().toasts).toHaveLength(1);
+  expect(useRecoveredPulls.getState().recovered.map((p) => p.id)).toEqual(["lost"]);
 });

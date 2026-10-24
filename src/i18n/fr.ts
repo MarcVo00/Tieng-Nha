@@ -782,7 +782,7 @@ export const fr = {
     resultTotal: (n: number) => `${n} xu rendus en tout`,
     resultLabel: (cost: number) => `Résultat de ton tirage à ${cost} xu`,
     resultContinue: "Continuer",
-    pulling: "Tirage en cours",
+    syncing: "Ton solde se synchronise…",
   },
   // --- profile ---
   shop: {
@@ -818,7 +818,7 @@ export const fr = {
       acc_con_vo: { name: "Bâton de Bình Định", desc: "Le bâton des maîtres d'arts martiaux de Bình Định. Pour ton héros.", confirmName: "le bâton de Bình Định" },
       outfit_hoi_vat: { name: "Tenue de lutteur", desc: "La tenue des lutteurs du hội vật, avec sa ceinture de soie rouge. Pour ton héros.", confirmName: "la tenue de lutteur" },
     } as Record<string, { name: string; desc: string; confirmName: string }>,
-    characters: { title: "Personnages", starter: "Héros de départ" },
+    characters: { starter: "Héros de départ" },
     themes: { legendes_sombres: "Légendes sombres", arene: "Arène" } as Record<string, string>,
     rarities: { common: "Commun", rare: "Rare", epic: "Épique", legendary: "Légendaire" } as Record<"common" | "rare" | "epic" | "legendary", string>,
     tryOn: {

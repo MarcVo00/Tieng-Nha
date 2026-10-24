@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { createFakeServices, FakeGachaGateway } from "@/adapters/fakes";
@@ -398,44 +398,81 @@ describe("gacha banner and set", () => {
     expect(within(sheet).getAllByText(/^Doublon · \+\d+ xu$/).length).toBeGreaterThan(0);
   });
 
-  test("not enough xu: both pulls are disabled with the reason", async () => {
+  test("not enough xu: both pulls are disabled, each with its own reason", async () => {
     const services = await make(0);
     setup(services);
     const section = await banner();
-    expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled();
-    expect(within(section).getByRole("button", { name: fr.gacha.pullTen(360) })).toBeDisabled();
-    expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.missing(40));
+    const one = within(section).getByRole("button", { name: fr.gacha.pullOne(40) });
+    const ten = within(section).getByRole("button", { name: fr.gacha.pullTen(360) });
+    expect(one).toBeDisabled();
+    expect(ten).toBeDisabled();
+    expect(one).toHaveAccessibleDescription(fr.gacha.missing(40));
+    expect(ten).toHaveAccessibleDescription(fr.gacha.missing(360));
   });
 
-  test("between 40 and 359 xu: the single pull works, the x10 is disabled and says what is missing", async () => {
+  test("between 40 and 359 xu: the single pull works, the x10 is disabled and says what is missing for it", async () => {
     const services = await make(100);
     setup(services);
     const section = await banner();
-    expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeEnabled();
+    const one = within(section).getByRole("button", { name: fr.gacha.pullOne(40) });
     const ten = within(section).getByRole("button", { name: fr.gacha.pullTen(360) });
+    expect(one).toBeEnabled();
+    expect(one).toHaveAccessibleDescription("");
     expect(ten).toBeDisabled();
-    expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.missing(260));
     expect(ten).toHaveAccessibleDescription(fr.gacha.missing(260));
   });
 
-  test("offline: the pulls are disabled with « Connecte-toi pour tirer. »", async () => {
+  test("no network on the device: the pulls are disabled with the sign-in hint", async () => {
     const services = await make(500);
-    (services.gacha as FakeGachaGateway).online = false;
+    vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
     setup(services);
     const section = await banner();
-    await waitFor(() => expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.offline));
+    const one = within(section).getByRole("button", { name: fr.gacha.pullOne(40) });
     expect(fr.gacha.offline).toBe("Connecte-toi pour tirer.");
-    expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled();
+    expect(one).toBeDisabled();
     expect(within(section).getByRole("button", { name: fr.gacha.pullTen(360) })).toBeDisabled();
+    expect(one).toHaveAccessibleDescription(fr.gacha.offline);
   });
 
-  test("the check uses min(local, server): a lower server balance blocks the pull", async () => {
+  test("an unreachable server warns but never locks the screen: the tap re-checks it and the pull goes through once it is back", async () => {
+    const services = await make(500);
+    const gacha = services.gacha as FakeGachaGateway;
+    gacha.online = false;
+    const user = setup(services);
+    const section = await banner();
+    const one = within(section).getByRole("button", { name: fr.gacha.pullOne(40) });
+    await waitFor(() => expect(one).toHaveAccessibleDescription(fr.gacha.offline));
+    expect(one).toBeEnabled();
+    await user.click(one); // still down: nothing happens
+    expect(screen.queryByRole("dialog")).toBeNull();
+    gacha.online = true; // the network is fine again, the browser never fired `online`
+    await user.click(one);
+    await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+    expect(await types(services)).toEqual(["demo_grant", "gacha_pulled"]);
+  });
+
+  test("coming back to the app re-checks the server", async () => {
+    const services = await make(500);
+    const gacha = services.gacha as FakeGachaGateway;
+    gacha.online = false;
+    setup(services);
+    const section = await banner();
+    const one = within(section).getByRole("button", { name: fr.gacha.pullOne(40) });
+    await waitFor(() => expect(one).toHaveAccessibleDescription(fr.gacha.offline));
+    gacha.online = true;
+    window.dispatchEvent(new Event("focus"));
+    await waitFor(() => expect(one).toHaveAccessibleDescription(""));
+  });
+
+  test("the check uses min(local, server): a lower server balance blocks the pull and says the balance is syncing", async () => {
     const services = await make(500);
     (services.gacha as FakeGachaGateway).serverCoins = 10;
     setup(services);
     const section = await banner();
-    await waitFor(() => expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled());
-    expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.missing(30));
+    const one = within(section).getByRole("button", { name: fr.gacha.pullOne(40) });
+    await waitFor(() => expect(one).toBeDisabled());
+    expect(one).toHaveAccessibleDescription(fr.gacha.syncing);
+    expect(within(section).queryByText(/Il te manque/)).toBeNull();
   });
 
   test("the server balance is re-checked at the tap: when it dropped meanwhile nothing is pulled", async () => {
@@ -448,33 +485,76 @@ describe("gacha banner and set", () => {
     gacha.serverCoins = 5;
     const pull = vi.spyOn(gacha, "pull");
     await user.click(one);
-    expect(await within(section).findByText(fr.gacha.missing(35))).toBeInTheDocument();
+    await waitFor(() => expect(one).toHaveAccessibleDescription(fr.gacha.syncing));
     expect(pull).not.toHaveBeenCalled();
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  test("a refusal from the server shows a message and spends nothing", async () => {
+  test("a server not_enough re-reads the balance instead of guessing what is missing", async () => {
+    const services = await make(500);
+    const gacha = services.gacha as FakeGachaGateway;
+    const user = setup(services);
+    const section = await banner();
+    const one = await within(section).findByRole("button", { name: fr.gacha.pullOne(40) });
+    await waitFor(() => expect(one).toBeEnabled());
+    vi.spyOn(gacha, "pull").mockImplementation(async () => {
+      gacha.serverCoins = 12; // the server really has less
+      return { ok: false, error: "not_enough" };
+    });
+    await user.click(one);
+    await waitFor(() => expect(one).toBeDisabled());
+    expect(one).toHaveAccessibleDescription(fr.gacha.syncing);
+    expect(within(section).queryByText(fr.gacha.missing(1))).toBeNull();
+  });
+
+  test("a refusal shows a message that goes away as soon as the balance changes", async () => {
     const services = await make(500);
     const gacha = services.gacha as FakeGachaGateway;
     vi.spyOn(gacha, "pull").mockResolvedValue({ ok: false, error: "unknown_theme" });
     const user = setup(services);
     const section = await banner();
     await user.click(await within(section).findByRole("button", { name: fr.gacha.pullOne(40) }));
-    expect(await within(section).findByText(fr.gacha.error)).toBeInTheDocument();
+    expect(await within(section).findByRole("status")).toHaveTextContent(fr.gacha.error);
     expect(await types(services)).toEqual(["demo_grant"]);
     expect(screen.queryByRole("dialog")).toBeNull();
+    await act(async () => {
+      await services.activity.demoGrant(10, 0); // the balance moves: the old message is no longer true
+      useAppState.getState().set({ wallet: await services.activity.getWallet() });
+    });
+    await waitFor(() => expect(within(section).getByRole("status")).toHaveTextContent(/^$/));
   });
 
-  test("the connection dropping mid-pull keeps the id pending and says the pull will reappear", async () => {
+  test("the connection dropping mid-pull keeps the id pending and says the pull will reappear; the next tap is not locked", async () => {
     const services = await make(500);
     const gacha = services.gacha as FakeGachaGateway;
-    vi.spyOn(gacha, "pull").mockRejectedValue(new OfflineError());
+    const failing = vi.spyOn(gacha, "pull").mockRejectedValue(new OfflineError());
     const user = setup(services);
     const section = await banner();
-    await user.click(await within(section).findByRole("button", { name: fr.gacha.pullOne(40) }));
+    const one = await within(section).findByRole("button", { name: fr.gacha.pullOne(40) });
+    await user.click(one);
     expect(await within(section).findByText(fr.gacha.interrupted)).toBeInTheDocument();
     expect(readPendingPulls()).toHaveLength(1);
-    await waitFor(() => expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled()); // unreachable
+    expect(one).toBeEnabled(); // not stuck offline
+    failing.mockRestore();
+    await user.click(one);
+    await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+  });
+
+  test("the guarantee counter comes from the journal on mount, and nothing is shown before it is known", async () => {
+    const services = await make(500);
+    await runGachaPull(services, THEME, 10); // rolls 0: acc_giao_tre x10, no legendary
+    setup(services);
+    const section = await banner();
+    expect(within(section).queryByText(fr.gacha.pityLine(40))).toBeNull();
+    expect(await within(section).findByText(fr.gacha.pityLine(30))).toBeInTheDocument();
+  });
+
+  test("gold stays for rewards: the banner fillet is neutral until a piece is owned", async () => {
+    const services = await make(100);
+    setup(services);
+    const section = await banner();
+    expect(section.querySelector("[data-banner] > span.border-gold")).toBeNull();
+    expect(section.querySelector("[data-banner] > span.border-line")).not.toBeNull();
   });
 
   test("while a pull runs, every other button of the screen is locked", async () => {

@@ -362,12 +362,13 @@ describe("gacha banner and set", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   });
 
-  test("a single pull: the result list, the new balance, the progress and the guarantee counter", async () => {
+  test("a single pull skipped to its recap: the piece, the new balance, the progress and the guarantee counter", async () => {
     const services = await make(100);
     const user = setup(services);
     const section = await banner();
     await user.click(within(section).getByRole("button", { name: fr.gacha.pullOne(40) }));
     const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.scene.skip })); // straight to the recap
     const lines = within(sheet).getAllByRole("listitem");
     expect(lines).toHaveLength(1);
     expect(lines[0]).toHaveTextContent(nameOf("acc_giao_tre"));
@@ -381,12 +382,13 @@ describe("gacha banner and set", () => {
     expect(within(await banner()).getByText(fr.gacha.pityLine(39))).toBeInTheDocument();
   });
 
-  test("a x10 pull lists ten lines, duplicates with their refund, and costs 360 xu minus the refunds", async () => {
+  test("a x10 pull skipped to its recap lists ten pieces, duplicates with their refund, and costs 360 xu minus the refunds", async () => {
     const services = await make(400);
     const user = setup(services);
     const section = await banner();
     await user.click(within(section).getByRole("button", { name: fr.gacha.pullTen(360) }));
     const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(360) });
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.scene.skip })); // straight to the recap
     const lines = within(sheet).getAllByRole("listitem");
     expect(lines).toHaveLength(10);
     const wallet = await services.activity.getWallet();
@@ -589,6 +591,7 @@ describe("gacha banner and set", () => {
     const before = (await services.activity.getWallet()).coins;
     await user.click(within(section).getByRole("button", { name: fr.gacha.pullOne(40) }));
     const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.scene.skip })); // straight to the recap
     expect(within(sheet).getByText(/^Doublon · \+\d+ xu$/)).toBeInTheDocument();
     const after = (await services.activity.getWallet()).coins;
     expect(after).toBeGreaterThan(before - 40);

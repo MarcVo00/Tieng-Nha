@@ -13,8 +13,8 @@ import { fr } from "@/i18n/fr";
 import { BalanceLine, Button, Card, ConfirmDialog, EmptyState, SectionTitle, Skeleton, TryOnSheet, useToast } from "@/ui";
 import { GachaBanner, type PullCount } from "@/features/shop/GachaBanner";
 import { GachaRates } from "@/features/shop/GachaRates";
-import { GachaResult } from "@/features/shop/GachaResult";
 import { GachaSet } from "@/features/shop/GachaSet";
+import { XinXamScene } from "@/features/shop/XinXamScene";
 
 type Verdict = { label: string; disabled: boolean; action: "buy" | "none" };
 
@@ -151,7 +151,7 @@ export function ShopScreen() {
     void loadPity();
   }, [loadPity]);
 
-  /** The single place a finished pull goes through: Task 6 swaps the list sheet below for the Xin xam scene here. */
+  /** The single place a finished pull goes through: the Xin xăm scene (a recovered pull opens on its recap). */
   const presentPull = useCallback((pull: GachaPull, recovered: boolean) => setShown({ pull, recovered }), []);
 
   // A pull recovered after a crash or a closed app is shown like a fresh one, once.
@@ -360,7 +360,7 @@ export function ShopScreen() {
       ) : null}
 
       <GachaRates open={ratesOpen} onClose={() => setRatesOpen(false)} />
-      <GachaResult pull={shown?.pull ?? null} recovered={shown?.recovered ?? false} onClose={() => setShown(null)} />
+      <XinXamScene pull={shown?.pull ?? null} recovered={shown?.recovered ?? false} items={items ?? []} baseLook={baseLook} onClose={() => setShown(null)} />
 
       <ConfirmDialog
         open={asking !== null}

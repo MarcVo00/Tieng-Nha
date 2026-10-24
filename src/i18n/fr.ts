@@ -783,6 +783,22 @@ export const fr = {
     resultLabel: (cost: number) => `Résultat de ton tirage à ${cost} xu`,
     resultContinue: "Continuer",
     syncing: "Ton solde se synchronise…",
+    scene: {
+      skip: "Passer",
+      shake: "Secouer le tube",
+      shakeHint: "Maintiens le doigt sur le tube, ou touche-le une fois.",
+      shaking: "Secoue, secoue… un bâtonnet va tomber.",
+      tapOne: "Regarde son bout, puis touche le bâtonnet.",
+      tapMany: (n: number) => `Touche un bâtonnet\u202f: encore ${n}.`,
+      holding: "Un bâtonnet d'or…",
+      revealAll: "Tout révéler",
+      stick: (n: number, tip: string) => `Bâtonnet ${n}, bout ${tip}`,
+      tips: { common: "de bois", rare: "de jade", epic: "vermillon", legendary: "d'or" } as Record<"common" | "rare" | "epic" | "legendary", string>,
+      duplicate: (n: number) => `Déjà obtenu → +${n} xu`,
+      next: "Bâtonnet suivant",
+      toRecap: "Voir tout le tirage",
+      wearing: (name: string) => `Ton héros avec ${name}`,
+    },
   },
   // --- profile ---
   shop: {

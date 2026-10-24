@@ -200,3 +200,32 @@ export async function seedKimBai(page: Page, amount: number): Promise<void> {
     await new Promise((res) => { tx.oncomplete = res; });
   }, amount);
 }
+
+/** Writes one `demo_grant` event worth `coins` xu (the fakes count it on both sides of the gacha). Call after onboarding, then reload. */
+export async function seedCoins(page: Page, coins: number): Promise<void> {
+  await page.evaluate(async (coins) => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open("tieng-nha");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const tx = db.transaction("events", "readwrite");
+    tx.objectStore("events").put({
+      clientId: crypto.randomUUID(),
+      schemaVersion: 1,
+      type: "demo_grant",
+      refId: "demo",
+      xp: 0,
+      payload: { coins, kimBai: 0 },
+      createdAt: new Date(Date.now() - 60000).toISOString(),
+    });
+    await new Promise((res) => { tx.oncomplete = res; });
+  }, coins);
+}
+
+/** In the Xin xăm scene: touches the tube once and waits until the stick(s) rest on the altar. */
+export async function shakeTube(page: Page): Promise<void> {
+  const scene = page.getByRole("dialog");
+  await scene.getByRole("button", { name: fr.gacha.scene.shake }).click();
+  await expect(scene).toHaveAttribute("data-phase", "altar");
+}

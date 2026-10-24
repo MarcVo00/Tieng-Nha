@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220">
+  <g id="scroll" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- quẻ : rouleau de papier điệp déroulé. Zone libre pour l'objet et son nom : (24,26)–(136,194) -->
+    <g id="scroll-paper">
+      <path d="M14 12 L146 12 L146 208 L14 208 Z" fill="#F4E4C4"/>
+      <!-- double filet vermillon, nuages aux coins -->
+      <path d="M22 20 L138 20 L138 200 L22 200 Z" fill="none" stroke="#B23A2A" stroke-width="1.6"/>
+      <path d="M26 24 L134 24 L134 196 L26 196 Z" fill="none" stroke="#B23A2A" stroke-width="0.9"/>
+      <path d="M30 34 Q30 29 35 29 Q39 29 39 33 Q39 36 36 36 Q34 36 34 34 M130 34 Q130 29 125 29 Q121 29 121 33 Q121 36 124 36 Q126 36 126 34 M30 186 Q30 191 35 191 Q39 191 39 187 Q39 184 36 184 Q34 184 34 186 M130 186 Q130 191 125 191 Q121 191 121 187 Q121 184 124 184 Q126 184 126 186" fill="none" stroke="#B23A2A" stroke-width="1.4"/>
+    </g>
+    <!-- baguettes de laque indigo, embouts d’or -->
+    <g id="scroll-rollers">
+      <rect x="8" y="5" width="144" height="10" rx="3" fill="#2B4E6E"/>
+      <rect x="8" y="205" width="144" height="10" rx="3" fill="#2B4E6E"/>
+      <path d="M2 4 L10 4 L10 16 L2 16 Z M150 4 L158 4 L158 16 L150 16 Z M2 204 L10 204 L10 216 L2 216 Z M150 204 L158 204 L158 216 L150 216 Z" fill="#D9A93A" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

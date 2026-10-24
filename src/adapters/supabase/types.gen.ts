@@ -267,6 +267,47 @@ export type Database = {
           },
         ]
       }
+      gacha_pulls: {
+        Row: {
+          claimed: boolean
+          cost: number
+          count: number
+          created_at: string
+          id: string
+          results: Json
+          theme: string
+          user_id: string
+        }
+        Insert: {
+          claimed?: boolean
+          cost: number
+          count: number
+          created_at?: string
+          id: string
+          results: Json
+          theme: string
+          user_id: string
+        }
+        Update: {
+          claimed?: boolean
+          cost?: number
+          count?: number
+          created_at?: string
+          id?: string
+          results?: Json
+          theme?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gacha_pulls_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       groups: {
         Row: {
           created_at: string
@@ -328,6 +369,7 @@ export type Database = {
           equipped: Json
           exam_best: number | null
           group_id: string
+          gacha_pity: Json
           inventory: string[]
           kim_bai: number
           last_active_day: string | null
@@ -349,6 +391,7 @@ export type Database = {
           equipped?: Json
           exam_best?: number | null
           group_id: string
+          gacha_pity?: Json
           inventory?: string[]
           kim_bai?: number
           last_active_day?: string | null
@@ -370,6 +413,7 @@ export type Database = {
           equipped?: Json
           exam_best?: number | null
           group_id?: string
+          gacha_pity?: Json
           inventory?: string[]
           kim_bai?: number
           last_active_day?: string | null
@@ -452,6 +496,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      gacha_pull: {
+        Args: {
+          p_pull: string
+          p_theme: string
+          p_count: number
+        }
+        Returns: Json
+      }
       join_group: {
         Args: {
           p_invite_code: string
@@ -461,6 +513,10 @@ export type Database = {
         Returns: undefined
       }
       list_duels: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      list_gacha_pulls: {
         Args: Record<PropertyKey, never>
         Returns: Json
       }

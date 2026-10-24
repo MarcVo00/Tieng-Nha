@@ -31,12 +31,12 @@ create function pg_temp.eq(k text) returns text language sql as $$
 $$;
 
 -- ---------- catalogue (as postgres) ----------
-select is((select price || '/' || kind || '/' || slot from public.shop_item('hat_thuy_tinh')), '60/cosmetic/hat', 'hat_thuy_tinh: 60, cosmetic, hat');
-select is((select price || '/' || kind || '/' || slot from public.shop_item('aura_waves')), '80/cosmetic/aura', 'aura_waves: 80, cosmetic, aura');
-select is((select price || '/' || kind || '/' || slot from public.shop_item('outfit_son_tinh')), '90/cosmetic/outfit', 'outfit_son_tinh: 90, cosmetic, outfit');
-select is((select price || '/' || kind || '/' || slot from public.shop_item('acc_thuan_thien')), '120/cosmetic/accessory', 'acc_thuan_thien: 120, cosmetic, accessory');
+select is((select coalesce(price::text, 'null') || '/' || kind || '/' || slot from public.shop_item('hat_thuy_tinh')), 'null/cosmetic/hat', 'hat_thuy_tinh: gacha-only (no price), cosmetic, hat');
+select is((select coalesce(price::text, 'null') || '/' || kind || '/' || slot from public.shop_item('aura_waves')), 'null/cosmetic/aura', 'aura_waves: gacha-only (no price), cosmetic, aura');
+select is((select coalesce(price::text, 'null') || '/' || kind || '/' || slot from public.shop_item('outfit_son_tinh')), 'null/cosmetic/outfit', 'outfit_son_tinh: gacha-only (no price), cosmetic, outfit');
+select is((select coalesce(price::text, 'null') || '/' || kind || '/' || slot from public.shop_item('acc_thuan_thien')), 'null/cosmetic/accessory', 'acc_thuan_thien: gacha-only (no price), cosmetic, accessory');
 
--- ---------- purchases ----------
+-- ---------- purchases: the four are gacha-only since the gacha migration, so a purchase is always refused ----------
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select lives_ok($$ select public.join_group('FAM', 'Alice', '🐉') $$, 'alice joins');
 reset role;
@@ -44,16 +44,15 @@ update public.user_stats set coins = 1000 where user_id = '11111111-1111-1111-11
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
 
 select pg_temp.ev('item_purchased', '{"itemId": "hat_thuy_tinh"}');
-select is(pg_temp.coins(), 940, 'hat_thuy_tinh costs 60');
-select ok('hat_thuy_tinh' = any(pg_temp.inv()), 'hat_thuy_tinh is in the inventory');
+select is(pg_temp.coins(), 1000, 'hat_thuy_tinh can no longer be bought');
+select ok(not ('hat_thuy_tinh' = any(pg_temp.inv())), 'hat_thuy_tinh is not in the inventory');
 select pg_temp.ev('item_purchased', '{"itemId": "hat_thuy_tinh"}');
-select is(pg_temp.coins(), 940, 'an owned cosmetic cannot be bought again');
+select is(pg_temp.coins(), 1000, 'a second attempt is refused too');
 
 select pg_temp.ev('item_purchased', '{"itemId": "aura_waves"}');
-select is(pg_temp.coins(), 860, 'aura_waves costs 80');
+select is(pg_temp.coins(), 1000, 'aura_waves can no longer be bought');
 select pg_temp.ev('item_purchased', '{"itemId": "outfit_son_tinh"}');
-select is(pg_temp.coins(), 770, 'outfit_son_tinh costs 90');
--- too poor for the 120-coin item: refused, nothing taken
+select is(pg_temp.coins(), 1000, 'outfit_son_tinh can no longer be bought');
 reset role;
 update public.user_stats set coins = 100 where user_id = '11111111-1111-1111-1111-111111111111';
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
@@ -63,8 +62,12 @@ reset role;
 update public.user_stats set coins = 770 where user_id = '11111111-1111-1111-1111-111111111111';
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select pg_temp.ev('item_purchased', '{"itemId": "acc_thuan_thien"}');
-select is(pg_temp.coins(), 650, 'acc_thuan_thien costs 120');
-select is(cardinality(pg_temp.inv()), 4, 'all four are in the inventory');
+select is(pg_temp.coins(), 770, 'acc_thuan_thien is refused even with enough coins');
+select is(cardinality(pg_temp.inv()), 0, 'none of the four reached the inventory');
+-- the player now owns them (a gacha pull, or a purchase made before the gacha migration)
+reset role;
+update public.user_stats set inventory = '{hat_thuy_tinh,aura_waves,outfit_son_tinh,acc_thuan_thien}' where user_id = '11111111-1111-1111-1111-111111111111';
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
 
 -- ---------- equipment ----------
 select pg_temp.ev('item_equipped', '{"slot": "hat", "itemId": "hat_thuy_tinh"}');

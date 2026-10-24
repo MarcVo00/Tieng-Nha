@@ -2,7 +2,7 @@ import type { z } from "zod";
 import type {
   VocabItemSchema, ExerciseSchema, ListenChooseSchema, TranslateChooseSchema, TonePickSchema, WordOrderSchema,
   SpeakSchema, LessonSchema, TurnSchema, NpcTurnSchema, UserTurnSchema, DialogueSchema, ExamSectionSchema,
-  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema, ShopItemSchema, ChangelogEntrySchema,
+  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema, ShopItemSchema, RaritySchema, ChangelogEntrySchema,
 } from "@/content/schema";
 
 export type { Tone } from "@/domain/tones";
@@ -153,6 +153,7 @@ export type TreeNode = z.infer<typeof TreeNodeSchema>;
 export type Tree = z.infer<typeof TreeFileSchema>;
 export type Boss = z.infer<typeof BossSchema>;
 export type ShopItem = z.infer<typeof ShopItemSchema>;
+export type Rarity = z.infer<typeof RaritySchema>;
 export type ChangelogEntry = z.infer<typeof ChangelogEntrySchema>;
 export type Shop = ShopItem[];
 /** Equipment slots: profile (frame, profile_fx) and character layers (hat, outfit, accessory, aura). */

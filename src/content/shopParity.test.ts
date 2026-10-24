@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import shop from "@/content/shop.json";
 import badges from "@/content/badges.json";
+import { ShopFileSchema } from "@/content/schema";
 
 const DIR = "supabase/migrations";
 
@@ -25,11 +26,21 @@ function valuesOf(sql: string, fnName: string): string {
   return sql.slice(from, to);
 }
 
-// Rows look like: ('frame_bronze', null::int, 'cosmetic', 'frame', 'xu') or ('energy_refill', 30, 'consumable', null::text, 'xu')
+// Rows look like: ('hat_thuy_tinh', null::int, 'cosmetic', 'hat', 'xu', 'legendes_sombres', 'rare')
+// or ('energy_refill', 30, 'consumable', null::text, 'xu', null::text, null::text)
 function shopRows() {
-  const body = valuesOf(latestMigrationDefining("shop_item"), "shop_item");
-  const rows = [...body.matchAll(/\(\s*'([a-z_]+)'\s*,\s*(\d+|null(?:::int)?)\s*,\s*'(consumable|cosmetic)'\s*,\s*(?:'([a-z_]+)'|null(?:::text)?)\s*,\s*'(xu|kim_bai)'\s*\)/g)];
-  return rows.map((m) => ({ id: m[1], price: m[2]!.startsWith("null") ? null : Number(m[2]), kind: m[3], slot: m[4] ?? null, currency: m[5] }));
+  const body = valuesOf(latestMigrationDefining("shop_items"), "shop_items");
+  const text = String.raw`(?:'([a-z_]+)'|null(?:::text)?)`;
+  const row = new RegExp(String.raw`\(\s*'([a-z_]+)'\s*,\s*(\d+|null(?:::int)?)\s*,\s*'(consumable|cosmetic)'\s*,\s*${text}\s*,\s*'(xu|kim_bai)'\s*,\s*${text}\s*,\s*${text}\s*\)`, "g");
+  return [...body.matchAll(row)].map((m) => ({
+    id: m[1],
+    price: m[2]!.startsWith("null") ? null : Number(m[2]),
+    kind: m[3],
+    slot: m[4] ?? null,
+    currency: m[5],
+    theme: m[6] ?? null,
+    rarity: m[7] ?? null,
+  }));
 }
 
 function rewardRows() {
@@ -39,10 +50,39 @@ function rewardRows() {
 
 describe("catalogue parity with the SQL migrations", () => {
   test("shop_item rows equal shop.json items", () => {
-    const fromJson = shop.items.map((i) => ({ id: i.id, price: i.price, kind: i.kind, slot: i.slot, currency: "currency" in i ? i.currency : "xu" }));
+    const fromJson = shop.items.map((i) => ({
+      id: i.id,
+      price: i.price,
+      kind: i.kind,
+      slot: i.slot,
+      currency: "currency" in i ? i.currency : "xu",
+      theme: "theme" in i ? i.theme : null,
+      rarity: "rarity" in i ? i.rarity : null,
+    }));
     const rows = shopRows();
     expect(rows).toHaveLength(fromJson.length);
     expect(rows).toEqual(fromJson);
+  });
+
+  test("shop.json parses with the schema", () => {
+    expect(ShopFileSchema.safeParse(shop).success).toBe(true);
+  });
+
+  test("the gacha theme has 12 items: 4 common, 4 rare, 3 epic, 1 legendary, none directly purchasable", () => {
+    const gacha = shop.items.filter((i) => "rarity" in i);
+    expect(gacha.every((i) => i.price === null && i.kind === "cosmetic" && ("currency" in i ? i.currency : "xu") === "xu")).toBe(true);
+    expect(gacha.every((i) => "theme" in i && i.theme === "legendes_sombres")).toBe(true);
+    const count = (r: string) => gacha.filter((i) => "rarity" in i && i.rarity === r).length;
+    expect([count("common"), count("rare"), count("epic"), count("legendary")]).toEqual([4, 4, 3, 1]);
+    expect(gacha).toHaveLength(12);
+  });
+
+  test("gacha prices, refunds and rates are those of the migration", () => {
+    const sql = readFileSync(`${DIR}/20261025000000_gacha.sql`, "utf8");
+    expect(sql).toMatch(/when 1 then 40 when 10 then 360/);
+    expect(sql).toMatch(/'common' then 8 when 'rare' then 20 when 'epic' then 50 when 'legendary' then 120/);
+    expect(sql).toMatch(/v_r1 < 0\.60[\s\S]*v_r1 < 0\.88[\s\S]*v_r1 < 0\.98/);
+    expect(sql).toMatch(/v_pity \+ 1 >= 40/);
   });
 
   test("only the arena items are paid in Kim bài", () => {
@@ -60,7 +100,9 @@ describe("catalogue parity with the SQL migrations", () => {
     const rewards = badges.badges.flatMap((b) => ("reward" in b && typeof b.reward === "string" ? [b.reward] : []));
     const priceOf = new Map(shop.items.map((i) => [i.id, i.price]));
     for (const r of rewards) expect(priceOf.get(r)).toBeNull();
-    for (const i of shop.items.filter((x) => x.price === null)) expect(rewards.filter((r) => r === i.id)).toHaveLength(1);
+    // gacha items have no price either, but they are won by drawing, not by a badge
+    for (const i of shop.items.filter((x) => x.price === null && !("rarity" in x))) expect(rewards.filter((r) => r === i.id)).toHaveLength(1);
+    for (const r of rewards) expect(shop.items.find((i) => i.id === r)).not.toHaveProperty("rarity");
   });
 
   test("the streak freeze cap is 2, as in the migration", () => {

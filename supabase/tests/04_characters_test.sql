@@ -31,10 +31,10 @@ create function pg_temp.eq(k text) returns text language sql as $$
 $$;
 
 -- ---------- catalogue (as postgres) ----------
-select is((select price || '/' || kind || '/' || slot from public.shop_item('char_kiem_khach')), '200/cosmetic/character', 'char_kiem_khach: 200, cosmetic, character');
-select is((select price || '/' || kind || '/' || slot from public.shop_item('char_phap_su')), '200/cosmetic/character', 'char_phap_su: 200, cosmetic, character');
+select is((select coalesce(price::text, 'null') || '/' || kind || '/' || slot from public.shop_item('char_kiem_khach')), 'null/cosmetic/character', 'char_kiem_khach: gacha-only (no price), cosmetic, character');
+select is((select coalesce(price::text, 'null') || '/' || kind || '/' || slot from public.shop_item('char_phap_su')), 'null/cosmetic/character', 'char_phap_su: gacha-only (no price), cosmetic, character');
 
--- ---------- purchase ----------
+-- ---------- purchase: characters are gacha-only since the gacha migration, so a purchase is always refused ----------
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select lives_ok($$ select public.join_group('FAM', 'Alice', '🐉') $$, 'alice joins');
 reset role;
@@ -47,13 +47,16 @@ reset role;
 update public.user_stats set coins = 1000 where user_id = '11111111-1111-1111-1111-111111111111';
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select pg_temp.ev('item_purchased', '{"itemId": "char_kiem_khach"}');
-select is(pg_temp.coins(), 800, 'char_kiem_khach costs 200');
-select ok('char_kiem_khach' = any(pg_temp.inv()), 'char_kiem_khach is in the inventory');
+select is(pg_temp.coins(), 1000, 'char_kiem_khach is refused even with enough coins (gacha-only)');
+select ok(not ('char_kiem_khach' = any(pg_temp.inv())), 'char_kiem_khach did not reach the inventory');
+-- the player owns the character and the hat (gacha pulls, or purchases made before the gacha migration)
+reset role;
+update public.user_stats set inventory = '{char_kiem_khach,hat_thuy_tinh}' where user_id = '11111111-1111-1111-1111-111111111111';
+select pg_temp.login('11111111-1111-1111-1111-111111111111');
 
 -- ---------- equipment ----------
 select pg_temp.ev('item_equipped', '{"slot": "character", "itemId": "char_kiem_khach"}');
 select is(pg_temp.eq('character'), 'char_kiem_khach', 'an owned character can be equipped');
-select pg_temp.ev('item_purchased', '{"itemId": "hat_thuy_tinh"}');
 select ok('hat_thuy_tinh' = any(pg_temp.inv()), 'a real hat is owned');
 select pg_temp.ev('item_equipped', '{"slot": "hat", "itemId": "hat_thuy_tinh"}');
 select is(pg_temp.eq('hat'), 'hat_thuy_tinh', 'the real hat is equipped');

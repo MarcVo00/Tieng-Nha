@@ -73,7 +73,7 @@ select is((select price || '/' || kind || '/' || slot || '/' || currency from pu
 select is((select price || '/' || kind || '/' || slot || '/' || currency from public.shop_item('acc_con_vo')), '8/cosmetic/accessory/kim_bai', 'acc_con_vo: 8 Kim bai accessory');
 select is((select price || '/' || kind || '/' || slot || '/' || currency from public.shop_item('outfit_hoi_vat')), '10/cosmetic/outfit/kim_bai', 'outfit_hoi_vat: 10 Kim bai outfit');
 select is((select currency from public.shop_item('energy_refill')), 'xu', 'existing items are paid in xu');
-select is((select count(*)::int from public.shop_item('char_phap_su') where currency = 'xu' and price = 200), 1, 'previous rows are unchanged');
+select is((select count(*)::int from public.shop_item('char_phap_su') where currency = 'xu' and price is null and rarity = 'legendary'), 1, 'previous rows keep their xu currency (gacha-only since the gacha migration)');
 
 -- ---------- scoring rules ----------
 select is(public.duel_damage(pg_temp.r1(8, true, 1000), pg_temp.r2(3, 3)), 165, 'all correct and fast: 8x15 + 3x15 = 165');

@@ -62,8 +62,9 @@ async function signedIn(): Promise<Services> {
 describe("changelog content", () => {
   test("the bundled changelog is valid: newest first, semver, real dates", () => {
     const entries = ChangelogFileSchema.parse(changelog).entries;
-    expect(entries.map((e) => e.version)).toEqual(["1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"]);
+    expect(entries.map((e) => e.version)).toEqual(["1.6.0", "1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"]);
     expect(entries.map((e) => e.date)).toEqual([
+      "2026-10-25",
       "2026-10-21",
       "2026-10-21",
       "2026-10-21",
@@ -129,7 +130,7 @@ describe("changelog content", () => {
       shop: async () => ({}),
       changelog: async () => changelog,
     });
-    expect((await src.getChangelog())[0]?.title).toBe("Petits écrans");
+    expect((await src.getChangelog())[0]?.title).toBe("Le tirage de la pagode");
   });
 });
 
@@ -166,12 +167,12 @@ describe("« Nouveautés »", () => {
     const versions = within(list)
       .getAllByText(/^Version \d/)
       .map((n) => n.textContent);
-    expect(versions).toEqual(["1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"].map(fr.news.version));
+    expect(versions).toEqual(["1.6.0", "1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"].map(fr.news.version));
     expect(within(list).getAllByText(fr.news.current)).toHaveLength(1);
     const first = within(list).getAllByRole("listitem")[0];
     expect(within(first!).getByText(fr.news.current)).toBeInTheDocument();
-    expect(within(first!).getByText("Petits écrans")).toBeInTheDocument();
-    expect(within(first!).getByText("21 octobre 2026")).toBeInTheDocument();
+    expect(within(first!).getByText("Le tirage de la pagode")).toBeInTheDocument();
+    expect(within(first!).getByText("25 octobre 2026")).toBeInTheDocument();
   });
 
   test("storage that throws never crashes: the dot stays, the page opens", async () => {

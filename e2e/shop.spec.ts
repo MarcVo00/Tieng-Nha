@@ -53,7 +53,7 @@ test("pull once from the dark legends banner, see the result, and the set fills 
   await shakeTube(page);
   await result.getByRole("button", { name: /^Bâtonnet 1, bout / }).click();
   await expect(result.locator("[data-seal]")).toBeVisible();
-  await expect(result.getByText(fr.gacha.resultNew)).toBeVisible();
+  await expect(result.locator("[data-scroll]").getByText(fr.gacha.resultNew)).toBeVisible();
   await result.getByRole("button", { name: fr.gacha.resultContinue }).click();
   await expect(result).toHaveCount(0);
 

@@ -48,6 +48,7 @@ test("x1: shake the tube, the stick falls showing its tip, a touch unrolls the s
   expect(within(dialog).getByRole("button", { name: fr.gacha.scene.skip })).toBeInTheDocument();
   await user.click(stick);
   const hero = await within(dialog).findByRole("img", { name: fr.gacha.scene.wearing(nameOf("hat_thuy_tinh")) });
+  expect(within(dialog).getByRole("status").textContent).toBe(fr.gacha.scene.announce(nameOf("hat_thuy_tinh"), fr.shop.rarities.rare, fr.gacha.resultNew));
   expect(hero.querySelector("[data-look]")?.getAttribute("data-look")).toContain("hat_thuy_tinh");
   expect(within(dialog).getByRole("heading", { name: nameOf("hat_thuy_tinh") })).toBeInTheDocument();
   expect(dialog.querySelector('[data-seal="rare"]')).toHaveTextContent(fr.shop.rarities.rare);
@@ -63,6 +64,7 @@ test("a duplicate says what it gave back", async () => {
   await waitFor(() => expect(stick).toBeEnabled(), SLOW);
   await user.click(stick);
   expect(await within(dialog).findByText(fr.gacha.scene.duplicate(20))).toBeInTheDocument();
+  expect(within(dialog).getByRole("status").textContent).toBe(fr.gacha.scene.announce(nameOf("acc_quat_sat"), fr.shop.rarities.rare, fr.gacha.scene.duplicate(20)));
   expect(fr.gacha.scene.duplicate(20)).toBe("Déjà obtenu → +20 xu");
 });
 
@@ -96,7 +98,7 @@ test("legendary: a longer hold with static gold rays, the gold seal, confetti on
   expect(rays?.querySelectorAll("path")).toHaveLength(1);
   expect(within(dialog).getByRole("button", { name: fr.gacha.scene.skip })).toBeInTheDocument();
   await waitFor(() => expect(dialog.querySelector('[data-seal="legendary"]')).not.toBeNull(), SLOW);
-  await waitFor(() => expect(dialog.querySelectorAll(".h-2.w-2").length).toBe(24), SLOW); // the existing confetti
+  await waitFor(() => expect(dialog.querySelector('[data-fx="confetti"]')?.children).toHaveLength(24), SLOW); // the existing confetti
   await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.next }));
   await within(dialog).findByText(fr.gacha.scene.tapMany(9));
   await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.stick(5, fr.gacha.scene.tips.legendary) }));
@@ -124,4 +126,30 @@ test("a recovered pull opens on its recap: nothing to shake for something alread
   expect(dialog).toHaveAttribute("data-phase", "recap");
   expect(within(dialog).getByRole("heading", { name: fr.gacha.recovered })).toBeInTheDocument();
   expect(within(dialog).queryByRole("button", { name: fr.gacha.scene.shake })).toBeNull();
+});
+
+test("focus starts on the tube, not on « Passer »", () => {
+  const { dialog } = show(pullOf([item("hat_thuy_tinh", "rare")]));
+  expect(within(dialog).getByRole("button", { name: fr.gacha.scene.shake })).toHaveFocus();
+});
+
+test("x10: closing a scroll puts focus on the next unread stick, then on the recap when none is left", async () => {
+  const two = [item("hat_thuy_tinh", "rare"), item("hat_khan_vanh", "common")];
+  const { user, dialog } = show(pullOf(two.concat(two.map((t) => ({ ...t })))));
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.shake }));
+  await within(dialog).findByRole("button", { name: fr.gacha.scene.revealAll }, SLOW);
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.stick(2, fr.gacha.scene.tips.common) }));
+  await user.click(await within(dialog).findByRole("button", { name: fr.gacha.scene.next }));
+  const first = within(dialog).getByRole("button", { name: fr.gacha.scene.stick(1, fr.gacha.scene.tips.rare) });
+  await waitFor(() => expect(first).toHaveFocus());
+  await user.click(first);
+  await user.click(await within(dialog).findByRole("button", { name: fr.gacha.scene.next }));
+  await waitFor(() => expect(dialog.querySelector('[data-stick][data-read="false"]')).toHaveFocus());
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.revealAll }));
+  expect(within(dialog).getByRole("button", { name: fr.gacha.resultContinue })).toHaveFocus();
+});
+
+test("the recap words a duplicate like the scroll does", () => {
+  const { dialog } = show(pullOf([item("acc_quat_sat", "rare", true, 20)]), { recovered: true });
+  expect(within(dialog).getByText("Déjà obtenu → +20 xu")).toBeInTheDocument();
 });

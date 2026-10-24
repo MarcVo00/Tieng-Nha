@@ -122,6 +122,7 @@ function Stick({ it, index, slot, delay, state, onOpen }: StickProps) {
     <motion.button
       type="button"
       data-stick={it.rarity}
+      data-read={read ? "true" : "false"}
       aria-label={fr.gacha.scene.stick(index + 1, fr.gacha.scene.tips[it.rarity])}
       disabled={state.phase !== "altar"}
       onClick={() => onOpen(index)}
@@ -193,7 +194,7 @@ function Recap({ pull, recovered, lookFor, onClose }: { pull: GachaPull; recover
   return (
     <div className="mt-4 flex flex-col gap-4">
       {recovered ? <p className="text-caption text-ink-muted">{fr.gacha.recoveredBody}</p> : null}
-      <ul className={`grid max-h-[55vh] list-none gap-3 overflow-y-auto ${single ? "grid-cols-1" : "grid-cols-2"}`}>
+      <ul className={`grid list-none gap-3 ${single ? "grid-cols-1" : "grid-cols-2"}`}>
         {recapOrder(pull.items).map((i) => {
           const it = pull.items[i];
           if (!it) return null;
@@ -204,7 +205,7 @@ function Recap({ pull, recovered, lookFor, onClose }: { pull: GachaPull; recover
               <span className="text-body-strong text-ink">{name}</span>
               <RarityBadge rarity={it.rarity} />
               <span className={`tabular text-caption ${it.duplicate ? "text-ink-muted" : "font-semibold text-gold-ink"}`}>
-                {it.duplicate ? fr.gacha.resultDuplicate(it.refund) : fr.gacha.resultNew}
+                {it.duplicate ? fr.gacha.scene.duplicate(it.refund) : fr.gacha.resultNew}
               </span>
             </li>
           );
@@ -226,6 +227,8 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
   const [state, dispatch] = useReducer(revealReducer, pull.items, (its) => initialReveal(its, { direct: reduced || recovered }));
   const [confetti, setConfetti] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  // Set when a x10 scroll closes: focus then moves to the next unread stick instead of falling back to the page.
+  const refocus = useRef(false);
   const lookFor = useLookFor(items, baseLook);
   const count = pull.items.length;
   const slots = useMemo(() => slotsFor(count), [count]);
@@ -273,11 +276,14 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
   const remaining = state.revealed.filter((r) => !r).length;
   const sticksOut = state.phase !== "tube" && state.phase !== "shaking";
   const tubeAway = count > 1 && sticksOut;
+  const tubeFade = { duration: REVEAL.tubeFade, delay: tubeAway ? (schedule[count - 1]?.delay ?? 0) : 0 };
   const veil = state.phase === "hold" || state.phase === "scroll";
   const showRays = currentSlot !== null && current?.rarity === "legendary" && veil;
 
   const hint =
-    state.phase === "tube"
+    state.phase === "scroll" && current
+      ? fr.gacha.scene.announce(nameOf(current.itemId), fr.shop.rarities[current.rarity], current.duplicate ? fr.gacha.scene.duplicate(current.refund) : fr.gacha.resultNew)
+      : state.phase === "tube"
       ? fr.gacha.scene.shakeHint
       : state.phase === "shaking" || state.phase === "falling"
         ? fr.gacha.scene.shaking
@@ -289,9 +295,20 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
               : fr.gacha.scene.tapMany(remaining)
             : "";
 
+  // Back on the altar after a scroll: focus the next unread stick (the recap focuses its own button).
+  useEffect(() => {
+    if (state.phase !== "altar" || !refocus.current) return;
+    refocus.current = false;
+    const next = panelRef.current?.querySelector<HTMLElement>('[data-stick][data-read="false"]');
+    (next ?? panelRef.current?.querySelector<HTMLElement>("[data-reveal-all]"))?.focus();
+  }, [state.phase]);
+
   function closeScroll(): void {
     if (count === 1) onClose();
-    else dispatch({ type: "close" });
+    else {
+      refocus.current = true;
+      dispatch({ type: "close" });
+    }
   }
 
   return (
@@ -359,17 +376,18 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
                 className="pointer-events-none absolute select-none"
                 style={{ left: ALTAR.x, top: ALTAR.y, width: ALTAR.w, height: ALTAR.h }}
                 animate={{ opacity: tubeAway ? 0 : 1 }}
-                transition={{ duration: REVEAL.tubeFade }}
+                transition={tubeFade}
               />
               <motion.button
                 type="button"
                 aria-label={fr.gacha.scene.shake}
+                autoFocus
                 aria-disabled={state.phase !== "tube"}
                 tabIndex={state.phase === "tube" ? 0 : -1}
                 className="absolute rounded-sm"
                 style={{ left: TUBE.x, top: TUBE.y, width: TUBE.w, height: TUBE.h, touchAction: "none" }}
                 animate={{ opacity: tubeAway ? 0 : 1 }}
-                transition={{ duration: REVEAL.tubeFade }}
+                transition={tubeFade}
                 onPointerDown={() => dispatch({ type: "press" })}
                 onClick={() => {
                   dispatch({ type: "press" });
@@ -417,7 +435,7 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
                 {hint}
               </p>
               {state.phase === "altar" && count > 1 ? (
-                <Button variant="secondary" fullWidth onClick={() => dispatch({ type: "revealAll" })}>
+                <Button variant="secondary" fullWidth data-reveal-all="" onClick={() => dispatch({ type: "revealAll" })}>
                   {fr.gacha.scene.revealAll}
                 </Button>
               ) : null}

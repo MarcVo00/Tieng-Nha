@@ -397,7 +397,7 @@ describe("gacha banner and set", () => {
     expect(refunds).toBeGreaterThan(0);
     expect(wallet.coins).toBe(400 - 360 + refunds);
     expect(within(sheet).getByText(fr.gacha.resultTotal(refunds))).toBeInTheDocument();
-    expect(within(sheet).getAllByText(/^Doublon · \+\d+ xu$/).length).toBeGreaterThan(0);
+    expect(within(sheet).getAllByText(/^Déjà obtenu → \+\d+ xu$/).length).toBeGreaterThan(0);
   });
 
   test("not enough xu: both pulls are disabled, each with its own reason", async () => {
@@ -592,7 +592,7 @@ describe("gacha banner and set", () => {
     await user.click(within(section).getByRole("button", { name: fr.gacha.pullOne(40) }));
     const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
     await user.click(within(sheet).getByRole("button", { name: fr.gacha.scene.skip })); // straight to the recap
-    expect(within(sheet).getByText(/^Doublon · \+\d+ xu$/)).toBeInTheDocument();
+    expect(within(sheet).getByText(/^Déjà obtenu → \+\d+ xu$/)).toBeInTheDocument();
     const after = (await services.activity.getWallet()).coins;
     expect(after).toBeGreaterThan(before - 40);
   }, 30000);

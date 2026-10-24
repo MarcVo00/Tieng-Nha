@@ -189,6 +189,10 @@ export type DuelRun = { round1: Round1Answer[]; round2: Round2Answer[]; damage: 
   /** Server flag (`duel_runs.claimed`): the reward has already been credited to the server balance (possibly from another device). */
   claimed: boolean;
 };
+/** One item of a gacha pull, as decided by the server. */
+export type GachaPullItem = { itemId: string; rarity: Rarity; duplicate: boolean; refund: number };
+/** A gacha pull as stored by the server (`gacha_pulls`); `claimed` is true once a `gacha_pulled` event went through. */
+export type GachaPull = { id: string; theme: string; count: number; cost: number; items: GachaPullItem[]; createdAt: string; claimed: boolean };
 export type DuelStatus = "open" | "settled" | "cancelled";
 export type Duel = {
   id: string;

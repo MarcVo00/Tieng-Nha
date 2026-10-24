@@ -751,6 +751,10 @@ export const fr = {
     notFound: { title: "Profil introuvable", body: "Cette personne n'est pas (ou plus) au classement." },
     error: { title: "Le profil n'a pas pu se charger", body: "Réessaie dans un instant." },
   },
+  gacha: {
+    recovered: "Tirage récupéré",
+    recoveredBody: "Un tirage interrompu a été ajouté à ta collection.",
+  },
   // --- profile ---
   shop: {
     title: "Boutique",

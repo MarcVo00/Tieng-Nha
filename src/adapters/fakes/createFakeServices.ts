@@ -15,6 +15,7 @@ import { FakeAuthService } from "@/adapters/fakes/FakeAuthService";
 import { FakeLeaderboardRepository } from "@/adapters/fakes/FakeLeaderboardRepository";
 import { FakeExamGateway } from "@/adapters/fakes/FakeExamGateway";
 import { FakeDuelGateway } from "@/adapters/fakes/FakeDuelGateway";
+import { FakeGachaGateway } from "@/adapters/fakes/FakeGachaGateway";
 import { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes/FakeSpeech";
 import { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
@@ -23,7 +24,7 @@ import { createSyncService } from "@/services/sync";
 import { walletAt } from "@/services/wallet";
 import { lookOf } from "@/services/look";
 
-export function createFakeServices(overrides: Partial<Services> = {}, options: { duelStorage?: Pick<Storage, "getItem" | "setItem"> } = {}): Services {
+export function createFakeServices(overrides: Partial<Services> = {}, options: { duelStorage?: Pick<Storage, "getItem" | "setItem">; gachaStorage?: Pick<Storage, "getItem" | "setItem">; gachaRng?: () => number } = {}): Services {
   // Dependent fakes are built from the overridden instances so callers can inject e.g. a Dexie-backed progress repo.
   const clock = overrides.clock ?? (() => new Date().toISOString());
   const progress = overrides.progress ?? new InMemoryProgressRepository();
@@ -55,6 +56,14 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
     duels: new FakeDuelGateway(() => progress.listEvents(), clock, {
       ...(options.duelStorage ? { storage: options.duelStorage } : {}),
       localKimBai: async () => walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).kimBai,
+    }),
+    gacha: new FakeGachaGateway({
+      getMyEvents: () => progress.listEvents(),
+      getShop: () => content.getShop(),
+      getBadges: () => content.getBadges(),
+      clock,
+      ...(options.gachaRng ? { rng: options.gachaRng } : {}),
+      ...(options.gachaStorage ? { storage: options.gachaStorage } : {}),
     }),
     tts: new FakeSpeechSynthesizer(),
     stt: new FakeSpeechRecognizer(),

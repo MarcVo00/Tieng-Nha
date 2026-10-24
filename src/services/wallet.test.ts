@@ -306,6 +306,27 @@ describe("gacha_pulled", () => {
     expect(w.inventory).toEqual(["g_hat"]);
   });
 
+  test("only catalogue gacha items count: an unknown, non-gacha or priced item voids the event", () => {
+    const bad = [
+      pull("a", 40, [item("nope")], 9),
+      pull("b", 40, [item("energy_refill")], 9),
+      pull("c", 40, [item("g_hat"), item("hat_tay_son")], 9),
+    ];
+    const w = walletAt([earn, ...bad], [...gshop, { id: "hat_tay_son", kind: "cosmetic", slot: "hat", price: 6, currency: "kim_bai", theme: "arene" }], badges);
+    expect(w.coins).toBe(1000);
+    expect(w.inventory).toEqual([]);
+  });
+
+  test("each refund is capped at the catalogue rarity's refund, whatever the payload claims", () => {
+    // g_hat is rare (20 xu), g_aura common (8 xu); the payload lies about the rarity and the refund
+    const forged = [
+      { itemId: "g_aura", rarity: "legendary", duplicate: true, refund: 120 },
+      { itemId: "g_hat", rarity: "common", duplicate: true, refund: 999 },
+    ];
+    const w = walletAt([earn, pull("p1", 360, forged, 9)], gshop, badges);
+    expect(w.coins).toBe(1000 - 360 + 8 + 20);
+  });
+
   test("gacha items are never purchasable", () => {
     const w = walletAt([earn, buy("g_hat", 9), buy("g_aura", 10)], gshop, badges);
     expect(w.inventory).toEqual([]);

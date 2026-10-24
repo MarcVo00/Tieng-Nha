@@ -9,3 +9,4 @@ export { FakeDuelGateway } from "@/adapters/fakes/FakeDuelGateway";
 export { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes/FakeSpeech";
 export { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
 export { createFakeServices } from "@/adapters/fakes/createFakeServices";
+export { FakeGachaGateway } from "@/adapters/fakes/FakeGachaGateway";

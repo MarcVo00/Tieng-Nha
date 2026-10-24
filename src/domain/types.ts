@@ -39,6 +39,7 @@ export type AppEventType =
   | "item_purchased"
   | "item_equipped"
   | "duel_settled"
+  | "gacha_pulled"
   | "demo_grant";
 
 /** Payload shapes by event type (stored as JSON). */
@@ -52,6 +53,7 @@ export type EventPayload = {
   item_purchased: { itemId: string };
   item_equipped: { slot: ItemSlot; itemId: string | null };
   duel_settled: { kimBai: number };
+  gacha_pulled: { theme: string; cost: number; items: { itemId: string; rarity: Rarity; duplicate: boolean; refund: number }[] };
   demo_grant: { coins: number; kimBai: number };
 };
 

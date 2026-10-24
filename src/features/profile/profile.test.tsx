@@ -477,7 +477,11 @@ describe("wardrobe section", () => {
     useToastStore.setState({ toasts: [] });
     const services = createFakeServices({ clock: () => NOW });
     for (let i = 0; i < exams; i++) await services.activity.finishExam({ attemptId: `a${i}`, score: 90, noSpeaking: false });
-    for (const id of own) await services.activity.purchase(id);
+    // Gacha-only items: ownership comes from a pull (cost 0 keeps the xu balance out of the picture).
+    if (own.length > 0) {
+      const items = own.map((itemId) => ({ itemId, rarity: "rare", duplicate: false, refund: 0 }));
+      await services.progress.appendEvent({ type: "gacha_pulled", refId: "seed-pull", xp: 0, payload: { theme: "legendes_sombres", cost: 0, items } }, NOW);
+    }
     useAppState.setState({ wallet: await services.activity.getWallet() });
     return { ...(await setup(services)), services };
   }
@@ -495,8 +499,7 @@ describe("wardrobe section", () => {
     expect(within(section).queryByRole("button", { name: fr.shop.tryOn.equip })).toBeNull();
   });
 
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("lists owned cosmetics by slot and equips then removes them", async () => {
+  test("lists owned cosmetics by slot and equips then removes them", async () => {
     const { services, user } = await setupWardrobe(["hat_thuy_tinh", "outfit_son_tinh"]);
     const section = (await screen.findByRole("heading", { name: fr.wardrobe.title })).closest("section") as HTMLElement;
     expect(screen.queryByText(fr.wardrobe.empty)).toBeNull();
@@ -523,8 +526,7 @@ describe("wardrobe section", () => {
       expect(within(g).getAllByRole("listitem")).toHaveLength(1);
     });
 
-    // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-    test.skip("owned characters join it; switching keeps the other slots and going back sends a null equip", async () => {
+    test("owned characters join it; switching keeps the other slots and going back sends a null equip", async () => {
       const { services, user } = await setupWardrobe(["char_kiem_khach", "char_phap_su", "hat_thuy_tinh"], 24);
       await services.activity.equip("hat", "hat_thuy_tinh");
       useAppState.setState({ wallet: await services.activity.getWallet() });

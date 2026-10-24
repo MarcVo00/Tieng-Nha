@@ -83,3 +83,24 @@ test("offline at start is quiet and retried when the network returns", async () 
   await flush();
   expect(useRecoveredPulls.getState().recovered.map((p) => p.id)).toEqual(["lost"]);
 });
+
+test("a recovery that finishes after the component unmounted still announces and exposes what it claimed", async () => {
+  const { services, gacha, mount } = setup();
+  await services.activity.demoGrant(100, 0);
+  await gacha.pull("lost", THEME, 1);
+  const real = gacha.list.bind(gacha);
+  let release: () => void = () => undefined;
+  const gate = new Promise<void>((r) => (release = r));
+  vi.spyOn(gacha, "list").mockImplementation(async () => {
+    await gate;
+    return real();
+  });
+  const view = mount();
+  await flush();
+  view.unmount();
+  release();
+  await flush();
+  expect((await services.activity.getWallet()).coins).toBe(60); // claimed
+  expect(useRecoveredPulls.getState().recovered.map((p) => p.id)).toEqual(["lost"]);
+  expect(useToastStore.getState().toasts.map((t) => t.title)).toEqual([fr.gacha.recovered]);
+});

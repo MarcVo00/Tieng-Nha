@@ -23,49 +23,44 @@ test("the shop no longer sells frames", async ({ page }) => {
   await expect(page.getByText(fr.shop.items.frame_bronze!.name)).toHaveCount(0);
 });
 
-test("buy and wear the crown of the tides", async ({ page }) => {
+test("a missing gacha piece is previewed in the shop, never sold", async ({ page }) => {
   await onboard(page);
-  await seedLessonsCompleted(page, ["l01", "l02", "l03", "l04"], { perfect: true });
-  await page.reload();
-
   await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
 
   const crown = fr.shop.items.hat_thuy_tinh!;
   await page.getByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} ${crown.name}`) }).click();
-  await page.getByRole("button", { name: fr.shop.tryOn.buy(60) }).click();
-  await page.getByRole("button", { name: fr.shop.confirm.confirm, exact: true }).click();
-  await expect(page.getByText(fr.shop.tryOn.equipped, { exact: true })).toBeVisible();
-
-  await page.goto("/");
-  await expect(page.locator('[data-look~="hat_thuy_tinh"]').first()).toBeVisible();
+  const sheet = page.getByRole("dialog", { name: crown.name });
+  await expect(sheet.getByText(fr.gacha.sheetHint)).toBeVisible();
+  await expect(sheet.getByRole("button", { name: /Acheter/ })).toHaveCount(0);
+  await sheet.getByRole("button", { name: fr.gacha.close }).click();
+  await expect(sheet).toHaveCount(0);
 });
 
-test("buy and play as the wandering blade", async ({ page }) => {
+test("pull once from the dark legends banner, see the result, and the set fills up", async ({ page }) => {
   await onboard(page);
-  // 10 perfect lessons (10 + 5 each = 150 xu) + 5 badges (10 each = 50 xu) = 200 xu, exactly the price.
-  await seedLessonsCompleted(page, ["l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10"], { perfect: true });
-  await seedBadges(page, ["first_lesson", "five_lessons", "streak_3", "perfect_lesson", "first_dialogue"]);
+  // 4 perfect lessons are worth more than the 40 xu of one pull (the old crown cost 60).
+  await seedLessonsCompleted(page, ["l01", "l02", "l03", "l04"], { perfect: true });
   await page.reload();
-
   await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
-  // Scoped to the balance paragraph: the 200 xu price chips of other items read the same.
-  await expect(page.locator("p").getByText(fr.shop.balance(200), { exact: true })).toBeVisible();
 
-  const blade = fr.shop.items.char_kiem_khach!;
-  await page.getByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} ${blade.name}`) }).click();
-  await page.getByRole("button", { name: fr.shop.tryOn.buy(200) }).click();
-  await page.getByRole("button", { name: fr.shop.confirm.confirm, exact: true }).click();
-  await expect(page.getByText(fr.shop.tryOn.equipped, { exact: true })).toBeVisible();
+  const banner = page.getByRole("heading", { name: fr.shop.themes.legendes_sombres! }).locator("xpath=ancestor::section");
+  await expect(banner.getByText(fr.gacha.ownedCount(0, 12))).toBeVisible();
+  await banner.getByRole("button", { name: fr.gacha.pullOne(40) }).click();
 
-  await page.goto("/");
-  await expect(page.locator('[data-look~="char_kiem_khach"]').first()).toBeVisible();
+  const result = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
+  await expect(result.getByRole("listitem")).toHaveCount(1);
+  await result.getByRole("button", { name: fr.gacha.resultContinue }).click();
+  await expect(result).toHaveCount(0);
 
-  await page.getByRole("link", { name: fr.app.tabs.me }).click();
-  const starter = page.getByRole("listitem").filter({ hasText: fr.shop.characters.starter });
-  await starter.getByRole("button", { name: fr.shop.tryOn.equip }).click();
-  await expect(starter.getByText(fr.rewards.equipped)).toBeVisible();
+  await expect(banner.getByText(fr.gacha.pityLine(39))).toBeVisible();
+  await expect(banner.getByText(fr.gacha.ownedCount(1, 12))).toBeVisible();
+});
 
-  await page.goto("/");
-  await expect(page.locator('[data-look~="char_kiem_khach"]')).toHaveCount(0);
-  await expect(page.locator("[data-look]").first()).toBeVisible();
+test("the rates sheet lists the four rarities", async ({ page }) => {
+  await onboard(page);
+  await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
+  await page.getByRole("button", { name: fr.gacha.rates }).click();
+  const sheet = page.getByRole("dialog", { name: fr.gacha.ratesTitle });
+  for (const label of Object.values(fr.shop.rarities)) await expect(sheet.getByText(label, { exact: true })).toBeVisible();
+  await expect(sheet.getByText(fr.gacha.ratePercent(2), { exact: true })).toBeVisible();
 });

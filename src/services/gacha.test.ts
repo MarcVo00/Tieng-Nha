@@ -1,5 +1,5 @@
 import type { ShopItem } from "@/domain/types";
-import { GACHA, gachaCost, gachaDraw, gachaRefund, themeItems } from "@/services/gacha";
+import { GACHA, gachaCost, gachaDraw, gachaRates, gachaRefund, pityFromEvents, themeItems } from "@/services/gacha";
 
 // Mirrors supabase/tests/06_gacha_test.sql ("pure rules"): same inputs, same outputs.
 const it = (id: string, slot: ShopItem["slot"], rarity: NonNullable<ShopItem["rarity"]>, theme = "legendes_sombres"): ShopItem => ({
@@ -127,5 +127,33 @@ describe("a rarity missing from the theme steps down, then up", () => {
   test("x10 with no rare: the forced rare falls back to common", () => expect(rar(g(ce, 0, 10, rep(0.1, 0, 10)))).toBe("cccccccccc"));
   test("a theme without gacha items throws", () => {
     expect(() => gachaDraw({ pity: 0 }, themeItems(SHOP, "arene"), [], 1, [0.1, 0])).toThrow();
+  });
+});
+
+describe("published rates", () => {
+  test("60 / 28 / 10 / 2 percent with the refunds 8 / 20 / 50 / 120", () => {
+    expect(gachaRates()).toEqual([
+      { rarity: "common", percent: 60, refund: 8 },
+      { rarity: "rare", percent: 28, refund: 20 },
+      { rarity: "epic", percent: 10, refund: 50 },
+      { rarity: "legendary", percent: 2, refund: 120 },
+    ]);
+  });
+});
+
+describe("pityFromEvents", () => {
+  const ev = (refId: string, theme: string, rarities: string[]) => ({
+    type: "gacha_pulled",
+    refId,
+    payload: { theme, cost: 40, items: rarities.map((rarity) => ({ itemId: "x", rarity, duplicate: false, refund: 0 })) },
+  });
+  test("counts items per theme, resets at a legendary, counts a pull id once", () => {
+    const events = [ev("a", "t", ["common", "rare"]), ev("a", "t", ["common"]), ev("b", "other", ["epic", "epic"]), ev("c", "t", ["legendary", "common", "common"])];
+    expect(pityFromEvents(events, "t")).toBe(2);
+    expect(pityFromEvents(events, "other")).toBe(2);
+    expect(pityFromEvents(events, "none")).toBe(0);
+  });
+  test("ignores other events and malformed payloads", () => {
+    expect(pityFromEvents([{ type: "item_purchased", refId: "z", payload: {} }, { type: "gacha_pulled", refId: "y", payload: { theme: "t", items: 3 } }], "t")).toBe(0);
   });
 });

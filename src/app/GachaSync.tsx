@@ -26,7 +26,8 @@ export function GachaSync() {
       running = true;
       try {
         const recovered = await recoverGachaPulls({ gacha, activity });
-        if (!stopped && recovered.length > 0) {
+        // Already claimed in the journal: announce even if the screen left meanwhile (only the re-run loop stops).
+        if (recovered.length > 0) {
           push(recovered);
           for (let i = 0; i < recovered.length; i++) show({ title: fr.gacha.recovered, body: fr.gacha.recoveredBody });
         }

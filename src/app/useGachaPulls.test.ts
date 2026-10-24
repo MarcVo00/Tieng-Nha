@@ -1,5 +1,6 @@
 import { createFakeServices, FakeGachaGateway } from "@/adapters/fakes";
 import { addPendingPull, isPullActive, readPendingPulls, recoverGachaPulls, runGachaPull, useRecoveredPulls } from "@/app/useGachaPulls";
+import { useAppState } from "@/app/appState";
 import { OfflineError } from "@/domain/errors";
 
 const THEME = "legendes_sombres";
@@ -11,8 +12,11 @@ const make = () => {
 const fund = (s: ReturnType<typeof make>["services"], n: number) => s.activity.demoGrant(n, 0);
 const journal = async (s: ReturnType<typeof make>["services"]) => (await s.progress.listEvents()).filter((e) => e.type === "gacha_pulled");
 
+const as = (userId: string | null) => useAppState.setState({ session: userId === null ? null : { userId, email: `${userId}@example.com` } });
+
 beforeEach(() => {
   localStorage.clear();
+  as(null);
   useRecoveredPulls.setState({ recovered: [] });
 });
 afterEach(() => vi.restoreAllMocks());
@@ -155,4 +159,30 @@ test("the recovered store keeps one entry per pull until dismissed", () => {
   expect(useRecoveredPulls.getState().recovered.map((x) => x.id)).toEqual(["a", "b"]);
   useRecoveredPulls.getState().dismiss("a");
   expect(useRecoveredPulls.getState().recovered.map((x) => x.id)).toEqual(["b"]);
+});
+
+describe("pending ids are scoped by user", () => {
+  test("another account on the same device never sees or re-sends them", () => {
+    as("alice");
+    addPendingPull({ id: "p1", theme: THEME, count: 1 });
+    expect(readPendingPulls()).toHaveLength(1);
+    as("bob");
+    expect(readPendingPulls()).toEqual([]);
+    addPendingPull({ id: "p2", theme: THEME, count: 10 });
+    as("alice");
+    expect(readPendingPulls().map((p) => p.id)).toEqual(["p1"]);
+  });
+
+  test("a legacy unscoped list is dropped, not handed to whoever signs in; the server list still recovers it", async () => {
+    const { services, gacha } = make();
+    await fund(services, 100);
+    await gacha.pull("old", THEME, 1); // the server did it; the legacy pending entry is the only local trace
+    localStorage.setItem("tn-gacha-pending", JSON.stringify([{ id: "old", theme: THEME, count: 1 }]));
+    as("alice");
+    const spy = vi.spyOn(gacha, "pull");
+    const recovered = await recoverGachaPulls(services);
+    expect(localStorage.getItem("tn-gacha-pending")).toBeNull();
+    expect(spy).not.toHaveBeenCalled(); // never re-sent
+    expect(recovered.map((p) => p.id)).toEqual(["old"]); // claimed through list()
+  });
 });

@@ -1,10 +1,12 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { createFakeServices } from "@/adapters/fakes";
+import { createFakeServices, FakeGachaGateway } from "@/adapters/fakes";
 import { EnergyIndicator } from "@/app/EnergyIndicator";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { useAppState, useRefreshProgress } from "@/app/appState";
+import { readPendingPulls, runGachaPull, useRecoveredPulls } from "@/app/useGachaPulls";
+import { OfflineError } from "@/domain/errors";
 import type { Services } from "@/app/services";
 import { ShopScreen } from "@/features/shop";
 import { fr } from "@/i18n/fr";
@@ -13,6 +15,12 @@ import { useToastStore } from "@/ui/Toast";
 import { useEffect } from "react";
 
 const NOW = "2026-10-14T10:00:00.000Z";
+
+beforeEach(() => {
+  localStorage.clear();
+  useRecoveredPulls.setState({ recovered: [] });
+});
+afterEach(() => vi.restoreAllMocks());
 
 function Boot() {
   const refresh = useRefreshProgress();
@@ -220,121 +228,109 @@ test("a failed wallet load offers a retry instead of an endless skeleton", async
   expect(await screen.findByText(fr.shop.playTitle)).toBeInTheDocument();
 });
 
-describe("dark legends section and try-on", () => {
-  const NAMES = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien"].map((id) => fr.shop.items[id]?.name ?? "");
+describe("gacha banner and set", () => {
+  const THEME = "legendes_sombres";
+  const SET = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien", "char_kiem_khach", "char_phap_su", "acc_giao_tre", "hat_khan_vanh", "outfit_ao_chen", "aura_suong_mu", "acc_quat_sat", "hat_mu_chien"];
+  const nameOf = (id: string) => fr.shop.items[id]?.name ?? id;
   const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
-  const tryOnName = (name: string) => new RegExp(`^${fr.shop.tryOn.prefix} ${escapeRe(name)}`);
-  const open = (name: string) => screen.findByRole("button", { name: tryOnName(name) });
+  const tryOnName = (id: string) => new RegExp(`^${fr.shop.tryOn.prefix} ${escapeRe(nameOf(id))}`);
+  const open = (id: string) => screen.findByRole("button", { name: tryOnName(id) });
   const types = async (services: Services) => (await services.progress.listEvents()).map((e) => e.type);
+  const banner = () => screen.findByRole("heading", { name: fr.shop.themes[THEME] ?? "" }).then((h) => h.closest("section") as HTMLElement);
+  const make = async (coins = 0) => {
+    const services = createFakeServices({ clock: () => NOW }, { gachaRng: () => 0 }); // always the first common: acc_giao_tre
+    if (coins > 0) await services.activity.demoGrant(coins, 0);
+    return services;
+  };
 
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("lists the consumables first, then the themed items by price, each previewed on the current hero", async () => {
-    const services = createFakeServices({ clock: () => NOW });
+  test("shows the theme banner: art, progress, guarantee, both pulls and the rates", async () => {
+    const services = await make(500);
     setup(services);
-    const heading = await screen.findByRole("heading", { name: fr.shop.themes["legendes_sombres"] ?? "" });
-    const play = screen.getByRole("heading", { name: fr.shop.playTitle });
-    expect(play.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    const section = heading.closest("section") as HTMLElement;
-    const buttons = within(section).getAllByRole("button");
-    buttons.forEach((b, i) => expect(b).toHaveAccessibleName(tryOnName(NAMES[i] ?? "")));
-    expect(buttons).toHaveLength(NAMES.length);
-    // The price is part of the accessible name (not hidden by an aria-label).
-    expect(buttons[0]).toHaveAccessibleName(/xu$/);
-    buttons.forEach((b, i) => expect(b.textContent).toContain(`${fr.shop.tryOn.prefix} ${NAMES[i] ?? ""}`));
-    const ids = ["hat_thuy_tinh", "aura_waves", "outfit_son_tinh", "acc_thuan_thien"];
-    buttons.forEach((b, i) => expect(b.querySelector("[data-look]")?.getAttribute("data-look")).toContain(ids[i]));
+    const section = await banner();
+    expect(within(section).getByText(fr.gacha.ownedCount(0, 12))).toBeInTheDocument();
+    expect(within(section).getByText(fr.gacha.pityLine(40))).toBeInTheDocument();
+    expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeEnabled();
+    expect(within(section).getByRole("button", { name: fr.gacha.pullTen(360) })).toBeEnabled();
+    expect(within(section).getByRole("button", { name: fr.gacha.rates })).toBeInTheDocument();
+    expect(fr.gacha.pullOne(40)).toBe("1 tirage — 40 xu");
+    expect(fr.gacha.pullTen(360)).toBe("10 tirages — 360 xu");
+    expect(fr.gacha.pityLine(23)).toBe("Légendaire garanti dans 23 tirages");
+    expect(fr.gacha.ownedCount(7, 12)).toBe("7/12 obtenus");
   });
 
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("the preview adds the item to what the hero already wears", async () => {
-    const services = createFakeServices({ clock: () => NOW });
-    await winExams(services, 6);
-    await services.activity.purchase("hat_thuy_tinh");
-    await services.activity.equip("hat", "hat_thuy_tinh");
+  test("gacha items are never sold: no « Acheter » in the themed section, consumables keep theirs", async () => {
+    const services = await make(500);
     setup(services);
-    const sword = await open(NAMES[3] ?? "");
-    const look = sword.querySelector("[data-look]")?.getAttribute("data-look") ?? "";
-    expect(look).toContain("hat_thuy_tinh");
-    expect(look).toContain("acc_thuan_thien");
+    const section = await banner();
+    expect(within(section).queryByRole("button", { name: /Acheter/ })).toBeNull();
+    for (const b of within(section).getAllByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} `) })) expect(b).not.toHaveTextContent(/xu/); // no price on a piece
+    const freeze = await card(nameOf("streak_freeze"));
+    expect(within(freeze).getByRole("button", { name: fr.shop.buy(50) })).toBeEnabled();
   });
 
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("opening and closing the sheet sends no event; the only action is a disabled buy when poor", async () => {
-    const services = createFakeServices({ clock: () => NOW });
+  test("the set lists the 12 pieces, rarest first, each with its rarity badge; missing ones are silhouettes", async () => {
+    const services = await make();
+    setup(services);
+    const section = await banner();
+    const buttons = within(section).getAllByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} `) });
+    expect(buttons).toHaveLength(12);
+    expect(buttons[0]).toHaveAccessibleName(tryOnName("char_phap_su"));
+    expect(buttons[0]?.querySelector('[data-rarity="legendary"]')).not.toBeNull();
+    expect(buttons[0]).toHaveAttribute("data-owned", "false");
+    expect(within(buttons[0] as HTMLElement).getByText(fr.gacha.notOwned)).toBeInTheDocument();
+    const ids = buttons.map((b) => (b.querySelector("[data-look]")?.getAttribute("data-look") ?? "").split(" ").find((t) => SET.includes(t)));
+    expect([...ids].sort()).toEqual([...SET].sort());
+  });
+
+  test("try-on of a missing piece is a preview without any purchase: a hint, no buy, a close button, no event", async () => {
+    const services = await make(500);
     const user = setup(services);
-    await user.click(await open(NAMES[0] ?? ""));
-    const sheet = await screen.findByRole("dialog", { name: NAMES[0] ?? "" });
-    expect(within(sheet).getAllByRole("button")).toHaveLength(1);
-    expect(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) })).toBeDisabled();
+    await user.click(await open("hat_thuy_tinh"));
+    const sheet = await screen.findByRole("dialog", { name: nameOf("hat_thuy_tinh") });
     expect(sheet.querySelector("[data-look]")).not.toBeNull();
-    await user.keyboard("{Escape}");
+    expect(within(sheet).getByText(fr.gacha.sheetHint)).toBeInTheDocument();
+    expect(within(sheet).getByText(fr.shop.rarities.rare)).toBeInTheDocument();
+    expect(within(sheet).getAllByRole("button")).toHaveLength(1);
+    expect(within(sheet).queryByRole("button", { name: /Acheter/ })).toBeNull();
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.close }));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(await types(services)).toEqual([]);
+    expect(await types(services)).toEqual(["demo_grant"]);
   });
 
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("buying confirms inside the sheet, then purchases and equips (two events)", async () => {
-    const services = createFakeServices({ clock: () => NOW });
-    await winExams(services, 6);
-    const before = (await types(services)).length;
+  test("the preview adds the piece to what the hero already wears", async () => {
+    const services = await make(100);
+    await runGachaPull(services, THEME, 1); // acc_giao_tre
+    await services.activity.equip("accessory", "acc_giao_tre");
     const user = setup(services);
-    await user.click(await open(NAMES[0] ?? ""));
-    const sheet = await screen.findByRole("dialog", { name: NAMES[0] ?? "" });
-    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) }));
-    expect(screen.queryByRole("alertdialog")).toBeNull();
-    expect(sheet).toHaveTextContent(fr.shop.confirm.title("la couronne des marées", 60), { normalizeWhitespace: false });
-    expect((await types(services)).length).toBe(before);
-    await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
-    await screen.findByText(fr.shop.bought);
-    expect(screen.getAllByText(fr.shop.bought)).toHaveLength(1); // one purchase, one toast
-    expect((await types(services)).slice(before)).toEqual(["item_purchased", "item_equipped"]);
-    expect((await services.activity.getWallet()).equipped["hat"]).toBe("hat_thuy_tinh");
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-  });
-
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip.each([
-    ["refuses", (s: Services) => vi.spyOn(s.activity, "equip").mockResolvedValue({ ok: false, wallet: {} as never })],
-    ["throws", (s: Services) => vi.spyOn(s.activity, "equip").mockRejectedValue(new Error("boom"))],
-  ])("when the equip %s, the item is still owned and the toast says so", async (_n, breakEquip) => {
-    useToastStore.setState({ toasts: [] });
-    const services = createFakeServices({ clock: () => NOW });
-    await winExams(services, 6);
-    const user = setup(services);
-    breakEquip(services);
-    await user.click(await open(NAMES[0] ?? ""));
+    await user.click(await open("hat_mu_chien"));
     const sheet = await screen.findByRole("dialog");
-    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) }));
-    await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
-    expect(await screen.findByText(fr.shop.tryOn.boughtNotEquipped)).toBeInTheDocument();
-    expect((await services.activity.getWallet()).inventory).toContain("hat_thuy_tinh");
-    await waitFor(() => expect(screen.getByText(fr.shop.tryOn.owned)).toBeInTheDocument());
+    const look = sheet.querySelector("[data-look]")?.getAttribute("data-look") ?? "";
+    expect(look).toContain("acc_giao_tre");
+    expect(look).toContain("hat_mu_chien");
   });
 
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("an owned item offers Equiper, then Retirer", async () => {
-    useToastStore.setState({ toasts: [] });
-    const services = createFakeServices({ clock: () => NOW });
-    await winExams(services, 6);
-    await services.activity.purchase("aura_waves");
+  test("an owned piece offers Équiper, then Retirer", async () => {
+    const services = await make(100);
+    await runGachaPull(services, THEME, 1);
     const user = setup(services);
-    await user.click(await open(NAMES[1] ?? ""));
+    const mine = await open("acc_giao_tre");
+    expect(mine).toHaveAttribute("data-owned", "true");
+    await user.click(mine);
     let sheet = await screen.findByRole("dialog");
+    expect(within(sheet).getByText(fr.shop.tryOn.owned)).toBeInTheDocument();
     await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.equip }));
-    await waitFor(async () => expect((await services.activity.getWallet()).equipped["aura"]).toBe("aura_waves"));
+    await waitFor(async () => expect((await services.activity.getWallet()).equipped["accessory"]).toBe("acc_giao_tre"));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    await user.click(await open(NAMES[1] ?? ""));
+    await user.click(await open("acc_giao_tre"));
     sheet = await screen.findByRole("dialog");
     await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.unequip }));
-    await waitFor(async () => expect((await services.activity.getWallet()).equipped["aura"]).toBeUndefined());
+    await waitFor(async () => expect((await services.activity.getWallet()).equipped["accessory"]).toBeUndefined());
   });
 
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("keyboard: Tab stays inside the sheet, also on the confirm step; Escape closes it alone", async () => {
-    const services = createFakeServices({ clock: () => NOW });
-    await winExams(services, 6);
+  test("keyboard: the sheet traps Tab, Escape closes it alone and returns the focus to the piece", async () => {
+    const services = await make();
     const user = setup(services);
-    const trigger = await open(NAMES[0] ?? "");
+    const trigger = await open("hat_thuy_tinh");
     await user.click(trigger);
     const sheet = await screen.findByRole("dialog");
     expect(document.querySelectorAll('[aria-modal="true"]')).toHaveLength(1);
@@ -343,63 +339,190 @@ describe("dark legends section and try-on", () => {
       await user.tab();
       expect(sheet.contains(document.activeElement)).toBe(true);
     }
-    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(60) }));
-    expect(document.querySelectorAll('[aria-modal="true"]')).toHaveLength(1);
-    await waitFor(() => expect(sheet.contains(document.activeElement)).toBe(true));
-    for (let i = 0; i < 4; i++) {
-      await user.tab();
-      expect(sheet.contains(document.activeElement)).toBe(true);
-    }
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(screen.queryByRole("alertdialog")).toBeNull();
-    expect((await services.activity.getWallet()).inventory).not.toContain("hat_thuy_tinh");
     expect(trigger).toHaveFocus();
   });
-});
 
-describe("characters section", () => {
-  const IDS = ["char_kiem_khach", "char_phap_su"];
-  const NAMES = IDS.map((id) => fr.shop.items[id]?.name ?? "");
-  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, (c) => `\\${c}`);
-  const open = (name: string) => screen.findByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} ${escapeRe(name)}`) });
-
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("sits between the consumables and the dark legends, previewed on the current look", async () => {
-    const services = createFakeServices({ clock: () => NOW });
-    await winExams(services, 9);
-    await services.activity.purchase("hat_thuy_tinh");
-    await services.activity.equip("hat", "hat_thuy_tinh");
-    setup(services);
-    const chars = await screen.findByRole("heading", { name: fr.shop.characters.title });
-    const play = screen.getByRole("heading", { name: fr.shop.playTitle });
-    const legends = screen.getByRole("heading", { name: fr.shop.themes["legendes_sombres"] ?? "" });
-    expect(play.compareDocumentPosition(chars) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(chars.compareDocumentPosition(legends) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    const section = chars.closest("section") as HTMLElement;
-    const buttons = within(section).getAllByRole("button");
-    expect(buttons).toHaveLength(2);
-    buttons.forEach((b, i) => {
-      const look = b.querySelector("[data-look]")?.getAttribute("data-look") ?? "";
-      expect(look.split(" ")[0]).toBe(IDS[i]);
-      expect(look).toContain("hat_thuy_tinh");
-    });
-    expect(within(play.closest("section") as HTMLElement).queryByText(NAMES[0] ?? "")).toBeNull();
-  });
-
-  // TODO(gacha task 5): xu cosmetics are gacha-only now (price null); rework once the wallet applies gacha_pulled (task 3) and the shop shows banners.
-  test.skip("the try-on buys in the sheet, then equips the character", async () => {
-    const services = createFakeServices({ clock: () => NOW });
-    await winExams(services, 9);
+  test("« Taux » opens the four rates with their refunds and the guarantees", async () => {
+    const services = await make();
     const user = setup(services);
-    await user.click(await open(NAMES[0] ?? ""));
-    const sheet = await screen.findByRole("dialog", { name: NAMES[0] ?? "" });
-    await user.click(within(sheet).getByRole("button", { name: fr.shop.tryOn.buy(200) }));
-    await user.click(within(sheet).getByRole("button", { name: fr.shop.confirm.confirm }));
-    await screen.findByText(fr.shop.bought);
+    await user.click(await screen.findByRole("button", { name: fr.gacha.rates }));
+    const sheet = await screen.findByRole("dialog", { name: fr.gacha.ratesTitle });
+    const rows = within(sheet).getAllByRole("listitem");
+    expect(rows.map((r) => r.textContent)).toEqual([
+      `${fr.shop.rarities.common}${fr.gacha.refund(8)}${fr.gacha.ratePercent(60)}`,
+      `${fr.shop.rarities.rare}${fr.gacha.refund(20)}${fr.gacha.ratePercent(28)}`,
+      `${fr.shop.rarities.epic}${fr.gacha.refund(50)}${fr.gacha.ratePercent(10)}`,
+      `${fr.shop.rarities.legendary}${fr.gacha.refund(120)}${fr.gacha.ratePercent(2)}`,
+    ]);
+    expect(within(sheet).getByText(fr.gacha.pityRule(40))).toBeInTheDocument();
+    expect(within(sheet).getByText(fr.gacha.tenRule)).toBeInTheDocument();
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.close }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+
+  test("a single pull: the result list, the new balance, the progress and the guarantee counter", async () => {
+    const services = await make(100);
+    const user = setup(services);
+    const section = await banner();
+    await user.click(within(section).getByRole("button", { name: fr.gacha.pullOne(40) }));
+    const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+    const lines = within(sheet).getAllByRole("listitem");
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toHaveTextContent(nameOf("acc_giao_tre"));
+    expect(lines[0]).toHaveTextContent(fr.shop.rarities.common);
+    expect(lines[0]).toHaveTextContent(fr.gacha.resultNew, { normalizeWhitespace: false });
+    expect(await screen.findByText(fr.shop.balance(60))).toBeInTheDocument();
+    expect(await types(services)).toEqual(["demo_grant", "gacha_pulled"]);
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.resultContinue }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(within(await banner()).getByText(fr.gacha.ownedCount(1, 12))).toBeInTheDocument();
+    expect(within(await banner()).getByText(fr.gacha.pityLine(39))).toBeInTheDocument();
+  });
+
+  test("a x10 pull lists ten lines, duplicates with their refund, and costs 360 xu minus the refunds", async () => {
+    const services = await make(400);
+    const user = setup(services);
+    const section = await banner();
+    await user.click(within(section).getByRole("button", { name: fr.gacha.pullTen(360) }));
+    const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(360) });
+    const lines = within(sheet).getAllByRole("listitem");
+    expect(lines).toHaveLength(10);
     const wallet = await services.activity.getWallet();
-    expect(wallet.inventory).toContain("char_kiem_khach");
-    expect(wallet.equipped["character"]).toBe("char_kiem_khach");
+    const event = (await services.progress.listEvents()).find((e) => e.type === "gacha_pulled");
+    const refunds = ((event?.payload["items"] as { refund: number }[]) ?? []).reduce((n, i) => n + i.refund, 0);
+    expect(refunds).toBeGreaterThan(0);
+    expect(wallet.coins).toBe(400 - 360 + refunds);
+    expect(within(sheet).getByText(fr.gacha.resultTotal(refunds))).toBeInTheDocument();
+    expect(within(sheet).getAllByText(/^Doublon · \+\d+ xu$/).length).toBeGreaterThan(0);
+  });
+
+  test("not enough xu: both pulls are disabled with the reason", async () => {
+    const services = await make(0);
+    setup(services);
+    const section = await banner();
+    expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled();
+    expect(within(section).getByRole("button", { name: fr.gacha.pullTen(360) })).toBeDisabled();
+    expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.missing(40));
+  });
+
+  test("between 40 and 359 xu: the single pull works, the x10 is disabled and says what is missing", async () => {
+    const services = await make(100);
+    setup(services);
+    const section = await banner();
+    expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeEnabled();
+    const ten = within(section).getByRole("button", { name: fr.gacha.pullTen(360) });
+    expect(ten).toBeDisabled();
+    expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.missing(260));
+    expect(ten).toHaveAccessibleDescription(fr.gacha.missing(260));
+  });
+
+  test("offline: the pulls are disabled with « Connecte-toi pour tirer. »", async () => {
+    const services = await make(500);
+    (services.gacha as FakeGachaGateway).online = false;
+    setup(services);
+    const section = await banner();
+    await waitFor(() => expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.offline));
+    expect(fr.gacha.offline).toBe("Connecte-toi pour tirer.");
+    expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled();
+    expect(within(section).getByRole("button", { name: fr.gacha.pullTen(360) })).toBeDisabled();
+  });
+
+  test("the check uses min(local, server): a lower server balance blocks the pull", async () => {
+    const services = await make(500);
+    (services.gacha as FakeGachaGateway).serverCoins = 10;
+    setup(services);
+    const section = await banner();
+    await waitFor(() => expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled());
+    expect(within(section).getByRole("status")).toHaveTextContent(fr.gacha.missing(30));
+  });
+
+  test("the server balance is re-checked at the tap: when it dropped meanwhile nothing is pulled", async () => {
+    const services = await make(500);
+    const gacha = services.gacha as FakeGachaGateway;
+    const user = setup(services);
+    const section = await banner();
+    const one = await within(section).findByRole("button", { name: fr.gacha.pullOne(40) });
+    await waitFor(() => expect(one).toBeEnabled());
+    gacha.serverCoins = 5;
+    const pull = vi.spyOn(gacha, "pull");
+    await user.click(one);
+    expect(await within(section).findByText(fr.gacha.missing(35))).toBeInTheDocument();
+    expect(pull).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  test("a refusal from the server shows a message and spends nothing", async () => {
+    const services = await make(500);
+    const gacha = services.gacha as FakeGachaGateway;
+    vi.spyOn(gacha, "pull").mockResolvedValue({ ok: false, error: "unknown_theme" });
+    const user = setup(services);
+    const section = await banner();
+    await user.click(await within(section).findByRole("button", { name: fr.gacha.pullOne(40) }));
+    expect(await within(section).findByText(fr.gacha.error)).toBeInTheDocument();
+    expect(await types(services)).toEqual(["demo_grant"]);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  test("the connection dropping mid-pull keeps the id pending and says the pull will reappear", async () => {
+    const services = await make(500);
+    const gacha = services.gacha as FakeGachaGateway;
+    vi.spyOn(gacha, "pull").mockRejectedValue(new OfflineError());
+    const user = setup(services);
+    const section = await banner();
+    await user.click(await within(section).findByRole("button", { name: fr.gacha.pullOne(40) }));
+    expect(await within(section).findByText(fr.gacha.interrupted)).toBeInTheDocument();
+    expect(readPendingPulls()).toHaveLength(1);
+    await waitFor(() => expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled()); // unreachable
+  });
+
+  test("while a pull runs, every other button of the screen is locked", async () => {
+    const services = await make(500);
+    const gacha = services.gacha as FakeGachaGateway;
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((r) => (release = r));
+    const real = FakeGachaGateway.prototype.pull;
+    vi.spyOn(gacha, "pull").mockImplementation(async (...a) => {
+      await gate;
+      return real.call(gacha, ...a);
+    });
+    const user = setup(services);
+    const section = await banner();
+    await user.click(await within(section).findByRole("button", { name: fr.gacha.pullTen(360) }));
+    await waitFor(() => expect(within(section).getByRole("button", { name: fr.gacha.pullOne(40) })).toBeDisabled());
+    for (const b of within(section).getAllByRole("button", { name: new RegExp(`^${fr.shop.tryOn.prefix} `) })) expect(b).toBeDisabled();
+    release();
+    await screen.findByRole("dialog", { name: fr.gacha.resultLabel(360) });
+  });
+
+  test("a complete set shows « Panoplie complète ! » and the pulls still work (every item is a refunded duplicate)", async () => {
+    const services = createFakeServices({ clock: () => NOW }); // random draws
+    await services.activity.demoGrant(100000, 0);
+    const owned = async () => (await services.activity.getWallet()).inventory.filter((id) => SET.includes(id));
+    for (let i = 0; i < 40 && (await owned()).length < 12; i++) await runGachaPull(services, THEME, 10);
+    expect(await owned()).toHaveLength(12);
+    const user = setup(services);
+    const section = await banner();
+    expect(within(section).getByText(fr.gacha.complete)).toBeInTheDocument();
+    expect(within(section).getByText(fr.gacha.ownedCount(12, 12))).toBeInTheDocument();
+    const before = (await services.activity.getWallet()).coins;
+    await user.click(within(section).getByRole("button", { name: fr.gacha.pullOne(40) }));
+    const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+    expect(within(sheet).getByText(/^Doublon · \+\d+ xu$/)).toBeInTheDocument();
+    const after = (await services.activity.getWallet()).coins;
+    expect(after).toBeGreaterThan(before - 40);
+  }, 30000);
+
+  test("a pull recovered after a crash is shown once as « Tirage récupéré »", async () => {
+    const services = await make(100);
+    const res = await services.gacha.pull("lost", THEME, 1);
+    if (!res.ok) throw new Error("unreachable");
+    await services.activity.claimGachaPulls([res.pull]);
+    useRecoveredPulls.setState({ recovered: [res.pull] });
+    setup(services);
+    const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+    expect(within(sheet).getByRole("heading", { name: fr.gacha.recovered })).toBeInTheDocument();
+    expect(useRecoveredPulls.getState().recovered).toEqual([]);
   });
 });
-

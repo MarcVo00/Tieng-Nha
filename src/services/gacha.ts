@@ -83,3 +83,33 @@ export function gachaDraw(
   }
   return { items: out, pity };
 }
+
+/** The published rates: per rarity, its chance in whole percent and the xu a duplicate gives back. */
+export function gachaRates(): { rarity: Rarity; percent: number; refund: number }[] {
+  const bounds = [0, ...GACHA.thresholds, 1];
+  return RARITY_ORDER.map((rarity, i) => ({
+    rarity,
+    percent: Math.round(((bounds[i + 1] ?? 1) - (bounds[i] ?? 0)) * 100),
+    refund: GACHA.refunds[rarity],
+  }));
+}
+
+/**
+ * The player's pity counter for a theme, replayed from the journal (`gacha_pulled` events, oldest first, once per pull
+ * id): +1 per item drawn, back to 0 at each legendary. Exact once every pull is claimed; a pull's own result carries
+ * the server value.
+ */
+export function pityFromEvents(events: readonly { type: string; refId: string; payload: Record<string, unknown> }[], theme: string): number {
+  const seen = new Set<string>();
+  let pity = 0;
+  for (const e of events) {
+    if (e.type !== "gacha_pulled" || seen.has(e.refId)) continue;
+    seen.add(e.refId);
+    if (e.payload["theme"] !== theme || !Array.isArray(e.payload["items"])) continue;
+    for (const it of e.payload["items"] as unknown[]) {
+      const rarity = typeof it === "object" && it !== null ? (it as { rarity?: unknown }).rarity : undefined;
+      pity = rarity === "legendary" ? 0 : Math.min(pity + 1, GACHA.pityAt - 1);
+    }
+  }
+  return pity;
+}

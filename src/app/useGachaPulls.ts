@@ -3,15 +3,23 @@ import { OfflineError } from "@/domain/errors";
 import type { GachaPull } from "@/domain/types";
 import type { GachaError, GachaPullResult } from "@/ports";
 import type { Services } from "@/app/services";
+import { useAppState } from "@/app/appState";
 
-const PENDING_KEY = "tn-gacha-pending";
+/** Before the per-user scoping the ids lived under this single key; it is dropped, see `readPendingPulls`. */
+const LEGACY_PENDING_KEY = "tn-gacha-pending";
+
+/** Pending ids are kept per signed-in user: on a shared phone another account never re-sends them. */
+const pendingKey = (): string => `${LEGACY_PENDING_KEY}:${useAppState.getState().session?.userId ?? "anon"}`;
 
 /** A pull the app asked for and has not yet seen claimed: kept on the phone so a crash can be recovered. */
 export type PendingPull = { id: string; theme: string; count: number };
 
 export function readPendingPulls(): PendingPull[] {
   try {
-    const raw: unknown = JSON.parse(localStorage.getItem(PENDING_KEY) ?? "[]");
+    // The legacy unscoped list cannot be attributed to a user. Dropping it loses nothing: an id the server never saw
+    // was never debited, and one it did see is returned by `gacha.list()` (the recovery claims it).
+    if (localStorage.getItem(LEGACY_PENDING_KEY) !== null) localStorage.removeItem(LEGACY_PENDING_KEY);
+    const raw: unknown = JSON.parse(localStorage.getItem(pendingKey()) ?? "[]");
     if (!Array.isArray(raw)) return [];
     return raw.filter(
       (p): p is PendingPull =>
@@ -24,7 +32,7 @@ export function readPendingPulls(): PendingPull[] {
 
 function writePending(list: PendingPull[]): void {
   try {
-    localStorage.setItem(PENDING_KEY, JSON.stringify(list));
+    localStorage.setItem(pendingKey(), JSON.stringify(list));
   } catch {
     // storage unavailable: the pull can still be recovered from the server list
   }

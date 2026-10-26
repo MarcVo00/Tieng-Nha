@@ -13,6 +13,10 @@ export class FakeSoundPlayer implements SoundPlayer {
   unlocks = 0;
   enabled = true;
   readonly enabledCalls: boolean[] = [];
+  /** When false, `unlock()` leaves the audio locked (an iOS gesture that was refused): use `setRunning(true)` later. */
+  unlockWorks = true;
+  private running = false;
+  private readonly listeners = new Set<(running: boolean) => void>();
 
   constructor(private readonly isVoiceBusy: () => boolean = () => false) {}
 
@@ -27,6 +31,23 @@ export class FakeSoundPlayer implements SoundPlayer {
 
   unlock(): void {
     this.unlocks++;
+    if (this.unlockWorks) this.setRunning(true);
+  }
+
+  isRunning(): boolean {
+    return this.running;
+  }
+
+  onStateChange(listener: (running: boolean) => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  /** Simulates the context entering or leaving "running" (a resume, an interruption). */
+  setRunning(running: boolean): void {
+    if (this.running === running) return;
+    this.running = running;
+    for (const l of [...this.listeners]) l(running);
   }
 
   setEnabled(on: boolean): void {

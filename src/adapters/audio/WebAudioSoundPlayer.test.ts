@@ -73,7 +73,8 @@ class FakeCompressor extends FakeNode {
   release = new FakeParam(0.25);
 }
 class FakeAudioContext {
-  state: "suspended" | "running" | "closed" = "running";
+  state: "suspended" | "running" | "closed" | "interrupted" = "running";
+  private readonly stateListeners: Array<() => void> = [];
   currentTime = 0;
   sampleRate = 8000;
   destination = new FakeNode();
@@ -100,6 +101,14 @@ class FakeAudioContext {
   createBuffer(channels: number, length: number, sampleRate: number) {
     const data = new Float32Array(length);
     return { numberOfChannels: channels, length, sampleRate, duration: length / sampleRate, getChannelData: () => data };
+  }
+  addEventListener(type: string, listener: () => void) {
+    if (type === "statechange") this.stateListeners.push(listener);
+  }
+  /** Like the browser: change the state, then fire "statechange". */
+  setState(state: FakeAudioContext["state"]) {
+    this.state = state;
+    this.stateListeners.forEach((l) => l());
   }
   resume() {
     this.resumes++;
@@ -155,6 +164,89 @@ test("a suspended context is resumed by unlock and plays nothing until it runs",
   ctx.state = "running";
   player.play("answer.correct");
   expect(ctx.starts).toBeGreaterThan(0);
+});
+
+function suspendedContext() {
+  const ctx = new FakeAudioContext();
+  ctx.state = "suspended";
+  let finish: () => void = () => undefined;
+  ctx.resume = () => {
+    ctx.resumes++;
+    return new Promise<void>((resolve) => {
+      finish = () => {
+        ctx.setState("running");
+        resolve();
+      };
+    });
+  };
+  return { ctx, finish: () => finish() };
+}
+
+test("reports when the context enters and leaves running, and unsubscribes", () => {
+  const { ctx, finish } = suspendedContext();
+  const { player } = setup({ context: ctx });
+  const seen: boolean[] = [];
+  const off = player.onStateChange((r) => seen.push(r));
+  expect(player.isRunning()).toBe(false);
+  player.unlock();
+  expect(player.isRunning()).toBe(false);
+  finish();
+  expect(seen).toEqual([true]);
+  expect(player.isRunning()).toBe(true);
+  ctx.setState("interrupted");
+  expect(seen).toEqual([true, false]);
+  expect(player.isRunning()).toBe(false);
+  off();
+  ctx.setState("running");
+  expect(seen).toEqual([true, false]);
+});
+
+test("the cue of the very gesture that unlocks audio plays once the context runs", () => {
+  const { ctx, finish } = suspendedContext();
+  const { player, at } = setup({ context: ctx });
+  at(1000);
+  player.unlock();
+  player.play("answer.correct"); // the tap's click, while resume() is pending
+  expect(ctx.starts).toBe(0);
+  at(1100);
+  finish();
+  expect(ctx.starts).toBeGreaterThan(0);
+});
+
+test("a cue that waited too long for the unlock is dropped, and only the last one is kept", () => {
+  const { ctx, finish } = suspendedContext();
+  const { player, at } = setup({ context: ctx });
+  at(1000);
+  player.unlock();
+  player.play("answer.correct");
+  at(1500);
+  finish();
+  expect(ctx.starts).toBe(0);
+  ctx.setState("interrupted");
+  at(2000);
+  player.play("answer.wrong");
+  player.play("answer.correct");
+  at(2100);
+  const before = ctx.starts;
+  ctx.setState("running");
+  const afterOne = ctx.starts;
+  expect(afterOne).toBeGreaterThan(before);
+  ctx.setState("interrupted");
+  ctx.setState("running"); // not replayed a second time
+  expect(ctx.starts).toBe(afterOne);
+});
+
+test("cues before any gesture are never remembered, nor after stopAll or when disabled", () => {
+  const { ctx, finish } = suspendedContext();
+  const { player, at } = setup({ context: ctx });
+  at(1000);
+  player.play("answer.correct"); // before the first gesture: dropped for good
+  player.unlock();
+  player.play("answer.wrong");
+  player.stopAll();
+  at(1050);
+  finish();
+  expect(ctx.starts).toBe(0);
 });
 
 test("no Web Audio: unlock and play never throw and start nothing", () => {

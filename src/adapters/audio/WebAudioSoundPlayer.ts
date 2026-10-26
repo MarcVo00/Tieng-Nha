@@ -16,6 +16,7 @@ const LEVEL = { normal: 1, strong: 1.5, soft: 0.2 } as const; // soft â‰¤ 0.25 Ã
 const DEDUPE_MS = 50;
 const MAX_VOICES = 6;
 const FADE_S = 0.06; // stopAll and the voice cap fade out within 80 ms
+const PENDING_MS = 300; // the cue of the unlocking gesture waits this long for the context to run
 const DUCK_S = 0.03; // a cue already sounding drops under (or comes back from) the voice in 30 ms
 
 type Sounding = { cue: SoundCue; bus: GainNode; voice: Voice; level: number; bornSoft: boolean };
@@ -38,6 +39,9 @@ export class WebAudioSoundPlayer implements SoundPlayer {
   private master: AudioNode | null = null;
   private unsupported = false;
   private enabled = true;
+  private wasRunning = false;
+  private readonly stateListeners = new Set<(running: boolean) => void>();
+  private pending: { cue: SoundCue; opts: PlayOptions; at: number } | null = null;
   private readonly lastPlayed = new Map<SoundCue, number>();
   private sounding: Sounding[] = [];
   private readonly isVoiceBusy: () => boolean;
@@ -61,19 +65,40 @@ export class WebAudioSoundPlayer implements SoundPlayer {
         }
         this.ctx = ctx;
         this.master = this.buildMaster(ctx);
+        ctx.addEventListener?.("statechange", () => this.syncState());
       }
       // "suspended" before the first gesture, "interrupted" on iOS after a call or the app went to the background.
-      if (this.ctx.state !== "running" && this.ctx.state !== "closed") void this.ctx.resume().catch(() => undefined);
+      if (this.ctx.state !== "running" && this.ctx.state !== "closed") {
+        void this.ctx.resume().then(
+          () => this.syncState(),
+          () => this.syncState(),
+        );
+      }
+      this.syncState();
     } catch {
       this.unsupported = true;
       this.ctx = null;
     }
   }
 
+  isRunning(): boolean {
+    return this.wasRunning;
+  }
+
+  onStateChange(listener: (running: boolean) => void): () => void {
+    this.stateListeners.add(listener);
+    return () => this.stateListeners.delete(listener);
+  }
+
   play(cue: SoundCue, opts: PlayOptions = {}): void {
     const ctx = this.ctx;
     const master = this.master;
-    if (!this.enabled || !ctx || !master || ctx.state !== "running") return;
+    if (!this.enabled || !ctx || !master) return;
+    if (ctx.state !== "running") {
+      // The context exists, so a gesture has come: this cue is probably the one of the tap that is waking the audio.
+      this.pending = { cue, opts, at: this.now() };
+      return;
+    }
     const now = this.now();
     const last = this.lastPlayed.get(cue);
     if (last !== undefined && now - last < DEDUPE_MS) return;
@@ -98,6 +123,7 @@ export class WebAudioSoundPlayer implements SoundPlayer {
   }
 
   stopAll(): void {
+    this.pending = null;
     const ctx = this.ctx;
     if (!ctx) return;
     try {
@@ -133,6 +159,17 @@ export class WebAudioSoundPlayer implements SoundPlayer {
   setEnabled(on: boolean): void {
     this.enabled = on;
     if (!on) this.stopAll();
+  }
+
+  /** Tells listeners when the context enters or leaves "running"; on entering, plays the cue that was waiting. */
+  private syncState(): void {
+    const running = this.ctx?.state === "running";
+    if (running === this.wasRunning) return;
+    this.wasRunning = running;
+    for (const l of [...this.stateListeners]) l(running);
+    const pending = this.pending;
+    this.pending = null;
+    if (running && pending && this.now() - pending.at <= PENDING_MS) this.play(pending.cue, pending.opts);
   }
 
   private buildMaster(ctx: AudioContext): AudioNode {

@@ -116,9 +116,15 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
       audio.onloadedmetadata = () => {
         clearTimeout(timer);
         const length = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 5;
-        timer = setTimeout(() => settle(resolve), (length / (rate > 0 ? rate : 1)) * 1000 + END_MARGIN_MS);
+        timer = setTimeout(() => {
+          audio.pause();
+          settle(resolve);
+        }, (length / (rate > 0 ? rate : 1)) * 1000 + END_MARGIN_MS);
       };
-      timer = setTimeout(() => settle(() => reject(new Error("audio_stalled"))), LOAD_TIMEOUT_MS);
+      timer = setTimeout(() => {
+        audio.pause();
+        settle(() => reject(new Error("audio_stalled")));
+      }, LOAD_TIMEOUT_MS);
       void audio.play().catch((e: unknown) => settle(() => reject(e instanceof Error ? e : new Error("audio_failed"))));
     });
   }

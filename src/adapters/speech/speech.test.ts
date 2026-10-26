@@ -361,6 +361,7 @@ describe("WebSpeechSynthesizer audioUrl clips", () => {
     onerror: (() => void) | null = null;
     onloadedmetadata: (() => void) | null = null;
     play = vi.fn(() => Promise.resolve());
+    pause = vi.fn();
     constructor(public src: string) {
       FakeClip.last = this;
     }
@@ -382,6 +383,7 @@ describe("WebSpeechSynthesizer audioUrl clips", () => {
     const settled = expect(done).rejects.toThrow("audio_stalled");
     await vi.advanceTimersByTimeAsync(8000);
     await settled;
+    expect(FakeClip.last.pause).toHaveBeenCalled(); // never keeps playing after the caller has moved on
   });
 
   test("a clip that loads but then goes silent resolves shortly after its expected end", async () => {
@@ -391,6 +393,7 @@ describe("WebSpeechSynthesizer audioUrl clips", () => {
     FakeClip.last.onloadedmetadata?.();
     await vi.advanceTimersByTimeAsync(2000 + 2000);
     await expect(done).resolves.toBeUndefined();
+    expect(FakeClip.last.pause).toHaveBeenCalled();
   });
 
   test("an error rejects", async () => {

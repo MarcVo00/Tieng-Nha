@@ -4,13 +4,12 @@ import { useServices } from "@/app/ServicesProvider";
 
 // Touch only grants audio on pointerup/touchend (pointerdown counts for a mouse); keydown and click cover the rest.
 const GESTURES = ["pointerdown", "pointerup", "touchend", "click", "keydown"] as const;
-// After one of these the page has user activation, so the unlock has had its chance.
-const ACTIVATING = new Set<string>(["pointerup", "touchend", "click", "keydown"]);
 
 /**
- * Keeps the sound player in step with the « Sons » setting, and unlocks audio on the first gesture. iOS suspends the
- * context when the app goes to the background, so the listeners come back each time the page is visible again. While the
- * page is hidden the player is muted: what rings stops, and a cue a scene had scheduled (a signature's gong) stays silent.
+ * Keeps the sound player in step with the « Sons » setting, and unlocks audio on gestures. The listeners stay armed until the
+ * context is really running (iOS may refuse a gesture), and come back whenever it leaves "running" (the app went to
+ * the background, a call or Siri interrupted it). While the page is hidden the player is muted: what rings stops, and
+ * a cue a scene had scheduled (a signature's gong) stays silent.
  */
 export function SoundSync() {
   const { sound } = useServices();
@@ -23,9 +22,8 @@ export function SoundSync() {
 
   useEffect(() => {
     let armed = false;
-    const onGesture = (e: Event) => {
+    const onGesture = () => {
       sound.unlock();
-      if (ACTIVATING.has(e.type)) disarm();
     };
     const arm = () => {
       if (armed) return;
@@ -39,11 +37,13 @@ export function SoundSync() {
     const onVisibility = () => {
       const shown = document.visibilityState === "visible";
       setVisible(shown);
-      if (shown) arm();
+      if (shown) arm(); // iOS may have suspended audio behind our back
     };
-    arm();
+    const stopWatching = sound.onStateChange((running) => (running ? disarm() : arm()));
+    if (!sound.isRunning()) arm();
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
+      stopWatching();
       disarm();
       document.removeEventListener("visibilitychange", onVisibility);
     };

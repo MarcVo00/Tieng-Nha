@@ -38,16 +38,41 @@ test("follows the « Sons » setting", () => {
   expect(sound.enabled).toBe(false);
 });
 
-test("a pointerdown unlocks audio, and listening stops once the gesture completes", () => {
+test("once audio really runs, a completed gesture stops the listening", () => {
   const sound = setup();
   expect(sound.unlocks).toBe(0);
   window.dispatchEvent(new Event("pointerdown"));
   expect(sound.unlocks).toBe(1);
+  expect(sound.isRunning()).toBe(true);
   window.dispatchEvent(new Event("pointerup"));
-  expect(sound.unlocks).toBe(2);
   window.dispatchEvent(new Event("click"));
   window.dispatchEvent(new KeyboardEvent("keydown"));
+  expect(sound.unlocks).toBe(1);
+});
+
+test("keeps listening while a gesture left the audio suspended, and a later gesture unlocks it", () => {
+  const sound = setup();
+  sound.unlockWorks = false; // iOS refused the pointerup as a media gesture
+  window.dispatchEvent(new Event("pointerup"));
+  window.dispatchEvent(new Event("touchend"));
+  window.dispatchEvent(new Event("click"));
+  expect(sound.unlocks).toBe(3);
+  sound.unlockWorks = true;
+  window.dispatchEvent(new Event("click"));
+  expect(sound.unlocks).toBe(4);
+  expect(sound.isRunning()).toBe(true);
+  window.dispatchEvent(new Event("click"));
+  expect(sound.unlocks).toBe(4);
+});
+
+test("an interruption while the app stays visible (a call, Siri) re-arms the listeners", () => {
+  const sound = setup();
+  window.dispatchEvent(new Event("click"));
+  expect(sound.unlocks).toBe(1);
+  act(() => sound.setRunning(false)); // iOS "interrupted"
+  window.dispatchEvent(new Event("click"));
   expect(sound.unlocks).toBe(2);
+  expect(sound.isRunning()).toBe(true);
 });
 
 test("listens again when the app comes back from the background (iOS suspends audio)", () => {
@@ -55,6 +80,7 @@ test("listens again when the app comes back from the background (iOS suspends au
   window.dispatchEvent(new KeyboardEvent("keydown"));
   expect(sound.unlocks).toBe(1);
   setVisibility("hidden");
+  act(() => sound.setRunning(false));
   setVisibility("visible");
   window.dispatchEvent(new Event("touchend"));
   expect(sound.unlocks).toBe(2);

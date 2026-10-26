@@ -793,7 +793,7 @@ export const fr = {
       revealAll: "Tout révéler",
       stick: (n: number, tip: string) => `Bâtonnet ${n}, bout ${tip}`,
       tips: { common: "de bois", rare: "de jade", epic: "vermillon", legendary: "d'or" } as Record<"common" | "rare" | "epic" | "legendary", string>,
-      duplicate: (n: number) => `Déjà obtenu → +${n} xu`,
+      duplicate: (n: number) => `Déjà obtenu → +${n}\u00A0xu`,
       announce: (name: string, rarity: string, line: string) => `${name}, ${rarity}. ${line}`,
       next: "Bâtonnet suivant",
       toRecap: "Voir tout le tirage",

@@ -65,7 +65,7 @@ test("a duplicate says what it gave back", async () => {
   await user.click(stick);
   expect(await within(dialog).findByText(fr.gacha.scene.duplicate(20))).toBeInTheDocument();
   expect(within(dialog).getByRole("status").textContent).toBe(fr.gacha.scene.announce(nameOf("acc_quat_sat"), fr.shop.rarities.rare, fr.gacha.scene.duplicate(20)));
-  expect(fr.gacha.scene.duplicate(20)).toBe("Déjà obtenu → +20 xu");
+  expect(fr.gacha.scene.duplicate(20)).toBe("Déjà obtenu → +20\u00A0xu");
 });
 
 test("x10: ten sticks fan out with their tips; « Tout révéler » shows the recap, new pieces first then by rarity", async () => {
@@ -151,5 +151,5 @@ test("x10: closing a scroll puts focus on the next unread stick, then on the rec
 
 test("the recap words a duplicate like the scroll does", () => {
   const { dialog } = show(pullOf([item("acc_quat_sat", "rare", true, 20)]), { recovered: true });
-  expect(within(dialog).getByText("Déjà obtenu → +20 xu")).toBeInTheDocument();
+  expect(within(dialog).getByText("Déjà obtenu → +20\u00A0xu")).toBeInTheDocument();
 });

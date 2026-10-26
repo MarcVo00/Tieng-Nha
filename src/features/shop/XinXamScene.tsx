@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { GachaPull, GachaPullItem, Look, Rarity, ShopItem } from "@/domain/types";
 import { fr } from "@/i18n/fr";
@@ -75,6 +75,8 @@ const RISE = 76;
 const LANTERN = { w: 40, h: Math.round((40 * 76) / 48), inset: 22, glow: 112 } as const;
 /** Width of the one card of a x1. */
 const SINGLE_CARD_W = 200;
+/** A dealt card starts as wide as a stick (scaleX), then opens into its card. */
+const STICK_WIDTH = 0.12;
 
 const ms = (s: number) => Math.round(s * 1000);
 const nameOf = (id: string) => fr.shop.items[id]?.name ?? id;
@@ -292,13 +294,17 @@ function Card({ it, index, flipped, turning, enabled, single, deal, look, onFlip
       data-card=""
       data-flipped={flipped ? "true" : "false"}
       aria-label={flipped ? fr.gacha.scene.cardOpen(index + 1, name, fr.shop.rarities[it.rarity]) : fr.gacha.scene.card(index + 1)}
-      disabled={!enabled}
-      onClick={() => onFlip(index)}
-      whileTap={tap}
+      // aria-disabled, not disabled: the card keeps focus while it turns over (a disabled button drops it).
+      aria-disabled={!enabled}
+      onClick={() => {
+        if (enabled) onFlip(index);
+      }}
+      {...(enabled ? { whileTap: tap } : {})}
       className={`relative block w-full rounded-md ${single ? "mx-auto" : ""}`}
       style={{ aspectRatio: `${CARD_RATIO}`, ...(single ? { maxWidth: SINGLE_CARD_W } : {}) }}
-      initial={deal ? { opacity: 0, y: -24, scale: 0.92 } : false}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      // The sticks settle into cards: each one comes down as a narrow stick and widens into its card.
+      initial={deal ? { opacity: 0, y: -24, scaleX: STICK_WIDTH } : false}
+      animate={{ opacity: 1, y: 0, scaleX: 1 }}
       transition={{ duration: REVEAL.deal, delay: deal?.delay ?? 0, ease: ease.out }}
     >
       <AnimatePresence initial={false}>
@@ -316,12 +322,13 @@ function Card({ it, index, flipped, turning, enabled, single, deal, look, onFlip
         <motion.span
           data-theme="light"
           data-face={it.rarity}
-          className={`absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-md bg-paper p-2 text-center shadow-card ring-[3px] ring-inset ${RING[it.rarity]}`}
+          className={`absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-md bg-paper px-2 pb-1.5 pt-3 text-center shadow-card ring-[3px] ring-inset ${RING[it.rarity]}`}
           initial={turning ? { scaleX: 0 } : false}
           animate={{ scaleX: 1 }}
           transition={{ duration: half, delay: half, ease: ease.out }}
         >
-          <span className={`absolute right-1.5 top-1.5 -rotate-6 whitespace-nowrap rounded-sm px-1.5 py-0.5 text-caption font-semibold shadow-card ${SEAL[it.rarity]}`}>
+          {/* The seal is stamped across the top edge, clear of the hero. */}
+          <span className={`absolute -top-2.5 right-1 -rotate-6 whitespace-nowrap rounded-sm px-1.5 py-0.5 text-caption font-semibold shadow-card ${SEAL[it.rarity]}`}>
             {fr.shop.rarities[it.rarity]}
           </span>
           <HeroMedallion look={look} size={single ? 88 : 52} />
@@ -355,7 +362,7 @@ function CardGrid({ pull, state, dealing, onShown, lookFor, onFlip }: GridProps)
     shown.current();
   }, []);
   return (
-    <div ref={ref} data-cards="" className={single ? "px-6 py-6" : "grid grid-cols-2 gap-3 py-1"}>
+    <div ref={ref} data-cards="" className={single ? "px-6 py-6" : "grid grid-cols-2 gap-x-3 gap-y-4 pb-1 pt-3"}>
       {pull.items.map((it, i) => (
         <Card
           key={i}
@@ -428,10 +435,18 @@ function SignatureSlot({ itemId, reduced, onEnd }: { itemId: string; reduced: bo
   return Signature ? <Signature onEnd={onEnd} reduced={reduced} /> : null;
 }
 
-type FocusProps = { it: GachaPullItem; look: Look; signing: boolean; reduced: boolean; onSignatureEnd: () => void };
+type FocusProps = {
+  it: GachaPullItem;
+  look: Look;
+  signing: boolean;
+  /** Its signature has played: the piece appears at once, without the generic gold. */
+  signed: boolean;
+  reduced: boolean;
+  onSignatureEnd: () => void;
+};
 
-function FocusView({ it, look, signing, reduced, onSignatureEnd }: FocusProps) {
-  const legendary = it.rarity === "legendary";
+function FocusView({ it, look, signing, signed, reduced, onSignatureEnd }: FocusProps) {
+  const gold = it.rarity === "legendary" && !signed;
   return (
     <div data-theme="light" data-stage="" data-focus="" className="relative mx-auto mt-1 overflow-hidden rounded-md bg-paper" style={{ width: STAGE.w, height: STAGE.h }}>
       <img src={altarSrc} alt="" draggable={false} className="pointer-events-none absolute select-none opacity-30" style={{ left: ALTAR.x, top: ALTAR.y, width: ALTAR.w, height: ALTAR.h }} />
@@ -440,8 +455,8 @@ function FocusView({ it, look, signing, reduced, onSignatureEnd }: FocusProps) {
       ) : (
         <>
           {/* A legendary without a signature: the generic gold treatment, rays first, then the scroll. */}
-          {legendary ? <GoldRays x={STAGE.w / 2} y={STAGE.h / 2} /> : null}
-          <Scroll it={it} look={look} delay={legendary ? REVEAL.goldHold : 0} />
+          {gold ? <GoldRays x={STAGE.w / 2} y={STAGE.h / 2} /> : null}
+          <Scroll it={it} look={look} delay={gold ? REVEAL.goldHold : 0} />
         </>
       )}
     </div>
@@ -487,6 +502,8 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
   const [state, dispatch] = useReducer(revealReducer, pull.items, (its) => initialReveal(its, { direct: reduced || recovered }));
   // The card whose focus view is open (it opens once the card has turned over in the grid).
   const [opened, setOpened] = useState<number | null>(null);
+  // Cards whose signature has played: their focus view stays open from the signature on (no return to the grid).
+  const [signed, setSigned] = useState<readonly number[]>([]);
   const [burst, setBurst] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   // The cards are dealt once; coming back from a focus view they are simply there.
@@ -510,6 +527,13 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
     if (phase === "focus" && turning !== null) return after(REVEAL.flip, () => setOpened(turning));
     return undefined;
   }, [phase, shake, top, turning, chaining]);
+
+  // A signature opens the focus view straight away (the card face would show the piece before it), and keeps it open.
+  useEffect(() => {
+    if (phase !== "signature" || turning === null) return;
+    setSigned((s) => (s.includes(turning) ? s : [...s, turning]));
+  }, [phase, turning]);
+  const onSignatureEnd = useCallback(() => dispatch({ type: "signatureEnd" }), []);
 
   // « Tout découvrir »: the card turning over is brought into view (the grid scrolls inside the panel).
   useEffect(() => {
@@ -547,7 +571,8 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
   }, [state.phase]);
 
   const current = state.current === null ? null : (pull.items[state.current] ?? null);
-  const focusOpen = (state.phase === "focus" && opened === state.current) || state.phase === "signature";
+  const focusOpen =
+    state.phase === "signature" || (state.phase === "focus" && state.current !== null && (opened === state.current || signed.includes(state.current)));
   const view = state.phase === "tube" || state.phase === "shaking" || state.phase === "omen" ? "stage" : focusOpen ? "focus" : recap ? "recap" : "cards";
   const remaining = state.flipped.filter((f) => !f).length;
 
@@ -560,8 +585,11 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
           ? fr.gacha.scene.shaking
           : state.phase === "omen"
             ? fr.gacha.scene.omen
-            : chaining
-              ? fr.gacha.scene.revealing
+            : state.phase === "focus" && current && state.current !== null
+              ? // « Tout découvrir » announces each card as it turns; a touched card says it is turning.
+                chaining
+                ? fr.gacha.scene.cardOpen(state.current + 1, nameOf(current.itemId), fr.shop.rarities[current.rarity])
+                : fr.gacha.scene.turning
               : state.phase === "cards"
                 ? count === 1
                   ? fr.gacha.scene.tapOne
@@ -638,7 +666,8 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
                 look={lookFor(current.itemId)}
                 signing={state.phase === "signature"}
                 reduced={reduced}
-                onSignatureEnd={() => dispatch({ type: "signatureEnd" })}
+                signed={state.current !== null && signed.includes(state.current)}
+                onSignatureEnd={onSignatureEnd}
               />
             ) : recap ? (
               <Recap pull={pull} recovered={recovered} lookFor={lookFor} onClose={onClose} />
@@ -651,8 +680,16 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
             <p role="status" className="min-h-[1.125rem] text-center text-caption text-ink-muted">
               {hint}
             </p>
-            {state.phase === "cards" && count > 1 ? (
-              <Button variant="secondary" fullWidth data-reveal-all="" onClick={() => dispatch({ type: "revealAll" })}>
+            {/* Stays in place while a card turns over in the grid (the footer does not jump; focus stays on it). */}
+            {count > 1 && (state.phase === "cards" || (state.phase === "focus" && !focusOpen)) ? (
+              <Button
+                variant="secondary"
+                fullWidth
+                data-reveal-all=""
+                aria-disabled={state.phase !== "cards"}
+                className={state.phase === "cards" ? "" : "opacity-50"}
+                onClick={() => dispatch({ type: "revealAll" })}
+              >
                 {fr.gacha.scene.revealAll}
               </Button>
             ) : null}

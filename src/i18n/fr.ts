@@ -791,7 +791,7 @@ export const fr = {
       omen: "Les bâtonnets sortent du tube…",
       tapOne: "Touche la carte pour la retourner.",
       tapMany: (n: number) => `Touche une carte\u202f: encore ${n}.`,
-      revealing: "Les cartes se retournent…",
+      turning: "La carte se retourne…",
       revealAll: "Tout découvrir",
       card: (n: number) => `Carte ${n}, face cachée`,
       cardOpen: (n: number, name: string, rarity: string) => `Carte ${n}\u202f: ${name}, ${rarity}`,

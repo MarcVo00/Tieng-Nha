@@ -120,8 +120,14 @@ test("x10: before a card is turned, nothing in the grid tells a rarity", async (
 test("x10: turning card 3 shows its piece; back on the grid it stays turned with its preview, and focus goes to a face-down card", async () => {
   const { user, dialog } = show(pullOf(TEN));
   await deal(user, dialog);
-  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(3) }));
+  const third = within(dialog).getByRole("button", { name: fr.gacha.scene.card(3) });
+  await user.click(third);
+  // While it turns over: a short status, the card keeps focus, « Tout découvrir » stays in place (inactive).
+  expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.turning);
+  expect(third).toHaveFocus();
+  expect(within(dialog).getByRole("button", { name: fr.gacha.scene.revealAll })).toHaveAttribute("aria-disabled", "true");
   expect(await within(dialog).findByRole("heading", { name: nameOf("hat_khan_vanh") }, SLOW)).toBeInTheDocument();
+  expect(within(dialog).getByRole("button", { name: fr.gacha.resultContinue })).toHaveFocus();
   expect(dialog.querySelector('[data-seal="common"]')).toHaveTextContent(fr.shop.rarities.common);
   await user.click(within(dialog).getByRole("button", { name: fr.gacha.resultContinue }));
   const turned = await within(dialog).findByRole("button", { name: fr.gacha.scene.cardOpen(3, nameOf("hat_khan_vanh"), fr.shop.rarities.common) }, SLOW);
@@ -142,8 +148,13 @@ test("« Tout découvrir » turns the cards lowest rarity first, ends on the bes
     }
   });
   watch.observe(grid, { subtree: true, attributes: true, attributeFilter: ["data-flipped"] });
-  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.revealAll }));
-  await waitFor(() => expect(within(dialog).getByText(fr.gacha.scene.revealing)).toBeInTheDocument());
+  const revealAll = within(dialog).getByRole("button", { name: fr.gacha.scene.revealAll });
+  await user.click(revealAll);
+  // Each card is announced as it turns (the first is the first common), and focus stays on the button meanwhile.
+  await waitFor(() => expect(within(dialog).getByRole("status").textContent).toBe(fr.gacha.scene.cardOpen(1, nameOf("acc_giao_tre"), fr.shop.rarities.common)));
+  expect(revealAll).toHaveFocus();
+  expect(revealAll).toHaveAttribute("aria-disabled", "true");
+  await waitFor(() => expect(within(dialog).getByRole("status").textContent).toBe(fr.gacha.scene.cardOpen(3, nameOf("hat_khan_vanh"), fr.shop.rarities.common)), SLOW);
   // The best piece (the legendary) opens its focus view and waits.
   expect(await within(dialog).findByRole("heading", { name: nameOf("char_phap_su") }, CHAIN)).toBeInTheDocument();
   watch.disconnect();

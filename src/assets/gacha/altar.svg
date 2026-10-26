@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 124">
+  <g id="altar" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- hương án : petit autel laqué. Le tube se pose au centre du plateau, (120,68) -->
+    <!-- encens fixe : trois bâtons et leur fumée immobile -->
+    <path d="M192 52 L188 18 M198 52 L198 14 M204 52 L208 18" fill="none" stroke="#B23A2A" stroke-width="2"/>
+    <circle cx="188" cy="17" r="1.6" fill="#D9A93A" stroke-width="1"/>
+    <circle cx="198" cy="13" r="1.6" fill="#D9A93A" stroke-width="1"/>
+    <circle cx="208" cy="17" r="1.6" fill="#D9A93A" stroke-width="1"/>
+    <path d="M198 9 Q193 4 198 0 M188 13 Q183 8 186 3 M208 13 Q213 8 210 3" fill="none" stroke-width="1.2" opacity="0.45"/>
+    <!-- lư hương : brûle-parfum d'or à trois pieds -->
+    <path d="M182 50 L214 50 Q214 66 198 66 Q182 66 182 50 Z" fill="#D9A93A"/>
+    <path d="M180 49 L216 49" fill="none" stroke-width="3"/>
+    <path d="M188 64 L186 69 M208 64 L210 69" fill="none" stroke-width="2.4"/>
+    <!-- offrande : trois fruits sur une coupe -->
+    <path d="M26 66 L62 66 L56 70 L32 70 Z" fill="#D9A93A" stroke-width="2"/>
+    <circle cx="36" cy="59" r="7" fill="#B23A2A"/>
+    <circle cx="52" cy="59" r="7" fill="#B23A2A"/>
+    <circle cx="44" cy="51" r="7" fill="#B23A2A"/>
+    <path d="M44 44 L46 41 M36 52 L38 49.5 M52 52 L54 49.5" fill="none" stroke="#4E7A4A" stroke-width="2"/>
+    <!-- pieds galbés -->
+    <path d="M30 84 L30 112 Q30 120 22 119 L40 119 Q38 108 42 84 Z M210 84 L210 112 Q210 120 218 119 L200 119 Q202 108 198 84 Z" fill="#B23A2A"/>
+    <!-- tablier à nuages d'or -->
+    <path d="M28 80 L212 80 L206 98 L34 98 Z" fill="#B23A2A"/>
+    <path d="M76 92 Q70 92 70 88 Q70 84 75 85 Q77 81 82 82.5 Q86 80 89 84 Q94 84 94 88 Q94 92 89 92 Z M146 92 Q140 92 140 88 Q140 84 145 85 Q147 81 152 82.5 Q156 80 159 84 Q164 84 164 88 Q164 92 159 92 Z" fill="#D9A93A" stroke-width="1.5"/>
+    <path d="M104 89 L136 89" fill="none" stroke="#D9A93A" stroke-width="1.8"/>
+    <!-- plateau, bouts relevés en volutes -->
+    <path d="M14 70 L226 70 Q234 70 234 64 Q234 59 229 60 Q226 61 227 64 L227 66 Q226 68 220 68 L20 68 Q14 68 13 66 L13 64 Q14 61 11 60 Q6 59 6 64 Q6 70 14 70 Z" fill="#1F1A17"/>
+    <path d="M12 69 L228 69 L226 80 L14 80 Z" fill="#B23A2A"/>
+    <path d="M18 74.5 L222 74.5" fill="none" stroke="#D9A93A" stroke-width="1.6"/>
+  </g>
+</svg>

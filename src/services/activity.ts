@@ -1,4 +1,4 @@
-import type { AppEvent, AppEventType, BadgeDef, DialogueId, Duel, EnergyState, ItemSlot, LessonId, NewEvent, ProgressSnapshot, SessionKind, VocabId, Wallet } from "@/domain/types";
+import type { AppEvent, AppEventType, BadgeDef, DialogueId, Duel, EnergyState, GachaPull, ItemSlot, LessonId, NewEvent, ProgressSnapshot, SessionKind, VocabId, Wallet } from "@/domain/types";
 import type { ContentSource, Outbox, ProgressRepository } from "@/ports";
 import { computeProgress } from "@/services/progress";
 import { evaluateBadges } from "@/services/badges";
@@ -26,6 +26,11 @@ export type ActivityService = {
    * Returns the Kim bài added to the local wallet.
    */
   claimSettledDuels(duels: readonly Duel[]): Promise<number>;
+  /**
+   * Mirrors gacha pulls into the local journal: one `gacha_pulled` per pull not yet in it, built from the SERVER result.
+   * Idempotent and serialised. Returns the pulls newly appended (in the given order).
+   */
+  claimGachaPulls(pulls: readonly GachaPull[]): Promise<GachaPull[]>;
   /** Demo mode only: credits xu / Kim bài in the local journal (never synced). Non-negative integers. */
   demoGrant(coins: number, kimBai: number): Promise<Wallet>;
 };
@@ -99,6 +104,23 @@ export function createActivityService(deps: {
     return added;
   }
 
+  // Same rule as the duels: the server already debited/credited, the journal only mirrors each pull once.
+  // A pull the server already marks `claimed` was applied to the xu by another device (or an earlier install): the
+  // journal of this device, which starts empty, only learns its items (cost 0, no refund), else its balance goes negative.
+  let claimingPulls: Promise<unknown> = Promise.resolve();
+  async function claimPulls(pulls: readonly GachaPull[]): Promise<GachaPull[]> {
+    const claimed = new Set((await progress.listEvents()).filter((e) => e.type === "gacha_pulled").map((e) => e.refId));
+    const added: GachaPull[] = [];
+    for (const p of pulls) {
+      if (claimed.has(p.id) || p.id === "" || p.items.length === 0) continue;
+      await append(ev("gacha_pulled", p.id, 0, { theme: p.theme, cost: p.claimed ? 0 : p.cost, items: p.items.map((i) => ({ itemId: i.itemId, rarity: i.rarity, duplicate: i.duplicate, refund: p.claimed ? 0 : i.refund })) }));
+      claimed.add(p.id);
+      added.push(p);
+    }
+    if (added.length > 0) deps.onEventAppended?.();
+    return added;
+  }
+
   return {
     getSnapshot: snapshot,
     async getEnergy() {
@@ -151,6 +173,11 @@ export function createActivityService(deps: {
     claimSettledDuels(duels) {
       const run = claiming.then(() => claim(duels));
       claiming = run.catch(() => undefined);
+      return run;
+    },
+    claimGachaPulls(pulls) {
+      const run = claimingPulls.then(() => claimPulls(pulls));
+      claimingPulls = run.catch(() => undefined);
       return run;
     },
     async demoGrant(coins, kimBai) {

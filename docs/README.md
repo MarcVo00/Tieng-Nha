@@ -14,6 +14,8 @@
 | [Plan Mode démo](superpowers/plans/2026-10-20-demo-mode.md) | orchestrateur + sous-agents | version démo (faux serveur, adversaires automatiques, panneau +xu / +Kim bài) |
 | [Audit design](superpowers/specs/2026-10-20-design-polish-audit.md) | tous | signes « IA », embellissements, chorégraphie des combats, garde-fous de perf |
 | [Plan embellissement](superpowers/plans/2026-10-20-design-polish.md) | orchestrateur + sous-agents | bug du résultat du boss, combats, textures, avatars-héros, parcours, vitrine |
+| [Spec Gacha « Xin xăm »](superpowers/specs/2026-10-21-gacha-design.md) | tous | gacha par thème, raretés, garanties, animation des bâtonnets de la pagode |
+| [Plan Gacha](superpowers/plans/2026-10-24-gacha.md) | orchestrateur + sous-agents | gacha par thème : dessins, migration, règles, reprise, bannières, animation Xin xăm |
 | [Déploiement](deploy.md) | toi | runbook Netlify/Supabase, et version démo sur le deploy preview de la PR « Démo (ne pas fusionner) » |
 | [Plan arbre + boss](superpowers/plans/2026-10-14-tree-and-boss.md) | orchestrateur + sous-agents | étapes 1–2 de la Progression V2 : arbre de compétences, boss Thủy Tinh |
 | [Plan énergie](superpowers/plans/2026-10-14-energy.md) | orchestrateur + sous-agents | étape 3 de la Progression V2 : énergie ⚡ |

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Casque de guerrier : mũ trụ de laque noire, côtes d'or, couvre-nuque indigo et houppe vermillon -->
+    <!-- houppe vermillon qui fouette vers l'arrière -->
+    <path d="M60 17 Q45 10 31 18 Q39 20 38 25 Q49 19 58 23 Z" fill="#B23A2A"/>
+    <!-- couvre-nuque en lamelles, de chaque côté du visage -->
+    <path d="M37 58 L31 83 L40 81 L41.5 64 Z M83 58 L89 83 L80 81 L78.5 64 Z" fill="#2B4E6E"/>
+    <path d="M35.5 68 L40.8 68.5 M34 75.5 L40.3 75 M84.5 68 L79.2 68.5 M86 75.5 L79.7 75" fill="none" stroke-width="1.2"/>
+    <!-- cimier d'or -->
+    <path d="M57 29 L60 11 L63 29 Z" fill="#D9A93A" stroke-width="2"/>
+    <!-- bombe noire laquée -->
+    <path d="M35 62 Q32 30 60 27 Q88 30 85 62 Z" fill="#1F1A17"/>
+    <path d="M60 29 L60 56 M48 32 Q43 43 43 58 M72 32 Q77 43 77 58" fill="none" stroke="#D9A93A" stroke-width="1.8"/>
+    <!-- bandeau d'or et pierre vermillon -->
+    <path d="M36 67 Q60 55 84 67 L83.5 58.5 Q60 48 36.5 58.5 Z" fill="#D9A93A"/>
+    <path d="M60 52 L64.5 57 L60 62 L55.5 57 Z" fill="#B23A2A" stroke-width="1.6"/>
+  </g>
+</svg>

@@ -1,4 +1,4 @@
-import type { Duel } from "@/domain/types";
+import type { Duel, GachaPull } from "@/domain/types";
 import { createActivityService } from "@/services/activity";
 import { InMemoryProgressRepository, InMemoryOutbox } from "@/adapters/fakes";
 import { createFakeServices } from "@/adapters/fakes";
@@ -205,6 +205,46 @@ describe("claimSettledDuels", () => {
     expect(await svc.claimSettledDuels(duels)).toBe(0);
     expect((await progress.listEvents()).filter((e) => e.type === "duel_settled")).toHaveLength(1);
     expect((await svc.getWallet()).kimBai).toBe(3);
+  });
+});
+
+describe("claimGachaPulls", () => {
+  const pull = (id: string, over: Partial<GachaPull> = {}): GachaPull => ({
+    id, theme: "legendes_sombres", count: 1, cost: 40, createdAt: "2026-10-24T08:00:00.000Z", claimed: false,
+    items: [{ itemId: "acc_giao_tre", rarity: "common", duplicate: false, refund: 0 }], ...over,
+  });
+
+  test("appends one synced gacha_pulled per new pull, from the server result, and credits the wallet", async () => {
+    const { svc, progress, outbox, appended } = setup();
+    await svc.demoGrant(100, 0);
+    const added = await svc.claimGachaPulls([
+      pull("p1"),
+      pull("p2", { count: 10, cost: 360, items: [{ itemId: "hat_mu_chien", rarity: "rare", duplicate: true, refund: 20 }] }),
+    ]);
+    expect(added.map((p) => p.id)).toEqual(["p1", "p2"]);
+    const events = (await progress.listEvents()).filter((e) => e.type === "gacha_pulled");
+    expect(events.map((e) => [e.refId, e.xp])).toEqual([["p1", 0], ["p2", 0]]);
+    expect(events[0]?.payload).toEqual({ theme: "legendes_sombres", cost: 40, items: [{ itemId: "acc_giao_tre", rarity: "common", duplicate: false, refund: 0 }] });
+    expect(await outbox.size()).toBe(2);
+    expect(appended.length).toBe(1);
+    const w = await svc.getWallet();
+    expect(w.coins).toBe(100 - 40 - 360 + 20);
+    expect(w.inventory).toContain("acc_giao_tre");
+  });
+
+  test("is idempotent across calls and overlapping calls; a pull already claimed elsewhere is mirrored once", async () => {
+    const { svc, progress } = setup();
+    const [a, b] = await Promise.all([svc.claimGachaPulls([pull("p1", { claimed: true })]), svc.claimGachaPulls([pull("p1", { claimed: true })])]);
+    expect(a.length + b.length).toBe(1);
+    expect(await svc.claimGachaPulls([pull("p1")])).toEqual([]);
+    expect((await progress.listEvents()).filter((e) => e.type === "gacha_pulled")).toHaveLength(1);
+  });
+
+  test("nothing to claim appends nothing and does not notify", async () => {
+    const { svc, appended } = setup();
+    expect(await svc.claimGachaPulls([])).toEqual([]);
+    expect(await svc.claimGachaPulls([pull("", {}), pull("p9", { items: [] })])).toEqual([]);
+    expect(appended.length).toBe(0);
   });
 });
 

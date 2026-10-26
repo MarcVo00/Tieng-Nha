@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Turban de l'éclaireur : une longue bande indigo enroulée en tours serrés autour de la tête -->
+    <!-- bout de la bande qui retombe à la tempe -->
+    <path d="M41 61 Q31 67 30 79 L36.5 77 Q37.5 69 44 65 Z" fill="#2B4E6E"/>
+    <!-- tours du haut, bombés -->
+    <path d="M39.5 61 Q38 43 60 39 Q82 43 80.5 61 Q60 53 39.5 61 Z" fill="#2B4E6E"/>
+    <path d="M42 51 Q60 44 78 51 M45 44.5 Q60 39.5 75 44.5" fill="none" stroke-width="1.3"/>
+    <!-- gros tour du bas sur le front, les deux brins se croisent au milieu -->
+    <path d="M37.5 69 Q60 56 82.5 69 L81.5 58.5 Q60 47 38.5 58.5 Z" fill="#2B4E6E"/>
+    <path d="M53 52 L62.5 63.5 M67 52.5 L60 60" fill="none" stroke-width="1.4"/>
+  </g>
+</svg>

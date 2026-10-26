@@ -135,6 +135,9 @@ export const BadgeDefSchema = z
   .strict();
 export const BadgesFileSchema = z.object({ badges: z.array(BadgeDefSchema).min(1) }).strict();
 
+/** Gacha rarities, lowest to highest (spec gacha §3). */
+export const RaritySchema = z.enum(["common", "rare", "epic", "legendary"]);
+
 export const ShopItemSchema = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
@@ -145,8 +148,13 @@ export const ShopItemSchema = z
     maxStock: z.number().int().min(1).optional(),
     /** What the item costs: xu (default) or Kim bài (duels). */
     currency: z.enum(["xu", "kim_bai"]).default("xu"),
+    /** Gacha rarity. A rarity makes the item gacha-only: an xu cosmetic of a theme, never directly purchasable. */
+    rarity: RaritySchema.optional(),
   })
-  .strict();
+  .strict()
+  .refine((i) => i.rarity === undefined || (i.kind === "cosmetic" && i.price === null && i.currency === "xu" && i.theme !== undefined), {
+    message: "an item with a rarity is an xu cosmetic with a theme and no price",
+  });
 export const ShopFileSchema = z.object({ contentVersion: z.number().int().min(1), items: z.array(ShopItemSchema).min(1) }).strict();
 
 /** French typography: a thin no-break space (U+202F) before ? ! : ; — never a plain or no-break space. */

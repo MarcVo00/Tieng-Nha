@@ -252,3 +252,84 @@ describe("demo_grant", () => {
     expect(w.streak).toBe(0);
   });
 });
+
+describe("gacha_pulled", () => {
+  const gshop: ShopItem[] = [
+    ...shop,
+    { id: "g_hat", kind: "cosmetic", slot: "hat", price: null, currency: "xu", theme: "t", rarity: "rare" },
+    { id: "g_aura", kind: "cosmetic", slot: "aura", price: null, currency: "xu", theme: "t", rarity: "common" },
+  ];
+  const item = (itemId: string, duplicate = false, refund = 0) => ({ itemId, rarity: "rare", duplicate, refund });
+  const pull = (refId: string, cost: number, items: unknown, hour: number) => ev("gacha_pulled", { theme: "t", cost, items }, refId, 10, hour);
+  const earn = ev("demo_grant", { coins: 1000, kimBai: 0 }, "demo", 10, 8);
+
+  test("debits the cost, credits refunds and adds the new items", () => {
+    const w = walletAt([earn, pull("p1", 40, [item("g_hat")], 9), pull("p2", 360, [item("g_aura"), item("g_hat", true, 20), item("g_aura", true, 8)], 10)], gshop, badges);
+    expect(w.coins).toBe(1000 - 40 - 360 + 28);
+    expect(w.inventory).toEqual(["g_hat", "g_aura"]);
+  });
+
+  test("counts once per refId", () => {
+    const w = walletAt([earn, pull("p1", 40, [item("g_hat")], 9), pull("p1", 40, [item("g_hat")], 10)], gshop, badges);
+    expect(w.coins).toBe(960);
+  });
+
+  test("the inventory is a set: an item already owned is not added twice", () => {
+    const w = walletAt([earn, pull("p1", 40, [item("g_hat")], 9), pull("p2", 40, [item("g_hat")], 10)], gshop, badges);
+    expect(w.inventory).toEqual(["g_hat"]);
+  });
+
+  test("the pulled item can be equipped", () => {
+    const w = walletAt([earn, pull("p1", 40, [item("g_hat")], 9), equip("hat", "g_hat", 10)], gshop, badges);
+    expect(w.equipped.hat).toBe("g_hat");
+  });
+
+  test("malformed payloads are ignored", () => {
+    const bad = [
+      pull("a", -5, [item("g_hat")], 9),
+      pull("b", 1.5, [item("g_hat")], 9),
+      pull("c", 40, "nope", 9),
+      pull("d", 40, [null], 9),
+      pull("e", 40, [{ itemId: 3, duplicate: false, refund: 0 }], 9),
+      pull("f", 40, [{ itemId: "g_hat", duplicate: "no", refund: 0 }], 9),
+      pull("g", 40, [item("g_hat", true, -8)], 9),
+      ev("gacha_pulled", {}, "h", 10, 9),
+    ];
+    const w = walletAt([earn, ...bad], gshop, badges);
+    expect(w.coins).toBe(1000);
+    expect(w.inventory).toEqual([]);
+  });
+
+  test("a malformed event does not use up its refId", () => {
+    const w = walletAt([earn, pull("p1", 40, "x", 9), pull("p1", 40, [item("g_hat")], 10)], gshop, badges);
+    expect(w.coins).toBe(960);
+    expect(w.inventory).toEqual(["g_hat"]);
+  });
+
+  test("only catalogue gacha items count: an unknown, non-gacha or priced item voids the event", () => {
+    const bad = [
+      pull("a", 40, [item("nope")], 9),
+      pull("b", 40, [item("energy_refill")], 9),
+      pull("c", 40, [item("g_hat"), item("hat_tay_son")], 9),
+    ];
+    const w = walletAt([earn, ...bad], [...gshop, { id: "hat_tay_son", kind: "cosmetic", slot: "hat", price: 6, currency: "kim_bai", theme: "arene" }], badges);
+    expect(w.coins).toBe(1000);
+    expect(w.inventory).toEqual([]);
+  });
+
+  test("each refund is capped at the catalogue rarity's refund, whatever the payload claims", () => {
+    // g_hat is rare (20 xu), g_aura common (8 xu); the payload lies about the rarity and the refund
+    const forged = [
+      { itemId: "g_aura", rarity: "legendary", duplicate: true, refund: 120 },
+      { itemId: "g_hat", rarity: "common", duplicate: true, refund: 999 },
+    ];
+    const w = walletAt([earn, pull("p1", 360, forged, 9)], gshop, badges);
+    expect(w.coins).toBe(1000 - 360 + 8 + 20);
+  });
+
+  test("gacha items are never purchasable", () => {
+    const w = walletAt([earn, buy("g_hat", 9), buy("g_aura", 10)], gshop, badges);
+    expect(w.inventory).toEqual([]);
+    expect(w.coins).toBe(1000);
+  });
+});

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Éventail de fer : un thiết phiến ouvert dans la main droite (92,122), lames de fer noir aux pointes affûtées -->
+    <!-- manche de fer sous le poing -->
+    <path d="M89.5 122 L89.5 136 L94.5 136 L94.5 122 Z" fill="#1F1A17"/>
+    <!-- tranchant clair, chaque baleine finit en pointe -->
+    <path d="M87.3 118.3 L70.7 105.4 L77 104.6 L78.6 98.5 L84.7 100.2 L88.6 95.2 L93.5 99.1 L99 95.9 L102.1 101.4 L108.4 100.5 L109.2 106.8 L115.3 108.4 L113.7 114.4 L118.7 118.2 L97.9 121.2 Z" fill="#F4E4C4"/>
+    <!-- feuille de fer noir -->
+    <path d="M76.6 110 L79.8 106.8 L83.7 104.4 L88 102.9 L92.5 102.5 L97 103.2 L101.3 104.8 L105 107.5 L108 110.9 L110.2 114.9 L111.3 119.3 L97.9 121.2 L97.6 119.8 L96.9 118.6 L96 117.5 L94.9 116.7 L93.6 116.2 L92.2 116 L90.8 116.1 L89.4 116.6 L88.3 117.3 L87.3 118.3 Z" fill="#1F1A17"/>
+    <!-- bande de laque vermillon et baleines -->
+    <path d="M79.8 112.5 L82.3 109.9 L85.4 108 L88.8 106.8 L92.4 106.5 L96 107 L99.4 108.4 L102.3 110.4 L104.7 113.2 L106.4 116.3 L107.3 119.8 L101.9 120.6 L101.3 118.4 L100.2 116.3 L98.7 114.5 L96.8 113.2 L94.6 112.3 L92.3 112 L90 112.2 L87.7 113 L85.8 114.2 L84.1 115.8 Z" fill="#B23A2A" stroke-width="1.6"/>
+    <path d="M88.5 115.9 L82.6 105.5 M91.1 115.1 L89.6 103.2 M93.8 115.2 L96.9 103.6 M96.2 116.4 L103.5 106.9 M98 118.5 L108.4 112.4" fill="none" stroke-width="1.4"/>
+    <!-- le poing qui le tient, rivet d’or -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="137.5" r="2.4" fill="#D9A93A" stroke-width="1.5"/>
+  </g>
+</svg>

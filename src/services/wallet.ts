@@ -1,4 +1,5 @@
 import type { AppEvent, BadgeDef, ItemSlot, ShopItem, Wallet } from "@/domain/types";
+import { gachaRefund, isGachaItem } from "@/services/gacha";
 import { STREAK_EVENT_TYPES } from "@/services/progress";
 import { daysBetween, parisDay } from "@/services/time";
 
@@ -56,12 +57,34 @@ export function equippable(w: Wallet, shop: readonly ShopItem[], slot: unknown, 
   return typeof itemId === "string" && w.inventory.includes(itemId) && shop.find((i) => i.id === itemId)?.slot === slot;
 }
 
+const isCount = (v: unknown): v is number => typeof v === "number" && Number.isInteger(v) && v >= 0;
+
+/** A well-formed `gacha_pulled` payload as { cost, refunds, newItems } (inventory handled by the caller), or null. */
+function gachaEffect(payload: Record<string, unknown>, shop: readonly ShopItem[]): { cost: number; refunds: number; itemIds: string[] } | null {
+  const { cost, items } = payload;
+  if (!isCount(cost) || !Array.isArray(items)) return null;
+  let refunds = 0;
+  const itemIds: string[] = [];
+  for (const it of items as unknown[]) {
+    if (typeof it !== "object" || it === null) return null;
+    const { itemId, duplicate, refund } = it as Record<string, unknown>;
+    if (typeof itemId !== "string" || typeof duplicate !== "boolean" || !isCount(refund)) return null;
+    // Only catalogue gacha items count, and a refund never exceeds what the item's catalogue rarity refunds.
+    const known = shop.find((s) => s.id === itemId);
+    if (!known || !isGachaItem(known) || known.rarity === undefined) return null;
+    refunds += Math.min(refund, gachaRefund(known.rarity));
+    if (!duplicate) itemIds.push(itemId);
+  }
+  return { cost, refunds, itemIds };
+}
+
 /** Replays the journal in time order with the server rules (earning, purchase acceptance, equipment). */
 export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[], badgeDefs: readonly BadgeDef[]): Wallet {
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const w: Wallet = { coins: 0, kimBai: 0, inventory: [], equipped: {}, freezes: 0, refills: [], streak: 0, lastActiveDay: null };
   const unlocked = new Set<string>();
   const settledDuels = new Set<string>();
+  const pulls = new Set<string>();
   let best: number | null = null;
 
   for (const e of sorted) {
@@ -88,6 +111,15 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
       const kb = e.payload["kimBai"];
       if (!settledDuels.has(e.refId) && typeof kb === "number" && Number.isInteger(kb) && kb >= 0) w.kimBai += kb;
       settledDuels.add(e.refId);
+      continue;
+    }
+    if (e.type === "gacha_pulled") {
+      // The server already debited and credited (ADR gacha): the journal only mirrors it, once per pull, malformed payloads ignored.
+      const fx = pulls.has(e.refId) ? null : gachaEffect(e.payload, shop);
+      if (!fx) continue;
+      pulls.add(e.refId);
+      w.coins += fx.refunds - fx.cost;
+      for (const id of fx.itemIds) if (!w.inventory.includes(id)) w.inventory.push(id);
       continue;
     }
     if (e.type === "demo_grant") {

@@ -22,6 +22,7 @@ export { StreakFlame } from "@/ui/StreakFlame";
 export { BadgeMedal, rewardProp } from "@/ui/BadgeMedal";
 export { BadgeShelf } from "@/ui/BadgeShelf";
 export { RareShowcase, type RareEntry } from "@/ui/RareShowcase";
+export { RarityBadge } from "@/ui/RarityBadge";
 export { BalanceLine } from "@/ui/BalanceLine";
 export { useToast, ToastViewport } from "@/ui/Toast";
 export { Skeleton } from "@/ui/Skeleton";

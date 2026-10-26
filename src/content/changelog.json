@@ -2,6 +2,17 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "1.6.0",
+      "date": "2026-10-25",
+      "title": "Le tirage de la pagode",
+      "items": [
+        "Les objets « Légendes sombres » se gagnent au tirage Xin xăm, à la pagode.",
+        "Quatre raretés, du bois à l'or.",
+        "Un objet légendaire est garanti au bout de 40 tirages.",
+        "Un doublon te rend des xu."
+      ]
+    },
+    {
       "version": "1.5.2",
       "date": "2026-10-21",
       "title": "Petits écrans",
@@ -47,7 +58,7 @@
       "title": "Ton héros",
       "items": [
         "Des cadres et des animations à débloquer avec les succès.",
-        "Les cosmétiques « Légendes sombres » à essayer.",
+        "Les cosmétiques « Légendes sombres » à essayer.",
         "Deux personnages à acheter."
       ]
     },

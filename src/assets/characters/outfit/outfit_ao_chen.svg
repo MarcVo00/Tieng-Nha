@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Tunique de rizière : tunique verte de paysan, manches jusqu'aux mains, fendue sur les côtés -->
+    <path d="M40 94 Q60 86 80 94 L94 118 L86 122 L80 110 L81 130 L83 138 L63 138 L60 133 L57 138 L37 138 L39 130 L40 110 L34 122 L26 118 Z" fill="#4E7A4A"/>
+    <!-- col croisé -->
+    <path d="M51 91 L60 105 L69 91" fill="none" stroke-width="1.5"/>
+    <!-- pièce crème cousue sur l'épaule, points de couture -->
+    <path d="M70 99 L78 98 L79 106 L71 107 Z" fill="#F4E4C4" stroke-width="1.5"/>
+    <path d="M72 101 L73.5 101.2 M76 100.6 L77.4 100.8 M72.4 104.6 L73.8 104.6" fill="none" stroke-width="1"/>
+    <!-- ceinture de paille nouée, deux bouts qui pendent -->
+    <path d="M40 119 L80 119 L80 124 L40 124 Z" fill="#D9A93A" stroke-width="2"/>
+    <path d="M51 123 L48 134 M54 123 L55 133" fill="none" stroke="#D9A93A" stroke-width="2.6"/>
+    <path d="M42 121.5 L78 121.5" fill="none" stroke-width="0.9"/>
+  </g>
+</svg>

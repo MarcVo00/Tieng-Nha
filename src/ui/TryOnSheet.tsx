@@ -4,6 +4,7 @@ import { fr } from "@/i18n/fr";
 import { Button } from "@/ui/Button";
 import { HeroMedallion } from "@/ui/HeroMedallion";
 import { Icon } from "@/ui/icons";
+import { RarityBadge } from "@/ui/RarityBadge";
 import { Sheet } from "@/ui/Sheet";
 
 type TryOnSheetProps = {
@@ -18,7 +19,8 @@ type TryOnSheetProps = {
   /** Why the last purchase attempt was refused (shown in the sheet, announced). Cleared by the caller. */
   purchaseMessage?: string | null;
   onClose: () => void;
-  onBuy: (item: ShopItem) => Promise<void>;
+  /** Absent in the gacha shop, where nothing is bought. */
+  onBuy?: (item: ShopItem) => Promise<void>;
   onToggle: (item: ShopItem, equippedNow: boolean) => Promise<void>;
 };
 
@@ -36,7 +38,7 @@ export function TryOnSheet({ item, open, wallet, baseLook, busy, slot, purchaseM
   const kim = item?.currency === "kim_bai";
 
   async function buy(it: ShopItem): Promise<void> {
-    await onBuy(it);
+    await onBuy?.(it);
     setConfirming(false);
   }
 
@@ -45,6 +47,8 @@ export function TryOnSheet({ item, open, wallet, baseLook, busy, slot, purchaseM
     const owned = wallet.inventory.includes(item.id);
     const on = wallet.equipped[slot] === item.id;
     const funds = kim ? wallet.kimBai : wallet.coins;
+    // A gacha piece (rarity, no price) is never sold: not owned = « se gagne au tirage », no buy button.
+    const gachaOnly = item.rarity !== undefined && price === null;
     const poor = !owned && (price === null || funds < price);
     const look: Look = { ...baseLook, [slot]: item.id };
     return (
@@ -66,10 +70,13 @@ export function TryOnSheet({ item, open, wallet, baseLook, busy, slot, purchaseM
           <>
             <div>
               <h2 className="text-heading text-ink">{text.name}</h2>
+              {item.rarity ? <RarityBadge rarity={item.rarity} className="mt-1" /> : null}
               <p className="mt-1 text-body text-ink-muted">{text.desc}</p>
             </div>
             {owned ? (
               <p className={`text-caption ${on ? "text-gold-ink" : "text-ink-muted"}`}>{on ? fr.shop.tryOn.equipped : fr.shop.tryOn.owned}</p>
+            ) : gachaOnly ? (
+              <p className="text-caption text-ink-muted">{fr.gacha.sheetHint}</p>
             ) : poor ? (
               <p className="text-caption text-ink-muted">{kim ? fr.arena.notEnough : fr.shop.noFunds}</p>
             ) : (
@@ -86,6 +93,10 @@ export function TryOnSheet({ item, open, wallet, baseLook, busy, slot, purchaseM
             {owned ? (
               <Button fullWidth autoFocus loading={busy} disabled={busy} onClick={() => void onToggle(item, on)}>
                 {on ? fr.shop.tryOn.unequip : fr.shop.tryOn.equip}
+              </Button>
+            ) : gachaOnly || !onBuy ? (
+              <Button variant="secondary" fullWidth autoFocus onClick={onClose}>
+                {fr.gacha.close}
               </Button>
             ) : (
               <Button fullWidth autoFocus disabled={poor || busy} onClick={() => setConfirming(true)}>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Lance de bambou : une tige de bambou vert taillée en biseau, à peine penchée, tenue dans la main droite (92,122) -->
+    <g transform="rotate(6 92 122)">
+      <path d="M89 150 L89 34 L95 9 L95 150 Z" fill="#4E7A4A"/>
+      <!-- la coupe en biseau laisse voir le cœur clair du bambou -->
+      <path d="M89.6 33 L94.4 13 L93.2 30 Z" fill="#F4E4C4" stroke-width="1.2"/>
+      <!-- nœuds du bambou -->
+      <path d="M89 56 L95 56 M89 84 L95 84 M89 140 L95 140" fill="none" stroke-width="1.6"/>
+      <!-- un simple lien de chanvre sous la pointe -->
+      <path d="M88.6 38 L95.4 38 L95.4 43 L88.6 43 Z" fill="#D9A93A" stroke-width="1.5"/>
+    </g>
+    <!-- le poing qui la tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

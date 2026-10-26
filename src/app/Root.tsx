@@ -9,6 +9,7 @@ import { useServices } from "@/app/ServicesProvider";
 import { ThemeController } from "@/app/ThemeController";
 import { UpdatePrompt } from "@/app/UpdatePrompt";
 import { DuelSync } from "@/features/duels";
+import { GachaSync } from "@/app/GachaSync";
 import { fr } from "@/i18n/fr";
 import { ToastViewport } from "@/ui";
 
@@ -122,6 +123,7 @@ export function Root() {
       <ToastViewport />
       <UpdatePrompt />
       {ready && signedIn ? <DuelSync /> : null}
+      {ready && signedIn ? <GachaSync /> : null}
       {ready ? <Outlet /> : <Splash />}
     </>
   );

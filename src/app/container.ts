@@ -9,18 +9,18 @@ import { AudioPackSynthesizer, WebSpeechSynthesizer, WebSpeechRecognizer, MediaR
 import { createStaticContentSource } from "@/adapters/content";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
 import {
-  createSupabase, SupabaseAuthService, SupabaseEventSink, SupabaseLeaderboardRepository, SupabaseExamGateway, SupabaseDuelGateway, SupabaseContentReporter,
+  createSupabase, SupabaseAuthService, SupabaseEventSink, SupabaseLeaderboardRepository, SupabaseExamGateway, SupabaseDuelGateway, SupabaseGachaGateway, SupabaseContentReporter,
 } from "@/adapters/supabase";
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
 import { createDemoTools } from "@/app/demoTools";
 
-type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "duels" | "reporter">;
+type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "duels" | "gacha" | "reporter">;
 
 /** Site data may be blocked: reading `localStorage` can throw, so the demo falls back to in-memory duels. */
-function demoStorage(): { duelStorage?: Storage } {
+function demoStorage(): { duelStorage?: Storage; gachaStorage?: Storage } {
   try {
-    return { duelStorage: window.localStorage };
+    return { duelStorage: window.localStorage, gachaStorage: window.localStorage };
   } catch {
     return {};
   }
@@ -60,7 +60,7 @@ export function createServices(env: Env): Services {
   let remote: Remote;
   if (env.VITE_USE_FAKES) {
     const f = createFakeServices({ clock, progress, auth: new FakeAuthService(demoAuthOptions(env.VITE_DEMO)) }, env.VITE_DEMO ? demoStorage() : {});
-    remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, duels: f.duels, reporter: f.reporter };
+    remote = { sink: f.sink, auth: f.auth, leaderboard: f.leaderboard, exam: f.exam, duels: f.duels, gacha: f.gacha, reporter: f.reporter };
   } else {
     const url = env.VITE_SUPABASE_URL;
     const key = env.VITE_SUPABASE_ANON_KEY;
@@ -76,6 +76,7 @@ export function createServices(env: Env): Services {
       leaderboard: new SupabaseLeaderboardRepository(sb),
       exam: new SupabaseExamGateway(sb),
       duels: new SupabaseDuelGateway(sb),
+      gacha: new SupabaseGachaGateway(sb),
       reporter,
     };
   }

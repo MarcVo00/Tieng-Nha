@@ -33,7 +33,7 @@ export function Confetti({ fire }: ConfettiProps) {
 
   if (!fire || reduced) return null;
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true">
+    <div data-fx="confetti" className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true">
       {pieces.map((p, i) => (
         <motion.div
           key={i}

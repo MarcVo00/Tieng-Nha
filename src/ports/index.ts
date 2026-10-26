@@ -12,3 +12,5 @@ export type { ConversationEngine, ConversationInput } from "@/ports/Conversation
 export type { ContentReporter } from "@/ports/ContentReporter";
 export type { DuelGateway, DuelError } from "@/ports/DuelGateway";
 export { DUEL_ERRORS } from "@/ports/DuelGateway";
+export type { GachaGateway, GachaError, GachaPullResult } from "@/ports/GachaGateway";
+export { GACHA_ERRORS } from "@/ports/GachaGateway";

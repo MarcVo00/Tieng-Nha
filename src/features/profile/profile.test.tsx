@@ -477,7 +477,11 @@ describe("wardrobe section", () => {
     useToastStore.setState({ toasts: [] });
     const services = createFakeServices({ clock: () => NOW });
     for (let i = 0; i < exams; i++) await services.activity.finishExam({ attemptId: `a${i}`, score: 90, noSpeaking: false });
-    for (const id of own) await services.activity.purchase(id);
+    // Gacha-only items: ownership comes from a pull (cost 0 keeps the xu balance out of the picture).
+    if (own.length > 0) {
+      const items = own.map((itemId) => ({ itemId, rarity: "rare", duplicate: false, refund: 0 }));
+      await services.progress.appendEvent({ type: "gacha_pulled", refId: "seed-pull", xp: 0, payload: { theme: "legendes_sombres", cost: 0, items } }, NOW);
+    }
     useAppState.setState({ wallet: await services.activity.getWallet() });
     return { ...(await setup(services)), services };
   }

@@ -200,3 +200,75 @@ export async function seedKimBai(page: Page, amount: number): Promise<void> {
     await new Promise((res) => { tx.oncomplete = res; });
   }, amount);
 }
+
+/** Writes one `demo_grant` event worth `coins` xu (the fakes count it on both sides of the gacha). Call after onboarding, then reload. */
+export async function seedCoins(page: Page, coins: number): Promise<void> {
+  await page.evaluate(async (coins) => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open("tieng-nha");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const tx = db.transaction("events", "readwrite");
+    tx.objectStore("events").put({
+      clientId: crypto.randomUUID(),
+      schemaVersion: 1,
+      type: "demo_grant",
+      refId: "demo",
+      xp: 0,
+      payload: { coins, kimBai: 0 },
+      createdAt: new Date(Date.now() - 60000).toISOString(),
+    });
+    await new Promise((res) => { tx.oncomplete = res; });
+  }, coins);
+}
+
+/** In the Xin xăm scene: touches the tube once and waits until the stick(s) rest on the altar. */
+export async function shakeTube(page: Page): Promise<void> {
+  const scene = page.getByRole("dialog");
+  await scene.getByRole("button", { name: fr.gacha.scene.shake }).click();
+  await expect(scene).toHaveAttribute("data-phase", "altar");
+}
+
+/** Makes every roll of the fake gacha 0 (first common by id, then the first rare): a deterministic draw. Call before the first navigation. */
+export async function fixGachaRolls(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    Math.random = () => 0;
+  });
+}
+
+/** Writes one `gacha_pulled` event that gives all 12 « Légendes sombres » pieces for free (a complete set). Call after onboarding, then reload. */
+export async function seedCompleteGachaSet(page: Page): Promise<void> {
+  const items = [
+    ["acc_giao_tre", "common"],
+    ["hat_khan_vanh", "common"],
+    ["outfit_ao_chen", "common"],
+    ["aura_suong_mu", "common"],
+    ["hat_thuy_tinh", "rare"],
+    ["aura_waves", "rare"],
+    ["acc_quat_sat", "rare"],
+    ["hat_mu_chien", "rare"],
+    ["outfit_son_tinh", "epic"],
+    ["acc_thuan_thien", "epic"],
+    ["char_kiem_khach", "epic"],
+    ["char_phap_su", "legendary"],
+  ].map(([itemId, rarity]) => ({ itemId, rarity, duplicate: false, refund: 0 }));
+  await page.evaluate(async (items) => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open("tieng-nha");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const tx = db.transaction("events", "readwrite");
+    tx.objectStore("events").put({
+      clientId: crypto.randomUUID(),
+      schemaVersion: 1,
+      type: "gacha_pulled",
+      refId: `seed-set-${crypto.randomUUID()}`,
+      xp: 0,
+      payload: { theme: "legendes_sombres", cost: 0, items },
+      createdAt: new Date(Date.now() - 60000).toISOString(),
+    });
+    await new Promise((res) => { tx.oncomplete = res; });
+  }, items);
+}

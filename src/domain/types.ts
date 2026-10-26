@@ -2,7 +2,7 @@ import type { z } from "zod";
 import type {
   VocabItemSchema, ExerciseSchema, ListenChooseSchema, TranslateChooseSchema, TonePickSchema, WordOrderSchema,
   SpeakSchema, LessonSchema, TurnSchema, NpcTurnSchema, UserTurnSchema, DialogueSchema, ExamSectionSchema,
-  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema, ShopItemSchema, ChangelogEntrySchema,
+  ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema, ShopItemSchema, RaritySchema, ChangelogEntrySchema,
 } from "@/content/schema";
 
 export type { Tone } from "@/domain/tones";
@@ -39,6 +39,7 @@ export type AppEventType =
   | "item_purchased"
   | "item_equipped"
   | "duel_settled"
+  | "gacha_pulled"
   | "demo_grant";
 
 /** Payload shapes by event type (stored as JSON). */
@@ -52,6 +53,7 @@ export type EventPayload = {
   item_purchased: { itemId: string };
   item_equipped: { slot: ItemSlot; itemId: string | null };
   duel_settled: { kimBai: number };
+  gacha_pulled: { theme: string; cost: number; items: { itemId: string; rarity: Rarity; duplicate: boolean; refund: number }[] };
   demo_grant: { coins: number; kimBai: number };
 };
 
@@ -153,6 +155,7 @@ export type TreeNode = z.infer<typeof TreeNodeSchema>;
 export type Tree = z.infer<typeof TreeFileSchema>;
 export type Boss = z.infer<typeof BossSchema>;
 export type ShopItem = z.infer<typeof ShopItemSchema>;
+export type Rarity = z.infer<typeof RaritySchema>;
 export type ChangelogEntry = z.infer<typeof ChangelogEntrySchema>;
 export type Shop = ShopItem[];
 /** Equipment slots: profile (frame, profile_fx) and character layers (hat, outfit, accessory, aura). */
@@ -186,6 +189,10 @@ export type DuelRun = { round1: Round1Answer[]; round2: Round2Answer[]; damage: 
   /** Server flag (`duel_runs.claimed`): the reward has already been credited to the server balance (possibly from another device). */
   claimed: boolean;
 };
+/** One item of a gacha pull, as decided by the server. */
+export type GachaPullItem = { itemId: string; rarity: Rarity; duplicate: boolean; refund: number };
+/** A gacha pull as stored by the server (`gacha_pulls`); `claimed` is true once a `gacha_pulled` event went through. */
+export type GachaPull = { id: string; theme: string; count: number; cost: number; items: GachaPullItem[]; createdAt: string; claimed: boolean };
 export type DuelStatus = "open" | "settled" | "cancelled";
 export type Duel = {
   id: string;

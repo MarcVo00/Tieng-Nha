@@ -1,7 +1,7 @@
 import type { Env, Flags } from "@/domain/config";
 import type { Capabilities, VoiceId } from "@/domain/types";
 import type {
-  AuthService, ContentReporter, ContentSource, ConversationEngine, EventSink, DuelGateway, ExamGateway, LeaderboardRepository,
+  AuthService, ContentReporter, ContentSource, ConversationEngine, EventSink, DuelGateway, ExamGateway, GachaGateway, LeaderboardRepository,
   Outbox, ProgressRepository, SpeechRecognizer, SpeechSynthesizer, VoiceRecorder,
 } from "@/ports";
 import type { ActivityService } from "@/services/activity";
@@ -19,6 +19,7 @@ export type Services = {
   auth: AuthService;
   exam: ExamGateway;
   duels: DuelGateway;
+  gacha: GachaGateway;
   tts: SpeechSynthesizer;
   stt: SpeechRecognizer;
   recorder: VoiceRecorder;

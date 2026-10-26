@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import type { GachaPull, GachaPullItem, Look, Rarity, ShopItem } from "@/domain/types";
+import type { GachaPull, GachaPullItem, Look, ShopItem } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { characterSlotOf } from "@/services/look";
 import { Button, Confetti, duration, ease, EXIT_RATIO, HeroMedallion, RarityBadge, spring, tap } from "@/ui";
@@ -9,15 +9,12 @@ import altarSrc from "@/assets/gacha/altar.svg?url";
 import tubeSrc from "@/assets/gacha/tube.svg?url";
 import scrollSrc from "@/assets/gacha/scroll.svg?url";
 import stickSrc from "@/assets/gacha/stick.svg?url";
-import cardBackSrc from "@/assets/gacha/card-back.svg?url";
-import lanternSrc from "@/assets/gacha/lantern.svg?url";
 import { SIGNATURES } from "@/features/shop/signatures";
+import { CardGrid, nameOf, SEAL } from "@/features/shop/XinXamCards";
+import { GoldFlood, GoldRays, JadeGlow, Lanterns } from "@/features/shop/XinXamOmen";
 import {
   ALTAR,
   autoAdvance,
-  CARD_RATIO,
-  dealSchedule,
-  EPIC_OMEN,
   initialReveal,
   LEGENDARY_OMEN,
   MOUTH,
@@ -45,19 +42,6 @@ type Props = {
   onClose: () => void;
 };
 
-// The rarity seal and the frame of a turned card: wood, jade, vermilion lacquer, gold; the word carries the meaning.
-const SEAL: Record<Rarity, string> = {
-  common: "bg-frame-bronze text-paper",
-  rare: "bg-frame-jade text-paper",
-  epic: "bg-fx-vermilion text-paper",
-  legendary: "bg-gold text-ink",
-};
-const RING: Record<Rarity, string> = {
-  common: "ring-frame-bronze",
-  rare: "ring-frame-jade",
-  epic: "ring-fx-vermilion",
-  legendary: "ring-gold",
-};
 const SHAKE = { rotate: [0, -6, 6, -6, 6, -3, 0], y: [0, -2, 0, -2, 0, -1, 0] };
 // The scroll art is 160 x 220 with a free zone (24,26)-(136,194), inner fillet at 26/134; drawn at the stage height. The
 // content keeps clear of the fillet (28..132).
@@ -66,20 +50,11 @@ const SCROLL_K = SCROLL.h / 220;
 const ZONE = { left: Math.round(28 * SCROLL_K), top: Math.round(26 * SCROLL_K), w: Math.round(104 * SCROLL_K), h: Math.round(168 * SCROLL_K) } as const;
 /** Past this many characters a name is set one size down, so it stays within three lines on the scroll. */
 const LONG_NAME = 18;
-const RAYS = 12;
-const RAY_BOX = 248;
 /** Rising sticks: drawn height, and how far they leave the mouth. */
 const STICK_H = 96;
 const RISE = 76;
-/** Epic lanterns: drawn size (art 48 x 76) and their glow. */
-const LANTERN = { w: 40, h: Math.round((40 * 76) / 48), inset: 22, glow: 112 } as const;
-/** Width of the one card of a x1. */
-const SINGLE_CARD_W = 200;
-/** A dealt card starts as wide as a stick (scaleX), then opens into its card. */
-const STICK_WIDTH = 0.12;
 
 const ms = (s: number) => Math.round(s * 1000);
-const nameOf = (id: string) => fr.shop.items[id]?.name ?? id;
 
 function useLookFor(items: readonly ShopItem[], baseLook: Look) {
   return useMemo(() => {
@@ -90,116 +65,6 @@ function useLookFor(items: readonly ShopItem[], baseLook: Look) {
       return slot ? { ...baseLook, [slot]: itemId } : baseLook;
     };
   }, [items, baseLook]);
-}
-
-/** Static gold rays: one path of 12 strokes, only its opacity moves. */
-function GoldRays({ x, y, delay = 0, length = REVEAL.raysIn }: { x: number; y: number; delay?: number; length?: number }) {
-  const d = Array.from({ length: RAYS }, (_, i) => {
-    const a = (i / RAYS) * Math.PI * 2;
-    const c = RAY_BOX / 2;
-    const p = (r: number) => `${(c + Math.cos(a) * r).toFixed(1)} ${(c + Math.sin(a) * r).toFixed(1)}`;
-    return `M${p(40)} L${p(i % 2 === 0 ? 122 : 98)}`;
-  }).join(" ");
-  return (
-    <motion.svg
-      aria-hidden="true"
-      data-fx="rays"
-      viewBox={`0 0 ${RAY_BOX} ${RAY_BOX}`}
-      width={RAY_BOX}
-      height={RAY_BOX}
-      className="pointer-events-none absolute"
-      style={{ left: x - RAY_BOX / 2, top: y - RAY_BOX / 2 }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.9 }}
-      transition={{ duration: length, delay, ease: ease.out }}
-    >
-      <path d={d} stroke="var(--fx-gold)" strokeWidth={5} strokeLinecap="round" fill="none" />
-    </motion.svg>
-  );
-}
-
-// --- The omen: built up by the best rarity of the pull, the only hint before the cards ---
-
-/** Rare: a jade light spreads around the altar (behind its print, so the lacquer keeps its red). */
-function JadeGlow() {
-  return (
-    <motion.span
-      aria-hidden="true"
-      data-fx="jade"
-      className="pointer-events-none absolute"
-      style={{ left: 0, top: ALTAR.y - 56, width: STAGE.w, height: ALTAR.h + 56, background: "radial-gradient(closest-side, var(--frame-jade), transparent)" }}
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: 0.85, scale: 1 }}
-      transition={{ duration: REVEAL.glow, delay: REVEAL.rise, ease: ease.out }}
-    />
-  );
-}
-
-/** Epic: two red lanterns come down on their cords, then light up. */
-function Lanterns() {
-  return (
-    <>
-      {[LANTERN.inset, STAGE.w - LANTERN.inset - LANTERN.w].map((left) => (
-        <motion.span
-          key={left}
-          aria-hidden="true"
-          data-fx="lantern"
-          className="pointer-events-none absolute"
-          style={{ left, top: 0, width: LANTERN.w, height: LANTERN.h }}
-          initial={{ y: -LANTERN.h - 8 }}
-          animate={{ y: 0 }}
-          transition={{ duration: duration.slow, delay: EPIC_OMEN.drop, ease: ease.out }}
-        >
-          <motion.span
-            className="absolute"
-            style={{
-              left: (LANTERN.w - LANTERN.glow) / 2,
-              top: LANTERN.h * 0.5 - LANTERN.glow / 2,
-              width: LANTERN.glow,
-              height: LANTERN.glow,
-              background: "radial-gradient(closest-side, var(--fx-gold), transparent)",
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.85 }}
-            transition={{ duration: duration.slow, delay: EPIC_OMEN.light, ease: ease.out }}
-          />
-          <img src={lanternSrc} alt="" draggable={false} className="absolute inset-0 h-full w-full select-none" />
-          <motion.span
-            className="absolute rounded-full"
-            style={{ left: "16%", top: "24%", width: "68%", height: "52%", background: "radial-gradient(closest-side, var(--color-paper), transparent)" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.7 }}
-            transition={{ duration: duration.slow, delay: EPIC_OMEN.light, ease: ease.out }}
-          />
-        </motion.span>
-      ))}
-    </>
-  );
-}
-
-/** Legendary: the altar holds its breath (ink dims it), then a gold light floods it, static rays behind the tube. */
-function GoldFlood() {
-  return (
-    <>
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-fx-ink"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.32, 0.32, 0] }}
-        transition={{ duration: REVEAL.pause + REVEAL.flood, delay: REVEAL.rise, times: [0, 0.3, REVEAL.pause / (REVEAL.pause + REVEAL.flood), 1], ease: ease.inOut }}
-      />
-      <motion.span
-        aria-hidden="true"
-        data-fx="gold"
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(closest-side, var(--fx-gold), transparent)" }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.85 }}
-        transition={{ duration: REVEAL.flood, delay: LEGENDARY_OMEN.flood, ease: ease.out }}
-      />
-      <GoldRays x={MOUTH.x} y={MOUTH.y} delay={LEGENDARY_OMEN.flood} length={REVEAL.flood} />
-    </>
-  );
 }
 
 type StageProps = { state: RevealState; count: number; dispatch: (a: RevealAction) => void };
@@ -261,122 +126,6 @@ function Stage({ state, count, dispatch }: StageProps) {
         />
       </motion.button>
       {omen && state.top === "epic" ? <Lanterns /> : null}
-    </div>
-  );
-}
-
-// --- The cards ---
-
-type CardProps = {
-  it: GachaPullItem;
-  index: number;
-  flipped: boolean;
-  /** This card is the one being turned over right now. */
-  turning: boolean;
-  enabled: boolean;
-  single: boolean;
-  /** First deal: the card comes down onto the panel; afterwards it is simply there. */
-  deal: { delay: number } | null;
-  look: Look;
-  onFlip: (i: number) => void;
-};
-
-/**
- * One card. Face down it is the same lacquer back for every piece (nothing in the DOM tells the rarity). Turned over,
- * in place (scaleX 1 → 0 → 1), it shows the seal and colour of its rarity and a small preview of the hero wearing it.
- */
-function Card({ it, index, flipped, turning, enabled, single, deal, look, onFlip }: CardProps) {
-  const name = nameOf(it.itemId);
-  const half = REVEAL.flip / 2;
-  return (
-    <motion.button
-      type="button"
-      data-card=""
-      data-flipped={flipped ? "true" : "false"}
-      aria-label={flipped ? fr.gacha.scene.cardOpen(index + 1, name, fr.shop.rarities[it.rarity]) : fr.gacha.scene.card(index + 1)}
-      // aria-disabled, not disabled: the card keeps focus while it turns over (a disabled button drops it).
-      aria-disabled={!enabled}
-      onClick={() => {
-        if (enabled) onFlip(index);
-      }}
-      {...(enabled ? { whileTap: tap } : {})}
-      className={`relative block w-full rounded-md ${single ? "mx-auto" : ""}`}
-      style={{ aspectRatio: `${CARD_RATIO}`, ...(single ? { maxWidth: SINGLE_CARD_W } : {}) }}
-      // The sticks settle into cards: each one comes down as a narrow stick and widens into its card.
-      initial={deal ? { opacity: 0, y: -24, scaleX: STICK_WIDTH } : false}
-      animate={{ opacity: 1, y: 0, scaleX: 1 }}
-      transition={{ duration: REVEAL.deal, delay: deal?.delay ?? 0, ease: ease.out }}
-    >
-      <AnimatePresence initial={false}>
-        {flipped ? null : (
-          <motion.span
-            key="back"
-            className="absolute inset-0 block rounded-md shadow-card"
-            exit={{ scaleX: 0, transition: { duration: half, ease: ease.in } }}
-          >
-            <img src={cardBackSrc} alt="" draggable={false} className="pointer-events-none h-full w-full select-none" />
-          </motion.span>
-        )}
-      </AnimatePresence>
-      {flipped ? (
-        <motion.span
-          data-theme="light"
-          data-face={it.rarity}
-          className={`absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-md bg-paper px-2 pb-1.5 pt-3 text-center shadow-card ring-[3px] ring-inset ${RING[it.rarity]}`}
-          initial={turning ? { scaleX: 0 } : false}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: half, delay: half, ease: ease.out }}
-        >
-          {/* The seal is stamped across the top edge, clear of the hero. */}
-          <span className={`absolute -top-2.5 right-1 -rotate-6 whitespace-nowrap rounded-sm px-1.5 py-0.5 text-caption font-semibold shadow-card ${SEAL[it.rarity]}`}>
-            {fr.shop.rarities[it.rarity]}
-          </span>
-          <HeroMedallion look={look} size={single ? 88 : 52} />
-          <span className={`line-clamp-2 text-balance font-semibold text-ink ${single ? "text-body-strong" : "text-caption"}`}>{name}</span>
-        </motion.span>
-      ) : null}
-    </motion.button>
-  );
-}
-
-type GridProps = {
-  pull: GachaPull;
-  state: RevealState;
-  /** True the first time the cards are shown: they are dealt. */
-  dealing: boolean;
-  onShown: () => void;
-  lookFor: (id: string) => Look;
-  onFlip: (i: number) => void;
-};
-
-function CardGrid({ pull, state, dealing, onShown, lookFor, onFlip }: GridProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const single = pull.items.length === 1;
-  const deal = useMemo(() => dealSchedule(pull.items.length), [pull.items.length]);
-  // Dealt once: the cards keep the deal they started with (`initial` only counts on mount).
-  const [dealt] = useState(dealing);
-  const shown = useRef(onShown);
-  // Shown (first deal, or back from a focus view): focus goes to the next face-down card.
-  useEffect(() => {
-    ref.current?.querySelector<HTMLElement>('[data-card][data-flipped="false"]')?.focus();
-    shown.current();
-  }, []);
-  return (
-    <div ref={ref} data-cards="" className={single ? "px-6 py-6" : "grid grid-cols-2 gap-x-3 gap-y-4 pb-1 pt-3"}>
-      {pull.items.map((it, i) => (
-        <Card
-          key={i}
-          it={it}
-          index={i}
-          flipped={state.flipped[i] === true}
-          turning={state.current === i && (state.phase === "focus" || state.phase === "signature")}
-          enabled={state.phase === "cards"}
-          single={single}
-          deal={dealt ? { delay: deal[i]?.delay ?? 0 } : null}
-          look={lookFor(it.itemId)}
-          onFlip={onFlip}
-        />
-      ))}
     </div>
   );
 }

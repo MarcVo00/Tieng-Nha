@@ -353,12 +353,13 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
   const reward = duel.myRun?.reward ?? 0;
   useEffect(() => {
     if (!done) return;
-    if (won) sound.play("arena.victory");
-    else if (lost) sound.play("arena.defeat");
+    // Like the confetti, the verdict cue sounds only the first time this device shows the result.
+    if (firstView && won) sound.play("arena.victory");
+    else if (firstView && lost) sound.play("arena.defeat");
     if (reward <= 0) return;
     const coins = window.setTimeout(() => sound.play("arena.coins"), Math.round(duration.base * 1000));
     return () => window.clearTimeout(coins);
-  }, [done, won, lost, reward, sound]);
+  }, [done, won, lost, reward, sound, firstView]);
   // Leaving mid-fight leaves nothing ringing.
   useEffect(() => () => sound.stopAll(), [sound]);
 

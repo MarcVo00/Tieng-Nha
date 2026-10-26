@@ -495,6 +495,29 @@ test("« Passer » silences the blows still to come and plays the verdict at onc
   expect(sound.stopped).toBeGreaterThan(0); // what was ringing stops with the scene
 });
 
+test("the verdict cue sounds only the first time the result is shown on this device", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await unlock(services);
+  const sound = soundOf(services);
+  const id = await settledAgainst(services, BA_NGOAI);
+  await openReplay(services, id);
+  await act(async () => {
+    screen.getByRole("button", { name: R.skip }).click();
+  });
+  await until(() => screen.queryByRole("heading", { name: R.headline.win }) !== null);
+  expect(sound.played.map((p) => p.cue)).toContain("arena.victory");
+  cleanup();
+
+  const at = sound.played.length;
+  await openReplay(services, id);
+  await until(() => screen.queryByRole("heading", { name: R.headline.win }) !== null);
+  await advance(2000);
+  const again = sound.played.slice(at).map((p) => p.cue);
+  expect(again).not.toContain("arena.victory");
+  expect(again).not.toContain("arena.defeat");
+});
+
 test("a duel with no Kim bài to show stays without coins", async () => {
   vi.useFakeTimers({ shouldAdvanceTime: false });
   const services = makeServices();

@@ -1,42 +1,8 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { fr } from "@/i18n/fr";
-import { onboard, seedDialoguesCompleted, seedLessonsCompleted } from "./helpers";
+import { onboard, playRun, seedDialoguesCompleted, seedLessonsCompleted } from "./helpers";
 
 const OPPONENT = { id: "bot_ba_ngoai", pseudo: "Bà Ngoại" };
-
-/** Answers every question blindly (first choice, or the fake mic), until the run hands over to the result screen (replay or, under reduced motion, the verdict). */
-async function playRun(page: Page): Promise<void> {
-  const start = page.getByRole("button", { name: fr.duels.run.round2Intro.start });
-  const mic = page.getByRole("button", { name: fr.exercises.speak.micLabel, exact: true });
-  const verify = page.getByRole("button", { name: fr.exercises.verify });
-  const choices = page.locator("button[aria-pressed]:not([aria-label])");
-  const exercise = page.locator("[data-exercise-id]");
-  const skip = page.getByRole("button", { name: fr.duels.result.skip });
-  const verdict = page.locator("#duel-verdict");
-
-  let last: string | null = null;
-  for (let i = 0; i < 40; i++) {
-    await start.or(mic).or(choices.first()).or(skip).or(verdict).first().waitFor();
-    if ((await skip.isVisible()) || (await verdict.isVisible())) return;
-    if (await start.isVisible()) {
-      await start.click();
-      continue;
-    }
-    const id = await exercise.first().getAttribute("data-exercise-id");
-    if (id === last) {
-      await page.waitForTimeout(100); // the previous question is still leaving
-      continue;
-    }
-    if (await mic.isVisible()) {
-      await mic.click();
-    } else {
-      await choices.first().click();
-      if (await verify.isVisible()) await verify.click();
-    }
-    last = id;
-  }
-  throw new Error("The duel run never reached the result screen");
-}
 
 test("duel against a family member, replay and Kim bài", async ({ page }) => {
   await onboard(page);

@@ -8,7 +8,7 @@ import { useAppState } from "@/app/appState";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import type { Services } from "@/app/services";
 import { OfflineError } from "@/domain/errors";
-import type { ExamQuestion, ProgressSnapshot, Settings } from "@/domain/types";
+import type { ExamQuestion, ProgressSnapshot, Settings, Wallet } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { fr } from "@/i18n/fr";
 import { bossMention, buildDeck } from "@/services/bossFight";
@@ -297,8 +297,9 @@ describe("run", () => {
   }
 
   /** Opens a fight against a boss with the given HP / lives (to reach the end in one answer). */
-  function setupShortFight(over: { hp?: number; playerLives?: number }) {
-    useAppState.setState({ settings: withCapabilities(false), wallet: null });
+  function setupShortFight(over: { hp?: number; playerLives?: number }, equipped?: Wallet["equipped"]) {
+    const wallet: Wallet | null = equipped ? { coins: 0, kimBai: 0, inventory: [], equipped, freezes: 0, refills: [], streak: 0, lastActiveDay: null } : null;
+    useAppState.setState({ settings: withCapabilities(false), wallet });
     markAttempt("pending", ATTEMPT.attemptId);
     const services = createFakeServices();
     const boss = { ...bossFixture, ...over };
@@ -397,9 +398,19 @@ describe("run", () => {
     if (!first || !second) throw new Error("deck too short");
     await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) });
     await answerQuestion(first, true);
-    await waitFor(() => expect(cuesOf(services)).toEqual(["answer.correct"])); // on contact
+    // On contact: the right answer and the hero's bare-handed blow (the starter hero punches).
+    await waitFor(() => expect(cuesOf(services)).toEqual(["answer.correct", "blow.fist"]));
     await answerQuestion(second, false);
-    await waitFor(() => expect(cuesOf(services)).toEqual(["answer.correct", "heart.lost"])); // when the wave lands
+    await waitFor(() => expect(cuesOf(services)).toEqual(["answer.correct", "blow.fist", "heart.lost"])); // when the wave lands
+  });
+
+  test("the hero strikes the boss with the sound of its gear: Pháp sư's talismans, bare-handed", async () => {
+    const { deck, services } = setupShortFight({}, { character: "char_phap_su" });
+    const [first] = deck;
+    if (!first) throw new Error("deck too short");
+    await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) });
+    await answerQuestion(first, true);
+    await waitFor(() => expect(cuesOf(services)).toEqual(["answer.correct", "blow.char_phap_su"]));
   });
 
   test("two quick hits never show two damage numbers at once", async () => {

@@ -334,3 +334,34 @@ test("signature cues: a long gust, a dry brush stroke shorter than the gap betwe
   expect(end("sig.gong")).toBeGreaterThanOrEqual(4);
   expect(end("sig.gong")).toBeGreaterThan(end("gacha.flip.legendary"));
 });
+
+test("fight cues: every blow has its own sound, a critical strikes sharper, the blows and the hurt stay short", () => {
+  const render = (cue: SoundCue, strong = false) => {
+    const ctx = new FakeAudioContext();
+    const voice = recipes[cue](ctx as unknown as AudioContext, ctx.createGain() as unknown as AudioNode, 0, strong);
+    // What the ear gets: every envelope, in order.
+    return { end: voice.end, shape: JSON.stringify(ctx.gains.map((g) => g.gain.events)) };
+  };
+  const blows = SOUND_CUES.filter((c) => c.startsWith("blow."));
+  expect(blows).toHaveLength(7);
+  const shapes = new Set(blows.map((c) => render(c).shape));
+  expect(shapes.size).toBe(blows.length);
+  for (const cue of blows) {
+    expect(render(cue).end, cue).toBeLessThanOrEqual(0.45); // over before the defender's recoil ends
+    expect(render(cue, true).shape, cue).not.toBe(render(cue).shape);
+  }
+  expect(render("fight.hurt").end).toBeLessThanOrEqual(0.3);
+  expect(render("fight.miss").end).toBeLessThanOrEqual(0.35);
+});
+
+test("arena cues: a gong that rings, a short fanfare, a sober defeat, a quick clink of coins", () => {
+  const end = (cue: SoundCue) => {
+    const ctx = new FakeAudioContext();
+    return recipes[cue](ctx as unknown as AudioContext, ctx.createGain() as unknown as AudioNode, 0, false).end;
+  };
+  expect(end("arena.start")).toBeGreaterThanOrEqual(1.5);
+  expect(end("arena.start")).toBeLessThanOrEqual(2.5);
+  expect(end("arena.victory")).toBeLessThanOrEqual(1.6);
+  expect(end("arena.defeat")).toBeLessThanOrEqual(1.4);
+  expect(end("arena.coins")).toBeLessThanOrEqual(0.6);
+});

@@ -8,6 +8,8 @@ import { OfflineError } from "@/domain/errors";
 import type { Duel, Look } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { useHeroLook } from "@/app/useHeroLook";
+import { useBlowCue } from "@/app/useBlowCue";
+import type { SoundCue } from "@/domain/sound";
 import { DUEL } from "@/services/duel";
 import { Avatar, Button, Confetti, duration, EmptyState, ease, FocusHeader, frameRing, Icon, Skeleton, spring } from "@/ui";
 import type { Expression } from "@/ui/characterLayers";
@@ -269,6 +271,7 @@ function Stats({ mine, theirs, theirName }: { mine: ReplayStats | null; theirs: 
 
 function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: string; theirLook: Look; theirFrame: string | null }) {
   const navigate = useNavigate();
+  const { sound } = useServices();
   const reduced = useReducedMotion() === true;
   const challenge = useChallenge();
   const equipped = useAppState((s) => s.wallet?.equipped);
@@ -294,6 +297,12 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
   const fight = useFightBeat();
   /** When the replay's time 0 was (ms since epoch), set by the first beat. */
   const clock = useRef<number | null>(null);
+  // Each fighter strikes with the sound of its own gear. Read from a ref by the beat timers: the catalogue loading
+  // later must not restart the beat.
+  const myBlow = useBlowCue(myLook);
+  const theirBlow = useBlowCue(theirLook);
+  const blowOf = useRef<Record<Side, SoundCue>>({ me: myBlow, them: theirBlow });
+  blowOf.current = { me: myBlow, them: theirBlow };
 
   const absentMe = duel.myRun === null;
   const absentThem = duel.status === "settled" && duel.theirRun === null;
@@ -327,6 +336,7 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
   useEffect(() => {
     if (!done) return;
     headingRef.current?.focus();
+    sound.stopAll(); // a blow still ringing when « Passer » is pressed ends with the fight
     for (const c of [meCtl, themCtl]) {
       c.body.stop();
       c.flash.stop();
@@ -335,7 +345,36 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
     }
     stageCtl.stop();
     stageCtl.set({ x: 0 });
-  }, [done, meCtl, themCtl, stageCtl]);
+  }, [done, meCtl, themCtl, stageCtl, sound]);
+
+  // The verdict: a short fanfare or a sober pluck, then the Kim bài clink as the reward pops in (spec sound-and-reveal §4.3).
+  const won = verdict === "win" || verdict === "forfeitWin";
+  const lost = verdict === "loss" || verdict === "forfeitLoss";
+  const reward = duel.myRun?.reward ?? 0;
+  useEffect(() => {
+    if (!done) return;
+    if (won) sound.play("arena.victory");
+    else if (lost) sound.play("arena.defeat");
+    if (reward <= 0) return;
+    const coins = window.setTimeout(() => sound.play("arena.coins"), Math.round(duration.base * 1000));
+    return () => window.clearTimeout(coins);
+  }, [done, won, lost, reward, sound]);
+  // Leaving mid-fight leaves nothing ringing.
+  useEffect(() => () => sound.stopAll(), [sound]);
+
+  /** On contact: the attacker's gear (louder for a critical), « hurt » when it lands on me, air for a miss. */
+  const contactSound = useCallback(
+    (b: ReplayBeat) => {
+      const strike = (attacker: Side, strong: boolean) => {
+        sound.play(blowOf.current[attacker], { strong });
+        if (attacker === "them") sound.play("fight.hurt");
+      };
+      if (b.type === "blow") strike(b.step.attacker, b.step.kind === "critical");
+      else if (b.type === "misses") sound.play("fight.miss");
+      else if (b.type === "flurry") for (const a of new Set(b.steps.filter((s) => s.kind !== "miss").map((s) => s.attacker))) strike(a, false);
+    },
+    [sound],
+  );
 
   useEffect(() => {
     if (done) return;
@@ -369,18 +408,24 @@ function Replay({ duel, myId, theirLook, theirFrame }: { duel: Duel; myId: strin
     }
     // Timers aim at the schedule's absolute times, so render latency never piles up over the fight.
     const now = Date.now();
-    if (clock.current === null) clock.current = now - b.start * 1000;
+    if (clock.current === null) {
+      clock.current = now - b.start * 1000;
+      sound.play("arena.start"); // the gong opens the fight
+    }
     const wait = (at: number) => Math.max(0, Math.round(clock.current === null ? 0 : clock.current + at * 1000 - now));
     const timers = [window.setTimeout(() => setBeat((n) => n + 1), wait(b.start + b.length))];
     if (b.type === "blow" || b.type === "misses" || b.type === "flurry") {
-      timers.push(window.setTimeout(() => setLanded(beat), wait(b.start + b.impact)));
+      timers.push(
+        window.setTimeout(() => {
+          setLanded(beat);
+          contactSound(b);
+        }, wait(b.start + b.impact)),
+      );
     }
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [beat, beats, done, ctl, stageCtl, fight, winner]);
+  }, [beat, beats, done, ctl, stageCtl, fight, winner, contactSound, sound]);
 
   const front: Side = current?.type === "blow" ? current.step.attacker : winner ?? "me";
-  const reward = duel.myRun?.reward ?? 0;
-  const won = verdict === "win" || verdict === "forfeitWin";
   const h = fr.duels.result.headline;
   const headline = verdict === "loss" ? h.loss(theirName) : h[verdict];
   const nameOf = (side: Side) => (side === "me" ? myName : theirName);

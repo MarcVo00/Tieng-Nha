@@ -12,6 +12,7 @@ import { answer, bossMention, buildDeck, fightScore, outOfQuestions, startFight,
 import { FINAL_BOSS_ID } from "@/services/tree";
 import { seedFromString } from "@/services/random";
 import { useHeroLook } from "@/app/useHeroLook";
+import { useBlowCue } from "@/app/useBlowCue";
 import { Button, ConfirmDialog, duration, ease, EmptyState, FocusHeader, Hearts, Motif, Skeleton, spring, tap, WaterDropHp } from "@/ui";
 import {
   DamageNumber,
@@ -166,6 +167,10 @@ function ExamRun({ run }: { run: RunState }) {
   const [quitting, setQuitting] = useState(false);
 
   const look = useHeroLook();
+  // The hero strikes with the sound of its gear; read by the contact timer, so a late catalogue never re-creates playHit.
+  const heroBlow = useBlowCue(look);
+  const heroBlowRef = useRef(heroBlow);
+  heroBlowRef.current = heroBlow;
   const beat = useFightBeat();
   const heroCtl = useFighterControls();
   const bossCtl = useFighterControls();
@@ -247,6 +252,7 @@ function ExamRun({ run }: { run: RunState }) {
       const after = t.length - t.impact;
       later(() => {
         sound.play("answer.correct"); // on contact
+        sound.play(heroBlowRef.current);
         showFx(ko ? "ko" : "ink", after);
         showFx("dmg", FIGHT.number);
         setBossFace(ko && beat.reduced ? "ko" : "hurt");

@@ -1,7 +1,7 @@
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { createFakeServices, type FakeSpeechRecognizer } from "@/adapters/fakes";
+import { createFakeServices, FakeSoundPlayer, type FakeSpeechRecognizer } from "@/adapters/fakes";
 import { useAppState } from "@/app/appState";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import type { Services } from "@/app/services";
@@ -73,6 +73,18 @@ afterEach(() => {
 });
 
 describe("duel run", () => {
+  test("the gong opens the duel once, when the first question shows", async () => {
+    const services = createFakeServices();
+    const sound = services.sound;
+    if (!(sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+    renderRun(services);
+    expect(await screen.findByText(fr.duels.run.round1)).toBeInTheDocument();
+    await waitFor(() => expect(sound.played.map((p) => p.cue)).toEqual(["arena.start"]));
+    await answer(E03.right, 1500);
+    expect(await screen.findByText("2/2", undefined, { timeout: 3000 })).toBeInTheDocument();
+    expect(sound.played.filter((p) => p.cue === "arena.start")).toHaveLength(1);
+  });
+
   test(
     "plays round 1, the round-2 intro and round 2 with the time measured from display, then sends and opens the result",
     async () => {

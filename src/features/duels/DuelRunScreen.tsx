@@ -54,7 +54,7 @@ const VERDICT_STYLE: Record<Verdict, string> = {
  */
 export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
   const { id = "" } = useParams();
-  const { content, duels, tts, stt, recorder } = useServices();
+  const { content, duels, tts, stt, recorder, sound } = useServices();
   const { settings, updateSettings } = useSettings();
   const heroLook = useHeroLook();
   const navigate = useNavigate();
@@ -205,6 +205,14 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
     const cur = recRef.current;
     if (live && load.status === "ready" && exerciseIndex >= 0 && exercise === null && cur) afterAnswer(recordMiss(cur), position?.round === 2 ? 2 : 1);
   }, [live, load.status, exercise, exerciseIndex, position?.round, afterAnswer]);
+
+  // The gong opens the duel (spec sound-and-reveal §4.3): once, when its first question shows.
+  const gonged = useRef(false);
+  useEffect(() => {
+    if (!live || !exercise || gonged.current) return;
+    gonged.current = true;
+    sound.play("arena.start");
+  }, [live, exercise, sound]);
 
   // The question is displayed: start its clock.
   useEffect(() => {

@@ -12,8 +12,8 @@ const SILENT = 0.0001; // exponential ramps cannot reach 0
 
 // Pitches (Hz). Lesson cues use the anhemitonic pentatonic the Vietnamese ear knows (ngũ cung).
 const N = {
-  A3: 220, D4: 293.66, E4: 329.63, G4: 392, A4: 440,
-  D5: 587.33, E5: 659.26, Fs5: 739.99, G5: 783.99, A5: 880, D6: 1174.66,
+  D4: 293.66, E4: 329.63, G4: 392, A4: 440,
+  D5: 587.33, E5: 659.26, G5: 783.99, A5: 880, D6: 1174.66,
 } as const;
 
 /** Collects the sources a recipe starts, so the whole cue can be stopped and its end known. */
@@ -429,12 +429,158 @@ const sigGong = score((s, t) => {
   wood(s, t, 260, 0.3, 0.12, true); // the mallet
 });
 
-/** Shared shapes for the cues Tasks 4–6 refine (gacha, signature, fights, arena). */
-const blade = (ring: number) =>
-  score((s, t, strong) => {
-    whoosh(s, t, 0.14, 1400, 4200, strong ? 0.6 : 0.42, strong ? 0.01 : 0.05, 1.5);
-    bell(s, t + 0.11, ring, 0.12, 0.28);
+// The fights (spec sound-and-reveal §4.2): each fighter strikes with the sound of its gear. A blow is ≤ 450 ms, so it
+// ends before the defender's recoil; a critical (`strong`) strikes sharper here, the player also plays it louder.
+
+/** How hard a blow lands: a critical has a near-instant attack and a little more body. */
+const force = (strong: boolean) => ({ k: strong ? 1.25 : 1, attack: (normal: number) => (strong ? Math.min(normal, 0.006) : normal) });
+
+/** A short burst of filtered noise: a scuff, a tick, a crackle. */
+function burst(s: Score, start: number, type: BiquadFilterType, freq: number, q: number, level: number, length: number): void {
+  const src = s.ctx.createBufferSource();
+  src.buffer = noise(s.ctx);
+  const f = filter(s.ctx, type, freq, q);
+  const g = envelope(s, start, level, 0.001, start + length);
+  src.connect(f).connect(g).connect(s.out);
+  s.run(src, start, start + length);
+}
+
+/** Struck metal: a bright tick and a few inharmonic partials that die fast (a blade, a coin, an iron rib). */
+function metal(s: Score, start: number, freq: number, level: number, length: number): void {
+  burst(s, start, "highpass", 5000, 0.7, level * 0.8, 0.025);
+  [
+    { ratio: 1, amp: 1, decay: 1 },
+    { ratio: 2.32, amp: 0.55, decay: 0.6 },
+    { ratio: 3.86, amp: 0.3, decay: 0.35 },
+  ].forEach((p) => {
+    const osc = s.ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = freq * p.ratio;
+    const end = start + length * p.decay;
+    const g = envelope(s, start, level * p.amp, 0.001, end);
+    osc.connect(g).connect(s.out);
+    s.run(osc, start, end);
   });
+}
+
+/** The swish of an edge through the air: narrow, rising high. */
+function swish(s: Score, start: number, length: number, level: number, attack: number, from = 1800, to = 5200): void {
+  whoosh(s, start, length, from, to, level, attack, 1.8);
+}
+
+/** Lame: a metallic swish and the ring of steel. ≈ 0.4 s. */
+const blowBlade = score((s, t, strong) => {
+  const f = force(strong);
+  swish(s, t, 0.13, 0.6 * f.k, f.attack(0.05));
+  metal(s, t + 0.11, 2400, 0.2 * f.k, 0.28);
+});
+
+/** Bâton ou lance: a broad wooden whoosh and the thock of the shaft. ≈ 0.3 s. */
+const blowStaff = score((s, t, strong) => {
+  const f = force(strong);
+  whoosh(s, t, 0.17, 380, 1100, 0.38 * f.k, f.attack(0.07), 0.9);
+  wood(s, t + 0.15, 430, 0.55 * f.k, 0.11);
+  thud(s, t + 0.15, 210, 0.3 * f.k, 0.12, f.attack(0.004));
+});
+
+/** Éventail: the paper flaps twice as it opens, then the iron ribs snap shut. ≈ 0.25 s. */
+const blowFan = score((s, t, strong) => {
+  const f = force(strong);
+  whoosh(s, t, 0.06, 800, 1500, 0.55 * f.k, f.attack(0.02), 0.8);
+  whoosh(s, t + 0.065, 0.07, 900, 1700, 0.6 * f.k, f.attack(0.02), 0.8);
+  burst(s, t + 0.15, "bandpass", 3200, 9, 1.8 * f.k, 0.03);
+  metal(s, t + 0.15, 1850, 0.14 * f.k, 0.09);
+});
+
+/** Poings: a short body thump; a muted knock carries it on a phone speaker. ≈ 0.22 s. */
+const blowFist = score((s, t, strong) => {
+  const f = force(strong);
+  whoosh(s, t, 0.06, 600, 1200, 0.16, f.attack(0.025));
+  thud(s, t + 0.05, 140, 0.5 * f.k, 0.16, f.attack(0.004));
+  wood(s, t + 0.05, 300, 0.26 * f.k, 0.07, true);
+});
+
+/** L'épée Thuận Thiên (epic): the blade's swish, then a jade ring that sings on. ≈ 0.45 s. */
+const blowThuanThien = score((s, t, strong) => {
+  const f = force(strong);
+  swish(s, t, 0.13, 0.42 * f.k, f.attack(0.05), 1600, 4800);
+  metal(s, t + 0.11, 2400, 0.07 * f.k, 0.12);
+  bell(s, t + 0.11, 1567.98, 0.16 * f.k, 0.34); // G6, jade
+  bell(s, t + 0.13, 2349.32, 0.06 * f.k, 0.3); // D7 above it
+  gong(s, t + 0.11, 523.25, 0.05 * f.k, 0.32); // a breath of resonance under the ring
+});
+
+/** Pháp sư (legendary), bare-handed: paper talismans crackle in the air, a soft bell seals the spell. ≈ 0.42 s. */
+const blowPhapSu = score((s, t, strong) => {
+  const f = force(strong);
+  const ticks = [
+    { at: 0, f: 3400, l: 0.9 },
+    { at: 0.022, f: 5200, l: 0.6 },
+    { at: 0.041, f: 2800, l: 1 },
+    { at: 0.07, f: 4600, l: 0.7 },
+    { at: 0.088, f: 3900, l: 0.85 },
+    { at: 0.115, f: 3000, l: 0.55 },
+  ];
+  for (const k of ticks) burst(s, t + k.at, "bandpass", k.f, 3, k.l * 1.3 * f.k, 0.022);
+  whoosh(s, t, 0.12, 1200, 2600, 0.2 * f.k, f.attack(0.04), 1.4);
+  bell(s, t + 0.12, 2093, 0.13 * f.k, 0.3); // C7
+});
+
+/** Kiếm khách (epic), bare-handed: two quick swishes, back and forth, light as a feint. ≈ 0.3 s. */
+const blowKiemKhach = score((s, t, strong) => {
+  const f = force(strong);
+  swish(s, t, 0.08, 0.6 * f.k, f.attack(0.025), 2200, 6000);
+  swish(s, t + 0.1, 0.09, 0.7 * f.k, f.attack(0.02), 2400, 6600);
+  metal(s, t + 0.17, 3136, 0.1 * f.k, 0.13);
+});
+
+/** Dégâts: a dull impact, felt in the chest. ≤ 0.26 s. */
+const fightHurt = score((s, t) => {
+  thud(s, t, 95, 0.7, 0.24);
+  wood(s, t, 260, 0.3, 0.1, true);
+});
+
+/** Raté: only the air the blow moved. ≈ 0.26 s. */
+const fightMiss = score((s, t) => whoosh(s, t, 0.26, 320, 1300, 0.34, 0.11, 0.7));
+
+// The arena (spec sound-and-reveal §4.3).
+
+/** The gong that opens a duel: middle-low, struck firmly, ringing about two seconds. */
+const arenaStart = score((s, t) => {
+  gong(s, t, 146.83, 0.34, 2.2); // D3
+  gong(s, t, 293.66, 0.13, 1.7); // its octave carries it on a phone speaker
+  wood(s, t, 280, 0.28, 0.12, true); // the mallet
+});
+
+/** Victory: a light gong and a quick rising call of plucks, the last one ringing. ≤ 1.5 s. */
+const arenaVictory = score((s, t) => {
+  gong(s, t, 196, 0.16, 1.3);
+  const call = [
+    { at: 0.02, f: N.D5, length: 0.3 },
+    { at: 0.12, f: N.D5, length: 0.3 },
+    { at: 0.22, f: N.A5, length: 0.4 },
+  ];
+  for (const c of call) pluck(s, t + c.at, c.f, { length: c.length, level: 0.42, bright: 7 });
+  pluck(s, t + 0.38, N.D6, { length: 1.1, level: 0.5, bright: 6, ring: 1.5 });
+  bell(s, t + 0.38, N.D6 * 2, 0.06, 0.9);
+});
+
+/** Defeat: two soft plucks going down, the last one sagging (luyến). Sober, never a buzzer. ≤ 1.2 s. */
+const arenaDefeat = score((s, t) => {
+  pluck(s, t, N.G4, { length: 0.5, level: 0.5, bright: 3 });
+  pluck(s, t + 0.26, N.D4, { length: 0.9, level: 0.56, bright: 3, ring: 1.2, bend: { from: 1, to: 0.95, start: 0.2, time: 0.4 } });
+});
+
+/** Kim bài: a few small coins clinking together. ≤ 0.5 s. */
+const arenaCoins = score((s, t) => {
+  const clinks = [
+    { at: 0, f: 3520, l: 0.12 },
+    { at: 0.065, f: 4186, l: 0.1 },
+    { at: 0.14, f: 3729, l: 0.11 },
+    { at: 0.19, f: 4435, l: 0.08 },
+  ];
+  for (const c of clinks) metal(s, t + c.at, c.f, c.l, 0.22);
+});
 
 export const recipes: Record<SoundCue, Recipe> = {
   "answer.correct": answerCorrect,
@@ -457,42 +603,19 @@ export const recipes: Record<SoundCue, Recipe> = {
   "sig.brush": sigBrush,
   "sig.gong": sigGong,
 
-  "blow.blade": blade(2400),
-  "blow.staff": score((s, t, strong) => {
-    whoosh(s, t, 0.16, 600, 1500, strong ? 0.5 : 0.36, strong ? 0.01 : 0.06);
-    wood(s, t + 0.12, 500, 0.4, 0.09);
-  }),
-  "blow.fan": score((s, t, strong) => whoosh(s, t, 0.22, 800, 2500, strong ? 0.42 : 0.3, strong ? 0.02 : 0.09, 0.9)),
-  "blow.fist": score((s, t, strong) => {
-    whoosh(s, t, 0.08, 700, 1600, 0.25, 0.03);
-    thud(s, t + 0.06, 150, strong ? 0.9 : 0.7, 0.18, strong ? 0.001 : 0.004);
-  }),
-  "blow.acc_thuan_thien": score((s, t, strong) => {
-    whoosh(s, t, 0.14, 1400, 4200, strong ? 0.6 : 0.42, strong ? 0.01 : 0.05, 1.5);
-    bell(s, t + 0.11, 1568, 0.14, 0.5);
-    gong(s, t + 0.11, 523, 0.12, 0.6);
-  }),
-  "blow.char_phap_su": score((s, t) => {
-    whoosh(s, t, 0.06, 2600, 1200, 0.3, 0.005, 2);
-    whoosh(s, t + 0.09, 0.06, 2600, 1200, 0.3, 0.005, 2);
-    bell(s, t + 0.14, 2093, 0.1, 0.4);
-  }),
-  "blow.char_kiem_khach": blade(3136),
+  "blow.blade": blowBlade,
+  "blow.staff": blowStaff,
+  "blow.fan": blowFan,
+  "blow.fist": blowFist,
+  "blow.acc_thuan_thien": blowThuanThien,
+  "blow.char_phap_su": blowPhapSu,
+  "blow.char_kiem_khach": blowKiemKhach,
 
-  "fight.hurt": score((s, t) => thud(s, t, 100, 0.8, 0.24)),
-  "fight.miss": score((s, t) => whoosh(s, t, 0.2, 400, 900, 0.22, 0.08)),
-  "arena.start": score((s, t) => gong(s, t, 196, 0.5, 2.0)),
-  "arena.victory": score((s, t) => {
-    [N.D5, N.Fs5, N.A5].forEach((f, i) => pluck(s, t + i * 0.09, f, { length: 0.45, level: 0.42, bright: 7 }));
-    pluck(s, t + 0.27, N.D6, { length: 1.0, level: 0.5, bright: 6, ring: 1.5 });
-    bell(s, t + 0.27, N.D6 * 2, 0.07, 0.9);
-  }),
-  "arena.defeat": score((s, t) => {
-    pluck(s, t, N.D4, { length: 0.6, level: 0.36, bright: 3 });
-    pluck(s, t + 0.24, N.A3, { length: 0.9, level: 0.38, bright: 3, bend: { from: 1, to: 0.95, start: 0.2, time: 0.4 } });
-  }),
-  "arena.coins": score((s, t) => {
-    [2637, 3136, 2637].forEach((f, i) => bell(s, t + i * 0.07, f, 0.1, 0.35));
-  }),
+  "fight.hurt": fightHurt,
+  "fight.miss": fightMiss,
+  "arena.start": arenaStart,
+  "arena.victory": arenaVictory,
+  "arena.defeat": arenaDefeat,
+  "arena.coins": arenaCoins,
 };
 

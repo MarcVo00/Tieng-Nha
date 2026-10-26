@@ -223,11 +223,24 @@ export async function seedCoins(page: Page, coins: number): Promise<void> {
   }, coins);
 }
 
-/** In the Xin xăm scene: touches the tube once and waits until the stick(s) rest on the altar. */
+/** In the gacha reveal: touches the tube once and waits, through the omen, until the face-down cards are dealt. */
 export async function shakeTube(page: Page): Promise<void> {
   const scene = page.getByRole("dialog");
   await scene.getByRole("button", { name: fr.gacha.scene.shake }).click();
-  await expect(scene).toHaveAttribute("data-phase", "altar");
+  await expect(scene).toHaveAttribute("data-phase", "cards");
+}
+
+/** After « Tout découvrir »: answers each focus view that waits (a legendary, then the best piece) until the recap. */
+export async function finishRevealAll(page: Page): Promise<void> {
+  const scene = page.getByRole("dialog");
+  const recap = scene.getByRole("heading", { name: fr.gacha.resultTitle });
+  const next = scene.getByRole("button", { name: fr.gacha.resultContinue }).or(scene.getByRole("button", { name: fr.gacha.scene.toRecap }));
+  for (let i = 0; i < 12; i++) {
+    await recap.or(next).first().waitFor();
+    if (await recap.isVisible()) return;
+    await next.first().click();
+  }
+  throw new Error("The reveal never reached its recap");
 }
 
 /** Makes every roll of the fake gacha 0 (first common by id, then the first rare): a deterministic draw. Call before the first navigation. */
@@ -271,4 +284,46 @@ export async function seedCompleteGachaSet(page: Page): Promise<void> {
     });
     await new Promise((res) => { tx.oncomplete = res; });
   }, items);
+}
+
+/** Sounds recorded by the fake sound player (e2e builds use fake speech, which records sounds instead of playing them). */
+export async function playedSounds(page: Page): Promise<{ cue: string; strong: boolean; soft: boolean }[]> {
+  return page.evaluate(() => {
+    const sounds: { played: { cue: string; strong: boolean; soft: boolean }[] } | undefined = Reflect.get(window, "__sounds");
+    return sounds ? [...sounds.played] : [];
+  });
+}
+
+/** Answers every question blindly (first choice, or the fake mic), until the run hands over to the result screen (replay or, under reduced motion, the verdict). */
+export async function playRun(page: Page): Promise<void> {
+  const start = page.getByRole("button", { name: fr.duels.run.round2Intro.start });
+  const mic = page.getByRole("button", { name: fr.exercises.speak.micLabel, exact: true });
+  const verify = page.getByRole("button", { name: fr.exercises.verify });
+  const choices = page.locator("button[aria-pressed]:not([aria-label])");
+  const exercise = page.locator("[data-exercise-id]");
+  const skip = page.getByRole("button", { name: fr.duels.result.skip });
+  const verdict = page.locator("#duel-verdict");
+
+  let last: string | null = null;
+  for (let i = 0; i < 40; i++) {
+    await start.or(mic).or(choices.first()).or(skip).or(verdict).first().waitFor();
+    if ((await skip.isVisible()) || (await verdict.isVisible())) return;
+    if (await start.isVisible()) {
+      await start.click();
+      continue;
+    }
+    const id = await exercise.first().getAttribute("data-exercise-id");
+    if (id === last) {
+      await page.waitForTimeout(100); // the previous question is still leaving
+      continue;
+    }
+    if (await mic.isVisible()) {
+      await mic.click();
+    } else {
+      await choices.first().click();
+      if (await verify.isVisible()) await verify.click();
+    }
+    last = id;
+  }
+  throw new Error("The duel run never reached the result screen");
 }

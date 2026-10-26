@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEntryState } from "@/app/useEntryState";
@@ -145,6 +145,7 @@ const STEP = [0, duration.slow, duration.slow + duration.base, duration.slow + d
 // every button is live while it fades in. Defeat shows the damage dealt, then retry or review.
 function ResultContent({ state }: { state: ResultState }) {
   const navigate = useNavigate();
+  const { sound } = useServices();
   const profile = useAppState((s) => s.profile);
   const xpTotal = useAppState((s) => s.snapshot?.xpTotal);
   const look = useHeroLook();
@@ -152,6 +153,13 @@ function ResultContent({ state }: { state: ResultState }) {
   const [downloadFailed, setDownloadFailed] = useState(false);
   const { boss } = state;
   const won = boss.won;
+  // The outcome sounds once per visit (a ref survives StrictMode's second effect run).
+  const announced = useRef(false);
+  useEffect(() => {
+    if (announced.current) return;
+    announced.current = true;
+    sound.play(won ? "lesson.won" : "lesson.lost");
+  }, [sound, won]);
   // The boss bows once the screen is in; under reduced motion the final pose shows at once.
   const [bowed, setBowed] = useState(reduced);
   useEffect(() => {

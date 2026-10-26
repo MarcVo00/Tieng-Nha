@@ -1,12 +1,12 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Route, Routes } from "react-router-dom";
-import { createFakeServices, FakeContentReporter, FakeSpeechRecognizer, FakeSpeechSynthesizer } from "@/adapters/fakes";
+import { createFakeServices, FakeContentReporter, FakeSoundPlayer, FakeSpeechRecognizer, FakeSpeechSynthesizer } from "@/adapters/fakes";
 import { useAppState } from "@/app/appState";
 import type { Exercise } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { LessonDoneScreen, LessonScreen } from "@/features/lessons";
-import { orderExercises } from "@/features/lessons/useLessonRun";
+import { orderExercises, type LessonDoneState } from "@/features/lessons/useLessonRun";
 import { lessonFixture } from "@/test/fixtures/lessonFixture";
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -396,4 +396,84 @@ test("the done screen shows the reward of a newly unlocked badge", async () => {
     </ServicesProvider>,
   );
   expect(await screen.findByText(fr.rewards.gained("cadre", "Bronze"))).toBeInTheDocument();
+});
+
+describe("sounds", () => {
+  const cuesOf = (services: Services): string[] => {
+    if (!(services.sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+    return services.sound.played.map((p) => p.cue);
+  };
+
+  test(
+    "a right answer sounds as the feedback opens, a wrong one that costs a heart sounds the lost heart",
+    async () => {
+      const { services } = setup();
+      await skipIntro();
+      const [first, second] = ORDER;
+      await play(first!, true);
+      expect(cuesOf(services)).toEqual(["answer.correct"]);
+      await play(second!, false);
+      expect(cuesOf(services)).toEqual(["answer.correct", "heart.lost"]);
+    },
+    TEST_TIMEOUT,
+  );
+
+  test(
+    "the cue plays when the answer is graded, before Continuer",
+    async () => {
+      const { services } = setup();
+      await skipIntro();
+      const first = ORDER[0]!;
+      await waitFor(() => expect(document.querySelector(`[data-exercise-id="${first.id}"]`)).not.toBeNull());
+      await screen.findByText(PROMPT[first.type], {}, { timeout: 4000 });
+      await userEvent.click(screen.getByRole("button", { name: LISTEN_RIGHT[(first as Extract<Exercise, { type: "listen_choose" }>).vocabId] ?? /./ }));
+      await userEvent.click(screen.getByRole("button", { name: fr.exercises.verify }));
+      await screen.findByRole("status");
+      expect(cuesOf(services)).toEqual(["answer.correct"]);
+    },
+    TEST_TIMEOUT,
+  );
+
+  test(
+    "finishing the lesson sounds the victory once, even under StrictMode",
+    async () => {
+      const services = createFakeServices({ clock: () => NOW });
+      const state: LessonDoneState = {
+        xpGained: 15,
+        firstTime: true,
+        coinsGained: 0,
+        newBadges: [],
+        accuracy: 1,
+        perfect: true,
+        snapshot: { xpTotal: 15, xpWeek: 15, xpToday: 15, streak: 1, lessonsDone: ["l05"], perfectLessons: ["l05"], dialoguesDone: [], vocabReviewed: 0, examBest: null, badges: [], activeDays: [] },
+      };
+      const view = render(
+        <StrictMode>
+          <ServicesProvider services={services}>
+            <MemoryRouter initialEntries={[{ pathname: "/lesson/l05/done", state }]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <Routes>
+                <Route path="/lesson/:id/done" element={<LessonDoneScreen />} />
+              </Routes>
+            </MemoryRouter>
+          </ServicesProvider>
+        </StrictMode>,
+      );
+      await screen.findByRole("heading", { name: fr.lessons.done.perfect });
+      expect(cuesOf(services).filter((c) => c === "lesson.won")).toHaveLength(1);
+      view.unmount();
+    },
+    TEST_TIMEOUT,
+  );
+
+  test(
+    "running out of hearts sounds each lost heart and the defeat once",
+    async () => {
+      const { services } = setup();
+      await skipIntro();
+      for (const ex of ORDER.slice(0, 3)) await play(ex, false);
+      await screen.findByRole("heading", { name: fr.lessons.failed.title });
+      expect(cuesOf(services)).toEqual(["heart.lost", "heart.lost", "heart.lost", "lesson.lost"]);
+    },
+    TEST_TIMEOUT,
+  );
 });

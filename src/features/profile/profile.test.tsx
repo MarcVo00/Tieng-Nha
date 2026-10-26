@@ -77,6 +77,19 @@ test("theme change persists in the stored settings", async () => {
   await waitFor(async () => expect((await services.progress.getSettings()).voiceRate).toBe("slow"));
 });
 
+test("the « Sons » switch is on by default and turning it off is saved", async () => {
+  const { services, user } = await setup();
+  const sounds = screen.getByRole("switch", { name: fr.profile.settings.sound.label });
+  expect(sounds).toHaveAttribute("aria-checked", "true");
+  expect(sounds).toHaveAccessibleDescription(fr.profile.settings.sound.hint);
+  await user.click(sounds);
+  expect(sounds).toHaveAttribute("aria-checked", "false");
+  expect(useAppState.getState().settings.sound).toBe(false);
+  await waitFor(async () => expect((await services.progress.getSettings()).sound).toBe(false));
+  await user.click(sounds);
+  await waitFor(async () => expect((await services.progress.getSettings()).sound).toBe(true));
+});
+
 test("voice selection persists and defaults to the Southern female voice", async () => {
   const { services, user } = await setup();
   expect(screen.getByRole("radio", { name: "Sud · Mỹ Duyên (femme)" })).toBeChecked();

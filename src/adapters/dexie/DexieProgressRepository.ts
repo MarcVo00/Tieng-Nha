@@ -38,8 +38,10 @@ export class DexieProgressRepository implements ProgressRepository {
   async getSettings(): Promise<Settings> {
     const row = await this.db.kv.get(SETTINGS_KEY);
     const merged: Settings = { ...DEFAULT_SETTINGS, ...((row?.value as Partial<Settings> | undefined) ?? {}) };
-    // Rows saved before voice packs have no voice; unknown values fall back to the default too.
-    return VOICE_IDS.includes(merged.voice) ? merged : { ...merged, voice: DEFAULT_SETTINGS.voice };
+    // Rows saved before voice packs have no voice, rows saved before 1.7 no sound; unknown values fall back to the default too.
+    const voice = VOICE_IDS.includes(merged.voice) ? merged.voice : DEFAULT_SETTINGS.voice;
+    const sound = typeof merged.sound === "boolean" ? merged.sound : DEFAULT_SETTINGS.sound;
+    return { ...merged, voice, sound };
   }
   async saveSettings(s: Settings): Promise<void> {
     await this.db.kv.put({ key: SETTINGS_KEY, value: s });

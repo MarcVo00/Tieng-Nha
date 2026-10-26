@@ -30,7 +30,7 @@ export type ReviewPhase =
   | { name: "done"; result: ReviewDone };
 
 export function useReviewRun() {
-  const { content, progress, activity, clock } = useServices();
+  const { content, progress, activity, clock, sound } = useServices();
   const { settings } = useSettings();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
@@ -154,6 +154,14 @@ export function useReviewRun() {
     [activity, finish],
   );
 
+  /** The moment an answer is graded (the feedback sheet opens). No hearts in a review: a wrong answer is the soft knock. */
+  const graded = useCallback(
+    (result: GradeResult) => {
+      if (!result.skipped) sound.play(result.correct ? "answer.correct" : "answer.wrong");
+    },
+    [sound],
+  );
+
   const retrySave = useCallback(() => {
     const s = sessionRef.current;
     if (s) void finish(s);
@@ -176,6 +184,7 @@ export function useReviewRun() {
     saveError,
     finishing,
     submit,
+    graded,
     retrySave,
     retryLoad,
     terminate,

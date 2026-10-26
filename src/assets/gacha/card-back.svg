@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 144">
+  <g id="card-back" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- dos de carte : laque vermillon, filet d'or, sceau de papier au lotus. Identique pour toutes les raretés -->
+    <rect x="2" y="2" width="146" height="140" rx="12" fill="#B23A2A"/>
+    <rect x="9" y="9" width="132" height="126" rx="7" fill="none" stroke="#D9A93A" stroke-width="2"/>
+    <rect x="13" y="13" width="124" height="118" rx="5" fill="none" stroke-width="1" opacity="0.6"/>
+    <!-- nuages d'or aux coins -->
+    <g fill="none" stroke="#D9A93A" stroke-width="1.6">
+      <path d="M19 30 Q19 21 27 21 Q33 21 33 27 Q33 31 29 31 Q26 31 26 28"/>
+      <path d="M131 30 Q131 21 123 21 Q117 21 117 27 Q117 31 121 31 Q124 31 124 28"/>
+      <path d="M19 114 Q19 123 27 123 Q33 123 33 117 Q33 113 29 113 Q26 113 26 116"/>
+      <path d="M131 114 Q131 123 123 123 Q117 123 117 117 Q117 113 121 113 Q124 113 124 116"/>
+    </g>
+    <!-- losanges d'or au milieu des côtés -->
+    <path d="M75 5 L79 9 L75 13 L71 9 Z M75 131 L79 135 L75 139 L71 135 Z M5 72 L9 68 L13 72 L9 76 Z M137 72 L141 68 L145 72 L141 76 Z" fill="#D9A93A" stroke-width="1.4"/>
+    <g transform="translate(0 8)">
+      <!-- rayons d'or derrière le sceau -->
+      <path d="M75 26 L75 32 M75 96 L75 102 M37 64 L43 64 M107 64 L113 64 M48 37 L52 41 M98 87 L102 91 M102 37 L98 41 M52 87 L48 91" fill="none" stroke="#D9A93A" stroke-width="2"/>
+      <!-- sceau de papier điệp -->
+      <circle cx="75" cy="64" r="28" fill="#F4E4C4"/>
+      <circle cx="75" cy="64" r="23" fill="none" stroke="#B23A2A" stroke-width="1.2"/>
+      <!-- lotus -->
+      <path d="M75 76 Q63 74 60 60 Q71 61 75 76 Z" fill="#D9A93A" stroke-width="2"/>
+      <path d="M75 76 Q87 74 90 60 Q79 61 75 76 Z" fill="#D9A93A" stroke-width="2"/>
+      <path d="M75 47 Q84 60 75 76 Q66 60 75 47 Z" fill="#B23A2A" stroke-width="2"/>
+      <path d="M75 55 L75 70" fill="none" stroke-width="1.2" opacity="0.6"/>
+      <path d="M60 81 Q67 78 75 81 Q83 84 90 81" fill="none" stroke-width="1.6"/>
+    </g>
+  </g>
+</svg>

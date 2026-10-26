@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <!-- La gardienne, une seule tache d'encre cernée d'or : les talismans se sont fondus en elle -->
+  <defs>
+    <g id="sil-shape">
+      <circle cx="60" cy="40" r="7"/>
+      <path d="M58 40 Q38 36 32 54 Q27 70 35 86 Q38 95 33 106 Q46 98 44 84 Q41 70 47 56 Z"/>
+      <circle cx="60" cy="70" r="22"/>
+      <path d="M40 94 Q60 86 80 94 L95 117 L86 123 L80 112 L84 141 L75 141 L76 151 L44 151 L45 141 L36 141 L40 112 L34 123 L25 117 Z"/>
+      <circle cx="28" cy="122" r="5"/>
+      <circle cx="92" cy="122" r="5"/>
+      <rect x="11" y="99" width="7" height="17" rx="0.5" transform="rotate(-18 14.5 107.5)"/>
+      <rect x="21" y="80" width="6" height="14" rx="0.5" transform="rotate(12 24 87)"/>
+      <rect x="93" y="84" width="6" height="14" rx="0.5" transform="rotate(-14 96 91)"/>
+      <rect x="102" y="102" width="7" height="17" rx="0.5" transform="rotate(16 105.5 110.5)"/>
+    </g>
+  </defs>
+  <!-- le cerne d'or (le tracé élargi), puis l'encre par-dessus : seul le contour extérieur reste doré -->
+  <use href="#sil-shape" fill="#D9A93A" stroke="#D9A93A" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#sil-shape" fill="#1F1A17"/>
+  <!-- ruban vermillon du chignon, yeux d'or mi-clos -->
+  <path d="M54 46 Q60 43 66 46" fill="none" stroke="#B23A2A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M48 72 Q52 69 56 72 M64 72 Q68 69 72 72" fill="none" stroke="#D9A93A" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

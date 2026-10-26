@@ -16,6 +16,7 @@
 | [Plan embellissement](superpowers/plans/2026-10-20-design-polish.md) | orchestrateur + sous-agents | bug du résultat du boss, combats, textures, avatars-héros, parcours, vitrine |
 | [Spec Gacha « Xin xăm »](superpowers/specs/2026-10-21-gacha-design.md) | tous | gacha par thème, raretés, garanties, animation des bâtonnets de la pagode |
 | [Plan Gacha](superpowers/plans/2026-10-24-gacha.md) | orchestrateur + sous-agents | gacha par thème : dessins, migration, règles, reprise, bannières, animation Xin xăm |
+| [Plan Sons et révélation](superpowers/plans/2026-10-26-sound-and-reveal.md) | orchestrateur + sous-agents | sons synthétisés (leçons, combats, arène), présage crescendo, cartes, signature de la Gardienne |
 | [Déploiement](deploy.md) | toi | runbook Netlify/Supabase, et version démo sur le deploy preview de la PR « Démo (ne pas fusionner) » |
 | [Plan arbre + boss](superpowers/plans/2026-10-14-tree-and-boss.md) | orchestrateur + sous-agents | étapes 1–2 de la Progression V2 : arbre de compétences, boss Thủy Tinh |
 | [Plan énergie](superpowers/plans/2026-10-14-energy.md) | orchestrateur + sous-agents | étape 3 de la Progression V2 : énergie ⚡ |
@@ -46,3 +47,4 @@
 | [0009](adr/0009-quality-gates.md) | Garde-fous qualité |
 | [0010](adr/0010-motion-and-fluidity.md) | Fluidité et animations |
 | [0011](adr/0011-voice-packs.md) | Packs de voix pré-générés (Sud / Nord) |
+| [0012](adr/0012-sound-effects.md) | Effets sonores synthétisés |

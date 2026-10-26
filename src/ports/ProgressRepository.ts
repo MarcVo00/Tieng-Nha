@@ -12,4 +12,4 @@ export interface ProgressRepository {
   cacheLeaderboard(period: "week" | "all", rows: LeaderboardRow[], fetchedAt: string): Promise<void>;
   clearAll(): Promise<void>; // used on account deletion / sign out
 }
-export const DEFAULT_SETTINGS = { theme: "system", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: false } as const;
+export const DEFAULT_SETTINGS = { theme: "system", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: false, sound: true } as const;

@@ -2,6 +2,18 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "1.7.0",
+      "date": "2026-10-27",
+      "title": "Le son de la pagode",
+      "items": [
+        "L'appli fait maintenant du bruit : bonnes réponses, victoires, coups reçus.",
+        "Au tirage, plus la pièce est rare, plus la pagode résonne.",
+        "Les cartes se retournent d'un doigt, ou toutes d'un coup.",
+        "La gardienne des talismans a sa propre apparition.",
+        "Un interrupteur « Sons » dans Moi pour couper le bruit."
+      ]
+    },
+    {
       "version": "1.6.1",
       "date": "2026-10-26",
       "title": "Toujours à jour",

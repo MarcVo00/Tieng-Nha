@@ -1,185 +1,207 @@
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { GachaPullItem } from "@/domain/types";
 import { duration } from "@/ui/motion";
 import {
+  autoAdvance,
   BUDGET,
-  fallSchedule,
-  fallTotal,
+  CARD_RATIO,
+  dealSchedule,
   initialReveal,
-  MOUTH,
+  omenDuration,
   peakConcurrency,
   REVEAL,
   recapOrder,
+  revealAllOrder,
   revealReducer,
-  slotsFor,
-  STAGE,
+  topRarity,
   type RevealAction,
   type RevealState,
 } from "@/features/shop/gachaReveal";
 
+// The registry ships empty (Task 5 fills it): a test double decides which pieces have a signature.
+const sig = vi.hoisted(() => ({ ids: new Set<string>() }));
+vi.mock("@/features/shop/signatures", () => ({ SIGNATURES: {}, hasSignature: (id: string) => sig.ids.has(id) }));
+
 const item = (itemId: string, rarity: GachaPullItem["rarity"], duplicate = false): GachaPullItem => ({ itemId, rarity, duplicate, refund: duplicate ? 8 : 0 });
 const run = (s: RevealState, ...actions: RevealAction[]) => actions.reduce(revealReducer, s);
+const DEALT: RevealAction[] = [{ type: "press" }, { type: "release" }, { type: "shakeEnd" }, { type: "omenEnd" }];
 
-describe("timing tokens", () => {
+beforeEach(() => sig.ids.clear());
+
+describe("the best piece of the pull", () => {
+  test("nine commons and a rare: the omen is rare", () => {
+    expect(topRarity([...Array.from({ length: 9 }, (_, i) => item(`c${i}`, "common")), item("r", "rare")])).toBe("rare");
+    expect(topRarity([item("a", "epic"), item("b", "legendary"), item("c", "common")])).toBe("legendary");
+    expect(topRarity([item("a", "common")])).toBe("common");
+  });
+
+  test("the omen lasts longer for a rarer best piece, and a pull of commons stays brief", () => {
+    const d = (["common", "rare", "epic", "legendary"] as const).map(omenDuration);
+    for (let i = 1; i < d.length; i++) expect(d[i]).toBeGreaterThan(d[i - 1] ?? Infinity);
+    expect(omenDuration("common")).toBeLessThanOrEqual(duration.slow * 2);
+    expect(omenDuration("legendary")).toBeLessThan(3);
+  });
+
   test("every beat is composed from the motion tokens", () => {
     expect(REVEAL.shake).toBe(duration.slow * 2);
-    expect(REVEAL.fall).toBe(duration.slow);
-    expect(REVEAL.fallStagger).toBe(duration.fast);
-    expect(REVEAL.unroll).toBe(duration.slow);
-    expect(REVEAL.legendaryHold).toBe(duration.slow + duration.celebrate);
-    expect(REVEAL.legendaryHold).toBeGreaterThan(REVEAL.unroll); // the gold stick holds longer than a plain reveal
-  });
-
-  test("a x1 falls at once; a x10 is staggered and lands within 2 s", () => {
-    expect(fallSchedule(1)).toEqual([{ delay: 0, length: REVEAL.fall }]);
-    const ten = fallSchedule(10);
-    expect(ten).toHaveLength(10);
-    expect(ten.map((s) => s.delay)).toEqual(Array.from({ length: 10 }, (_, i) => i * REVEAL.fallStagger));
-    expect(fallTotal(10)).toBeCloseTo(9 * REVEAL.fallStagger + REVEAL.fall);
-    expect(fallTotal(10)).toBeLessThan(2);
-  });
-
-  test("the fan stays within the budget of 8 animated elements (the fading tube included)", () => {
-    expect(peakConcurrency(fallSchedule(10)) + 1).toBeLessThanOrEqual(BUDGET.animated);
-    expect(peakConcurrency([{ delay: 0, length: 1 }, { delay: 0.5, length: 1 }, { delay: 1, length: 1 }])).toBe(2);
+    expect(REVEAL.rise).toBe(duration.slow);
+    expect(REVEAL.flip).toBe(duration.fast * 2);
+    expect(omenDuration("common")).toBeCloseTo(REVEAL.rise + REVEAL.settle);
+    expect(omenDuration("legendary")).toBeCloseTo(REVEAL.rise + REVEAL.pause + REVEAL.flood + duration.celebrate);
   });
 
   test("the shake is bounded: no infinite loop", () => {
     expect(REVEAL.maxShakes).toBeGreaterThan(1);
     expect(REVEAL.maxShakes * REVEAL.shake).toBeLessThan(3);
   });
+
+  test("the ten cards are dealt staggered, within the budget of 8 animated elements", () => {
+    const deal = dealSchedule(10);
+    expect(deal).toHaveLength(10);
+    expect(peakConcurrency(deal)).toBeLessThanOrEqual(BUDGET.animated);
+    expect(peakConcurrency([{ delay: 0, length: 1 }, { delay: 0.5, length: 1 }, { delay: 1, length: 1 }])).toBe(2);
+  });
 });
 
-describe("stage geometry", () => {
-  test("constant slots inside the stage, one per stick, touch targets at least 44 px", () => {
-    for (const n of [1, 10]) {
-      const slots = slotsFor(n);
-      expect(slots).toHaveLength(n);
-      for (const s of slots) {
-        expect(s.w).toBeGreaterThanOrEqual(44);
-        expect(s.h).toBeGreaterThanOrEqual(44);
-        expect(s.hit).toBeGreaterThanOrEqual(44);
-        expect(s.hit).toBeLessThanOrEqual(s.h);
-        expect(s.x - s.w / 2).toBeGreaterThanOrEqual(0);
-        expect(s.x + s.w / 2).toBeLessThanOrEqual(STAGE.w);
-        expect(s.y + s.h / 2).toBeLessThanOrEqual(STAGE.h);
-      }
-    }
+describe("card size", () => {
+  test("a card of the x10 grid is a big target: well over 44 px, about 120 px tall on a 360 px phone", () => {
+    // Column width: screen − scene gutter (2 × 16) − panel padding (2 × 8) − body padding (2 × 8) − grid gap (12), halved.
+    const height = (screen: number) => (screen - 32 - 16 - 16 - 12) / 2 / CARD_RATIO;
+    expect(height(320)).toBeGreaterThanOrEqual(110);
+    expect(height(360)).toBeGreaterThanOrEqual(120);
   });
+});
 
-  test("the ten sticks do not share a centre (two staggered rows), and they all leave from the tube mouth", () => {
-    const slots = slotsFor(10);
-    expect(new Set(slots.map((s) => `${s.x},${s.y}`)).size).toBe(10);
-    expect(new Set(slots.map((s) => s.y)).size).toBe(2);
-    expect(MOUTH.x).toBe(STAGE.w / 2);
-  });
-
-  test("the back row stands on the tray too, its tips rising at least 44 px above the front row", () => {
-    const slots = slotsFor(10);
-    const back = slots.slice(0, 5);
-    const front = slots.slice(5);
-    const bottom = (s: (typeof slots)[number]) => s.y + s.h / 2;
-    expect(new Set(slots.map(bottom)).size).toBe(1);
-    for (const b of back) for (const f of front) expect(f.y - f.h / 2 - (b.y - b.h / 2)).toBeGreaterThanOrEqual(44);
-    for (const b of back) expect(b.hit).toBeLessThan(b.h); // touches only on the tip, never under the front row
-    expect(slots.every((s) => s.pivot === "bottom")).toBe(true);
-  });
-
-  test("other counts fall back to rows of five", () => {
-    expect(slotsFor(3)).toHaveLength(3);
+describe("reveal-all order", () => {
+  test("lowest rarity first, the best last, draw order within a rarity", () => {
+    const items = [item("a", "epic"), item("b", "common"), item("c", "legendary"), item("d", "common")];
+    expect(revealAllOrder(items, [false, false, false, false])).toEqual([1, 3, 0, 2]);
+    expect(revealAllOrder(items, [false, false, true, false])).toEqual([1, 3, 0]);
   });
 });
 
 describe("recap order", () => {
   test("new pieces first, then by rarity (rarest first), then in draw order", () => {
-    const items = [
-      item("a", "common", true),
-      item("b", "rare"),
-      item("c", "legendary", true),
-      item("d", "common"),
-      item("e", "epic"),
-      item("f", "rare"),
-    ];
+    const items = [item("a", "common", true), item("b", "rare"), item("c", "legendary", true), item("d", "common"), item("e", "epic"), item("f", "rare")];
     expect(recapOrder(items)).toEqual([4, 1, 5, 3, 2, 0]);
   });
 });
 
 describe("the sequence", () => {
-  const ten = [item("a", "common"), item("b", "legendary"), ...Array.from({ length: 8 }, (_, i) => item(`c${i}`, "rare", i % 2 === 0))];
+  const four = [item("a", "epic"), item("b", "common"), item("c", "legendary"), item("d", "common")];
 
-  test("reduced motion and a recovered pull go straight to the recap, everything revealed", () => {
-    expect(initialReveal(ten, { direct: true })).toMatchObject({ phase: "recap", revealed: Array(10).fill(true) });
-    expect(initialReveal(ten, { direct: false })).toMatchObject({ phase: "tube", revealed: Array(10).fill(false) });
+  test("reduced motion and a recovered pull go straight to the recap, everything flipped", () => {
+    expect(initialReveal(four, { direct: true })).toMatchObject({ phase: "recap", flipped: [true, true, true, true], top: "legendary" });
+    expect(initialReveal(four, { direct: false })).toMatchObject({ phase: "tube", flipped: [false, false, false, false], current: null, queue: [] });
   });
 
-  test("a tap shakes once, then the stick falls", () => {
+  test("a tap shakes once, then the omen, then the face-down cards", () => {
     const s = run(initialReveal([item("a", "rare")], { direct: false }), { type: "press" }, { type: "release" });
     expect(s.phase).toBe("shaking");
-    expect(run(s, { type: "shakeEnd" }).phase).toBe("falling");
+    const omen = run(s, { type: "shakeEnd" });
+    expect(omen).toMatchObject({ phase: "omen", top: "rare" });
+    expect(run(omen, { type: "omenEnd" })).toMatchObject({ phase: "cards", flipped: [false] });
   });
 
-  test("holding keeps shaking, at most maxShakes cycles", () => {
+  test("holding keeps shaking, at most maxShakes cycles; a second press does not restart it", () => {
     let s = run(initialReveal([item("a", "rare")], { direct: false }), { type: "press" });
+    expect(revealReducer(s, { type: "press" })).toBe(s);
     for (let i = 1; i < REVEAL.maxShakes; i++) {
       s = revealReducer(s, { type: "shakeEnd" });
       expect(s).toMatchObject({ phase: "shaking", shake: i });
     }
-    expect(revealReducer(s, { type: "shakeEnd" }).phase).toBe("falling");
+    expect(revealReducer(s, { type: "shakeEnd" }).phase).toBe("omen");
   });
 
-  test("a second press while shaking does not restart the shake", () => {
-    const s = run(initialReveal([item("a", "rare")], { direct: false }), { type: "press" });
-    expect(revealReducer(s, { type: "press" })).toBe(s);
+  test("a flip turns the card over and opens its focus view; closing goes back to the cards, then to the recap", () => {
+    let s = run(initialReveal(four, { direct: false }), ...DEALT, { type: "flip", index: 2 });
+    expect(s).toMatchObject({ phase: "focus", current: 2, flipped: [false, false, true, false] });
+    s = run(s, { type: "close" });
+    expect(s).toMatchObject({ phase: "cards", current: null });
+    for (const i of [0, 1]) s = run(s, { type: "flip", index: i }, { type: "close" });
+    expect(s.phase).toBe("cards");
+    s = run(s, { type: "flip", index: 3 }, { type: "close" });
+    expect(s).toMatchObject({ phase: "recap", flipped: [true, true, true, true] });
   });
 
-  test("a common stick unrolls at once; a legendary one holds first, then unrolls with the confetti", () => {
-    const fallen = run(initialReveal(ten, { direct: false }), { type: "press" }, { type: "release" }, { type: "shakeEnd" }, { type: "fallen" });
-    expect(fallen.phase).toBe("altar");
-    expect(run(fallen, { type: "open", index: 0 })).toMatchObject({ phase: "scroll", current: 0 });
-    const held = run(fallen, { type: "open", index: 1 });
-    expect(held).toMatchObject({ phase: "hold", current: 1, burst: 0 });
-    const unrolled = run(held, { type: "holdEnd" });
-    expect(unrolled).toMatchObject({ phase: "scroll", current: 1, burst: 1 });
+  test("touching a card already turned opens it again, without a second signature", () => {
+    sig.ids.add("c");
+    const s = run(initialReveal(four, { direct: false }), ...DEALT, { type: "flip", index: 2 }, { type: "signatureEnd" }, { type: "close" });
+    expect(run(s, { type: "flip", index: 2 })).toMatchObject({ phase: "focus", current: 2 });
   });
 
-  test("the confetti fire once, even when a legendary scroll is opened again", () => {
-    const fallen = run(initialReveal(ten, { direct: false }), { type: "press" }, { type: "release" }, { type: "shakeEnd" }, { type: "fallen" });
-    const once = run(fallen, { type: "open", index: 1 }, { type: "holdEnd" }, { type: "close" });
-    expect(once.burst).toBe(1);
-    const again = run(once, { type: "open", index: 1 });
-    expect(again.phase).toBe("scroll"); // already seen: no second hold
-    expect(again.burst).toBe(1);
+  test("a legendary with a registered signature plays it first; one without goes straight to its focus view", () => {
+    const dealt = run(initialReveal(four, { direct: false }), ...DEALT);
+    expect(run(dealt, { type: "flip", index: 2 }).phase).toBe("focus");
+    sig.ids.add("c");
+    const signing = run(dealt, { type: "flip", index: 2 });
+    expect(signing).toMatchObject({ phase: "signature", current: 2 });
+    expect(run(signing, { type: "signatureEnd" })).toMatchObject({ phase: "focus", current: 2 });
+    sig.ids.add("a"); // an epic never has one
+    expect(run(dealt, { type: "flip", index: 0 }).phase).toBe("focus");
   });
 
-  test("closing a scroll goes back to the altar, and to the recap once every stick is read", () => {
-    let s = run(initialReveal(ten, { direct: false }), { type: "press" }, { type: "release" }, { type: "shakeEnd" }, { type: "fallen" });
-    for (let i = 0; i < 10; i++) {
-      s = run(s, { type: "open", index: i }, { type: "holdEnd" }, { type: "close" });
-      expect(s.phase).toBe(i < 9 ? "altar" : "recap");
+  test("« Tout découvrir » queues the face-down cards lowest rarity first; each close brings the next; then the recap", () => {
+    let s = run(initialReveal(four, { direct: false }), ...DEALT, { type: "flip", index: 3 }, { type: "close" }, { type: "revealAll" });
+    expect(s).toMatchObject({ phase: "focus", current: 1, queue: [0, 2] });
+    const seen = [s.current];
+    while (s.phase === "focus") {
+      s = run(s, { type: "close" });
+      if (s.phase === "focus") seen.push(s.current);
     }
+    expect(seen).toEqual([1, 0, 2]);
+    expect(s).toMatchObject({ phase: "recap", queue: [], current: null, flipped: [true, true, true, true] });
   });
 
-  test("« Tout révéler » and « Passer » go to the recap from any phase; the pull itself is never touched", () => {
-    const start = initialReveal(ten, { direct: false });
-    const phases: RevealAction[][] = [[], [{ type: "press" }], [{ type: "press" }, { type: "shakeEnd" }], [{ type: "press" }, { type: "release" }, { type: "shakeEnd" }, { type: "fallen" }, { type: "open", index: 1 }]];
-    for (const path of phases) {
-      for (const end of [{ type: "skip" }, { type: "revealAll" }] as RevealAction[]) {
-        const s = run(start, ...path, end);
-        expect(s.phase).toBe("recap");
-        expect(s.revealed.every(Boolean)).toBe(true);
-        expect(s.items).toBe(start.items);
-      }
+  test("during « Tout découvrir » the cards turn over by themselves, except a legendary and the last one", () => {
+    const s = run(initialReveal(four, { direct: false }), ...DEALT, { type: "revealAll" });
+    expect(autoAdvance(s)).toBe(true); // a common, more to come
+    const epic = run(s, { type: "close" }, { type: "close" });
+    expect(epic.current).toBe(0);
+    expect(autoAdvance(epic)).toBe(true);
+    const last = run(epic, { type: "close" });
+    expect(last.current).toBe(2);
+    expect(autoAdvance(last)).toBe(false); // the best piece waits for « Continuer »
+    const tapped = run(initialReveal(four, { direct: false }), ...DEALT, { type: "flip", index: 1 });
+    expect(autoAdvance(tapped)).toBe(false);
+    const twoLegends = [item("x", "legendary"), item("y", "legendary")];
+    expect(autoAdvance(run(initialReveal(twoLegends, { direct: false }), ...DEALT, { type: "revealAll" }))).toBe(false);
+  });
+
+  test("« Passer » goes to the recap from any phase; the pull itself is never touched", () => {
+    const start = initialReveal(four, { direct: false });
+    const paths: RevealAction[][] = [
+      [],
+      [{ type: "press" }],
+      [{ type: "press" }, { type: "shakeEnd" }],
+      DEALT,
+      [...DEALT, { type: "flip", index: 2 }],
+      [...DEALT, { type: "revealAll" }],
+    ];
+    for (const path of paths) {
+      const s = run(start, ...path, { type: "skip" });
+      expect(s).toMatchObject({ phase: "recap", current: null, queue: [], held: false, flipped: [true, true, true, true] });
+      expect(s.items).toBe(start.items);
     }
   });
 
   test("stray actions are ignored", () => {
-    const start = initialReveal(ten, { direct: false });
-    expect(revealReducer(start, { type: "fallen" })).toBe(start);
-    expect(revealReducer(start, { type: "open", index: 0 })).toBe(start);
+    const start = initialReveal(four, { direct: false });
+    expect(revealReducer(start, { type: "omenEnd" })).toBe(start);
+    expect(revealReducer(start, { type: "flip", index: 0 })).toBe(start);
     expect(revealReducer(start, { type: "close" })).toBe(start);
-    const fallen = run(start, { type: "press" }, { type: "release" }, { type: "shakeEnd" }, { type: "fallen" });
-    expect(revealReducer(fallen, { type: "open", index: 42 })).toBe(fallen);
+    expect(revealReducer(start, { type: "revealAll" })).toBe(start);
+    const omen = run(start, { type: "press" }, { type: "release" }, { type: "shakeEnd" });
+    expect(omen.phase).toBe("omen");
+    expect(revealReducer(omen, { type: "flip", index: 0 })).toBe(omen);
+    expect(revealReducer(omen, { type: "signatureEnd" })).toBe(omen);
+    const dealt = run(omen, { type: "omenEnd" });
+    expect(revealReducer(dealt, { type: "flip", index: 42 })).toBe(dealt);
+    const focus = run(dealt, { type: "flip", index: 1 });
+    expect(revealReducer(focus, { type: "flip", index: 0 })).toBe(focus);
+    expect(revealReducer(focus, { type: "revealAll" })).toBe(focus);
     const recap = revealReducer(start, { type: "skip" });
     expect(revealReducer(recap, { type: "press" })).toBe(recap);
+    expect(revealReducer(recap, { type: "skip" })).toBe(recap);
   });
 });

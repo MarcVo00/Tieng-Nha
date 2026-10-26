@@ -1,7 +1,7 @@
 import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
-import { createFakeServices, FakeDuelGateway, InMemoryContentSource } from "@/adapters/fakes";
+import { createFakeServices, FakeDuelGateway, FakeSoundPlayer, InMemoryContentSource } from "@/adapters/fakes";
 import { autoOpponentRun } from "@/adapters/fakes/FakeDuelGateway";
 import { lessonFixture } from "@/adapters/fakes/seed/lesson";
 import { dialogueFixture } from "@/adapters/fakes/seed/dialogue";
@@ -413,4 +413,121 @@ test("an unknown duel says so", async () => {
   const services = makeServices();
   renderAt("/duel/nope", services);
   expect(await screen.findByText(fr.duels.run.notFound.title)).toBeInTheDocument();
+});
+
+// --- Sounds (spec sound-and-reveal §4.2–4.3) ---
+
+const BA_NGOAI = "bot_ba_ngoai"; // wears the Thuận Thiên sword (epic): its own blow sound
+const soundOf = (services: Services): FakeSoundPlayer => {
+  if (!(services.sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  return services.sound;
+};
+/** Me with the iron fan (rare, from a pull): its family sound. */
+async function wearFan(services: Services) {
+  const fan = { itemId: "acc_quat_sat", rarity: "rare" as const, duplicate: false, refund: 0 };
+  await services.progress.appendEvent({ type: "gacha_pulled", refId: "pull1", xp: 0, payload: { theme: "legendes_sombres", cost: 0, items: [fan] } }, now);
+  await services.progress.appendEvent({ type: "item_equipped", refId: "accessory", xp: 0, payload: { slot: "accessory", itemId: "acc_quat_sat" } }, now);
+  await unlock(services);
+  expect(useAppState.getState().wallet?.equipped.accessory).toBe("acc_quat_sat");
+}
+async function settledAgainst(services: Services, opponent: string, run = STRONG): Promise<string> {
+  const gw = gateway(services);
+  const res = await gw.create(opponent, QUESTIONS, 1);
+  if (!res.ok) throw new Error(res.error);
+  const sent = await gw.submitRun(res.duelId, run.round1, run.round2);
+  if (!sent.ok) throw new Error(sent.error);
+  return res.duelId;
+}
+
+test("the replay sounds: the gong, each blow with its fighter's gear on contact, the hurt, the misses, the fanfare and the coins", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await wearFan(services);
+  const sound = soundOf(services);
+  await openReplay(services, await settledAgainst(services, BA_NGOAI));
+  const cues = () => sound.played.map((p) => p.cue);
+  // The gong opens the fight.
+  await until(() => cues().includes("arena.start"));
+  expect(cues()).toEqual(["arena.start"]);
+  // My critical winds up in silence, then rings with my fan on contact, louder.
+  await until(() => fxOf(1, "[data-fx='glint']") !== null);
+  expect(cues()).not.toContain("blow.fan");
+  await until(() => fxOf(1, "[data-fx='impact']") !== null);
+  expect(sound.played.at(-1)).toEqual({ cue: "blow.fan", strong: true, soft: false });
+  // Hers: the Thuận Thiên sword, and my hurt.
+  await until(() => fxOf(2, "[data-fx='impact']") !== null);
+  expect(sound.played.slice(-2).map((p) => p.cue)).toEqual(["blow.acc_thuan_thien", "fight.hurt"]);
+  expect(sound.played.at(-2)?.strong).toBe(true); // her first answer was a critical too
+
+  await until(() => screen.queryByRole("heading", { name: R.headline.win }) !== null);
+  await advance(1000);
+  const all = cues();
+  expect(all.filter((c) => c === "arena.start")).toHaveLength(1);
+  // Each of her blows hurts me; mine never sound « hurt ».
+  expect(all.filter((c) => c === "fight.hurt")).toHaveLength(all.filter((c) => c === "blow.acc_thuan_thien").length);
+  expect(all.filter((c) => c === "blow.fan").length).toBeGreaterThan(0);
+  expect(all).toContain("fight.miss"); // she missed one
+  // My four round-1 criticals ring louder; the round-2 blow is a plain hit.
+  expect(sound.played.filter((p) => p.cue === "blow.fan").map((p) => p.strong)).toEqual([true, true, true, true, false]);
+  expect(all.slice(-2)).toEqual(["arena.victory", "arena.coins"]);
+  expect(all).not.toContain("arena.defeat");
+});
+
+test("« Passer » silences the blows still to come and plays the verdict at once; a loss sounds sober", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await unlock(services);
+  const sound = soundOf(services);
+  const weak = { round1: QUESTIONS.round1.map(() => ({ correct: false, ms: 5000 })), round2: [{ correct: true }] };
+  await openReplay(services, await settledAgainst(services, BE_NA, weak));
+  await act(async () => {
+    screen.getByRole("button", { name: R.skip }).click();
+  });
+  await until(() => screen.queryByRole("heading", { name: R.headline.loss("Bé Na") }) !== null);
+  const at = sound.played.length;
+  await advance(10_000);
+  const after = sound.played.slice(at).map((p) => p.cue);
+  expect(after.filter((c) => c.startsWith("blow.") || c.startsWith("fight."))).toEqual([]);
+  const cues = sound.played.map((p) => p.cue);
+  expect(cues).toContain("arena.defeat");
+  expect(cues).not.toContain("arena.victory");
+  expect(cues.at(-1)).toBe("arena.coins"); // the consolation Kim bài still clink
+  expect(sound.stopped).toBeGreaterThan(0); // what was ringing stops with the scene
+});
+
+test("the verdict cue sounds only the first time the result is shown on this device", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await unlock(services);
+  const sound = soundOf(services);
+  const id = await settledAgainst(services, BA_NGOAI);
+  await openReplay(services, id);
+  await act(async () => {
+    screen.getByRole("button", { name: R.skip }).click();
+  });
+  await until(() => screen.queryByRole("heading", { name: R.headline.win }) !== null);
+  expect(sound.played.map((p) => p.cue)).toContain("arena.victory");
+  cleanup();
+
+  const at = sound.played.length;
+  await openReplay(services, id);
+  await until(() => screen.queryByRole("heading", { name: R.headline.win }) !== null);
+  await advance(2000);
+  const again = sound.played.slice(at).map((p) => p.cue);
+  expect(again).not.toContain("arena.victory");
+  expect(again).not.toContain("arena.defeat");
+});
+
+test("a duel with no Kim bài to show stays without coins", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: false });
+  const services = makeServices();
+  await unlock(services);
+  const sound = soundOf(services);
+  const id = gateway(services).seedIncoming(QUESTIONS, { from: BE_NA });
+  now = "2026-10-14T10:00:00.000Z"; // forfeit loss: no reward
+  await openReplay(services, id);
+  await until(() => screen.queryByRole("heading", { name: R.headline.forfeitLoss }) !== null);
+  await advance(2000);
+  expect(sound.played.map((p) => p.cue)).not.toContain("arena.coins");
+  expect(sound.played.map((p) => p.cue)).toContain("arena.defeat");
 });

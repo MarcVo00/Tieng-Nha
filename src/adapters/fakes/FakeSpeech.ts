@@ -4,8 +4,10 @@ export class FakeSpeechSynthesizer implements SpeechSynthesizer {
   available = true;
   spoken: string[] = [];
   lastOptions: SpeakOptions | undefined;
+  /** Calls still speaking (lets the fake sound player tell when the voice is busy). */
+  speaking = 0;
 
-  constructor(private readonly delayMs = 0) {}
+  constructor(public delayMs = 0) {}
 
   isAvailable(): boolean {
     return this.available;
@@ -14,10 +16,17 @@ export class FakeSpeechSynthesizer implements SpeechSynthesizer {
   async speak(text: string, opts?: SpeakOptions): Promise<void> {
     this.lastOptions = opts;
     this.spoken.push(text);
-    await new Promise<void>((resolve) => setTimeout(resolve, this.delayMs));
+    this.speaking++;
+    try {
+      await new Promise<void>((resolve) => setTimeout(resolve, this.delayMs));
+    } finally {
+      this.speaking = Math.max(0, this.speaking - 1);
+    }
   }
 
-  cancel(): void {}
+  cancel(): void {
+    this.speaking = 0;
+  }
 }
 
 export class FakeSpeechRecognizer implements SpeechRecognizer {

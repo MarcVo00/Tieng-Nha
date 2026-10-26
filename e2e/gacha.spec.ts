@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { fr } from "@/i18n/fr";
-import { fixGachaRolls, onboard, seedCoins, seedCompleteGachaSet, shakeTube } from "./helpers";
+import { finishRevealAll, fixGachaRolls, onboard, seedCoins, seedCompleteGachaSet, shakeTube } from "./helpers";
 
 // Every roll is 0: the first common by id (Lance de bambou), then, in a x10, the forced rare (Éventail de fer).
 const BAMBOO = fr.shop.items.acc_giao_tre!.name;
@@ -17,7 +17,7 @@ async function wardrobe(page: Page) {
   return section;
 }
 
-test("pull once: the stick, the scroll, the new piece in the wardrobe, 40 xu less", async ({ page }) => {
+test("pull once: the omen, one face-down card, the scroll, the new piece in the wardrobe, 40 xu less", async ({ page }) => {
   await fixGachaRolls(page);
   await onboard(page);
   await seedCoins(page, 100);
@@ -28,7 +28,8 @@ test("pull once: the stick, the scroll, the new piece in the wardrobe, 40 xu les
   await banner(page).getByRole("button", { name: fr.gacha.pullOne(40) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
   await shakeTube(page);
-  await scene.getByRole("button", { name: fr.gacha.scene.stick(1, fr.gacha.scene.tips.common) }).click();
+  await expect(scene.locator("[data-card]")).toHaveCount(1);
+  await scene.getByRole("button", { name: fr.gacha.scene.card(1) }).click();
   await expect(scene.locator('[data-seal="common"]')).toHaveText(fr.shop.rarities.common);
   await expect(scene.getByRole("heading", { name: BAMBOO })).toBeVisible();
   await expect(scene.getByRole("status")).toHaveText(fr.gacha.scene.announce(BAMBOO, fr.shop.rarities.common, fr.gacha.resultNew));
@@ -44,7 +45,7 @@ test("pull once: the stick, the scroll, the new piece in the wardrobe, 40 xu les
   await expect(card.getByRole("button", { name: fr.shop.tryOn.unequip })).toBeVisible();
 });
 
-test("pull ten: one stick opened, then the recap with the refunds, the balance and the wardrobe", async ({ page }) => {
+test("pull ten: one card turned, « Tout découvrir », then the recap with the refunds, the balance and the wardrobe", async ({ page }) => {
   await fixGachaRolls(page);
   await onboard(page);
   await seedCoins(page, 400);
@@ -54,14 +55,17 @@ test("pull ten: one stick opened, then the recap with the refunds, the balance a
   await banner(page).getByRole("button", { name: fr.gacha.pullTen(360) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(360) });
   await shakeTube(page);
-  await expect(scene.locator("[data-stick]")).toHaveCount(10);
-  // Nine wooden tips, then the rare the x10 rule forces.
-  await expect(scene.locator('[data-stick="common"]')).toHaveCount(9);
-  await scene.getByRole("button", { name: fr.gacha.scene.stick(10, fr.gacha.scene.tips.rare) }).click();
+  // Ten identical face-down cards: nothing tells the rarity before a card is turned.
+  await expect(scene.locator("[data-card]")).toHaveCount(10);
+  await expect(scene.locator("[data-cards] [data-face], [data-cards] [data-rarity]")).toHaveCount(0);
+  // The tenth is the rare the x10 rule forces.
+  await scene.getByRole("button", { name: fr.gacha.scene.card(10) }).click();
   await expect(scene.getByRole("heading", { name: FAN })).toBeVisible();
-  await scene.getByRole("button", { name: fr.gacha.scene.next }).click();
-  await expect(scene.getByRole("button", { name: fr.gacha.scene.stick(1, fr.gacha.scene.tips.common) })).toBeFocused();
+  await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();
+  await expect(scene.getByRole("button", { name: fr.gacha.scene.cardOpen(10, FAN, fr.shop.rarities.rare) })).toBeVisible();
+  await expect(scene.getByRole("button", { name: fr.gacha.scene.card(1) })).toBeFocused();
   await scene.getByRole("button", { name: fr.gacha.scene.revealAll }).click();
+  await finishRevealAll(page);
 
   await expect(scene.getByRole("heading", { name: fr.gacha.resultTitle })).toBeVisible();
   await expect(scene.getByRole("listitem")).toHaveCount(10);
@@ -77,6 +81,26 @@ test("pull ten: one stick opened, then the recap with the refunds, the balance a
   await expect(section.getByRole("listitem").filter({ hasText: FAN })).toBeVisible();
 });
 
+test("« Passer » during the omen shows the recap of the ten pieces drawn", async ({ page }) => {
+  await fixGachaRolls(page);
+  await onboard(page);
+  await seedCoins(page, 400);
+  await page.reload();
+  await openShop(page);
+
+  await banner(page).getByRole("button", { name: fr.gacha.pullTen(360) }).click();
+  const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(360) });
+  await scene.getByRole("button", { name: fr.gacha.scene.shake }).click();
+  await expect(scene).toHaveAttribute("data-phase", "omen");
+  await scene.getByRole("button", { name: fr.gacha.scene.skip }).click();
+  await expect(scene).toHaveAttribute("data-phase", "recap");
+  await expect(scene.getByRole("listitem")).toHaveCount(10);
+  await expect(scene.getByText(fr.gacha.resultTotal(64))).toBeVisible();
+  await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();
+  await expect(scene).toHaveCount(0);
+  await balance(page, 400 - 360 + 64);
+});
+
 test("a complete set can still be pulled: everything comes back in xu", async ({ page }) => {
   await fixGachaRolls(page);
   await onboard(page);
@@ -89,7 +113,7 @@ test("a complete set can still be pulled: everything comes back in xu", async ({
   await banner(page).getByRole("button", { name: fr.gacha.pullOne(40) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
   await shakeTube(page);
-  await scene.getByRole("button", { name: fr.gacha.scene.stick(1, fr.gacha.scene.tips.common) }).click();
+  await scene.getByRole("button", { name: fr.gacha.scene.card(1) }).click();
   await expect(scene.locator("[data-scroll]").getByText(fr.gacha.scene.duplicate(8))).toBeVisible(); // the status line says it too
   await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();
   await expect(scene).toHaveCount(0);
@@ -106,7 +130,7 @@ test("a pull the server made but the phone never applied is recovered once, as �
   await banner(page).getByRole("button", { name: fr.gacha.pullOne(40) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
   await shakeTube(page);
-  await scene.getByRole("button", { name: fr.gacha.scene.stick(1, fr.gacha.scene.tips.common) }).click();
+  await scene.getByRole("button", { name: fr.gacha.scene.card(1) }).click();
   await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();
   await expect(scene).toHaveCount(0);
   await balance(page, 60);

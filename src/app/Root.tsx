@@ -10,6 +10,7 @@ import { ThemeController } from "@/app/ThemeController";
 import { UpdatePrompt } from "@/app/UpdatePrompt";
 import { DuelSync } from "@/features/duels";
 import { GachaSync } from "@/app/GachaSync";
+import { SoundSync } from "@/app/SoundSync";
 import { fr } from "@/i18n/fr";
 import { ToastViewport } from "@/ui";
 
@@ -120,6 +121,7 @@ export function Root() {
   return (
     <>
       {ready ? <ThemeController /> : null}
+      {ready ? <SoundSync /> : null}
       <ToastViewport />
       <UpdatePrompt />
       {ready && signedIn ? <DuelSync /> : null}

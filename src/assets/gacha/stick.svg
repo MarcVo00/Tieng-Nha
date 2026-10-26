@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 110">
-  <g id="stick-common" stroke="#1F1A17" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-    <!-- bâtonnet de bambou du ống xăm ; bout bois nu (commun) : seulement le fil du bois -->
+  <g id="stick" stroke="#1F1A17" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <!-- bâtonnet de bambou du ống xăm ; tous en bois nu, identiques : rien ne dit la rareté avant le présage -->
     <rect x="4" y="3" width="10" height="104" rx="2" fill="#F4E4C4"/>
     <path d="M4 5 Q4 3 6 3 L12 3 Q14 3 14 5 L14 36 L4 36 Z" fill="#F4E4C4"/>
     <path d="M7 8 Q8 18 7 34 M11 9 Q10 20 11 33" fill="none" stroke-width="1" opacity="0.55"/>

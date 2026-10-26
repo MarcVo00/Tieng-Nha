@@ -10,3 +10,4 @@ export { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "
 export { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
 export { createFakeServices } from "@/adapters/fakes/createFakeServices";
 export { FakeGachaGateway } from "@/adapters/fakes/FakeGachaGateway";
+export { FakeSoundPlayer, type PlayedSound } from "@/adapters/fakes/FakeSoundPlayer";

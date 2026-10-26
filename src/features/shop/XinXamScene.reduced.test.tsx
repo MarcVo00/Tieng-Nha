@@ -1,5 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { expect, test } from "vitest";
+import { createFakeServices, FakeSoundPlayer } from "@/adapters/fakes";
+import { ServicesProvider } from "@/app/ServicesProvider";
 import { XinXamScene } from "@/features/shop/XinXamScene";
 import { fr } from "@/i18n/fr";
 
@@ -15,7 +17,7 @@ window.matchMedia = ((query: string) => ({
   dispatchEvent: () => false,
 })) as typeof window.matchMedia;
 
-test("reduced motion: the result directly (the recap), no tube, no sticks", () => {
+test("reduced motion: the result directly (the recap), no tube, no omen, no cards; only the best piece rings, once", () => {
   const pull = {
     id: "p1",
     theme: "legendes_sombres",
@@ -25,11 +27,37 @@ test("reduced motion: the result directly (the recap), no tube, no sticks", () =
     createdAt: "2026-10-24T10:00:00.000Z",
     claimed: true,
   };
-  render(<XinXamScene pull={pull} items={[]} baseLook={{}} onClose={() => undefined} />);
+  const services = createFakeServices();
+  const sound = services.sound;
+  if (!(sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  render(
+    <ServicesProvider services={services}>
+      <XinXamScene pull={{ ...pull, count: 2, cost: 40, items: [{ itemId: "acc_giao_tre", rarity: "common" as const, duplicate: false, refund: 0 }, ...pull.items] }} items={[]} baseLook={{}} onClose={() => undefined} />
+    </ServicesProvider>,
+  );
   const dialog = screen.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
   expect(dialog).toHaveAttribute("data-phase", "recap");
   expect(within(dialog).getByText(fr.shop.items.char_phap_su?.name ?? "")).toBeInTheDocument();
   expect(within(dialog).queryByRole("button", { name: fr.gacha.scene.shake })).toBeNull();
-  expect(dialog.querySelector("[data-stick]")).toBeNull();
+  expect(dialog.querySelector("[data-stage]")).toBeNull();
+  expect(dialog.querySelector("[data-card]")).toBeNull();
   expect(within(dialog).getByRole("button", { name: fr.gacha.resultContinue })).toBeInTheDocument();
+  expect(sound.played.map((p) => p.cue)).toEqual(["gacha.flip.legendary"]);
+});
+
+test("reduced motion never mounts the guardian's signature, nor plays its sounds", async () => {
+  const services = createFakeServices();
+  const sound = services.sound;
+  if (!(sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  const item = { itemId: "char_phap_su", rarity: "legendary" as const, duplicate: false, refund: 0 };
+  render(
+    <ServicesProvider services={services}>
+      <XinXamScene pull={{ id: "p2", theme: "legendes_sombres", count: 1, cost: 40, items: [item], createdAt: "2026-10-24T10:00:00.000Z", claimed: true }} items={[]} baseLook={{}} onClose={() => undefined} />
+    </ServicesProvider>,
+  );
+  const dialog = screen.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
+  expect(dialog).toHaveAttribute("data-phase", "recap");
+  await new Promise((r) => setTimeout(r, 300));
+  expect(dialog.querySelector("[data-signature]")).toBeNull();
+  expect(sound.played.map((p) => p.cue).filter((c) => c.startsWith("sig."))).toEqual([]);
 });

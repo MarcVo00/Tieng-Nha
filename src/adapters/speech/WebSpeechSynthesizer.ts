@@ -8,6 +8,9 @@ export function pickVietnameseVoice(voices: readonly SpeechSynthesisVoice[]): Sp
   return vi.find((v) => /google/i.test(v.name)) ?? vi.find((v) => !v.localService) ?? vi[0] ?? null;
 }
 
+const LOAD_TIMEOUT_MS = 8000; // cap before the clip's length is known (stalled network)
+const END_MARGIN_MS = 2000; // slack after the expected end before a silent clip is given up on
+
 export class WebSpeechSynthesizer implements SpeechSynthesizer {
   private voice: SpeechSynthesisVoice | null = null;
   private readyPromise: Promise<void> | null = null;
@@ -62,13 +65,7 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
 
   async speak(text: string, opts: SpeakOptions = {}): Promise<void> {
     if (opts.audioUrl && this.win.Audio) {
-      const audio = new this.win.Audio(opts.audioUrl);
-      audio.playbackRate = opts.rate ?? 1;
-      await new Promise<void>((resolve, reject) => {
-        audio.onended = () => resolve();
-        audio.onerror = () => reject(new Error("audio_failed"));
-        void audio.play().catch(reject);
-      });
+      await this.playClip(new this.win.Audio(opts.audioUrl), opts.rate ?? 1);
       return;
     }
     await this.ready();
@@ -98,6 +95,37 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
       u.onend = done;
       u.onerror = done;
       synth.speak(u);
+    });
+  }
+
+  /** Never stays pending: it ends, errors, or gives up when the clip stalls (the caller then falls back or moves on). */
+  private playClip(audio: HTMLAudioElement, rate: number): Promise<void> {
+    audio.playbackRate = rate;
+    return new Promise<void>((resolve, reject) => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const settle = (fn: () => void) => {
+        clearTimeout(timer);
+        audio.onended = null;
+        audio.onerror = null;
+        audio.onloadedmetadata = null;
+        fn();
+      };
+      audio.onended = () => settle(resolve);
+      audio.onerror = () => settle(() => reject(new Error("audio_failed")));
+      // Once the length is known, wait for what is left of the clip (plus a margin) instead of the load cap.
+      audio.onloadedmetadata = () => {
+        clearTimeout(timer);
+        const length = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 5;
+        timer = setTimeout(() => {
+          audio.pause();
+          settle(resolve);
+        }, (length / (rate > 0 ? rate : 1)) * 1000 + END_MARGIN_MS);
+      };
+      timer = setTimeout(() => {
+        audio.pause();
+        settle(() => reject(new Error("audio_stalled")));
+      }, LOAD_TIMEOUT_MS);
+      void audio.play().catch((e: unknown) => settle(() => reject(e instanceof Error ? e : new Error("audio_failed"))));
     });
   }
 

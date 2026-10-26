@@ -336,7 +336,7 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
       >
         {/* The fillet frames the panel and never scrolls; the content scrolls inside it, clipped short of the line. */}
         <span aria-hidden="true" className="pointer-events-none absolute inset-1.5 rounded-md border border-gold opacity-60" />
-        <div data-scroll="" className="relative min-h-0 overflow-y-auto p-2">
+        <div data-panel-body="" className="relative min-h-0 overflow-y-auto p-2">
           <div className="relative flex items-start justify-between gap-3 pl-1">
             <div className="flex min-w-0 flex-col pt-1">
               <span lang="vi" className="text-caption font-semibold uppercase tracking-[0.18em] text-gold-ink">

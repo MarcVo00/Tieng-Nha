@@ -328,125 +328,128 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
         tabIndex={-1}
         data-theme="dark"
         data-phase={state.phase}
-        className="relative max-h-full w-full max-w-md overflow-y-auto rounded-lg bg-surface p-4 text-ink shadow-raised outline-none"
+        className="relative flex max-h-full w-full max-w-md flex-col rounded-lg bg-surface p-2 text-ink shadow-raised outline-none"
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, transition: { duration: duration.base * EXIT_RATIO } }}
         transition={{ duration: duration.base, ease: ease.out }}
       >
+        {/* The fillet frames the panel and never scrolls; the content scrolls inside it, clipped short of the line. */}
         <span aria-hidden="true" className="pointer-events-none absolute inset-1.5 rounded-md border border-gold opacity-60" />
-        <div className="relative flex items-start justify-between gap-3 pl-1">
-          <div className="flex min-w-0 flex-col pt-1">
-            <span lang="vi" className="text-caption font-semibold uppercase tracking-[0.18em] text-gold-ink">
-              {fr.gacha.overline}
-            </span>
-            <h2 className="text-heading text-ink">{recap ? (recovered ? fr.gacha.recovered : fr.gacha.resultTitle) : (fr.shop.themes[pull.theme] ?? pull.theme)}</h2>
-          </div>
-          {recap ? null : (
-            <motion.button
-              type="button"
-              whileTap={tap}
-              onClick={() => dispatch({ type: "skip" })}
-              className="inline-flex min-h-11 shrink-0 items-center rounded-sm px-3 text-body-strong text-primary underline"
-            >
-              {fr.gacha.scene.skip}
-            </motion.button>
-          )}
-        </div>
-
-        {recap ? (
-          <Recap pull={pull} recovered={recovered} lookFor={lookFor} onClose={onClose} />
-        ) : (
-          <>
-            <div
-              data-theme="light"
-              data-stage=""
-              className="relative mx-auto mt-3 overflow-hidden rounded-md bg-paper"
-              style={{ width: STAGE.w, height: STAGE.h }}
-            >
-              {count > 1 ? (
-                <span aria-hidden="true" className="pointer-events-none absolute overflow-hidden" style={{ left: ALTAR.x, top: ALTAR.y + TRAY_TOP, width: ALTAR.w, height: ALTAR.h - TRAY_TOP }}>
-                  <img src={altarSrc} alt="" draggable={false} className="absolute left-0 max-w-none select-none" style={{ top: -TRAY_TOP, width: ALTAR.w, height: ALTAR.h }} />
-                </span>
-              ) : null}
-              <motion.img
-                src={altarSrc}
-                alt=""
-                draggable={false}
-                className="pointer-events-none absolute select-none"
-                style={{ left: ALTAR.x, top: ALTAR.y, width: ALTAR.w, height: ALTAR.h }}
-                animate={{ opacity: tubeAway ? 0 : 1 }}
-                transition={tubeFade}
-              />
+        <div data-scroll="" className="relative min-h-0 overflow-y-auto p-2">
+          <div className="relative flex items-start justify-between gap-3 pl-1">
+            <div className="flex min-w-0 flex-col pt-1">
+              <span lang="vi" className="text-caption font-semibold uppercase tracking-[0.18em] text-gold-ink">
+                {fr.gacha.overline}
+              </span>
+              <h2 className="text-heading text-ink">{recap ? (recovered ? fr.gacha.recovered : fr.gacha.resultTitle) : (fr.shop.themes[pull.theme] ?? pull.theme)}</h2>
+            </div>
+            {recap ? null : (
               <motion.button
                 type="button"
-                aria-label={fr.gacha.scene.shake}
-                autoFocus
-                aria-disabled={state.phase !== "tube"}
-                tabIndex={state.phase === "tube" ? 0 : -1}
-                className="absolute rounded-sm"
-                style={{ left: TUBE.x, top: TUBE.y, width: TUBE.w, height: TUBE.h, touchAction: "none" }}
-                animate={{ opacity: tubeAway ? 0 : 1 }}
-                transition={tubeFade}
-                onPointerDown={() => dispatch({ type: "press" })}
-                onClick={() => {
-                  dispatch({ type: "press" });
-                  dispatch({ type: "release" });
-                }}
+                whileTap={tap}
+                onClick={() => dispatch({ type: "skip" })}
+                className="inline-flex min-h-11 shrink-0 items-center rounded-sm px-3 text-body-strong text-primary underline"
               >
+                {fr.gacha.scene.skip}
+              </motion.button>
+            )}
+          </div>
+
+          {recap ? (
+            <Recap pull={pull} recovered={recovered} lookFor={lookFor} onClose={onClose} />
+          ) : (
+            <>
+              <div
+                data-theme="light"
+                data-stage=""
+                className="relative mx-auto mt-3 overflow-hidden rounded-md bg-paper"
+                style={{ width: STAGE.w, height: STAGE.h }}
+              >
+                {count > 1 ? (
+                  <span aria-hidden="true" className="pointer-events-none absolute overflow-hidden" style={{ left: ALTAR.x, top: ALTAR.y + TRAY_TOP, width: ALTAR.w, height: ALTAR.h - TRAY_TOP }}>
+                    <img src={altarSrc} alt="" draggable={false} className="absolute left-0 max-w-none select-none" style={{ top: -TRAY_TOP, width: ALTAR.w, height: ALTAR.h }} />
+                  </span>
+                ) : null}
                 <motion.img
-                  key={state.phase === "shaking" ? `shake-${state.shake}` : "still"}
-                  src={tubeSrc}
+                  src={altarSrc}
                   alt=""
                   draggable={false}
-                  className="pointer-events-none h-full w-full select-none"
-                  style={{ transformOrigin: TUBE_PIVOT }}
-                  {...(state.phase === "shaking" ? { animate: SHAKE, transition: { duration: REVEAL.shake, ease: ease.inOut } } : {})}
+                  className="pointer-events-none absolute select-none"
+                  style={{ left: ALTAR.x, top: ALTAR.y, width: ALTAR.w, height: ALTAR.h }}
+                  animate={{ opacity: tubeAway ? 0 : 1 }}
+                  transition={tubeFade}
                 />
-              </motion.button>
-              {sticksOut
-                ? pull.items.map((it, i) => {
-                    const slot = slots[i];
-                    if (!slot) return null;
-                    return <Stick key={i} it={it} index={i} slot={slot} delay={schedule[i]?.delay ?? 0} state={state} onOpen={(index) => dispatch({ type: "open", index })} />;
-                  })
-                : null}
-              <AnimatePresence>
-                {veil ? (
-                  <motion.span
-                    key="veil"
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 z-[1] bg-paper"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.85 }}
-                    exit={{ opacity: 0, transition: { duration: duration.fast * EXIT_RATIO } }}
-                    transition={{ duration: REVEAL.raysIn, ease: ease.out }}
+                <motion.button
+                  type="button"
+                  aria-label={fr.gacha.scene.shake}
+                  autoFocus
+                  aria-disabled={state.phase !== "tube"}
+                  tabIndex={state.phase === "tube" ? 0 : -1}
+                  className="absolute rounded-sm"
+                  style={{ left: TUBE.x, top: TUBE.y, width: TUBE.w, height: TUBE.h, touchAction: "none" }}
+                  animate={{ opacity: tubeAway ? 0 : 1 }}
+                  transition={tubeFade}
+                  onPointerDown={() => dispatch({ type: "press" })}
+                  onClick={() => {
+                    dispatch({ type: "press" });
+                    dispatch({ type: "release" });
+                  }}
+                >
+                  <motion.img
+                    key={state.phase === "shaking" ? `shake-${state.shake}` : "still"}
+                    src={tubeSrc}
+                    alt=""
+                    draggable={false}
+                    className="pointer-events-none h-full w-full select-none"
+                    style={{ transformOrigin: TUBE_PIVOT }}
+                    {...(state.phase === "shaking" ? { animate: SHAKE, transition: { duration: REVEAL.shake, ease: ease.inOut } } : {})}
                   />
-                ) : null}
-              </AnimatePresence>
-              <AnimatePresence>{showRays && currentSlot ? <GoldRays key="rays" slot={currentSlot} /> : null}</AnimatePresence>
-              <AnimatePresence>
-                {state.phase === "scroll" && current ? <Scroll key={`scroll-${state.current}`} it={current} look={lookFor(current.itemId)} /> : null}
-              </AnimatePresence>
-            </div>
+                </motion.button>
+                {sticksOut
+                  ? pull.items.map((it, i) => {
+                      const slot = slots[i];
+                      if (!slot) return null;
+                      return <Stick key={i} it={it} index={i} slot={slot} delay={schedule[i]?.delay ?? 0} state={state} onOpen={(index) => dispatch({ type: "open", index })} />;
+                    })
+                  : null}
+                <AnimatePresence>
+                  {veil ? (
+                    <motion.span
+                      key="veil"
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 z-[1] bg-paper"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.85 }}
+                      exit={{ opacity: 0, transition: { duration: duration.fast * EXIT_RATIO } }}
+                      transition={{ duration: REVEAL.raysIn, ease: ease.out }}
+                    />
+                  ) : null}
+                </AnimatePresence>
+                <AnimatePresence>{showRays && currentSlot ? <GoldRays key="rays" slot={currentSlot} /> : null}</AnimatePresence>
+                <AnimatePresence>
+                  {state.phase === "scroll" && current ? <Scroll key={`scroll-${state.current}`} it={current} look={lookFor(current.itemId)} /> : null}
+                </AnimatePresence>
+              </div>
 
-            <div className="mt-3 flex min-h-[6.5rem] flex-col justify-start gap-3">
-              <p role="status" className="min-h-[1.125rem] text-center text-caption text-ink-muted">
-                {hint}
-              </p>
-              {state.phase === "altar" && count > 1 ? (
-                <Button variant="secondary" fullWidth data-reveal-all="" onClick={() => dispatch({ type: "revealAll" })}>
-                  {fr.gacha.scene.revealAll}
-                </Button>
-              ) : null}
-              {state.phase === "scroll" ? (
-                <Button fullWidth autoFocus onClick={closeScroll}>
-                  {count === 1 ? fr.gacha.resultContinue : remaining > 0 ? fr.gacha.scene.next : fr.gacha.scene.toRecap}
-                </Button>
-              ) : null}
-            </div>
-          </>
-        )}
+              <div className="mt-3 flex min-h-[6.5rem] flex-col justify-start gap-3">
+                <p role="status" className="min-h-[1.125rem] text-center text-caption text-ink-muted">
+                  {hint}
+                </p>
+                {state.phase === "altar" && count > 1 ? (
+                  <Button variant="secondary" fullWidth data-reveal-all="" onClick={() => dispatch({ type: "revealAll" })}>
+                    {fr.gacha.scene.revealAll}
+                  </Button>
+                ) : null}
+                {state.phase === "scroll" ? (
+                  <Button fullWidth autoFocus onClick={closeScroll}>
+                    {count === 1 ? fr.gacha.resultContinue : remaining > 0 ? fr.gacha.scene.next : fr.gacha.scene.toRecap}
+                  </Button>
+                ) : null}
+              </div>
+            </>
+          )}
+        </div>
         <Confetti fire={confetti} />
       </motion.div>
     </div>

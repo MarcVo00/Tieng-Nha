@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { UPDATE_CHECK_INTERVAL_MS, watchForUpdates } from "@/app/swUpdates";
+import { LAUNCH_WINDOW_MS, UPDATE_CHECK_INTERVAL_MS, shouldApplyUpdate, watchForUpdates } from "@/app/swUpdates";
 
 function setup(onLine = true) {
   const listeners = new Map<string, () => void>();
@@ -56,5 +56,22 @@ describe("watchForUpdates", () => {
     stop();
     expect(listeners.has("visibilitychange")).toBe(false);
     expect(env.clearInterval).toHaveBeenCalledWith(1);
+  });
+});
+
+describe("shouldApplyUpdate", () => {
+  it("applies right after the app opens", () => {
+    expect(shouldApplyUpdate({ sinceOpenedMs: 2000, hidden: false, inFocusFlow: false })).toBe(true);
+    expect(shouldApplyUpdate({ sinceOpenedMs: LAUNCH_WINDOW_MS, hidden: false, inFocusFlow: false })).toBe(true);
+  });
+
+  it("waits while the app is in use, then applies in the background", () => {
+    expect(shouldApplyUpdate({ sinceOpenedMs: LAUNCH_WINDOW_MS + 1, hidden: false, inFocusFlow: false })).toBe(false);
+    expect(shouldApplyUpdate({ sinceOpenedMs: LAUNCH_WINDOW_MS + 1, hidden: true, inFocusFlow: false })).toBe(true);
+  });
+
+  it("never interrupts a lesson, exam, dialogue or review", () => {
+    expect(shouldApplyUpdate({ sinceOpenedMs: 0, hidden: false, inFocusFlow: true })).toBe(false);
+    expect(shouldApplyUpdate({ sinceOpenedMs: 0, hidden: true, inFocusFlow: true })).toBe(false);
   });
 });

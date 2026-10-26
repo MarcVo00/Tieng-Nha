@@ -1,5 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createFakeServices, FakeSoundPlayer } from "@/adapters/fakes";
+import { ServicesProvider } from "@/app/ServicesProvider";
 import type { GachaPull, GachaPullItem } from "@/domain/types";
 import { XinXamScene } from "@/features/shop/XinXamScene";
 import { fr } from "@/i18n/fr";
@@ -32,10 +34,21 @@ const pull: GachaPull = {
 };
 const GUARDIAN = fr.shop.items.char_phap_su?.name ?? "char_phap_su";
 
+function show() {
+  const services = createFakeServices();
+  const sound = services.sound;
+  if (!(sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  render(
+    <ServicesProvider services={services}>
+      <XinXamScene pull={pull} items={[]} baseLook={{}} onClose={() => undefined} />
+    </ServicesProvider>,
+  );
+  return { sound, user: userEvent.setup(), dialog: screen.getByRole("dialog", { name: fr.gacha.resultLabel(360) }) };
+}
+const flips = (sound: FakeSoundPlayer) => sound.played.map((p) => p.cue).filter((c) => c.startsWith("gacha.flip."));
+
 test("a signature plays in the focus view, then the piece appears there: no flash of the grid, no generic gold after it", async () => {
-  render(<XinXamScene pull={pull} items={[]} baseLook={{}} onClose={() => undefined} />);
-  const dialog = screen.getByRole("dialog", { name: fr.gacha.resultLabel(360) });
-  const user = userEvent.setup();
+  const { dialog, user, sound } = show();
   await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.shake }));
   await waitFor(() => expect(dialog).toHaveAttribute("data-phase", "cards"), SLOW);
 
@@ -51,10 +64,12 @@ test("a signature plays in the focus view, then the piece appears there: no flas
   expect(dialog.querySelector("[data-focus] [data-signature-stub]")).not.toBeNull();
   expect(dialog.querySelector("[data-cards]")).toBeNull(); // the card face would tell the piece before its signature
   expect(within(dialog).queryByRole("heading", { name: GUARDIAN })).toBeNull();
+  expect(flips(sound)).toEqual([]); // the signature carries its own sound; the piece rings when it appears
 
   expect(await within(dialog).findByRole("heading", { name: GUARDIAN }, SLOW)).toBeInTheDocument();
   watch.disconnect();
   expect(dialog).toHaveAttribute("data-phase", "focus");
+  expect(flips(sound)).toEqual(["gacha.flip.legendary"]);
   expect(seen).toEqual([]);
   expect(dialog.querySelector("[data-signature-stub]")).toBeNull(); // unmounted with its phase
   expect(dialog.querySelector("[data-focus] [data-fx='rays']")).toBeNull(); // the signature replaced the generic gold
@@ -66,4 +81,19 @@ test("a signature plays in the focus view, then the piece appears there: no flas
   await user.click(await within(dialog).findByRole("button", { name: fr.gacha.scene.cardOpen(2, GUARDIAN, fr.shop.rarities.legendary) }));
   expect(dialog).toHaveAttribute("data-phase", "focus");
   expect(dialog.querySelector("[data-signature-stub]")).toBeNull();
+  expect(flips(sound)).toEqual(["gacha.flip.legendary"]); // reopening is silent
+});
+
+test("« Passer » during a signature stops its sound, and the piece never rings afterwards", async () => {
+  const { dialog, user, sound } = show();
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.shake }));
+  await waitFor(() => expect(dialog).toHaveAttribute("data-phase", "cards"), SLOW);
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(2) }));
+  expect(dialog).toHaveAttribute("data-phase", "signature");
+  const before = sound.stopped;
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.skip }));
+  expect(dialog).toHaveAttribute("data-phase", "recap");
+  expect(sound.stopped).toBeGreaterThan(before);
+  await new Promise((r) => setTimeout(r, 500));
+  expect(flips(sound)).toEqual([]);
 });

@@ -310,3 +310,16 @@ test("lesson cues stay within their length budget", () => {
     expect(voice.end, cue).toBeLessThanOrEqual(max);
   }
 });
+
+test("gacha cues: a rattle per shake, an omen longer for a rarer best piece (≤ 3 s), short flips (≤ 600 ms)", () => {
+  const end = (cue: SoundCue) => {
+    const ctx = new FakeAudioContext();
+    return recipes[cue](ctx as unknown as AudioContext, ctx.createGain() as unknown as AudioNode, 0, false).end;
+  };
+  expect(end("gacha.shake")).toBeLessThanOrEqual(0.45); // within one shake of the tube (0.72 s)
+  const omens = (["common", "rare", "epic", "legendary"] as const).map((r) => end(`gacha.omen.${r}`));
+  for (let i = 1; i < omens.length; i++) expect(omens[i]).toBeGreaterThan(omens[i - 1] ?? 0);
+  expect(omens[0]).toBeLessThanOrEqual(0.2); // a pull of commons stays brief
+  expect(omens[3]).toBeLessThanOrEqual(3);
+  for (const r of ["common", "rare", "epic", "legendary"] as const) expect(end(`gacha.flip.${r}`), r).toBeLessThanOrEqual(0.6);
+});

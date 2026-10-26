@@ -1,8 +1,9 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { createFakeServices } from "@/adapters/fakes";
+import { createFakeServices, FakeSoundPlayer } from "@/adapters/fakes";
+import { ServicesProvider } from "@/app/ServicesProvider";
 import type { GachaPull, GachaPullItem, ShopItem } from "@/domain/types";
-import { revealAllOrder } from "@/features/shop/gachaReveal";
+import { omenDuration, REVEAL, revealAllOrder } from "@/features/shop/gachaReveal";
 import { XinXamScene } from "@/features/shop/XinXamScene";
 import { fr } from "@/i18n/fr";
 
@@ -21,9 +22,19 @@ const RARITY_WORDS = [...Object.keys(fr.shop.rarities), ...Object.values(fr.shop
 
 function show(pull: GachaPull, opts: { recovered?: boolean } = {}) {
   const onClose = vi.fn();
-  render(<XinXamScene pull={pull} recovered={opts.recovered ?? false} items={shop} baseLook={LOOK} onClose={onClose} />);
-  return { onClose, user: userEvent.setup(), dialog: screen.getByRole("dialog", { name: fr.gacha.resultLabel(pull.cost) }) };
+  const services = createFakeServices();
+  const sound = services.sound;
+  if (!(sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  const { unmount } = render(
+    <ServicesProvider services={services}>
+      <XinXamScene pull={pull} recovered={opts.recovered ?? false} items={shop} baseLook={LOOK} onClose={onClose} />
+    </ServicesProvider>,
+  );
+  return { onClose, unmount, sound, user: userEvent.setup(), dialog: screen.getByRole("dialog", { name: fr.gacha.resultLabel(pull.cost) }) };
 }
+
+/** The cues the scene played, in order (optionally only those starting with `prefix`). */
+const cues = (sound: FakeSoundPlayer, prefix = "") => sound.played.map((p) => p.cue).filter((c) => c.startsWith(prefix));
 
 /** Shakes the tube once and waits for the face-down cards (after the omen). */
 async function deal(user: ReturnType<typeof userEvent.setup>, dialog: HTMLElement) {
@@ -138,7 +149,7 @@ test("x10: turning card 3 shows its piece; back on the grid it stays turned with
 });
 
 test("« Tout découvrir » turns the cards lowest rarity first, ends on the best one, then the recap", async () => {
-  const { user, dialog } = show(pullOf(TEN));
+  const { user, dialog, sound } = show(pullOf(TEN));
   const grid = await deal(user, dialog);
   const order: number[] = [];
   const watch = new MutationObserver((records) => {
@@ -159,6 +170,8 @@ test("« Tout découvrir » turns the cards lowest rarity first, ends on the bes
   expect(await within(dialog).findByRole("heading", { name: nameOf("char_phap_su") }, CHAIN)).toBeInTheDocument();
   watch.disconnect();
   expect(order).toEqual(revealAllOrder(TEN, Array(10).fill(false)));
+  // One flip sound per card, in the order they turned, each of its own rarity.
+  expect(cues(sound, "gacha.flip.")).toEqual(order.map((i) => `gacha.flip.${TEN[i]?.rarity}`));
   await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.toRecap }));
   expect(within(dialog).getByRole("heading", { name: fr.gacha.resultTitle })).toBeInTheDocument();
   const lines = within(dialog).getAllByRole("listitem");
@@ -230,4 +243,77 @@ test("focus starts on the tube, not on « Passer », then goes to the first card
 test("the recap words a duplicate like the scroll does", () => {
   const { dialog } = show(pullOf([item("acc_quat_sat", "rare", true, 20)]), { recovered: true });
   expect(within(dialog).getByText("Déjà obtenu → +20 xu")).toBeInTheDocument();
+});
+
+// --- Sounds (spec sound-and-reveal §4.4): cues follow the reveal state, never the animations ---
+
+test("sounds: each shake of the tube rattles once (never more than once per 300 ms), the omen rings once for the best piece", async () => {
+  const { dialog, sound } = show(pullOf(TEN));
+  const times: number[] = [];
+  const play = sound.play.bind(sound);
+  vi.spyOn(sound, "play").mockImplementation((cue, o) => {
+    if (cue === "gacha.shake") times.push(performance.now());
+    play(cue, o);
+  });
+  // Held down: the tube shakes its maximum number of times.
+  fireEvent.pointerDown(within(dialog).getByRole("button", { name: fr.gacha.scene.shake }));
+  await waitFor(() => expect(dialog).toHaveAttribute("data-phase", "omen"), SLOW);
+  expect(times).toHaveLength(REVEAL.maxShakes);
+  for (let i = 1; i < times.length; i++) expect((times[i] ?? 0) - (times[i - 1] ?? 0)).toBeGreaterThanOrEqual(300);
+  expect(cues(sound, "gacha.omen.")).toEqual(["gacha.omen.legendary"]);
+  await waitFor(() => expect(dialog).toHaveAttribute("data-phase", "cards"), SLOW);
+  expect(cues(sound, "gacha.omen.")).toEqual(["gacha.omen.legendary"]); // exactly one, the whole omen long
+  expect(cues(sound, "gacha.flip.")).toEqual([]); // nothing turned yet
+}, 10000);
+
+test("sounds: a pull of commons gets the plain wood omen", async () => {
+  const { user, dialog, sound } = show(pullOf([item("acc_giao_tre", "common"), item("hat_khan_vanh", "common")]));
+  await deal(user, dialog);
+  expect(cues(sound)).toEqual(["gacha.shake", "gacha.omen.common"]);
+});
+
+test("sounds: a turned card rings its own rarity, once; opening it again is silent", async () => {
+  const { user, dialog, sound } = show(pullOf([item("hat_khan_vanh", "common"), item("outfit_son_tinh", "epic")]));
+  await deal(user, dialog);
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(2) }));
+  expect(cues(sound, "gacha.flip.")).toEqual(["gacha.flip.epic"]); // with the touch, as the card starts to turn
+  await user.click(await within(dialog).findByRole("button", { name: fr.gacha.resultContinue }, SLOW));
+  const epic = await within(dialog).findByRole("button", { name: fr.gacha.scene.cardOpen(2, nameOf("outfit_son_tinh"), fr.shop.rarities.epic) }, SLOW);
+  await user.click(epic);
+  await user.click(await within(dialog).findByRole("button", { name: fr.gacha.resultContinue }, SLOW));
+  await user.click(await within(dialog).findByRole("button", { name: fr.gacha.scene.card(1) }, SLOW));
+  expect(cues(sound, "gacha.flip.")).toEqual(["gacha.flip.epic", "gacha.flip.common"]);
+});
+
+test("sounds: « Passer » during the omen stops the gong, and nothing of the reveal sounds afterwards", async () => {
+  const { user, dialog, sound } = show(pullOf(TEN));
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.shake }));
+  await waitFor(() => expect(dialog).toHaveAttribute("data-phase", "omen"), SLOW);
+  const before = sound.stopped;
+  const played = sound.played.length;
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.skip }));
+  expect(sound.stopped).toBeGreaterThan(before);
+  await new Promise((r) => setTimeout(r, Math.round(omenDuration("legendary") * 1000) + 200));
+  expect(sound.played).toHaveLength(played); // no orphan gong or flip from the skipped beats
+});
+
+test("sounds: Escape stops the reveal like « Passer »", async () => {
+  const { user, dialog, sound } = show(pullOf([item("hat_thuy_tinh", "rare")]));
+  await user.keyboard("{Escape}");
+  expect(dialog).toHaveAttribute("data-phase", "recap");
+  expect(sound.stopped).toBe(1);
+});
+
+test("sounds: closing the scene mid-reveal stops its sound", async () => {
+  const { user, dialog, sound, unmount } = show(pullOf(TEN));
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.shake }));
+  await waitFor(() => expect(dialog).toHaveAttribute("data-phase", "omen"), SLOW);
+  const before = sound.stopped;
+  unmount();
+  expect(sound.stopped).toBe(before + 1);
+});
+
+test("sounds: a recovered pull opens on its recap in silence", () => {
+  const { sound } = show(pullOf([item("char_phap_su", "legendary")]), { recovered: true });
+  expect(sound.played).toEqual([]);
 });

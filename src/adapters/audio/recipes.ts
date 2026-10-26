@@ -254,6 +254,17 @@ function whoosh(s: Score, start: number, length: number, from: number, to: numbe
   s.run(src, start, start + length);
 }
 
+/** One bamboo stick knocking on the tube: a very short noise burst through a narrow band. */
+function rattle(s: Score, start: number, freq: number, level: number): void {
+  const src = s.ctx.createBufferSource();
+  src.buffer = noise(s.ctx);
+  const band = filter(s.ctx, "bandpass", freq, 6);
+  const end = start + 0.035;
+  const g = envelope(s, start, level, 0.001, end);
+  src.connect(band).connect(g).connect(s.out);
+  s.run(src, start, end);
+}
+
 // --- Recipes ------------------------------------------------------------------------------------------------------
 
 function score(build: (s: Score, t: number, strong: boolean) => void): Recipe {
@@ -302,6 +313,69 @@ const lessonLost = score((s, t) => {
   pluck(s, t + 0.68, N.D4, { length: 0.8, level: 0.8, bright: 3, ring: 1.4, bend: { from: 1, to: 0.95, start: 0.22, time: 0.4 } });
 });
 
+// The gacha (spec sound-and-reveal §4.4): the tube rattles, the omen grows with the best rarity of the pull (wood, jade
+// bells, a gong, the great gong), and each card rings its own rarity as it turns, louder for a rarer piece.
+
+/** The sticks rattle in the bamboo tube: uneven knocks, high and woody. One per shake of the tube (≈ 0.7 s). ≤ 450 ms. */
+const gachaShake = score((s, t) => {
+  const knocks = [
+    { at: 0, f: 2300, l: 1.5 },
+    { at: 0.055, f: 1750, l: 1.2 },
+    { at: 0.1, f: 2650, l: 1.35 },
+    { at: 0.19, f: 1950, l: 1.65 },
+    { at: 0.235, f: 2450, l: 1.05 },
+    { at: 0.33, f: 1850, l: 1.35 },
+    { at: 0.37, f: 2550, l: 0.9 },
+  ];
+  for (const k of knocks) rattle(s, t + k.at, k.f, k.l);
+  wood(s, t + 0.19, 640, 0.3, 0.06, true); // the tube itself, felt more than heard
+});
+
+/** Common: one dry clack of wood, and nothing more (a pull of commons stays brief). ≤ 200 ms. */
+const omenCommon = score((s, t) => wood(s, t, 760, 1.3, 0.14));
+
+/** Rare: three small jade bells, one after the other, with a breath of air around them. ≤ 1.6 s. */
+const omenRare = score((s, t) => {
+  [N.D6 * 2, N.E5 * 4, N.A5 * 3].forEach((f, i) => bell(s, t + i * 0.12, f, 0.16, 1.3));
+  whoosh(s, t, 0.9, 3500, 7000, 0.035, 0.35, 0.7);
+});
+
+/** Epic: a gong of middle pitch, then the « whoosh » of the lanterns coming down (0.36 s in, with the picture). ≤ 2.2 s. */
+const omenEpic = score((s, t) => {
+  gong(s, t, 196, 0.19, 2.2);
+  whoosh(s, t + 0.36, 0.42, 380, 1500, 0.16, 0.2, 1);
+});
+
+/**
+ * Legendary: the great low gong, ~0.6 s of held breath where only it rings, then a shimmering rise of bells and air as
+ * the gold floods the altar (0.94 s in, with the picture). ≤ 3 s.
+ */
+const omenLegendary = score((s, t) => {
+  gong(s, t, 73.42, 0.6, 2.9); // D2
+  gong(s, t, 146.83, 0.34, 2.4); // its octave carries the strike on a phone speaker
+  wood(s, t, 300, 0.25, 0.12, true); // the mallet: phone speakers barely play the fundamental
+  const rise = t + 0.94;
+  whoosh(s, rise - 0.3, 1.2, 500, 6000, 0.12, 0.9, 0.8);
+  [N.D5, N.E5, N.G5, N.A5, N.D6, N.D6 * 1.122, N.D6 * 1.335].forEach((f, i) => bell(s, rise + i * 0.085, f * 2, 0.05 + i * 0.015, 1.0 + i * 0.06));
+});
+
+/** The flips: the same instruments, short (≤ 600 ms) and louder for a rarer piece. */
+const flipCommon = score((s, t) => wood(s, t, 880, 1.3, 0.09));
+const flipRare = score((s, t) => {
+  bell(s, t, N.E5 * 4, 0.22, 0.55);
+  bell(s, t + 0.07, N.A5 * 3, 0.18, 0.5);
+});
+const flipEpic = score((s, t) => {
+  wood(s, t, 520, 0.3, 0.08);
+  gong(s, t, 233, 0.2, 0.6);
+});
+const flipLegendary = score((s, t) => {
+  wood(s, t, 300, 0.38, 0.1, true);
+  gong(s, t, 110, 0.6, 0.6);
+  gong(s, t, 220, 0.2, 0.55);
+  bell(s, t + 0.05, N.D6 * 2, 0.1, 0.5);
+});
+
 /** Shared shapes for the cues Tasks 4–6 refine (gacha, signature, fights, arena). */
 const blade = (ring: number) =>
   score((s, t, strong) => {
@@ -316,25 +390,15 @@ export const recipes: Record<SoundCue, Recipe> = {
   "lesson.lost": lessonLost,
   "heart.lost": heartLost,
 
-  "gacha.shake": score((s, t) => {
-    [900, 760, 980].forEach((f, i) => wood(s, t + i * 0.05, f, 0.25, 0.05));
-  }),
-  "gacha.omen.common": score((s, t) => wood(s, t, 820, 0.4, 0.1)),
-  "gacha.omen.rare": score((s, t) => {
-    [1760, 2349, 2637].forEach((f, i) => bell(s, t + i * 0.09, f, 0.16, 1.2));
-  }),
-  "gacha.omen.epic": score((s, t) => gong(s, t, 220, 0.45, 2.2)),
-  "gacha.omen.legendary": score((s, t) => {
-    gong(s, t, 98, 0.55, 3.8);
-    bell(s, t + 1.6, 1568, 0.08, 1.6);
-  }),
-  "gacha.flip.common": score((s, t) => wood(s, t, 950, 0.38, 0.08)),
-  "gacha.flip.rare": score((s, t) => {
-    bell(s, t, 1975, 0.16, 0.9);
-    bell(s, t + 0.06, 2637, 0.12, 0.8);
-  }),
-  "gacha.flip.epic": score((s, t) => gong(s, t, 262, 0.42, 1.6)),
-  "gacha.flip.legendary": score((s, t) => gong(s, t, 110, 0.5, 3.0)),
+  "gacha.shake": gachaShake,
+  "gacha.omen.common": omenCommon,
+  "gacha.omen.rare": omenRare,
+  "gacha.omen.epic": omenEpic,
+  "gacha.omen.legendary": omenLegendary,
+  "gacha.flip.common": flipCommon,
+  "gacha.flip.rare": flipRare,
+  "gacha.flip.epic": flipEpic,
+  "gacha.flip.legendary": flipLegendary,
 
   "sig.wind": score((s, t) => whoosh(s, t, 2.0, 300, 1200, 0.3, 0.8, 0.9)),
   "sig.brush": score((s, t) => whoosh(s, t, 0.12, 2400, 900, 0.35, 0.01, 2)),

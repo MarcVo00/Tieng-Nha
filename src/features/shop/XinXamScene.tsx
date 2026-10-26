@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useServices } from "@/app/ServicesProvider";
 import type { GachaPull, GachaPullItem, Look, ShopItem } from "@/domain/types";
 import { fr } from "@/i18n/fr";
 import { characterSlotOf } from "@/services/look";
@@ -261,7 +262,13 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
   const count = pull.items.length;
   const recap = state.phase === "recap";
   const chaining = autoAdvance(state);
-  useFocusTrap(panelRef, () => (recap ? onClose() : dispatch({ type: "skip" })));
+  const { sound } = useServices();
+  // « Passer » (or Escape): the reveal stops at once, its sound with it (no orphan gong).
+  const skip = useCallback(() => {
+    sound.stopAll();
+    dispatch({ type: "skip" });
+  }, [sound]);
+  useFocusTrap(panelRef, () => (recap ? onClose() : skip()));
 
   // Beats run on timers from the schedule (never on animation callbacks): the sequence is the same whatever the frame rate.
   const { phase, shake, top, current: turning } = state;
@@ -276,6 +283,37 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
     if (phase === "focus" && turning !== null) return after(REVEAL.flip, () => setOpened(turning));
     return undefined;
   }, [phase, shake, top, turning, chaining]);
+
+  // Sounds (spec sound-and-reveal §4.4) follow the reveal state, never the animations: the same beats at any frame rate.
+  // Each shake of the tube rattles (one per cycle, never faster than `REVEAL.shake`).
+  useEffect(() => {
+    if (phase === "shaking") sound.play("gacha.shake");
+  }, [phase, shake, sound]);
+  // The omen rings once, for the best piece of the pull.
+  useEffect(() => {
+    if (phase === "omen") sound.play(`gacha.omen.${top}` as const);
+  }, [phase, top, sound]);
+  // A card rings its rarity once, as it turns over; after a signature, as its piece appears (the signature has its own
+  // sounds). Opening a turned card again is silent.
+  const rung = useRef(new Set<number>());
+  useEffect(() => {
+    if (phase !== "focus" || turning === null || rung.current.has(turning)) return;
+    const it = pull.items[turning];
+    if (!it) return;
+    rung.current.add(turning);
+    sound.play(`gacha.flip.${it.rarity}` as const);
+  }, [phase, turning, pull.items, sound]);
+  // Reduced motion opens on the recap: the best piece rings once there (a recovered pull opens in silence). The ref keeps
+  // it to one under StrictMode.
+  const [ringRecap] = useState(() => reduced && !recovered);
+  const rangRecap = useRef(false);
+  useEffect(() => {
+    if (!ringRecap || rangRecap.current) return;
+    rangRecap.current = true;
+    sound.play(`gacha.flip.${top}` as const);
+  }, [ringRecap, top, sound]);
+  // The scene closes (or the app leaves it): whatever it still rings stops with it.
+  useEffect(() => () => sound.stopAll(), [sound]);
 
   // A signature opens the focus view straight away (the card face would show the piece before it), and keeps it open.
   useEffect(() => {
@@ -389,7 +427,7 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
             <motion.button
               type="button"
               whileTap={tap}
-              onClick={() => dispatch({ type: "skip" })}
+              onClick={skip}
               className="inline-flex min-h-11 shrink-0 items-center rounded-sm px-3 text-body-strong text-primary underline"
             >
               {fr.gacha.scene.skip}

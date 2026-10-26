@@ -27,7 +27,7 @@ async function onboardedServices() {
   const services = createFakeServices();
   await services.auth.verifyOtp("a@b.c", "123456");
   await services.auth.joinGroup("TEST-CODE", "Marc", "🐉");
-  await services.progress.saveSettings({ theme: "system", voiceRate: "normal", voice: "south-f", capabilities: { tts: true, stt: true, recorder: true }, onboardingDone: true });
+  await services.progress.saveSettings({ theme: "system", voiceRate: "normal", voice: "south-f", capabilities: { tts: true, stt: true, recorder: true }, onboardingDone: true, sound: true });
   return services;
 }
 
@@ -54,7 +54,7 @@ test("focus routes hide the tab bar", async () => {
 
 test("saved dark theme never drops the dark class during bootstrap", async () => {
   const services = await onboardedServices();
-  await services.progress.saveSettings({ theme: "dark", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: true });
+  await services.progress.saveSettings({ theme: "dark", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: true, sound: true });
   localStorage.setItem("tn-theme", "dark");
   document.documentElement.classList.add("dark"); // as the inline script in index.html does
   let removed = false;
@@ -84,7 +84,7 @@ test("a failing bootstrap still reaches a rendered app", async () => {
 
 test("offline cold start with an expired token keeps the cached profile and saved settings", async () => {
   const services = await onboardedServices();
-  await services.progress.saveSettings({ theme: "dark", voiceRate: "slow", voice: "south-f", capabilities: null, onboardingDone: true });
+  await services.progress.saveSettings({ theme: "dark", voiceRate: "slow", voice: "south-f", capabilities: null, onboardingDone: true, sound: true });
   localStorage.setItem("tn-session", JSON.stringify({ userId: "me", email: "a@b.c" }));
   localStorage.setItem("tn-profile", JSON.stringify({ pseudo: "Marc", avatarEmoji: "🐉" }));
   vi.spyOn(services.auth, "getSession").mockRejectedValue(new OfflineError());
@@ -93,7 +93,7 @@ test("offline cold start with an expired token keeps the cached profile and save
   expect(await screen.findByRole("navigation")).toBeInTheDocument();
   expect(router.state.location.pathname).toBe("/");
   expect(useAppState.getState().profile).toEqual({ pseudo: "Marc", avatarEmoji: "🐉" });
-  expect(useAppState.getState().settings).toMatchObject({ theme: "dark", voiceRate: "slow", onboardingDone: true });
+  expect(useAppState.getState().settings).toMatchObject({ theme: "dark", voiceRate: "slow", onboardingDone: true, sound: true });
 });
 
 test("a null INITIAL_SESSION does not sign the user out, an explicit SIGNED_OUT does", async () => {

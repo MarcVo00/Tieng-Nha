@@ -92,6 +92,7 @@ export type Settings = {
   voice: VoiceId; // which accent/voice pack speaks; "device" = browser speechSynthesis
   capabilities: Capabilities | null; // null = device test not done yet
   onboardingDone: boolean;
+  sound: boolean; // sound effects (lessons, fights, gacha); rows saved before 1.7 have none and read back as on
 };
 
 export type Session = { userId: string; email: string };

@@ -6,7 +6,7 @@ import { useDeviceTest, useSettings } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { ChangePasswordSheet } from "@/features/profile/ChangePasswordSheet";
-import { Button, DeviceCheck, Icon, SectionTitle, Sheet, tap, useToast } from "@/ui";
+import { Button, DeviceCheck, Icon, SectionTitle, Sheet, spring, tap, useToast } from "@/ui";
 
 type SegmentedProps<T extends string> = { label: string; value: T; options: readonly { id: T; label: string }[]; onChange(v: T): void };
 
@@ -30,6 +30,41 @@ function Segmented<T extends string>({ label, value, options, onChange }: Segmen
         ))}
       </div>
     </div>
+  );
+}
+
+type ToggleProps = { id: string; label: string; hint: string; on: boolean; onChange(on: boolean): void };
+
+/** A labelled on/off row: the whole row is the touch target, the lacquer track is only its picture. */
+function Toggle({ id, label, hint, on, onChange }: ToggleProps) {
+  return (
+    <motion.button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-labelledby={`${id}-label`}
+      aria-describedby={`${id}-hint`}
+      whileTap={tap}
+      onClick={() => onChange(!on)}
+      className="flex min-h-12 items-center gap-3 text-left"
+    >
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span id={`${id}-label`} className="text-body-strong text-ink">
+          {label}
+        </span>
+        <span id={`${id}-hint`} className="text-caption text-ink-muted">
+          {hint}
+        </span>
+      </span>
+      <span aria-hidden="true" className={`flex h-7 w-12 shrink-0 items-center rounded-full border-2 p-0.5 ${on ? "border-primary bg-primary" : "border-line bg-surface-2"}`}>
+        <motion.span
+          className={`h-5 w-5 rounded-full shadow-card ${on ? "bg-primary-on" : "bg-surface"}`}
+          initial={false}
+          animate={{ x: on ? 20 : 0 }}
+          transition={spring.snappy}
+        />
+      </span>
+    </motion.button>
   );
 }
 
@@ -149,6 +184,7 @@ export function SettingsSection({ onReport }: { onReport(): void }) {
           { id: "slow", label: t.voice.slow },
         ]}
       />
+      <Toggle id="settings-sound" label={t.sound.label} hint={t.sound.hint} on={settings.sound} onChange={(sound) => change({ sound })} />
       <div className="flex flex-col gap-2">
         <Button variant="secondary" fullWidth onClick={() => setDeviceOpen(true)}>
           {t.device.open}

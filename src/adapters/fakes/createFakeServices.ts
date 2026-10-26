@@ -18,6 +18,7 @@ import { FakeDuelGateway } from "@/adapters/fakes/FakeDuelGateway";
 import { FakeGachaGateway } from "@/adapters/fakes/FakeGachaGateway";
 import { FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes/FakeSpeech";
 import { FakeContentReporter } from "@/adapters/fakes/FakeContentReporter";
+import { FakeSoundPlayer } from "@/adapters/fakes/FakeSoundPlayer";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
@@ -42,6 +43,8 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
   };
   const myFrame = async () => walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).equipped.frame ?? null;
   const myLook = async () => lookOf(walletAt(await progress.listEvents(), await content.getShop(), await content.getBadges()).equipped);
+  const tts = overrides.tts ?? new FakeSpeechSynthesizer();
+  const voiceBusy = () => tts instanceof FakeSpeechSynthesizer && tts.speaking > 0;
   const base: Services = {
     env: { VITE_WELCOME_MESSAGE: "", VITE_USE_FAKES: true, VITE_FAKE_SPEECH: true, VITE_DEMO: false },
     flags: { aiConversation: false, streakFreeze: false, humanAudio: false },
@@ -65,7 +68,8 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
       ...(options.gachaRng ? { rng: options.gachaRng } : {}),
       ...(options.gachaStorage ? { storage: options.gachaStorage } : {}),
     }),
-    tts: new FakeSpeechSynthesizer(),
+    tts,
+    sound: new FakeSoundPlayer(voiceBusy),
     stt: new FakeSpeechRecognizer(),
     recorder: new FakeVoiceRecorder(),
     detectCapabilities: async () => ({ tts: true, stt: true, recorder: true }),

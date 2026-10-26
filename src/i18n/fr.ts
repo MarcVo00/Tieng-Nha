@@ -933,6 +933,7 @@ export const fr = {
       title: "Réglages",
       theme: { label: "Thème", system: "Système", light: "Clair", dark: "Sombre" },
       voice: { label: "Vitesse de la voix", normal: "Normale", slow: "Lente 🐢" },
+      sound: { label: "Sons", hint: "Effets sonores des leçons, des combats et du tirage." },
       saveError: "Ce réglage n'a pas pu être enregistré.",
       password: { open: "Changer mon mot de passe", title: "Changer mon mot de passe", updated: "Mot de passe mis à jour" },
       voicePack: {

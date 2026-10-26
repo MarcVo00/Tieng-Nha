@@ -3,9 +3,10 @@ import type { VoiceId } from "@/domain/types";
 import type { DemoTools, Services } from "@/app/services";
 import { flags } from "@/app/flags";
 import { useAppState } from "@/app/appState";
-import { createFakeServices, FakeAuthService, type FakeAuthOptions, FakeDuelGateway, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
+import { createFakeServices, FakeAuthService, type FakeAuthOptions, FakeDuelGateway, FakeSoundPlayer, FakeSpeechSynthesizer, FakeSpeechRecognizer, FakeVoiceRecorder } from "@/adapters/fakes";
 import { TiengNhaDb, DexieProgressRepository, DexieOutbox, DexieReportQueue } from "@/adapters/dexie";
 import { AudioPackSynthesizer, WebSpeechSynthesizer, WebSpeechRecognizer, MediaRecorderVoiceRecorder, createDetectCapabilities } from "@/adapters/speech";
+import { WebAudioSoundPlayer } from "@/adapters/audio";
 import { createStaticContentSource } from "@/adapters/content";
 import { ScriptedConversationEngine } from "@/adapters/conversation";
 import {
@@ -14,6 +15,8 @@ import {
 import { createActivityService } from "@/services/activity";
 import { createSyncService } from "@/services/sync";
 import { createDemoTools } from "@/app/demoTools";
+import { trackSpeaking } from "@/app/speakingTracker";
+import type { SoundPlayer } from "@/ports";
 
 type Remote = Pick<Services, "sink" | "auth" | "leaderboard" | "exam" | "duels" | "gacha" | "reporter">;
 
@@ -36,6 +39,14 @@ function demoAuthOptions(demo: boolean): FakeAuthOptions {
   }
 }
 
+/** Fake speech (e2e) records sounds instead of playing them, and exposes them as `window.__sounds` for Playwright. */
+function createSoundPlayer(env: Env, isVoiceBusy: () => boolean): SoundPlayer {
+  if (!env.VITE_FAKE_SPEECH) return new WebAudioSoundPlayer({ isVoiceBusy });
+  const fake = new FakeSoundPlayer(isVoiceBusy);
+  if (env.VITE_USE_FAKES) Object.assign(window, { __sounds: fake });
+  return fake;
+}
+
 /** Composition root: the only place that picks concrete adapters. */
 export function createServices(env: Env): Services {
   const clock = () => new Date().toISOString();
@@ -45,16 +56,19 @@ export function createServices(env: Env): Services {
   const content = createStaticContentSource();
 
   // Speech
-  const tts = env.VITE_FAKE_SPEECH
+  const voice = env.VITE_FAKE_SPEECH
     ? new FakeSpeechSynthesizer()
     : new AudioPackSynthesizer(new WebSpeechSynthesizer(), { getVoice: () => useAppState.getState().settings.voice });
   const stt = env.VITE_FAKE_SPEECH ? new FakeSpeechRecognizer() : new WebSpeechRecognizer();
   const recorder = env.VITE_FAKE_SPEECH ? new FakeVoiceRecorder() : new MediaRecorderVoiceRecorder();
   const detectCapabilities =
-    tts instanceof AudioPackSynthesizer
-      ? createDetectCapabilities(tts, stt, recorder)
+    voice instanceof AudioPackSynthesizer
+      ? createDetectCapabilities(voice, stt, recorder)
       : async () => ({ tts: true, stt: true, recorder: true });
-  const prefetchVoice = async (voice: VoiceId) => (tts instanceof AudioPackSynthesizer ? tts.prefetchVoice(voice) : { done: 0, total: 0 });
+  const prefetchVoice = async (id: VoiceId) => (voice instanceof AudioPackSynthesizer ? voice.prefetchVoice(id) : { done: 0, total: 0 });
+  // Everything speaks through the tracked voice, so sound effects know when to stay under it.
+  const tts = trackSpeaking(voice);
+  const sound = createSoundPlayer(env, tts.isSpeaking);
 
   // Remote (fake or Supabase)
   let remote: Remote;
@@ -90,7 +104,7 @@ export function createServices(env: Env): Services {
       : undefined;
 
   return {
-    env, flags, clock, content, progress, outbox, ...remote, tts, stt, recorder, detectCapabilities, prefetchVoice,
+    env, flags, clock, content, progress, outbox, ...remote, tts, sound, stt, recorder, detectCapabilities, prefetchVoice,
     conversation: new ScriptedConversationEngine(content), activity, sync, ...(demo ? { demo } : {}),
   };
 }

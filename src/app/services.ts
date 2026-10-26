@@ -2,7 +2,7 @@ import type { Env, Flags } from "@/domain/config";
 import type { Capabilities, VoiceId } from "@/domain/types";
 import type {
   AuthService, ContentReporter, ContentSource, ConversationEngine, EventSink, DuelGateway, ExamGateway, GachaGateway, LeaderboardRepository,
-  Outbox, ProgressRepository, SpeechRecognizer, SpeechSynthesizer, VoiceRecorder,
+  Outbox, ProgressRepository, SoundPlayer, SpeechRecognizer, SpeechSynthesizer, VoiceRecorder,
 } from "@/ports";
 import type { ActivityService } from "@/services/activity";
 import type { SyncService } from "@/services/sync";
@@ -21,6 +21,7 @@ export type Services = {
   duels: DuelGateway;
   gacha: GachaGateway;
   tts: SpeechSynthesizer;
+  sound: SoundPlayer; // sound effects; mutes itself while `tts` speaks
   stt: SpeechRecognizer;
   recorder: VoiceRecorder;
   detectCapabilities: () => Promise<Capabilities>; // real implementation in T12 (waits for TTS voices)

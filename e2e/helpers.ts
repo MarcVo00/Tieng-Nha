@@ -272,3 +272,11 @@ export async function seedCompleteGachaSet(page: Page): Promise<void> {
     await new Promise((res) => { tx.oncomplete = res; });
   }, items);
 }
+
+/** Sounds recorded by the fake sound player (e2e builds use fake speech, which records sounds instead of playing them). */
+export async function playedSounds(page: Page): Promise<{ cue: string; strong: boolean; soft: boolean }[]> {
+  return page.evaluate(() => {
+    const sounds: { played: { cue: string; strong: boolean; soft: boolean }[] } | undefined = Reflect.get(window, "__sounds");
+    return sounds ? [...sounds.played] : [];
+  });
+}

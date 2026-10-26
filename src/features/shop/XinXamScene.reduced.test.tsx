@@ -15,7 +15,7 @@ window.matchMedia = ((query: string) => ({
   dispatchEvent: () => false,
 })) as typeof window.matchMedia;
 
-test("reduced motion: the result directly (the recap), no tube, no sticks", () => {
+test("reduced motion: the result directly (the recap), no tube, no omen, no cards", () => {
   const pull = {
     id: "p1",
     theme: "legendes_sombres",
@@ -30,6 +30,7 @@ test("reduced motion: the result directly (the recap), no tube, no sticks", () =
   expect(dialog).toHaveAttribute("data-phase", "recap");
   expect(within(dialog).getByText(fr.shop.items.char_phap_su?.name ?? "")).toBeInTheDocument();
   expect(within(dialog).queryByRole("button", { name: fr.gacha.scene.shake })).toBeNull();
-  expect(dialog.querySelector("[data-stick]")).toBeNull();
+  expect(dialog.querySelector("[data-stage]")).toBeNull();
+  expect(dialog.querySelector("[data-card]")).toBeNull();
   expect(within(dialog).getByRole("button", { name: fr.gacha.resultContinue })).toBeInTheDocument();
 });

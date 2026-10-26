@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { fr } from "@/i18n/fr";
-import { fixGachaRolls, onboard, seedBadges, seedCoins, seedLessonsCompleted, shakeTube } from "./helpers";
+import { finishRevealAll, fixGachaRolls, onboard, seedBadges, seedCoins, seedLessonsCompleted, shakeTube } from "./helpers";
 
 test("a badge reward frame can be equipped from Moi", async ({ page }) => {
   await onboard(page);
@@ -48,11 +48,11 @@ test("pull once from the dark legends banner, see the result, and the set fills 
   await expect(banner.getByText(fr.gacha.ownedCount(0, 12))).toBeVisible();
   await banner.getByRole("button", { name: fr.gacha.pullOne(40) }).click();
 
-  // Xin xăm: shake the tube, the stick falls, its tip is read, a touch unrolls the scroll on the hero.
+  // Shake the tube, the omen, then a touch turns the card over and unrolls the scroll on the hero.
   const result = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
   await expect(result.getByRole("button", { name: fr.gacha.scene.skip })).toBeVisible();
   await shakeTube(page);
-  await result.getByRole("button", { name: /^Bâtonnet 1, bout / }).click();
+  await result.getByRole("button", { name: fr.gacha.scene.card(1) }).click();
   await expect(result.locator("[data-seal]")).toBeVisible();
   await expect(result.locator("[data-scroll]").getByText(fr.gacha.resultNew)).toBeVisible();
   await result.getByRole("button", { name: fr.gacha.resultContinue }).click();
@@ -71,7 +71,7 @@ test("the rates sheet lists the four rarities", async ({ page }) => {
   await expect(sheet.getByText(fr.gacha.ratePercent(2), { exact: true })).toBeVisible();
 });
 
-test("a x10 pull fans out ten sticks; « Tout révéler » shows the recap, and « Passer » is there all along", async ({ page }) => {
+test("a x10 pull deals ten face-down cards; « Tout découvrir » ends on the recap, and « Passer » is there all along", async ({ page }) => {
   await onboard(page);
   await seedCoins(page, 400);
   await page.reload();
@@ -81,13 +81,15 @@ test("a x10 pull fans out ten sticks; « Tout révéler » shows the recap, and 
   await banner.getByRole("button", { name: fr.gacha.pullTen(360) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(360) });
   await shakeTube(page);
-  await expect(scene.locator("[data-stick]")).toHaveCount(10);
+  await expect(scene.locator("[data-card]")).toHaveCount(10);
   await expect(scene.getByRole("button", { name: fr.gacha.scene.skip })).toBeVisible();
-  await scene.getByRole("button", { name: /^Bâtonnet 1, bout / }).click();
-  await expect(scene).toHaveAttribute("data-phase", /hold|scroll/);
+  await scene.getByRole("button", { name: fr.gacha.scene.card(1) }).click();
+  await expect(scene).toHaveAttribute("data-phase", /focus|signature/);
   await expect(scene.locator("[data-seal]")).toBeVisible();
-  await scene.getByRole("button", { name: fr.gacha.scene.next }).click();
+  await expect(scene.getByRole("button", { name: fr.gacha.scene.skip })).toBeVisible();
+  await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();
   await scene.getByRole("button", { name: fr.gacha.scene.revealAll }).click();
+  await finishRevealAll(page);
   await expect(scene.getByRole("heading", { name: fr.gacha.resultTitle })).toBeVisible();
   await expect(scene.getByRole("listitem")).toHaveCount(10);
   await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();

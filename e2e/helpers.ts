@@ -223,11 +223,24 @@ export async function seedCoins(page: Page, coins: number): Promise<void> {
   }, coins);
 }
 
-/** In the Xin xăm scene: touches the tube once and waits until the stick(s) rest on the altar. */
+/** In the gacha reveal: touches the tube once and waits, through the omen, until the face-down cards are dealt. */
 export async function shakeTube(page: Page): Promise<void> {
   const scene = page.getByRole("dialog");
   await scene.getByRole("button", { name: fr.gacha.scene.shake }).click();
-  await expect(scene).toHaveAttribute("data-phase", "altar");
+  await expect(scene).toHaveAttribute("data-phase", "cards");
+}
+
+/** After « Tout découvrir »: answers each focus view that waits (a legendary, then the best piece) until the recap. */
+export async function finishRevealAll(page: Page): Promise<void> {
+  const scene = page.getByRole("dialog");
+  const recap = scene.getByRole("heading", { name: fr.gacha.resultTitle });
+  const next = scene.getByRole("button", { name: fr.gacha.resultContinue }).or(scene.getByRole("button", { name: fr.gacha.scene.toRecap }));
+  for (let i = 0; i < 12; i++) {
+    await recap.or(next).first().waitFor();
+    if (await recap.isVisible()) return;
+    await next.first().click();
+  }
+  throw new Error("The reveal never reached its recap");
 }
 
 /** Makes every roll of the fake gacha 0 (first common by id, then the first rare): a deterministic draw. Call before the first navigation. */

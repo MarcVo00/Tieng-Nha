@@ -372,16 +372,18 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
           ? fr.gacha.scene.shaking
           : state.phase === "omen"
             ? fr.gacha.scene.omen
-            : state.phase === "focus" && current && state.current !== null
-              ? // « Tout découvrir » announces each card as it turns; a touched card says it is turning.
-                chaining
-                ? fr.gacha.scene.cardOpen(state.current + 1, nameOf(current.itemId), fr.shop.rarities[current.rarity])
-                : fr.gacha.scene.turning
-              : state.phase === "cards"
-                ? count === 1
-                  ? fr.gacha.scene.tapOne
-                  : fr.gacha.scene.tapMany(remaining)
-                : "";
+            : state.phase === "signature"
+              ? fr.gacha.scene.signature
+              : state.phase === "focus" && current && state.current !== null
+                ? // « Tout découvrir » announces each card as it turns; a touched card says it is turning.
+                  chaining
+                  ? fr.gacha.scene.cardOpen(state.current + 1, nameOf(current.itemId), fr.shop.rarities[current.rarity])
+                  : fr.gacha.scene.turning
+                : state.phase === "cards"
+                  ? count === 1
+                    ? fr.gacha.scene.tapOne
+                    : fr.gacha.scene.tapMany(remaining)
+                  : "";
 
   function closeFocus(): void {
     if (count === 1) onClose();

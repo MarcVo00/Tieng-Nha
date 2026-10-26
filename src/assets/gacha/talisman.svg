@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 52">
+  <g id="talisman" stroke="#1F1A17" stroke-linejoin="round" stroke-linecap="round">
+    <!-- bùa : papier vàng hoè, bas entaillé en queue d'aronde -->
+    <path d="M3 2 L21 2 L21 47 L16.5 50 L12 46.5 L7.5 50 L3 47 Z" fill="#D9A93A" stroke-width="1.6"/>
+    <!-- sceau vermillon, son caractère en réserve -->
+    <rect x="6.5" y="5.5" width="11" height="11" rx="1" fill="#B23A2A" stroke-width="1.2"/>
+    <path d="M9 8.5 L15 8.5 M12 8.5 L12 14 M9.5 11.5 L14.5 11.5 M9 14 L15 14" fill="none" stroke="#F4E4C4" stroke-width="1"/>
+    <!-- formule au pinceau, encre rouge -->
+    <path d="M12 20 L12 43 M7.5 24 Q12 21.5 16.5 24 M8 30 L16 30 M8.5 35.5 Q12 39 15.5 34.5 M9.5 41 L14.5 44.5" fill="none" stroke="#B23A2A" stroke-width="1.5"/>
+  </g>
+</svg>

@@ -323,3 +323,14 @@ test("gacha cues: a rattle per shake, an omen longer for a rarer best piece (≤
   expect(omens[3]).toBeLessThanOrEqual(3);
   for (const r of ["common", "rare", "epic", "legendary"] as const) expect(end(`gacha.flip.${r}`), r).toBeLessThanOrEqual(0.6);
 });
+
+test("signature cues: a long gust, a dry brush stroke shorter than the gap between two seals, a deep gong with a long tail", () => {
+  const end = (cue: SoundCue) => {
+    const ctx = new FakeAudioContext();
+    return recipes[cue](ctx as unknown as AudioContext, ctx.createGain() as unknown as AudioNode, 0, false).end;
+  };
+  expect(end("sig.wind")).toBeGreaterThanOrEqual(1.8);
+  expect(end("sig.brush")).toBeLessThanOrEqual(0.12); // the seals catch fire 120 ms apart
+  expect(end("sig.gong")).toBeGreaterThanOrEqual(4);
+  expect(end("sig.gong")).toBeGreaterThan(end("gacha.flip.legendary"));
+});

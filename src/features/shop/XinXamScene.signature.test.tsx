@@ -6,8 +6,8 @@ import type { GachaPull, GachaPullItem } from "@/domain/types";
 import { XinXamScene } from "@/features/shop/XinXamScene";
 import { fr } from "@/i18n/fr";
 
-// Own file: the registry ships empty (Task 5 fills it), so a stub signature is registered for the guardian here. It
-// shows itself, then ends after a short beat, like a real signature.
+// Own file: the scene's hand-over around any signature, with a stub registered for the guardian (her real scene is
+// covered in XinXamScene.guardian.test.tsx). It shows itself, then ends after a short beat, like a real signature.
 vi.mock("@/features/shop/signatures", async () => {
   const { createElement, useEffect } = await import("react");
   function Stub({ onEnd }: { onEnd: () => void; reduced: boolean }) {

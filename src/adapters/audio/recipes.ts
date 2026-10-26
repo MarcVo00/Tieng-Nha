@@ -376,6 +376,59 @@ const flipLegendary = score((s, t) => {
   bell(s, t + 0.05, N.D6 * 2, 0.1, 0.5);
 });
 
+// The signature of La gardienne des talismans (spec sound-and-reveal §6.2): the gust, a brush stroke per seal, the gong.
+
+/** A breath of wind: band-passed noise that swells, gusts twice and dies away, with a hiss of air above it. */
+function gust(s: Score, start: number, length: number, level: number): void {
+  const body = s.ctx.createBufferSource();
+  body.buffer = noise(s.ctx);
+  const band = filter(s.ctx, "bandpass", 260, 0.9);
+  band.frequency.setValueAtTime(260, start);
+  band.frequency.exponentialRampToValueAtTime(900, start + length * 0.4);
+  band.frequency.exponentialRampToValueAtTime(520, start + length * 0.62);
+  band.frequency.exponentialRampToValueAtTime(1100, start + length * 0.78);
+  band.frequency.exponentialRampToValueAtTime(320, start + length);
+  const g = s.ctx.createGain();
+  g.gain.setValueAtTime(SILENT, start);
+  g.gain.linearRampToValueAtTime(level, start + length * 0.38);
+  g.gain.linearRampToValueAtTime(level * 0.55, start + length * 0.6);
+  g.gain.linearRampToValueAtTime(level * 0.9, start + length * 0.76);
+  g.gain.exponentialRampToValueAtTime(SILENT, start + length);
+  body.connect(band).connect(g).connect(s.out);
+  s.run(body, start, start + length);
+  // The hiss of the air above it.
+  const air = s.ctx.createBufferSource();
+  air.buffer = noise(s.ctx);
+  const hiss = filter(s.ctx, "highpass", 3200, 0.5);
+  const ga = envelope(s, start, level * 0.22, length * 0.45, start + length);
+  air.connect(hiss).connect(ga).connect(s.out);
+  s.run(air, start, start + length);
+}
+
+/** The gust that tears the talismans off the altar. ≈ 2.2 s. */
+const sigWind = score((s, t) => gust(s, t, 2.2, 0.55));
+
+/** A brush slapping paper: a dry, bright scuff and the soft thump of the sheet. ≤ 150 ms. */
+const sigBrush = score((s, t) => {
+  whoosh(s, t, 0.09, 4200, 1800, 0.5, 0.004, 1.4);
+  const paper = s.ctx.createBufferSource();
+  paper.buffer = noise(s.ctx);
+  const dry = filter(s.ctx, "highpass", 1500, 0.7);
+  const g = envelope(s, t, 0.32, 0.002, t + 0.05);
+  paper.connect(dry).connect(g).connect(s.out);
+  s.run(paper, t, t + 0.05);
+  wood(s, t + 0.01, 240, 0.22, 0.07, true);
+});
+
+/** The last gong: deep, struck hard, with a long tail; its octave and fifth carry it on a phone speaker. ≈ 4.5 s. */
+const sigGong = score((s, t) => {
+  gong(s, t, 55, 0.65, 4.5); // A1
+  gong(s, t, 110, 0.42, 4);
+  gong(s, t, 164.81, 0.14, 3.2);
+  thud(s, t, 120, 0.6, 0.4);
+  wood(s, t, 260, 0.3, 0.12, true); // the mallet
+});
+
 /** Shared shapes for the cues Tasks 4–6 refine (gacha, signature, fights, arena). */
 const blade = (ring: number) =>
   score((s, t, strong) => {
@@ -400,9 +453,9 @@ export const recipes: Record<SoundCue, Recipe> = {
   "gacha.flip.epic": flipEpic,
   "gacha.flip.legendary": flipLegendary,
 
-  "sig.wind": score((s, t) => whoosh(s, t, 2.0, 300, 1200, 0.3, 0.8, 0.9)),
-  "sig.brush": score((s, t) => whoosh(s, t, 0.12, 2400, 900, 0.35, 0.01, 2)),
-  "sig.gong": score((s, t) => gong(s, t, 82, 0.6, 3.5)),
+  "sig.wind": sigWind,
+  "sig.brush": sigBrush,
+  "sig.gong": sigGong,
 
   "blow.blade": blade(2400),
   "blow.staff": score((s, t, strong) => {

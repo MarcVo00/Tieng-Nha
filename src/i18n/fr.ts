@@ -792,6 +792,7 @@ export const fr = {
       tapOne: "Touche la carte pour la retourner.",
       tapMany: (n: number) => `Touche une carte\u202f: encore ${n}.`,
       turning: "La carte se retourne…",
+      signature: "Un vent se lève sur l'autel…",
       revealAll: "Tout découvrir",
       card: (n: number) => `Carte ${n}, face cachée`,
       cardOpen: (n: number, name: string, rarity: string) => `Carte ${n}\u202f: ${name}, ${rarity}`,

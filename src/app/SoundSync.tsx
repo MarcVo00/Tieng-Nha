@@ -9,7 +9,8 @@ const ACTIVATING = new Set<string>(["pointerup", "touchend", "click", "keydown"]
 
 /**
  * Keeps the sound player in step with the « Sons » setting, and unlocks audio on the first gesture. iOS suspends the
- * context when the app goes to the background, so the listeners come back each time the page is visible again.
+ * context when the app goes to the background, so the listeners come back each time the page is visible again; going to
+ * the background stops every sound.
  */
 export function SoundSync() {
   const { sound } = useServices();
@@ -34,8 +35,10 @@ export function SoundSync() {
       armed = false;
       GESTURES.forEach((type) => window.removeEventListener(type, onGesture, { capture: true }));
     };
+    // Hidden: whatever still rings (a gong's tail) stops with the app; visible again: listen for the next gesture.
     const onVisibility = () => {
       if (document.visibilityState === "visible") arm();
+      else sound.stopAll();
     };
     arm();
     document.addEventListener("visibilitychange", onVisibility);

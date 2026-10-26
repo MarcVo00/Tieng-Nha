@@ -44,3 +44,20 @@ test("reduced motion: the result directly (the recap), no tube, no omen, no card
   expect(within(dialog).getByRole("button", { name: fr.gacha.resultContinue })).toBeInTheDocument();
   expect(sound.played.map((p) => p.cue)).toEqual(["gacha.flip.legendary"]);
 });
+
+test("reduced motion never mounts the guardian's signature, nor plays its sounds", async () => {
+  const services = createFakeServices();
+  const sound = services.sound;
+  if (!(sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  const item = { itemId: "char_phap_su", rarity: "legendary" as const, duplicate: false, refund: 0 };
+  render(
+    <ServicesProvider services={services}>
+      <XinXamScene pull={{ id: "p2", theme: "legendes_sombres", count: 1, cost: 40, items: [item], createdAt: "2026-10-24T10:00:00.000Z", claimed: true }} items={[]} baseLook={{}} onClose={() => undefined} />
+    </ServicesProvider>,
+  );
+  const dialog = screen.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
+  expect(dialog).toHaveAttribute("data-phase", "recap");
+  await new Promise((r) => setTimeout(r, 300));
+  expect(dialog.querySelector("[data-signature]")).toBeNull();
+  expect(sound.played.map((p) => p.cue).filter((c) => c.startsWith("sig."))).toEqual([]);
+});

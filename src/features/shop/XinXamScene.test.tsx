@@ -7,6 +7,10 @@ import { omenDuration, REVEAL, revealAllOrder } from "@/features/shop/gachaRevea
 import { XinXamScene } from "@/features/shop/XinXamScene";
 import { fr } from "@/i18n/fr";
 
+// The generic reveal, with an empty signature registry: a legendary here gets the generic gold treatment. The guardian's
+// own signature is covered in XinXamScene.guardian.test.tsx.
+vi.mock("@/features/shop/signatures", () => ({ SIGNATURES: {}, hasSignature: () => false }));
+
 const LOOK = { character: "char_default" };
 const SLOW = { timeout: 5000 };
 const CHAIN = { timeout: 9000 };
@@ -188,7 +192,7 @@ test("a legendary without a signature: the generic gold rays, then its scroll wi
   await deal(user, dialog);
   await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(2) }));
   await waitFor(() => expect(dialog.querySelector("[data-focus] [data-fx='rays']")).not.toBeNull(), SLOW);
-  expect(dialog).toHaveAttribute("data-phase", "focus"); // the registry is empty: no signature phase
+  expect(dialog).toHaveAttribute("data-phase", "focus"); // the registry is mocked empty: no signature phase
   expect(dialog.querySelector('[data-seal="legendary"]')).toHaveTextContent(fr.shop.rarities.legendary);
 });
 

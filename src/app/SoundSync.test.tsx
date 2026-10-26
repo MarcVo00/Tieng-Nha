@@ -57,3 +57,12 @@ test("listens again when the app comes back from the background (iOS suspends au
   window.dispatchEvent(new Event("touchend"));
   expect(sound.unlocks).toBe(2);
 });
+
+test("going to the background stops every sound (no gong ringing on behind the app)", () => {
+  const sound = setup();
+  expect(sound.stopped).toBe(0);
+  setVisibility("hidden");
+  expect(sound.stopped).toBe(1);
+  setVisibility("visible");
+  expect(sound.stopped).toBe(1);
+});

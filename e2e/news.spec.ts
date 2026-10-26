@@ -13,7 +13,7 @@ test("Nouveautés: a dot on Moi until the page is opened, and the current versio
   const bar = page.getByRole("navigation", { name: fr.ui.nav.label });
   await expect(bar.getByTestId("tab-dot")).toBeVisible();
   await bar.getByRole("link", { name: fr.app.tabs.me }).click();
-  const row = page.getByRole("link", { name: fr.news.meRow("1.6.0") });
+  const row = page.getByRole("link", { name: fr.news.meRow("1.6.1") });
   await expect(row).toBeVisible();
 
   if (SHOTS) {

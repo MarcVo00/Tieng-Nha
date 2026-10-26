@@ -61,7 +61,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,svg,png,woff2,json}"],
         // Voice packs are tens of MB: fetched on demand (see runtimeCaching), never precached.
         globIgnores: ["audio/**"],
-        // First install takes control of the page, so the first-session voice prefetch goes through the cache. No skipWaiting: updates still wait for the prompt.
+        // First install takes control of the page, so the first-session voice prefetch goes through the cache. No skipWaiting here: UpdatePrompt decides when a waiting update is taken.
         clientsClaim: true,
         navigateFallback: "/index.html",
         runtimeCaching: [

@@ -2,6 +2,15 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "1.6.1",
+      "date": "2026-10-26",
+      "title": "Toujours à jour",
+      "items": [
+        "L'appli se met à jour toute seule à l'ouverture, sans rien te demander.",
+        "Jamais pendant une leçon, un examen, un dialogue ou une révision."
+      ]
+    },
+    {
       "version": "1.6.0",
       "date": "2026-10-25",
       "title": "Le tirage de la pagode",

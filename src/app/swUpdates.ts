@@ -36,3 +36,17 @@ function defaultEnv(): Env {
     clearInterval: (id) => window.clearInterval(id),
   };
 }
+
+/** An update found this soon after the app opened (or came back to the foreground) is applied at once. */
+export const LAUNCH_WINDOW_MS = 15 * 1000;
+
+type ApplyContext = { sinceOpenedMs: number; hidden: boolean; inFocusFlow: boolean };
+
+/**
+ * A waiting update is taken without asking when it cannot cost anything: right after the app opens (nothing started
+ * yet) or while it is in the background. Never during a lesson, exam, dialogue or review; then the prompt stays.
+ */
+export function shouldApplyUpdate({ sinceOpenedMs, hidden, inFocusFlow }: ApplyContext): boolean {
+  if (inFocusFlow) return false;
+  return hidden || sinceOpenedMs <= LAUNCH_WINDOW_MS;
+}

@@ -17,7 +17,9 @@ function setup() {
 
 function setVisibility(state: "visible" | "hidden") {
   Object.defineProperty(document, "visibilityState", { configurable: true, get: () => state });
-  document.dispatchEvent(new Event("visibilitychange"));
+  act(() => {
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
 }
 
 beforeEach(() => {
@@ -58,11 +60,24 @@ test("listens again when the app comes back from the background (iOS suspends au
   expect(sound.unlocks).toBe(2);
 });
 
-test("going to the background stops every sound (no gong ringing on behind the app)", () => {
+test("going to the background stops every sound and mutes cues until the app is visible again", () => {
   const sound = setup();
   expect(sound.stopped).toBe(0);
   setVisibility("hidden");
   expect(sound.stopped).toBe(1);
+  // A cue scheduled earlier (a signature's gong) fires behind the app: it is not played.
+  sound.play("sig.gong");
+  expect(sound.played).toEqual([]);
   setVisibility("visible");
   expect(sound.stopped).toBe(1);
+  sound.play("sig.gong");
+  expect(sound.played.map((p) => p.cue)).toEqual(["sig.gong"]);
+});
+
+test("coming back from the background keeps « Sons » off when it was off", () => {
+  useAppState.setState({ settings: { ...DEFAULT_SETTINGS, sound: false } });
+  const sound = setup();
+  setVisibility("hidden");
+  setVisibility("visible");
+  expect(sound.enabled).toBe(false);
 });

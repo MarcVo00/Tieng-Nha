@@ -1,6 +1,9 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createFakeServices, FakeSoundPlayer } from "@/adapters/fakes";
 import { ServicesProvider } from "@/app/ServicesProvider";
+import { SoundSync } from "@/app/SoundSync";
+import { useAppState } from "@/app/appState";
+import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import type { GachaPull, GachaPullItem } from "@/domain/types";
 import { omenDuration, REVEAL } from "@/features/shop/gachaReveal";
 import { TalismanGuardian } from "@/features/shop/signatures/TalismanGuardian";
@@ -9,7 +12,7 @@ import { XinXamScene } from "@/features/shop/XinXamScene";
 import { fr } from "@/i18n/fr";
 
 // The real registry: La gardienne des talismans plays her own scene (spec sound-and-reveal §6.2). Only setTimeout is
-// faked (the scene's beats and sounds all run on it), so the 3.5 s scene is stepped through beat by beat; clicks are
+// faked (the scene's beats and sounds all run on it), so the 3 s scene is stepped through beat by beat; clicks are
 // plain events (user-event waits on real timers).
 
 const GUARDIAN = fr.shop.items.char_phap_su?.name ?? "char_phap_su";
@@ -46,8 +49,10 @@ function fakeSound() {
 
 async function show(pull: GachaPull) {
   const { services, sound } = fakeSound();
+  useAppState.setState({ settings: { ...DEFAULT_SETTINGS, sound: true } });
   render(
     <ServicesProvider services={services}>
+      <SoundSync />
       <XinXamScene pull={pull} items={[]} baseLook={{}} onClose={() => undefined} />
     </ServicesProvider>,
   );
@@ -68,9 +73,12 @@ test("her card turns: the signature plays in the focus view (wind, twelve seals,
   expect(dialog.querySelector("[data-focus] [data-signature='char_phap_su']")).not.toBeNull();
   expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.signature);
   expect(within(dialog).queryByRole("heading", { name: GUARDIAN })).toBeNull();
+  await advance(SIG.wind - 0.05);
+  expect(dialog.querySelectorAll("[data-fx='talisman']")).toHaveLength(12); // lying on the altar
+  expect(cues(sound, "sig.")).toEqual([]);
 
-  // The gust: twelve talismans in the air.
-  await advance(SIG.wind + 0.05);
+  // The gust tears them off.
+  await advance(0.1);
   expect(dialog.querySelectorAll("[data-fx='talisman']")).toHaveLength(12);
   expect(cues(sound, "sig.")).toEqual(["sig.wind"]);
 
@@ -109,6 +117,30 @@ test("« Passer » during her signature: the recap at once, every sound stopped,
   expect(within(dialog).getByText(GUARDIAN)).toBeInTheDocument();
   await advance(SIG.end);
   expect(sound.played.length).toBe(played); // no brush, no gong, no flip after the skip
+});
+
+function setVisibility(state: "visible" | "hidden") {
+  Object.defineProperty(document, "visibilityState", { configurable: true, get: () => state });
+  act(() => {
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+}
+
+test("the app goes to the background mid-signature: what rings stops, and no later stroke, gong or flip sounds", async () => {
+  const { sound, dialog } = await show(pullOf([item("char_phap_su", "legendary")]));
+  fireEvent.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(1) }));
+  await advance(SIG.firstSeal + 0.05);
+  const before = { stopped: sound.stopped, played: sound.played.length };
+  expect(cues(sound, "sig.")).toEqual(["sig.wind", "sig.brush"]);
+  try {
+    setVisibility("hidden");
+    expect(sound.stopped).toBeGreaterThan(before.stopped);
+    await advance(SIG.end + 0.5); // the scene's timers still run behind the app
+    expect(sound.played.length).toBe(before.played);
+    expect(cues(sound, "sig.gong")).toEqual([]);
+  } finally {
+    setVisibility("visible");
+  }
 });
 
 test("two of her in one pull: each card plays its own signature when it is turned", async () => {

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 
@@ -9,16 +9,17 @@ const ACTIVATING = new Set<string>(["pointerup", "touchend", "click", "keydown"]
 
 /**
  * Keeps the sound player in step with the « Sons » setting, and unlocks audio on the first gesture. iOS suspends the
- * context when the app goes to the background, so the listeners come back each time the page is visible again; going to
- * the background stops every sound.
+ * context when the app goes to the background, so the listeners come back each time the page is visible again. While the
+ * page is hidden the player is muted: what rings stops, and a cue a scene had scheduled (a signature's gong) stays silent.
  */
 export function SoundSync() {
   const { sound } = useServices();
   const enabled = useAppState((s) => s.settings.sound);
+  const [visible, setVisible] = useState(() => document.visibilityState !== "hidden");
 
   useEffect(() => {
-    sound.setEnabled(enabled);
-  }, [sound, enabled]);
+    sound.setEnabled(enabled && visible);
+  }, [sound, enabled, visible]);
 
   useEffect(() => {
     let armed = false;
@@ -35,10 +36,10 @@ export function SoundSync() {
       armed = false;
       GESTURES.forEach((type) => window.removeEventListener(type, onGesture, { capture: true }));
     };
-    // Hidden: whatever still rings (a gong's tail) stops with the app; visible again: listen for the next gesture.
     const onVisibility = () => {
-      if (document.visibilityState === "visible") arm();
-      else sound.stopAll();
+      const shown = document.visibilityState === "visible";
+      setVisible(shown);
+      if (shown) arm();
     };
     arm();
     document.addEventListener("visibilitychange", onVisibility);

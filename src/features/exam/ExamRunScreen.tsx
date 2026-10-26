@@ -150,7 +150,7 @@ function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled
 
 // Hierarchy: the fight stage (hero vs boss, water-drop HP) is the hero, the current exercise is the one action, lives sit in the header.
 function ExamRun({ run }: { run: RunState }) {
-  const { content, exam, activity, clock, tts, stt, recorder } = useServices();
+  const { content, exam, activity, clock, tts, stt, recorder, sound } = useServices();
   const { settings } = useSettings();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
@@ -246,6 +246,7 @@ function ExamRun({ run }: { run: RunState }) {
       const t = beat.blow({ kind: "hit", ko, compact: true, attacker: heroCtl, defender: bossCtl, stage: stageCtl, reach: REACH });
       const after = t.length - t.impact;
       later(() => {
+        sound.play("answer.correct"); // on contact
         showFx(ko ? "ko" : "ink", after);
         showFx("dmg", FIGHT.number);
         setBossFace(ko && beat.reduced ? "ko" : "hurt");
@@ -263,16 +264,21 @@ function ExamRun({ run }: { run: RunState }) {
         later(() => setBossFace((f) => (f === "hurt" ? "idle" : f)), t.length);
       }
     },
-    [beat, heroCtl, bossCtl, stageCtl, later, showFx, closeGate, release],
+    [beat, heroCtl, bossCtl, stageCtl, later, showFx, closeGate, release, sound],
   );
 
   /** A wrong answer: the boss throws a wave at the hero, who winces and steps back; a heart breaks (Hearts). */
   const playMiss = useCallback(
     (lost: boolean, seq: number) => {
       setHeroFace("hurt");
-      if (beat.reduced) release(seq);
-      else {
-        later(() => release(seq), duration.base); // the heart breaks when the wave lands
+      if (beat.reduced) {
+        release(seq);
+        sound.play("heart.lost");
+      } else {
+        later(() => {
+          release(seq); // the heart breaks when the wave lands
+          sound.play("heart.lost");
+        }, duration.base);
         showFx("wave", duration.base);
         void heroCtl.body.start({ x: [null, 0, -8, 0], transition: { duration: duration.slow, times: [0, 0.55, 0.7, 1], ease: ease.out } });
       }
@@ -286,7 +292,7 @@ function ExamRun({ run }: { run: RunState }) {
         later(() => setHeroFace((f) => (f === "hurt" ? "idle" : f)), duration.slow);
       }
     },
-    [beat, heroCtl, bossCtl, later, showFx, closeGate, release],
+    [beat, heroCtl, bossCtl, later, showFx, closeGate, release, sound],
   );
 
   useEffect(() => {

@@ -7,7 +7,7 @@ export class FakeSpeechSynthesizer implements SpeechSynthesizer {
   /** Calls still speaking (lets the fake sound player tell when the voice is busy). */
   speaking = 0;
 
-  constructor(private readonly delayMs = 0) {}
+  constructor(public delayMs = 0) {}
 
   isAvailable(): boolean {
     return this.available;

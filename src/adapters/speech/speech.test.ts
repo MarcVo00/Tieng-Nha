@@ -351,3 +351,51 @@ test("interim results the caller does not accept wait for the final result", asy
   const stt = new WebSpeechRecognizer(win as never);
   await expect(stt.listen({ lang: "vi-VN", timeoutMs: 8000, acceptEarly: (alts) => alts.includes("chào anh") })).resolves.toEqual(["chào em"]);
 });
+
+describe("WebSpeechSynthesizer audioUrl clips", () => {
+  class FakeClip {
+    static last: FakeClip;
+    playbackRate = 1;
+    duration = Number.NaN;
+    onended: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    onloadedmetadata: (() => void) | null = null;
+    play = vi.fn(() => Promise.resolve());
+    constructor(public src: string) {
+      FakeClip.last = this;
+    }
+  }
+  const make = () => new WebSpeechSynthesizer({ Audio: FakeClip } as never);
+
+  afterEach(() => vi.useRealTimers());
+
+  test("resolves when the clip ends", async () => {
+    const done = make().speak("xin chào", { audioUrl: "/a.mp3", rate: 0.8 });
+    expect(FakeClip.last.playbackRate).toBe(0.8);
+    FakeClip.last.onended?.();
+    await expect(done).resolves.toBeUndefined();
+  });
+
+  test("a clip that never loads gives up after the load cap instead of hanging", async () => {
+    vi.useFakeTimers();
+    const done = make().speak("xin chào", { audioUrl: "/a.mp3" });
+    const settled = expect(done).rejects.toThrow("audio_stalled");
+    await vi.advanceTimersByTimeAsync(8000);
+    await settled;
+  });
+
+  test("a clip that loads but then goes silent resolves shortly after its expected end", async () => {
+    vi.useFakeTimers();
+    const done = make().speak("xin chào", { audioUrl: "/a.mp3", rate: 1 });
+    FakeClip.last.duration = 2;
+    FakeClip.last.onloadedmetadata?.();
+    await vi.advanceTimersByTimeAsync(2000 + 2000);
+    await expect(done).resolves.toBeUndefined();
+  });
+
+  test("an error rejects", async () => {
+    const done = make().speak("xin chào", { audioUrl: "/a.mp3" });
+    FakeClip.last.onerror?.();
+    await expect(done).rejects.toThrow("audio_failed");
+  });
+});

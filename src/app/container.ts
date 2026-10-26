@@ -67,8 +67,13 @@ export function createServices(env: Env): Services {
       : async () => ({ tts: true, stt: true, recorder: true });
   const prefetchVoice = async (id: VoiceId) => (voice instanceof AudioPackSynthesizer ? voice.prefetchVoice(id) : { done: 0, total: 0 });
   // Everything speaks through the tracked voice, so sound effects know when to stay under it.
-  const tts = trackSpeaking(voice);
+  // A cue already sounding when the voice starts ducks under it (and swells back after): the player is built after the tracker.
+  let onVoiceChange: (speaking: boolean) => void = () => undefined;
+  const tts = trackSpeaking(voice, (speaking) => onVoiceChange(speaking));
   const sound = createSoundPlayer(env, tts.isSpeaking);
+  // e2e only: lets a spec keep the fake voice "speaking" (`__voice.delayMs`, then `__tts.speak(...)`).
+  if (env.VITE_FAKE_SPEECH && env.VITE_USE_FAKES) Object.assign(window, { __voice: voice, __tts: tts });
+  if (sound instanceof WebAudioSoundPlayer) onVoiceChange = (speaking) => sound.setVoiceBusy(speaking);
 
   // Remote (fake or Supabase)
   let remote: Remote;

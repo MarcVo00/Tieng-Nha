@@ -1,8 +1,8 @@
 import { StrictMode, type ReactElement } from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { createFakeServices } from "@/adapters/fakes";
+import { createFakeServices, FakeSoundPlayer } from "@/adapters/fakes";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import type { Services } from "@/app/services";
 import { useAppState } from "@/app/appState";
@@ -236,6 +236,23 @@ test(
     await playOneWord(ui);
     await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
     expect(await screen.findByText(fr.rewards.gained("cadre", "Bronze"), {}, { timeout: 4000 })).toBeInTheDocument();
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  "an answer sounds as the feedback opens, matching it: the bright pluck when right, the soft knock when wrong",
+  async () => {
+    const { ui, services } = setup({ nowOffsetDays: 2, route: "/review/run" });
+    await seedKnownWords(services, ["v_ca_phe"]);
+    await playOneWord(ui);
+    if (!(services.sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+    const right = within(screen.getByRole("status")).queryByText(fr.ui.feedback.correct) !== null;
+    expect(services.sound.played.map((p) => p.cue)).toEqual([right ? "answer.correct" : "answer.wrong"]);
+    // Continuer never replays it.
+    await userEvent.click(screen.getByRole("button", { name: fr.ui.feedback.continue }));
+    await screen.findByText(fr.review.done.title, {}, { timeout: 4000 });
+    expect(services.sound.played).toHaveLength(1);
   },
   TEST_TIMEOUT,
 );

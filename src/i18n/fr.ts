@@ -32,6 +32,7 @@ export const fr = {
     kimBai: "+20 Kim bài",
     unlock: "Débloquer les duels",
     challenge: "Recevoir un défi",
+    sounds: "Écouter les sons",
     toast: {
       coins: "500 xu ajoutés",
       kimBai: "20 Kim bài ajoutés",

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useEntryState } from "@/app/useEntryState";
 import { useServices } from "@/app/ServicesProvider";
@@ -25,12 +25,20 @@ function isDoneState(v: unknown): v is LessonDoneState {
 // Actions: "Continuer" (home) and, when the lesson has one, the dialogue as the primary next step.
 function DoneContent({ state: given, lessonId }: { state: LessonDoneState; lessonId: string }) {
   const state = { ...given, coinsGained: typeof given.coinsGained === "number" ? given.coinsGained : 0 };
-  const { content } = useServices();
+  const { content, sound } = useServices();
   const navigate = useNavigate();
   const total = state.snapshot.xpTotal;
   const [counted, setCounted] = useState(false);
   const [shownBadges, setShownBadges] = useState(0);
   const [dialogue, setDialogue] = useState<{ id: string; title: string } | null>(null);
+
+  // The victory sounds once per visit (a ref survives StrictMode's second effect run).
+  const cheered = useRef(false);
+  useEffect(() => {
+    if (cheered.current) return;
+    cheered.current = true;
+    sound.play("lesson.won");
+  }, [sound]);
 
   // Mount showing the XP before the lesson, then count up to the new total.
   useEffect(() => {

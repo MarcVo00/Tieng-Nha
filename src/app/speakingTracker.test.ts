@@ -71,3 +71,24 @@ test("counts overlapping calls", async () => {
   expect(tracked.isSpeaking()).toBe(false);
   expect(tracked.isAvailable()).toBe(true);
 });
+
+test("onChange fires once per silence/voice transition, including cancel()", async () => {
+  const c = controllable();
+  const changes: boolean[] = [];
+  const tracked = trackSpeaking(c.tts, (speaking) => changes.push(speaking));
+  const a = tracked.speak("một");
+  const b = tracked.speak("hai"); // already speaking: no new transition
+  expect(changes).toEqual([true]);
+  c.pending[0]!.resolve();
+  await a;
+  expect(changes).toEqual([true]); // still one call in flight
+  c.pending[1]!.resolve();
+  await b;
+  expect(changes).toEqual([true, false]);
+  const d = tracked.speak("ba");
+  tracked.cancel();
+  expect(changes).toEqual([true, false, true, false]);
+  c.pending[2]!.resolve();
+  await d;
+  expect(changes).toEqual([true, false, true, false]); // the late settlement is not a transition
+});

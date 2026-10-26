@@ -100,6 +100,7 @@ export function LessonScreen() {
             voiceRate={voiceRateOf(settings)}
             services={{ tts, stt, recorder }}
             onResult={run.submit}
+            onGraded={run.graded}
             onReport={setReportRef}
             onCapabilityLost={(c) => void updateSettings({ capabilities: { ...capabilities, [c]: false } })}
           />

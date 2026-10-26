@@ -39,7 +39,7 @@ export const orderExercises = (lesson: Lesson, now: string): Exercise[] =>
 export const liveVocab = (lesson: Lesson): VocabItem[] => lesson.vocab.filter((v) => !v.deprecated);
 
 export function useLessonRun(lessonId: string | undefined) {
-  const { content, activity, clock } = useServices();
+  const { content, activity, clock, sound } = useServices();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
 
@@ -161,6 +161,7 @@ export function useLessonRun(lessonId: string | undefined) {
     const lesson = lessonRef.current;
     if (!lesson || failHandled.current) return;
     failHandled.current = true;
+    sound.play("lesson.lost");
     setPhase("failed");
     setFailPending(true);
     try {
@@ -170,7 +171,7 @@ export function useLessonRun(lessonId: string | undefined) {
       // The words simply will not be in the reviews; the failed panel still works.
     }
     if (mounted.current) setFailPending(false);
-  }, [activity]);
+  }, [activity, sound]);
 
   const submit = useCallback((result: GradeResult) => {
     const s = sessionRef.current;
@@ -192,6 +193,15 @@ export function useLessonRun(lessonId: string | undefined) {
     if (next.status === "done") void finish(next);
     else if (next.status === "failed") void fail();
   }, [activity, finish, fail]);
+
+  /** The moment an answer is graded (the feedback sheet opens): a wrong one costs a heart, so it sounds the lost heart. */
+  const graded = useCallback(
+    (result: GradeResult) => {
+      if (result.skipped) return;
+      sound.play(result.correct ? "answer.correct" : sessionRef.current?.hearts != null ? "heart.lost" : "answer.wrong");
+    },
+    [sound],
+  );
 
   const startExercises = useCallback(() => setPhase("exercises"), []);
 
@@ -236,6 +246,7 @@ export function useLessonRun(lessonId: string | undefined) {
     failPending,
     startExercises,
     submit,
+    graded,
     restart,
     retrySave,
     reload,

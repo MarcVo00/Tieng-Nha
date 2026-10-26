@@ -1,13 +1,14 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { createDemoTools } from "@/app/demoTools";
 import { useAppState } from "@/app/appState";
 import type { Services } from "@/app/services";
-import { createFakeServices, FakeDuelGateway } from "@/adapters/fakes";
+import { createFakeServices, FakeDuelGateway, FakeSoundPlayer } from "@/adapters/fakes";
 import { createStaticContentSource } from "@/adapters/content";
 import { DemoPanel } from "@/features/profile/DemoPanel";
+import { SOUND_CUES } from "@/domain/sound";
 import { fr } from "@/i18n/fr";
 import { ToastViewport } from "@/ui";
 import "@/test/routerTestEnv";
@@ -67,4 +68,20 @@ test("unlocks duels through the normal activity events, then a challenge arrives
     expect(list).toHaveLength(1);
     expect(list[0]?.myRun).toBeNull();
   });
+});
+
+test("lists every sound cue to listen to, and tapping one plays it", async () => {
+  const { services, user } = build(true);
+  if (!(services.sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  const list = screen.getByRole("group", { name: fr.demo.sounds });
+  expect(within(list).getAllByRole("button")).toHaveLength(SOUND_CUES.length);
+  await user.click(within(list).getByRole("button", { name: "heart.lost" }));
+  await user.click(within(list).getByRole("button", { name: "lesson.won" }));
+  expect(services.sound.played.map((p) => p.cue)).toEqual(["heart.lost", "lesson.won"]);
+  expect(services.sound.unlocks).toBeGreaterThan(0);
+});
+
+test("has no sound list outside demo mode", () => {
+  build(false);
+  expect(screen.queryByRole("group", { name: fr.demo.sounds })).toBeNull();
 });

@@ -16,8 +16,9 @@ const LEVEL = { normal: 1, strong: 1.5, soft: 0.2 } as const; // soft â‰¤ 0.25 Ã
 const DEDUPE_MS = 50;
 const MAX_VOICES = 6;
 const FADE_S = 0.06; // stopAll and the voice cap fade out within 80 ms
+const DUCK_S = 0.03; // a cue already sounding drops under (or comes back from) the voice in 30 ms
 
-type Sounding = { cue: SoundCue; bus: GainNode; voice: Voice };
+type Sounding = { cue: SoundCue; bus: GainNode; voice: Voice; level: number; bornSoft: boolean };
 
 type AudioWindow = { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext };
 
@@ -84,10 +85,12 @@ export class WebAudioSoundPlayer implements SoundPlayer {
         if (oldest) this.fadeOut(oldest, at);
       }
       const bus = ctx.createGain();
-      bus.gain.value = this.isVoiceBusy() ? LEVEL.soft : opts.strong ? LEVEL.strong : LEVEL.normal;
+      const level = opts.strong ? LEVEL.strong : LEVEL.normal;
+      const bornSoft = this.isVoiceBusy();
+      bus.gain.value = bornSoft ? LEVEL.soft : level;
       bus.connect(master);
       const voice = recipes[cue](ctx, bus, at, opts.strong ?? false);
-      this.sounding.push({ cue, bus, voice });
+      this.sounding.push({ cue, bus, voice, level, bornSoft });
       this.lastPlayed.set(cue, now);
     } catch {
       // A failing recipe must never break the screen that asked for a sound.
@@ -104,6 +107,27 @@ export class WebAudioSoundPlayer implements SoundPlayer {
       // nothing else to do: the context is gone
     }
     this.sounding = [];
+  }
+
+  /**
+   * Called when the voice starts or stops speaking: cues already sounding ramp down to the soft level, then back up
+   * (a cue that began under the voice stays soft). Cues starting later read `isVoiceBusy` themselves.
+   */
+  setVoiceBusy(busy: boolean): void {
+    const ctx = this.ctx;
+    if (!ctx || ctx.state !== "running") return;
+    try {
+      const at = ctx.currentTime;
+      this.sounding = this.sounding.filter((s) => s.voice.end > at);
+      for (const s of this.sounding) {
+        const g = s.bus.gain;
+        g.cancelScheduledValues(at);
+        g.setValueAtTime(g.value, at);
+        g.linearRampToValueAtTime(busy || s.bornSoft ? LEVEL.soft : s.level, at + DUCK_S);
+      }
+    } catch {
+      // The context is gone: nothing left to duck.
+    }
   }
 
   setEnabled(on: boolean): void {

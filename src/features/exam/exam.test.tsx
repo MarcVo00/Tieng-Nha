@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { createFakeServices, FakeSpeechRecognizer } from "@/adapters/fakes";
+import { createFakeServices, FakeSoundPlayer, FakeSpeechRecognizer } from "@/adapters/fakes";
 import { examPoolFixture } from "@/adapters/fakes/seed/exam";
 import { bossFixture } from "@/adapters/fakes/seed/tree";
 import { useAppState } from "@/app/appState";
@@ -306,7 +306,7 @@ describe("run", () => {
     const finishExam = vi.spyOn(services.activity, "finishExam");
     const deck = buildDeck(examPoolFixture, boss, seedFromString(ATTEMPT.attemptId), false);
     renderExam({ services, entry: { pathname: "/exam/run", state: ATTEMPT } });
-    return { deck, finishExam };
+    return { deck, finishExam, services };
   }
 
   test("the stage shows the player's hero facing Thủy Tinh, the HP as 15 water drops (no progress bar)", async () => {
@@ -391,6 +391,17 @@ describe("run", () => {
     expect(await screen.findByRole("heading", { level: 1, name: fr.exam.result.lost("Thủy Tinh") }, { timeout: 3000 })).toBeInTheDocument();
   });
 
+  test("a hit sounds the right answer, a lost life sounds the lost heart", async () => {
+    const { deck, services } = setupShortFight({});
+    const [first, second] = deck;
+    if (!first || !second) throw new Error("deck too short");
+    await screen.findByRole("progressbar", { name: fr.exam.run.bossHp("Thủy Tinh", 15, 15) });
+    await answerQuestion(first, true);
+    await waitFor(() => expect(cuesOf(services)).toEqual(["answer.correct"])); // on contact
+    await answerQuestion(second, false);
+    await waitFor(() => expect(cuesOf(services)).toEqual(["answer.correct", "heart.lost"])); // when the wave lands
+  });
+
   test("two quick hits never show two damage numbers at once", async () => {
     const { deck } = setupShortFight({});
     const [a, b] = deck;
@@ -430,6 +441,11 @@ describe("run", () => {
     TEST_TIMEOUT,
   );
 });
+
+function cuesOf(services: Services): string[] {
+  if (!(services.sound instanceof FakeSoundPlayer)) throw new Error("expected the fake sound player");
+  return services.sound.played.map((p) => p.cue);
+}
 
 describe("result", () => {
   const questions = buildDeck(examPoolFixture, bossFixture, 7, true);
@@ -550,6 +566,16 @@ describe("result", () => {
     expect(screen.getByRole("img", { name: fr.ui.hearts(4, 5) })).toBeInTheDocument();
     expect(within(headline.closest("header") as HTMLElement).getByText(fr.exam.result.mention.excellent)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: fr.exam.result.download })).toBeInTheDocument();
+  });
+
+  test("a victory sounds the victory once, a defeat the defeat once", async () => {
+    const won = renderExam({ entry: { pathname: "/exam/result", state: result({ score: 92, won: true, livesLeft: 4, bossHpLeft: 0 }) } });
+    await screen.findByRole("heading", { name: fr.exam.result.won("Thủy Tinh") });
+    expect(cuesOf(won.services)).toEqual(["lesson.won"]);
+    won.unmount();
+    const lost = renderExam({ entry: { pathname: "/exam/result", state: result({ score: 36, won: false, livesLeft: 0, bossHpLeft: 6 }) } });
+    await screen.findByRole("heading", { name: fr.exam.result.lost("Thủy Tinh") });
+    expect(cuesOf(lost.services)).toEqual(["lesson.lost"]);
   });
 
   test("a defeat shows the damage dealt, a retry and the review, no certificate", async () => {

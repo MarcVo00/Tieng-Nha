@@ -237,6 +237,38 @@ test("voice busy: a cue plays at most a quarter as loud and never stops the voic
   expect(soft.gain.value).toBeLessThanOrEqual(0.25 * normal.gain.value);
 });
 
+test("a cue already sounding ducks when the voice starts, and comes back when it stops", () => {
+  const { player, ctx } = setup();
+  player.unlock();
+  const bus = busOfNextPlay(ctx!, () => player.play("lesson.won"))!; // 1.58 s long: still sounding
+  expect(bus.gain.value).toBe(1);
+  const ramps = () => bus.gain.events.filter((e) => e.type === "linear");
+  ctx!.currentTime = 0.1;
+  player.setVoiceBusy(true);
+  expect(ramps().at(-1)).toMatchObject({ value: 0.2, time: expect.closeTo(0.13, 5) });
+  ctx!.currentTime = 0.5;
+  player.setVoiceBusy(false);
+  expect(ramps().at(-1)).toMatchObject({ value: 1 });
+});
+
+test("a cue that began under the voice stays soft when the voice stops, and a finished cue is left alone", () => {
+  let busy = true;
+  const { player, ctx } = setup({ busy: () => busy });
+  player.unlock();
+  const soft = busOfNextPlay(ctx!, () => player.play("lesson.won"))!;
+  const done = busOfNextPlay(ctx!, () => player.play("answer.wrong"))!; // 0.2 s long
+  busy = false;
+  ctx!.currentTime = 0.5; // answer.wrong is over
+  player.setVoiceBusy(false);
+  expect(soft.gain.events.filter((e) => e.type === "linear").at(-1)).toMatchObject({ value: 0.2 });
+  expect(done.gain.events.filter((e) => e.type === "linear")).toHaveLength(0);
+});
+
+test("setVoiceBusy before a gesture unlocked the context does nothing and never throws", () => {
+  const { player } = setup();
+  expect(() => player.setVoiceBusy(true)).not.toThrow();
+});
+
 test("strong: a critical hit peaks louder than a normal one", () => {
   const { player, ctx, at } = setup();
   player.unlock();

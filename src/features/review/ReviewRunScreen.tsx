@@ -137,6 +137,7 @@ export function ReviewRunScreen() {
             voiceRate={voiceRateOf(settings)}
             services={{ tts, stt, recorder }}
             onResult={run.submit}
+            onGraded={run.graded}
             onCapabilityLost={(c) => void updateSettings({ capabilities: { ...capabilities, [c]: false } })}
           />
         </div>

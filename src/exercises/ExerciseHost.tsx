@@ -15,6 +15,7 @@ export type ExerciseHostProps = {
   voiceRate: number;
   services: ExerciseServices;
   onResult: (r: GradeResult) => void; // practice: after the user taps "Continuer"
+  onGraded?: (r: GradeResult) => void; // practice: the moment the answer is graded, as the feedback sheet opens
   onReport?: (refId: string) => void;
   onCapabilityLost?: (c: "stt" | "recorder") => void;
   seedSalt?: string; // fixes the answer shuffle (duels: same order for both players)
@@ -24,7 +25,7 @@ export type ExerciseHostProps = {
 const SHAKE = { x: [0, -6, 6, -4, 4, 0] };
 const SHAKE_TRANSITION = { duration: duration.base, ease: ease.inOut };
 
-export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onReport, onCapabilityLost, seedSalt, attempt = 0 }: ExerciseHostProps) {
+export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onGraded, onReport, onCapabilityLost, seedSalt, attempt = 0 }: ExerciseHostProps) {
   const plugin = getPlugin(exercise.type);
   // Each presentation (exercise id + attempt) owns its result and its one-answer guard.
   const presentation = `${exercise.id}:${attempt}`;
@@ -41,7 +42,10 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
     answered.current = presentation;
     const r = plugin.grade(exercise, answer, { vocabIndex });
     if (mode === "exam") onResult(r);
-    else setState({ presentation, result: r });
+    else {
+      setState({ presentation, result: r });
+      onGraded?.(r);
+    }
   };
 
   const wrong = result !== null && !result.correct && !result.skipped;

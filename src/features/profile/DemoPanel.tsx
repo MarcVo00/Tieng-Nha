@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRefreshProgress } from "@/app/appState";
+import { SOUND_CUES } from "@/domain/sound";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { Button, Card, useToast } from "@/ui";
@@ -9,7 +10,7 @@ const UNLOCK_DIALOGUE = "d01";
 
 // Hierarchy: a quiet test-tools card for the demo build only; four equal secondary actions, no primary.
 export function DemoPanel() {
-  const { env, demo, activity, content } = useServices();
+  const { env, demo, activity, content, sound } = useServices();
   const refresh = useRefreshProgress();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
@@ -78,6 +79,25 @@ export function DemoPanel() {
           <Button variant="secondary" disabled={busy} onClick={() => void run(challenge)}>
             {fr.demo.challenge}
           </Button>
+        </div>
+        <div className="flex flex-col gap-2">
+          <h3 id="me-demo-sounds" className="text-body-strong text-ink">
+            {fr.demo.sounds}
+          </h3>
+          <div role="group" aria-labelledby="me-demo-sounds" className="grid grid-cols-2 gap-2">
+            {SOUND_CUES.map((cue) => (
+              <Button
+                key={cue}
+                variant="secondary"
+                onClick={() => {
+                  sound.unlock(); // this tap is the gesture that wakes the audio on iOS
+                  sound.play(cue);
+                }}
+              >
+                {cue}
+              </Button>
+            ))}
+          </div>
         </div>
       </Card>
     </section>

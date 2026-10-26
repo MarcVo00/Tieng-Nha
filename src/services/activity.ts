@@ -105,13 +105,15 @@ export function createActivityService(deps: {
   }
 
   // Same rule as the duels: the server already debited/credited, the journal only mirrors each pull once.
+  // A pull the server already marks `claimed` was applied to the xu by another device (or an earlier install): the
+  // journal of this device, which starts empty, only learns its items (cost 0, no refund), else its balance goes negative.
   let claimingPulls: Promise<unknown> = Promise.resolve();
   async function claimPulls(pulls: readonly GachaPull[]): Promise<GachaPull[]> {
     const claimed = new Set((await progress.listEvents()).filter((e) => e.type === "gacha_pulled").map((e) => e.refId));
     const added: GachaPull[] = [];
     for (const p of pulls) {
       if (claimed.has(p.id) || p.id === "" || p.items.length === 0) continue;
-      await append(ev("gacha_pulled", p.id, 0, { theme: p.theme, cost: p.cost, items: p.items.map((i) => ({ itemId: i.itemId, rarity: i.rarity, duplicate: i.duplicate, refund: i.refund })) }));
+      await append(ev("gacha_pulled", p.id, 0, { theme: p.theme, cost: p.claimed ? 0 : p.cost, items: p.items.map((i) => ({ itemId: i.itemId, rarity: i.rarity, duplicate: i.duplicate, refund: p.claimed ? 0 : i.refund })) }));
       claimed.add(p.id);
       added.push(p);
     }

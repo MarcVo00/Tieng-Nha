@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { fr } from "@/i18n/fr";
-import { onboard, seedBadges, seedCoins, seedLessonsCompleted, shakeTube } from "./helpers";
+import { fixGachaRolls, onboard, seedBadges, seedCoins, seedLessonsCompleted, shakeTube } from "./helpers";
 
 test("a badge reward frame can be equipped from Moi", async ({ page }) => {
   await onboard(page);
@@ -37,6 +37,7 @@ test("a missing gacha piece is previewed in the shop, never sold", async ({ page
 });
 
 test("pull once from the dark legends banner, see the result, and the set fills up", async ({ page }) => {
+  await fixGachaRolls(page); // deterministic: no legendary resetting the pity counter
   await onboard(page);
   // 4 perfect lessons are worth more than the 40 xu of one pull (the old crown cost 60).
   await seedLessonsCompleted(page, ["l01", "l02", "l03", "l04"], { perfect: true });

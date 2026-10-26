@@ -211,7 +211,7 @@ export function ShopScreen() {
   const noticeKey = (): string => `${useAppState.getState().wallet?.coins}|${serverRef.current}|${navigator.onLine && reachableRef.current}`;
   const fail = (text: string) => setNotice({ text, key: noticeKey() });
 
-  // One pull: the server balance is checked first (min of local and server; this also re-tests a server that was
+  // One pull: pending events are flushed, then the server balance is checked (min of local and server; this also re-tests a server that was
   // unreachable), then the idempotent pull runs; the server result is mirrored into the journal by `runGachaPull`.
   // Nothing is spent on a refusal. « Il te manque N xu » is never stored: the banner derives it from the balances.
   async function pull(theme: string, count: PullCount): Promise<void> {
@@ -220,6 +220,7 @@ export function ShopScreen() {
     setNotice(null);
     setPulling(count);
     try {
+      await services.sync.flush().catch(() => undefined); // just-earned xu reach the server before its balance is read
       const server = await checkServer();
       if (server === null) return; // the banner says why (offline)
       const have = Math.min(useAppState.getState().wallet?.coins ?? 0, server);

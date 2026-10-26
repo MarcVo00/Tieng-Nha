@@ -97,28 +97,63 @@ test("a complete set can still be pulled: everything comes back in xu", async ({
   await expect(banner(page).getByText(fr.gacha.ownedCount(12, 12))).toBeVisible();
 });
 
-test("a pull the phone never applied is recovered once, as « Tirage récupéré »", async ({ page }) => {
+test("a pull the server made but the phone never applied is recovered once, as « Tirage récupéré », debited once", async ({ page }) => {
   await fixGachaRolls(page);
   await onboard(page);
   await seedCoins(page, 100);
-  // The app asked for this pull and closed before seeing the answer: only its id is left on the phone.
-  await page.evaluate(() => localStorage.setItem("tn-gacha-pending:me", JSON.stringify([{ id: "lost-pull-1", theme: "legendes_sombres", count: 1 }])));
   await page.reload();
-
-  await expect(page.getByText(fr.gacha.recovered, { exact: true })).toHaveCount(1);
   await openShop(page);
+  await banner(page).getByRole("button", { name: fr.gacha.pullOne(40) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
-  await expect(scene).toHaveAttribute("data-phase", "recap");
-  await expect(scene.getByRole("heading", { name: fr.gacha.recovered })).toBeVisible();
-  await expect(scene.getByText(BAMBOO)).toBeVisible();
+  await shakeTube(page);
+  await scene.getByRole("button", { name: fr.gacha.scene.stick(1, fr.gacha.scene.tips.common) }).click();
   await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();
   await expect(scene).toHaveCount(0);
   await balance(page, 60);
-  expect(await page.evaluate(() => localStorage.getItem("tn-gacha-pending:me"))).toBe("[]");
+
+  // Simulate the crash: the (fake) server kept and debited the pull, the phone lost the journal entry and still has the pending id.
+  await page.evaluate(async () => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open("tieng-nha");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const tx = db.transaction("events", "readwrite");
+    const store = tx.objectStore("events");
+    const all: { clientId: string; type: string; refId: string }[] = await new Promise((res) => {
+      const q = store.getAll();
+      q.onsuccess = () => res(q.result);
+    });
+    const pulled = all.filter((e) => e.type === "gacha_pulled");
+    for (const e of pulled) store.delete(e.clientId);
+    await new Promise((res) => { tx.oncomplete = res; });
+    localStorage.setItem("tn-gacha-pending:me", JSON.stringify(pulled.map((e) => ({ id: e.refId, theme: "legendes_sombres", count: 1 }))));
+    window.dispatchEvent(new Event("online"));
+  });
+
+  const recovery = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
+  await expect(recovery).toHaveAttribute("data-phase", "recap");
+  await expect(recovery.getByRole("heading", { name: fr.gacha.recovered })).toBeVisible();
+  await expect(recovery.getByText(BAMBOO)).toBeVisible();
+  await recovery.getByRole("button", { name: fr.gacha.resultContinue }).click();
+  await expect(recovery).toHaveCount(0);
+  await balance(page, 60); // debited once, not twice
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("tn-gacha-pending:me"))).toBe("[]");
 
   // Nothing comes back a second time.
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await balance(page, 60);
+});
+
+test("a pending id the server never saw is dropped: no surprise pull, no xu spent", async ({ page }) => {
+  await fixGachaRolls(page);
+  await onboard(page);
+  await seedCoins(page, 100);
+  await page.evaluate(() => localStorage.setItem("tn-gacha-pending:me", JSON.stringify([{ id: "never-sent", theme: "legendes_sombres", count: 1 }])));
   await page.reload();
   await openShop(page);
+  await balance(page, 100);
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByText(fr.gacha.recovered, { exact: true })).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("tn-gacha-pending:me"))).toBe("[]");
 });

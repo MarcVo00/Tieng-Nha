@@ -44,16 +44,19 @@ test("at start, claims an unclaimed pull, announces « Tirage récupéré » onc
   expect(fr.gacha.recovered).toBe("Tirage récupéré");
 });
 
-test("re-sends a pending pull at start", async () => {
+test("a pending id is never re-sent at start: the server list recovers it, then it is forgotten", async () => {
   const { services, gacha, mount } = setup();
   await services.activity.demoGrant(100, 0);
+  await gacha.pull("p1", THEME, 1); // the server did it, the response was lost
   addPendingPull({ id: "p1", theme: THEME, count: 1 });
+  addPendingPull({ id: "never", theme: THEME, count: 1 }); // the server never saw this one
   const pull = vi.spyOn(gacha, "pull");
   mount();
   await flush();
-  expect(pull).toHaveBeenCalledWith("p1", THEME, 1);
+  expect(pull).not.toHaveBeenCalled();
   expect(readPendingPulls()).toEqual([]);
   expect(useRecoveredPulls.getState().recovered.map((p) => p.id)).toEqual(["p1"]);
+  expect((await services.activity.getWallet()).coins).toBe(60);
 });
 
 test("nothing to recover: no notice; the next `online` recovers what appeared while offline", async () => {

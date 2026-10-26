@@ -55,7 +55,7 @@ type Deps = Pick<Services, "gacha" | "activity">;
 /**
  * One pull, end to end: generates the id, keeps it pending, asks the server (idempotent per id), mirrors the SERVER
  * result into the journal and forgets the id. A network failure throws `OfflineError` and leaves the pull pending
- * (recovered later by `recoverGachaPulls`). A business refusal is returned and forgotten.
+ * (recovered later from the server list by `recoverGachaPulls`). A business refusal is returned and forgotten.
  */
 export async function runGachaPull(
   { gacha, activity }: Deps,
@@ -77,30 +77,19 @@ export async function runGachaPull(
 }
 
 /**
- * Brings the journal back in line with the server: retries the locally pending pulls (same id, idempotent), then
- * mirrors every pull the journal does not have. Returns the pulls to announce: those this device never applied
- * (`claimed` false on the server) that it just recovered; pulls already applied from another device are mirrored silently.
- * Offline: stops quietly (the caller retries on `online`).
+ * Brings the journal back in line with the server from `gacha.list()` ONLY: a pending id is never re-sent (an id the
+ * server never saw debited nothing, and re-sending it later would be a surprise pull). Once the list is read, every
+ * pending id not driven by a screen is forgotten: it is either in the list (claimed below) or was never debited.
+ * Returns the pulls to announce: those this device never applied (`claimed` false on the server) that it just
+ * recovered; pulls already applied from another device are mirrored silently, items only (`claimGachaPulls`).
+ * Offline or failing list: stops quietly, pending ids are kept (the caller retries on `online`).
  */
 export async function recoverGachaPulls({ gacha, activity }: Deps): Promise<GachaPull[]> {
   const recovered: GachaPull[] = [];
-  const announce = (added: GachaPull[], serverClaimed: (p: GachaPull) => boolean) => {
-    for (const p of added) if (!serverClaimed(p)) recovered.push(p);
-  };
   try {
-    for (const p of readPendingPulls()) {
-      if (active.has(p.id)) continue;
-      try {
-        const res = await gacha.pull(p.id, p.theme, p.count);
-        if (res.ok) announce(await activity.claimGachaPulls([res.pull]), (x) => x.claimed);
-        clearPendingPull(p.id);
-      } catch (e) {
-        if (e instanceof OfflineError) return recovered;
-        // any other failure keeps the id: retried at the next start
-      }
-    }
     const pulls = (await gacha.list()).filter((p) => !active.has(p.id));
-    announce(await activity.claimGachaPulls(pulls), (x) => x.claimed);
+    for (const p of await activity.claimGachaPulls(pulls)) if (!p.claimed) recovered.push(p);
+    for (const p of readPendingPulls()) if (!active.has(p.id)) clearPendingPull(p.id);
   } catch (e) {
     if (!(e instanceof OfflineError)) console.warn("Could not recover gacha pulls", e);
   }

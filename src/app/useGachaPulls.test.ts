@@ -73,34 +73,42 @@ describe("recoverGachaPulls", () => {
     expect(await journal(services)).toHaveLength(1);
   });
 
-  test("a pending id whose request never reached the server is re-sent with the same id, then claimed", async () => {
+  test("a pending id the server never saw is cleared and never sent to pull (it was never debited)", async () => {
     const { services, gacha } = make();
     await fund(services, 100);
-    addPendingPull({ id: "p1", theme: THEME, count: 1 });
+    addPendingPull({ id: "unknown", theme: THEME, count: 1 });
     const spy = vi.spyOn(gacha, "pull");
-    const recovered = await recoverGachaPulls(services);
-    expect(spy).toHaveBeenCalledWith("p1", THEME, 1);
-    expect(recovered.map((p) => p.id)).toEqual(["p1"]);
+    expect(await recoverGachaPulls(services)).toEqual([]);
+    expect(spy).not.toHaveBeenCalled();
     expect(readPendingPulls()).toEqual([]);
-    expect((await services.activity.getWallet()).coins).toBe(60);
-    expect(await journal(services)).toHaveLength(1);
+    expect(await gacha.balance()).toBe(100);
+    expect((await services.activity.getWallet()).coins).toBe(100);
+    expect(await journal(services)).toEqual([]);
   });
 
-  test("a pending id the server already knows is a replay: one debit, one event", async () => {
+  test("a pending id the server already knows is recovered through list(): one debit, one event, id cleared", async () => {
     const { services, gacha } = make();
     await fund(services, 100);
     await gacha.pull("p1", THEME, 1);
     addPendingPull({ id: "p1", theme: THEME, count: 1 });
+    const spy = vi.spyOn(gacha, "pull");
     const recovered = await recoverGachaPulls(services);
+    expect(spy).not.toHaveBeenCalled();
     expect(recovered.map((p) => p.id)).toEqual(["p1"]);
+    expect(readPendingPulls()).toEqual([]);
     expect(await gacha.balance()).toBe(60);
+    expect((await services.activity.getWallet()).coins).toBe(60);
     expect(await journal(services)).toHaveLength(1);
   });
 
-  test("a refused pending id is forgotten", async () => {
-    const { services } = make();
-    addPendingPull({ id: "p1", theme: THEME, count: 1 }); // no xu
-    expect(await recoverGachaPulls(services)).toEqual([]);
+  test("a pending id is kept when list() fails (offline or error), cleared only after a successful list", async () => {
+    const { services, gacha } = make();
+    addPendingPull({ id: "p1", theme: THEME, count: 1 });
+    vi.spyOn(gacha, "list").mockRejectedValueOnce(new Error("boom"));
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    await recoverGachaPulls(services);
+    expect(readPendingPulls()).toHaveLength(1);
+    await recoverGachaPulls(services);
     expect(readPendingPulls()).toEqual([]);
   });
 
@@ -112,6 +120,30 @@ describe("recoverGachaPulls", () => {
     vi.spyOn(gacha, "list").mockResolvedValue([{ ...res.pull, claimed: true }]);
     expect(await recoverGachaPulls(services)).toEqual([]);
     expect(await journal(services)).toHaveLength(1);
+  });
+
+  test("a fresh device mirrors pulls claimed elsewhere items-only: no negative balance, items owned", async () => {
+    const { services, gacha } = make();
+    await fund(services, 400);
+    const res = await gacha.pull("big", THEME, 10);
+    if (!res.ok) throw new Error("unreachable");
+    // A new phone: empty journal, the server already applied the pull (claimed) and holds the xu.
+    const fresh = make();
+    vi.spyOn(fresh.gacha, "list").mockResolvedValue([{ ...res.pull, claimed: true }]);
+    expect(await recoverGachaPulls(fresh.services)).toEqual([]);
+    const w = await fresh.services.activity.getWallet();
+    expect(w.coins).toBe(0);
+    expect(w.coins).toBeGreaterThanOrEqual(0);
+    for (const i of res.pull.items) expect(w.inventory).toContain(i.itemId);
+    expect(await journal(fresh.services)).toHaveLength(1);
+  });
+
+  test("an unclaimed pull keeps the full debit", async () => {
+    const { services, gacha } = make();
+    await fund(services, 100);
+    await gacha.pull("p1", THEME, 1);
+    await recoverGachaPulls(services);
+    expect((await services.activity.getWallet()).coins).toBe(60);
   });
 
   test("offline: quiet, pending kept for the next start", async () => {

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Lanterne de papier : un bâton noir tenu dans la main droite (92,122), une lanterne vermillon pendue au bout -->
+    <path d="M89.6 134 L104 86 L108 87.2 L93.8 135.4 Z" fill="#1F1A17"/>
+    <!-- cordon -->
+    <path d="M106 87 L106 93" fill="none" stroke-width="1.5"/>
+    <!-- la lanterne : corps vermillon, côtes de bambou, chapeaux d'or -->
+    <ellipse cx="106" cy="104" rx="9.5" ry="10" fill="#B23A2A"/>
+    <path d="M101 96 Q98.5 104 101 112 M111 96 Q113.5 104 111 112 M106 94 L106 114" fill="none" stroke-width="1.2"/>
+    <path d="M101 92.5 L111 92.5 L110 96 L102 96 Z M102 112 L110 112 L111 115.5 L101 115.5 Z" fill="#D9A93A" stroke-width="1.6"/>
+    <!-- gland d'or -->
+    <path d="M106 115.5 L106 119 M104 119 L108 119 L107.4 124.5 L104.6 124.5 Z" fill="#D9A93A" stroke-width="1.4"/>
+    <!-- le poing qui le tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

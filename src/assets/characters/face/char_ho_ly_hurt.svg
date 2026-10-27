@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- yeux plissés « > < » : le coup a porté -->
+    <path d="M49.5 70 L56 73.2 L49.5 76.4" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M70.5 70 L64 73.2 L70.5 76.4" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- flamme de feu de renard au front -->
+    <path d="M60 63.5 Q62.6 67 60 69.5 Q57.4 67 60 63.5 Z" fill="#9CC3BB" stroke-width="1.2"/>
+    <!-- petite bouche ouverte -->
+    <ellipse cx="60" cy="83.5" rx="2.4" ry="2.1" fill="#1F1A17" stroke="none"/>
+    <!-- joues vermillon -->
+    <circle cx="46" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <!-- goutte de sueur à la tempe -->
+    <path d="M73 61 Q69.5 66.5 70 68.5 A3.1 3.1 0 0 0 76 68.5 Q76.5 66.5 73 61 Z" fill="#9CC3BB" stroke-width="1.6" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { characterLayers, expressionFace } from "@/ui/characterLayers";
+import { CHARACTER_BODIES, characterLayers, expressionFace } from "@/ui/characterLayers";
 import { Avatar, BadgeMedal, Character, Button, Sheet, ToneMark, Hearts, ConfirmDialog, FeedbackSheet, ProgressBar } from "@/ui";
 
 test("Button shows loading state and is disabled", () => {
@@ -220,6 +220,26 @@ describe("Character layers", () => {
     const hurt = characterLayers({ character: "char_lac_long_quan" }, "hurt").find((l) => l.slot === "face")?.src;
     const ko = characterLayers({ character: "char_lac_long_quan" }, "ko").find((l) => l.slot === "face")?.src;
     expect(new Set([srcOf({ character: "char_lac_long_quan" }, "face"), hurt, ko]).size).toBe(3);
+  });
+  test("every body has its own base, face and outfit files, and three expressions", () => {
+    expect(CHARACTER_BODIES).toEqual(["hero", "char_kiem_khach", "char_phap_su", "char_lac_long_quan", "char_thay_phap", "char_ho_ly"]);
+    for (const character of CHARACTER_BODIES) {
+      const layers = characterLayers({ character });
+      expect(layers.map((l) => l.slot), character).toEqual(character === "hero" ? ["shadow", "base", "face", "outfit", "hat"] : ["shadow", "base", "face", "outfit"]);
+      const face = (expression: "idle" | "hurt" | "ko") => characterLayers({ character }, expression).find((l) => l.slot === "face")?.src;
+      expect(new Set([face("idle"), face("hurt"), face("ko")]).size, character).toBe(3);
+    }
+  });
+  test("the spirit hunter and the nine-tailed fox are bodies of their own and wear any piece", () => {
+    for (const character of ["char_thay_phap", "char_ho_ly"]) {
+      for (const slot of ["base", "face", "outfit"]) {
+        expect(srcOf({ character }, slot), `${character} ${slot}`).not.toBe(srcOf({}, slot));
+        expect(srcOf({ character }, slot), `${character} ${slot}`).toMatch(new RegExp(character));
+      }
+      const dressed = characterLayers({ character, hat: "hat_mat_na_cao", outfit: "outfit_ao_khoi", accessory: "acc_quat_giay", aura: "aura_ma_troi" });
+      expect(dressed.map((l) => l.slot)).toEqual(["aura", "shadow", "base", "face", "outfit", "hat", "accessory"]);
+      expect(dressed.find((l) => l.slot === "outfit")?.src).toMatch(/outfit_ao_khoi/);
+    }
   });
   test("an unknown character is the starting hero", () => {
     expect(characterLayers({ character: "char_future" })).toEqual(characterLayers({}));

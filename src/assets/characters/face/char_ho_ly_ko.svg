@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- yeux fermés en arcs doux, trait vermillon : le salut après le combat -->
+    <path d="M49 72 Q53 75.5 57 72 M63 72 Q67 75.5 71 72"/>
+    <path d="M49 72 L45 69.5 M71 72 L75 69.5" stroke="#B23A2A" stroke-width="2.2"/>
+    <!-- flamme de feu de renard au front -->
+    <path d="M60 63.5 Q62.6 67 60 69.5 Q57.4 67 60 63.5 Z" fill="#9CC3BB" stroke-width="1.2"/>
+    <!-- petit sourire respectueux -->
+    <path d="M57 82.5 Q60 85 63 82.5"/>
+    <!-- joues vermillon -->
+    <circle cx="46" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+  </g>
+</svg>

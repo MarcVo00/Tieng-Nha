@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <path id="aura-wisp" d="M0 7 Q-8 7 -8 -0.5 Q-8 -6 -3.5 -9 Q-4 -13 -7 -15.5 Q0 -15 1.2 -10 Q4.5 -13 2.5 -21 Q10 -12.5 7.6 -3 Q7.5 7 0 7 Z" fill="#9CC3BB" vector-effect="non-scaling-stroke"/>
+    <circle id="aura-wisp-core" cx="-0.6" cy="0.6" r="3.4" fill="#F4E4C4" stroke="none"/>
+  </defs>
+  <g id="layer-aura" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Feux follets : neuf flammes de feu de renard bleu (ma trơi) qui flottent en cercle autour du héros -->
+    <g id="aura-wisps">
+      <use href="#aura-wisp" transform="translate(11 70) rotate(-10)"/>
+      <use href="#aura-wisp-core" transform="translate(11 70) rotate(-10)"/>
+      <use href="#aura-wisp" transform="translate(10 104) rotate(-6) scale(0.9)"/>
+      <use href="#aura-wisp-core" transform="translate(10 104) rotate(-6) scale(0.9)"/>
+      <use href="#aura-wisp" transform="translate(13 136) scale(0.8)"/>
+      <use href="#aura-wisp-core" transform="translate(13 136) scale(0.8)"/>
+      <use href="#aura-wisp" transform="translate(19 34) rotate(-20) scale(0.8)"/>
+      <use href="#aura-wisp-core" transform="translate(19 34) rotate(-20) scale(0.8)"/>
+    </g>
+    <use href="#aura-wisps" transform="matrix(-1 0 0 1 120 0)"/>
+    <use href="#aura-wisp" transform="translate(60 17) scale(0.9)"/>
+    <use href="#aura-wisp-core" transform="translate(60 17) scale(0.9)"/>
+  </g>
+</svg>

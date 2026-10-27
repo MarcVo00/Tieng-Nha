@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Robe de brume : longue robe indigo dont le bas se perd dans des nuages de brume crème (seule zone à motif), fumée qui monte des manches -->
+    <!-- volutes de fumée qui s'échappent des poignets -->
+    <path d="M27 115 Q16 110 19 100 Q22 92 15 86 Q11 82 14 79 Q18 77 19 81" fill="none" stroke-width="7.5"/>
+    <path d="M93 115 Q104 110 101 100 Q98 92 105 86 Q109 82 106 79 Q102 77 101 81" fill="none" stroke-width="7.5"/>
+    <path d="M27 115 Q16 110 19 100 Q22 92 15 86 Q11 82 14 79 Q18 77 19 81 M93 115 Q104 110 101 100 Q98 92 105 86 Q109 82 106 79 Q102 77 101 81" fill="none" stroke="#F4E4C4" stroke-width="2.5"/>
+    <path d="M40 94 Q60 86 80 94 L94 118 L86 122 L81 110 L86 144 L34 144 L39 110 L34 122 L26 118 Z" fill="#2B4E6E"/>
+    <!-- col croisé noir, cordon vermillon -->
+    <path d="M51 91 L60 107 L69 91" fill="none" stroke-width="3"/>
+    <path d="M39.4 114 Q60 117 80.6 114" fill="none" stroke="#B23A2A" stroke-width="2.6"/>
+    <!-- brume en nuages d'estampe qui roule autour des pieds : lobes ronds et spirales -->
+    <path d="M25 147 Q18 147 19 140.5 Q20 134.5 27 135.5 Q28 127 37 128.5 Q41 121 50 124 Q55 118 62 122 Q70 118 74 125 Q83 122 85 130 Q94 129 94 137 Q101 139 98 145 Q96.5 147.5 92 147 Z" fill="#F4E4C4"/>
+    <path d="M30 141 Q28 137 31.5 136.5 Q35 137 33.5 140.5 M44 133 Q42 128.5 46 128 Q50 128.5 48 132.5 M63 130 Q61 125.5 65 125 Q69 125.5 67 129.5 M82 137 Q80 132.5 84 132 Q88 132.5 86 136.5 M48 142 Q54 138 60 142 Q66 138 72 142" fill="none" stroke-width="1.5"/>
+  </g>
+</svg>

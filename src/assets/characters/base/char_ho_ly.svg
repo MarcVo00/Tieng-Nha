@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-base" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- La renarde à neuf queues : neuf queues indigo en éventail derrière le corps, pointes de fourrure crème -->
+    <g fill="none">
+      <path d="M59.6 78.6 C60.1 62.7 61.3 46.2 60 28" stroke-width="16"/><path d="M60 104 C58 80 62 56 60 28" stroke-width="12"/><path d="M60 104 C58 80 62 56 60 28" stroke="#2B4E6E" stroke-width="7"/><path d="M59.6 78.6 C60.1 62.7 61.3 46.2 60 28" stroke="#2B4E6E" stroke-width="11"/><path d="M54.8 44.4 L57.7 41.4 L60.6 44.4 L63.5 41.3 L66.4 44.3 Q66.4 28 59.4 19 Q53.6 28 54.8 44.4Z" fill="#F4E4C4"/>
+      <path d="M48.6 84.1 C43.3 70.3 38.5 54.3 32 40" stroke-width="16"/><path d="M58 104 C48 88 42 62 32 40" stroke-width="12"/><path d="M58 104 C48 88 42 62 32 40" stroke="#2B4E6E" stroke-width="7"/><path d="M48.6 84.1 C43.3 70.3 38.5 54.3 32 40" stroke="#2B4E6E" stroke-width="11"/><path d="M32.2 55.6 L33.8 51.8 L37.6 53.6 L39.2 49.7 L43 51.5 Q38 37.7 28.3 31.8 Q26 42.3 32.2 55.6Z" fill="#F4E4C4"/>
+      <path d="M71.4 84.1 C76.7 70.3 81.5 54.3 88 40" stroke-width="16"/><path d="M62 104 C72 88 78 62 88 40" stroke-width="12"/><path d="M62 104 C72 88 78 62 88 40" stroke="#2B4E6E" stroke-width="7"/><path d="M71.4 84.1 C76.7 70.3 81.5 54.3 88 40" stroke="#2B4E6E" stroke-width="11"/><path d="M77 51.5 L80.8 49.7 L82.4 53.6 L86.2 51.8 L87.8 55.6 Q94 42.3 91.7 31.8 Q82 37.7 77 51.5Z" fill="#F4E4C4"/>
+      <path d="M41 91.9 C32.6 81.3 25.4 68.4 17 58" stroke-width="16"/><path d="M56 106 C40 96 30 74 17 58" stroke-width="12"/><path d="M56 106 C40 96 30 74 17 58" stroke="#2B4E6E" stroke-width="7"/><path d="M41 91.9 C32.6 81.3 25.4 68.4 17 58" stroke="#2B4E6E" stroke-width="11"/><path d="M19.7 71.5 L20.4 67.3 L24.5 68.2 L25.2 64.1 L29.3 64.9 Q22.3 54.4 11.3 51 Q11.7 61.6 19.7 71.5Z" fill="#F4E4C4"/>
+      <path d="M79 91.9 C87.4 81.3 94.5 68.4 103 58" stroke-width="16"/><path d="M64 106 C80 96 90 74 103 58" stroke-width="12"/><path d="M64 106 C80 96 90 74 103 58" stroke="#2B4E6E" stroke-width="7"/><path d="M79 91.9 C87.4 81.3 94.5 68.4 103 58" stroke="#2B4E6E" stroke-width="11"/><path d="M90.7 64.9 L94.8 64.1 L95.5 68.2 L99.6 67.3 L100.3 71.5 Q108.3 61.6 108.7 51 Q97.7 54.4 90.7 64.9Z" fill="#F4E4C4"/>
+      <path d="M35.6 98.8 C25.7 91.8 18.1 83.2 11 78" stroke-width="16"/><path d="M54 108 C34 102 22 86 11 78" stroke-width="12"/><path d="M54 108 C34 102 22 86 11 78" stroke="#2B4E6E" stroke-width="7"/><path d="M35.6 98.8 C25.7 91.8 18.1 83.2 11 78" stroke="#2B4E6E" stroke-width="11"/><path d="M13.9 87.9 L13.6 83.8 L17.8 83.6 L17.5 79.5 L21.6 79.3 Q15.3 73.3 3.7 72.7 Q6.7 82.7 13.9 87.9Z" fill="#F4E4C4"/>
+      <path d="M84.4 98.8 C94.3 91.8 101.8 83.2 109 78" stroke-width="16"/><path d="M66 108 C86 102 98 86 109 78" stroke-width="12"/><path d="M66 108 C86 102 98 86 109 78" stroke="#2B4E6E" stroke-width="7"/><path d="M84.4 98.8 C94.3 91.8 101.8 83.2 109 78" stroke="#2B4E6E" stroke-width="11"/><path d="M98.4 79.3 L102.5 79.5 L102.2 83.6 L106.4 83.8 L106.1 87.9 Q113.3 82.7 116.3 72.7 Q104.7 73.3 98.4 79.3Z" fill="#F4E4C4"/>
+      <path d="M35.7 112.9 C25.8 111.6 18.5 107.2 12 102" stroke-width="16"/><path d="M54 112 C34 116 22 110 12 102" stroke-width="12"/><path d="M54 112 C34 116 22 110 12 102" stroke="#2B4E6E" stroke-width="7"/><path d="M35.7 112.9 C25.8 111.6 18.5 107.2 12 102" stroke="#2B4E6E" stroke-width="11"/><path d="M15.2 111.4 L14.2 107.4 L18.3 106.5 L17.3 102.4 L21.4 101.6 Q15.4 96.6 5 96.4 Q8.6 107.4 15.2 111.4Z" fill="#F4E4C4"/>
+      <path d="M84.3 112.9 C94.2 111.6 101.5 107.2 108 102" stroke-width="16"/><path d="M66 112 C86 116 98 110 108 102" stroke-width="12"/><path d="M66 112 C86 116 98 110 108 102" stroke="#2B4E6E" stroke-width="7"/><path d="M84.3 112.9 C94.2 111.6 101.5 107.2 108 102" stroke="#2B4E6E" stroke-width="11"/><path d="M98.6 101.6 L102.7 102.4 L101.7 106.5 L105.8 107.4 L104.8 111.4 Q111.4 107.4 115 96.4 Q104.6 96.6 98.6 101.6Z" fill="#F4E4C4"/>
+    </g>
+    <!-- petits souliers noirs -->
+    <path d="M47 134 L45 150 L58 150 L60 137 L62 150 L75 150 L73 134 Z" fill="#1F1A17"/>
+    <!-- mains -->
+    <circle cx="28" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <!-- oreilles de renarde indigo, intérieur vermillon -->
+    <path d="M40 58 L35 27 Q48 33 55 48 Z M80 58 L85 27 Q72 33 65 48 Z" fill="#2B4E6E"/>
+    <path d="M40.5 50 L38.5 33 Q46 37 49.5 45 Z M79.5 50 L81.5 33 Q74 37 70.5 45 Z" fill="#B23A2A" stroke-width="1.5"/>
+    <!-- longue chevelure noire qui tombe dans le dos -->
+    <path d="M39 64 Q31 82 34 100 Q35 108 32 114 L46 112 Q44 100 46 88 Z M81 64 Q89 82 86 100 Q85 108 88 114 L74 112 Q76 100 74 88 Z" fill="#1F1A17"/>
+    <!-- tête -->
+    <circle cx="60" cy="70" r="22" fill="#F6DDBF"/>
+    <!-- frange droite et mèches qui encadrent le visage -->
+    <path d="M38 80 Q35 50 60 47 Q85 50 82 80 L79 80 Q79 70 76 62 L44 62 Q41 70 41 80 Z" fill="#1F1A17"/>
+  </g>
+</svg>

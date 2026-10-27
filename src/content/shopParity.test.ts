@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import shop from "@/content/shop.json";
 import badges from "@/content/badges.json";
 import { ShopFileSchema } from "@/content/schema";
+import { fr } from "@/i18n/fr";
 
 const DIR = "supabase/migrations";
 
@@ -68,13 +69,41 @@ describe("catalogue parity with the SQL migrations", () => {
     expect(ShopFileSchema.safeParse(shop).success).toBe(true);
   });
 
-  test("the gacha theme has 12 items: 4 common, 4 rare, 3 epic, 1 legendary, none directly purchasable", () => {
+  test("each gacha theme has 12 items: 4 common, 4 rare, 3 epic, 1 legendary, none directly purchasable", () => {
     const gacha = shop.items.filter((i) => "rarity" in i);
     expect(gacha.every((i) => i.price === null && i.kind === "cosmetic" && ("currency" in i ? i.currency : "xu") === "xu")).toBe(true);
-    expect(gacha.every((i) => "theme" in i && i.theme === "legendes_sombres")).toBe(true);
-    const count = (r: string) => gacha.filter((i) => "rarity" in i && i.rarity === r).length;
-    expect([count("common"), count("rare"), count("epic"), count("legendary")]).toEqual([4, 4, 3, 1]);
-    expect(gacha).toHaveLength(12);
+    const themes = [...new Set(gacha.map((i) => ("theme" in i ? i.theme : undefined)))];
+    expect(themes).toEqual(["legendes_sombres", "seigneur_des_mers", "esprits_de_la_nuit"]);
+    for (const theme of themes) {
+      const set = gacha.filter((i) => "theme" in i && i.theme === theme);
+      const count = (r: string) => set.filter((i) => "rarity" in i && i.rarity === r).length;
+      expect([count("common"), count("rare"), count("epic"), count("legendary")]).toEqual([4, 4, 3, 1]);
+      expect(set).toHaveLength(12);
+    }
+  });
+
+  test("the two new banners are exactly the items of the spec (id, slot, rarity)", () => {
+    const row = (theme: string) =>
+      shop.items.filter((i) => "theme" in i && i.theme === theme).map((i) => `${i.id}:${i.slot}:${"rarity" in i ? i.rarity : ""}`);
+    expect(row("seigneur_des_mers")).toEqual([
+      "acc_mai_cheo:accessory:common", "hat_khan_song:hat:common", "outfit_ao_luoi:outfit:common", "aura_bot_bien:aura:common",
+      "acc_dinh_ba:accessory:rare", "hat_vuong_mien_san_ho:hat:rare", "outfit_ao_thuy_trieu:outfit:rare", "aura_ngoc_trai:aura:rare",
+      "char_lac_long_quan:character:epic", "outfit_giap_vay_rong:outfit:epic", "hat_mu_rong:hat:epic", "acc_kiem_rong:accessory:legendary",
+    ]);
+    expect(row("esprits_de_la_nuit")).toEqual([
+      "acc_long_den:accessory:common", "hat_khan_den:hat:common", "outfit_ao_dem:outfit:common", "aura_dom_dom:aura:common",
+      "acc_quat_giay:accessory:rare", "hat_tram_chuong:hat:rare", "outfit_ao_khoi:outfit:rare", "aura_khoi_huong:aura:rare",
+      "hat_mat_na_cao:hat:epic", "aura_ma_troi:aura:epic", "char_thay_phap:character:epic", "char_ho_ly:character:legendary",
+    ]);
+  });
+
+  test("every catalogue item has French texts, and every gacha theme a label", () => {
+    for (const i of shop.items) expect(fr.shop.items[i.id], i.id).toBeDefined();
+    for (const i of shop.items) if ("rarity" in i && "theme" in i) expect(fr.shop.themes[i.theme], i.theme).toBeDefined();
+    expect(fr.shop.items["char_lac_long_quan"]?.name).toBe("Lạc Long Quân");
+    expect(fr.shop.items["acc_kiem_rong"]?.name).toBe("L'épée du dragon");
+    expect(fr.shop.items["char_ho_ly"]?.name).toBe("La renarde à neuf queues");
+    expect([fr.shop.themes["seigneur_des_mers"], fr.shop.themes["esprits_de_la_nuit"]]).toEqual(["Seigneur des mers", "Esprits de la nuit"]);
   });
 
   test("gacha prices, refunds and rates are those of the migration", () => {

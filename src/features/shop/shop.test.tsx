@@ -347,7 +347,7 @@ describe("gacha banner and set", () => {
   test("« Taux » opens the four rates with their refunds and the guarantees", async () => {
     const services = await make();
     const user = setup(services);
-    await user.click(await screen.findByRole("button", { name: fr.gacha.rates }));
+    await user.click(within(await banner()).getByRole("button", { name: fr.gacha.rates }));
     const sheet = await screen.findByRole("dialog", { name: fr.gacha.ratesTitle });
     const rows = within(sheet).getAllByRole("listitem");
     expect(rows.map((r) => r.textContent)).toEqual([

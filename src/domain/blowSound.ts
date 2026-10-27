@@ -10,6 +10,11 @@ export const WEAPON_FAMILY: Readonly<Record<string, WeaponFamily>> = {
   acc_giao_tre: "staff", // the bamboo spear
   acc_quat_sat: "fan",
   acc_con_vo: "staff",
+  acc_mai_cheo: "staff", // the fisherman's oar
+  acc_dinh_ba: "staff", // the coral trident
+  acc_kiem_rong: "blade", // the dragon sword
+  acc_long_den: "staff", // the lantern pole
+  acc_quat_giay: "fan",
 };
 
 const CUES: ReadonlySet<string> = new Set(SOUND_CUES);

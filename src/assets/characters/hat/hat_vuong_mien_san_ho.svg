@@ -5,7 +5,7 @@
   <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
     <!-- Couronne de corail : branches de corail vermillon qui poussent d’un bandeau d’or, perle d’écume au front -->
     <g fill="none">
-      <use href="#hat-san-ho-coral" stroke-width="7.5"/>
+      <use href="#hat-san-ho-coral" stroke-width="8.8"/>
       <use href="#hat-san-ho-coral" stroke="#B23A2A" stroke-width="3.8"/>
     </g>
     <!-- bandeau d’or -->

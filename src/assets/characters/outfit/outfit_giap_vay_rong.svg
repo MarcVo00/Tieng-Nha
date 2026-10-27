@@ -12,7 +12,8 @@
     <use href="#outfit-vay-chest" fill="url(#outfit-vay-scale)" stroke="none"/>
     <!-- miroir de cœur d’or, perle de jade -->
     <circle cx="60" cy="106" r="6.5" fill="#D9A93A" stroke-width="2"/>
-    <circle cx="60" cy="106" r="2.6" fill="#9CC3BB" stroke-width="1.4"/>
+    <circle cx="60" cy="106" r="4" fill="#F4E4C4" stroke-width="1.2"/>
+    <circle cx="60" cy="106" r="2.2" fill="#1F1A17" stroke="none"/>
     <!-- ceinture noire, boucle de corail, tassettes vertes -->
     <path d="M38 126 L82 126 L82 132 L38 132 Z" fill="#1F1A17"/>
     <path d="M38 132 L59 132 L56 142 L40 140 Z M61 132 L82 132 L80 140 L64 142 Z" fill="#4E7A4A"/>

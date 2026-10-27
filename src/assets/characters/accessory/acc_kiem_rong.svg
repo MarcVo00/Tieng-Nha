@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <path id="acc-kiem-rong-coil" d="M92 106 C104 101 104 92 92 88 C80 84 80 75 92 71 C103 67 103 58 93 55 Q86 53 85 47"/>
+  </defs>
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- L’épée du dragon : lame d’écume aux veines d’or, un dragon de jade enroulé qui sort de la garde, main droite (92,122) -->
+    <path d="M87 108 L87 30 L92 15 L97 30 L97 108 Z" fill="#F4E4C4"/>
+    <path d="M90.6 104 L90.6 31 L92 26 L93.4 31 L93.4 104 Z" fill="#D9A93A" stroke-width="1"/>
+    <!-- le dragon enroulé : contour noir, corps jade -->
+    <g fill="none">
+      <use href="#acc-kiem-rong-coil" stroke-width="7"/>
+      <use href="#acc-kiem-rong-coil" stroke="#9CC3BB" stroke-width="3.4"/>
+    </g>
+    <!-- nageoire de la queue -->
+    <path d="M85 47 L81 40 L86 42.5 L88 37 Z" fill="#B23A2A" stroke-width="1.6"/>
+    <!-- garde en tête de dragon d’or, yeux de corail -->
+    <path d="M79 111 Q80 104 86 105 L89 100 L92 104 L95 100 L98 105 Q104 104 105 111 Q99 115 92 114 Q85 115 79 111 Z" fill="#D9A93A"/>
+    <circle cx="86.5" cy="109.5" r="1.7" fill="#B23A2A" stroke-width="1"/>
+    <circle cx="97.5" cy="109.5" r="1.7" fill="#B23A2A" stroke-width="1"/>
+    <!-- poignée noire, pommeau perle de jade, gland vermillon -->
+    <path d="M89 114 L95 114 L95 132 L89 132 Z" fill="#1F1A17"/>
+    <path d="M92 138 Q91 146 86.5 151 L91 151.5 Q94 146 93.6 138.5 Z" fill="#B23A2A" stroke-width="1.8"/>
+    <circle cx="92" cy="135.5" r="3.6" fill="#9CC3BB"/>
+    <!-- le poing qui la tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Manteau des marées : long manteau indigo, ourlet de deux rangs de vagues (seule zone à motif), pèlerine d’écume festonnée -->
+    <path d="M40 94 Q60 86 80 94 L94 118 L86 122 L81 110 L86 144 L34 144 L39 110 L34 122 L26 118 Z" fill="#2B4E6E"/>
+    <path d="M60 106 L60 128" fill="none" stroke-width="1.5"/>
+    <!-- deux rangs de vagues : jade puis écume -->
+    <path d="M35.4 128 Q40 122 45 127 Q50 121 55 127 Q60 121 65 127 Q70 121 75 127 Q80 121 84.6 128 L86 144 L34 144 Z" fill="#9CC3BB" stroke-width="2"/>
+    <path d="M34.7 137 Q39 132 44 136.5 Q48.5 131.5 53 136.5 Q57 131.5 60 136 Q63 131.5 67 136.5 Q71.5 131.5 76 136.5 Q81 132 85.3 137 L86 144 L34 144 Z" fill="#F4E4C4" stroke-width="2"/>
+    <!-- poignets jade -->
+    <path d="M29.5 113 L36 117.5 M90.5 113 L84 117.5" fill="none" stroke="#9CC3BB" stroke-width="2.6"/>
+    <!-- pèlerine d’écume aux bords en vagues -->
+    <path d="M39 92.5 Q60 84 81 92.5 L91 106 Q87 102.5 83.5 106.5 Q80 101.5 75.5 105.5 Q71.5 100 67 104.5 Q63.5 99.5 60 104 Q56.5 99.5 53 104.5 Q48.5 100 44.5 105.5 Q40 101.5 36.5 106.5 Q33 102.5 29 106 Z" fill="#F4E4C4"/>
+    <!-- fermoir de corail serti d’or -->
+    <circle cx="60" cy="96" r="4.4" fill="#D9A93A" stroke-width="2"/>
+    <circle cx="60" cy="96" r="2" fill="#B23A2A" stroke-width="1.2"/>
+  </g>
+</svg>

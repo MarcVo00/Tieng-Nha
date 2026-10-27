@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-aura" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Perles flottantes : un arc de perles d’écume, chacune dans son halo de jade, la perle du dragon au sommet dans sa flamme -->
+    <!-- flamme vermillon de la perle du dragon -->
+    <path d="M60 2 Q62.5 7 66 6 Q65.5 10.5 69 12.5 Q69.5 22 60 27 Q50.5 22 51 12.5 Q54.5 10.5 54 6 Q57.5 7 60 2 Z" fill="#B23A2A" stroke-width="2"/>
+    <!-- halos de jade -->
+    <g fill="#9CC3BB" stroke-width="2">
+      <circle cx="33" cy="38" r="7.5"/>
+      <circle cx="87" cy="38" r="7.5"/>
+      <circle cx="17" cy="62" r="6.5"/>
+      <circle cx="103" cy="62" r="6.5"/>
+      <circle cx="11" cy="92" r="7"/>
+      <circle cx="109" cy="92" r="7"/>
+      <circle cx="15" cy="122" r="6"/>
+      <circle cx="105" cy="122" r="6"/>
+    </g>
+    <!-- les perles -->
+    <g fill="#F4E4C4" stroke-width="1.5">
+      <circle cx="60" cy="17" r="5.5"/>
+      <circle cx="33" cy="38" r="4.2"/>
+      <circle cx="87" cy="38" r="4.2"/>
+      <circle cx="17" cy="62" r="3.5"/>
+      <circle cx="103" cy="62" r="3.5"/>
+      <circle cx="11" cy="92" r="3.9"/>
+      <circle cx="109" cy="92" r="3.9"/>
+      <circle cx="15" cy="122" r="3.2"/>
+      <circle cx="105" cy="122" r="3.2"/>
+    </g>
+    <!-- petites bulles de jade entre les perles -->
+    <g fill="#9CC3BB" stroke-width="1.4">
+      <circle cx="45" cy="25" r="2"/>
+      <circle cx="75" cy="25" r="2"/>
+      <circle cx="23" cy="49" r="1.8"/>
+      <circle cx="97" cy="49" r="1.8"/>
+      <circle cx="12" cy="77" r="1.8"/>
+      <circle cx="108" cy="77" r="1.8"/>
+    </g>
+  </g>
+</svg>

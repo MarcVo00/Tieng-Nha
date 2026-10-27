@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Heaume du dragon : tête de dragon verte posée sur le crâne, bois d’or, crête et crinière vermillon, museau de jade -->
+    <!-- bois d’or -->
+    <path d="M45 43 Q36 31 27 16 Q33 18 37 23 Q35 14 38 7 Q43 17 43 25 Q47 34 54 39 Z M75 43 Q84 31 93 16 Q87 18 83 23 Q85 14 82 7 Q77 17 77 25 Q73 34 66 39 Z" fill="#D9A93A"/>
+    <!-- crête dorsale et crinière vermillon -->
+    <path d="M52 36 L55 22 L59 28 L62 17 L65 28 L68 25 L68 36 Z" fill="#B23A2A" stroke-width="2"/>
+    <path d="M38 58 Q26 62 21 80 Q27 76 29 82 Q32 70 39 66 Z M82 58 Q94 62 99 80 Q93 76 91 82 Q88 70 81 66 Z" fill="#B23A2A"/>
+    <!-- crâne -->
+    <path d="M36.5 64 Q33 36 60 32 Q87 36 83.5 64 Z" fill="#4E7A4A"/>
+    <!-- arcades froncées et yeux d’or à pupille fendue -->
+    <path d="M41 47 L55 50 M79 47 L65 50" fill="none" stroke-width="3"/>
+    <path d="M43 52 Q48 48.5 53 52 Q48 55.5 43 52 Z M77 52 Q72 48.5 67 52 Q72 55.5 77 52 Z" fill="#D9A93A" stroke-width="1.6"/>
+    <path d="M48 49.5 L48 54.5 M72 49.5 L72 54.5" fill="none" stroke-width="1.6"/>
+    <!-- bord d’or du heaume et museau de jade -->
+    <path d="M36 67 Q60 56 84 67 L83.5 60 Q60 50 36.5 60 Z" fill="#D9A93A"/>
+    <path d="M51 55 Q60 49 69 55 L68 63 Q60 67 52 63 Z" fill="#9CC3BB"/>
+    <circle cx="56.5" cy="58" r="1.1" fill="#1F1A17" stroke="none"/>
+    <circle cx="63.5" cy="58" r="1.1" fill="#1F1A17" stroke="none"/>
+    <!-- crocs d’écume -->
+    <path d="M53.5 63.5 L55 68.5 L57 64.6 Z M66.5 63.5 L65 68.5 L63 64.6 Z" fill="#F4E4C4" stroke-width="1.5"/>
+  </g>
+</svg>

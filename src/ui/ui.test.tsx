@@ -209,6 +209,18 @@ describe("Character layers", () => {
   test("the sorcerer has no default hat either", () => {
     expect(slots({ character: "char_phap_su" })).toEqual(["shadow", "base", "face", "outfit"]);
   });
+  test("Lạc Long Quân is a body of his own and holds the dragon sword", () => {
+    expect(slots({ character: "char_lac_long_quan" })).toEqual(["shadow", "base", "face", "outfit"]);
+    for (const slot of ["base", "face", "outfit"]) {
+      expect(srcOf({ character: "char_lac_long_quan" }, slot)).not.toBe(srcOf({}, slot));
+    }
+    const armed = characterLayers({ character: "char_lac_long_quan", accessory: "acc_kiem_rong" });
+    expect(armed.map((l) => l.slot)).toEqual(["shadow", "base", "face", "outfit", "accessory"]);
+    expect(armed.find((l) => l.slot === "accessory")?.src).toMatch(/acc_kiem_rong/);
+    const hurt = characterLayers({ character: "char_lac_long_quan" }, "hurt").find((l) => l.slot === "face")?.src;
+    const ko = characterLayers({ character: "char_lac_long_quan" }, "ko").find((l) => l.slot === "face")?.src;
+    expect(new Set([srcOf({ character: "char_lac_long_quan" }, "face"), hurt, ko]).size).toBe(3);
+  });
   test("an unknown character is the starting hero", () => {
     expect(characterLayers({ character: "char_future" })).toEqual(characterLayers({}));
     expect(characterLayers({ character: "constructor" })).toEqual(characterLayers({}));

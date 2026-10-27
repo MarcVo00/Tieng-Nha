@@ -17,6 +17,7 @@ const CHARACTERS: Record<string, Defaults> = {
   hero: HERO,
   char_kiem_khach: { base: "char_kiem_khach", face: "char_kiem_khach", outfit: "char_kiem_khach", hat: null },
   char_phap_su: { base: "char_phap_su", face: "char_phap_su", outfit: "char_phap_su", hat: null },
+  char_lac_long_quan: { base: "char_lac_long_quan", face: "char_lac_long_quan", outfit: "char_lac_long_quan", hat: null },
 };
 
 function urlOf(slot: string, id: string): string | undefined {

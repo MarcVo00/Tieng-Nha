@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <pattern id="outfit-luoi-net" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0 L0 6 M0 0 L6 0" fill="none" stroke="#1F1A17" stroke-width="0.9" opacity="0.45"/>
+    </pattern>
+    <path id="outfit-luoi-body" d="M40 94 Q60 86 80 94 L80 110 L81 130 L83 138 L63 138 L60 133 L57 138 L37 138 L39 130 L40 110 Z"/>
+  </defs>
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Tunique de filets : tunique de pêcheur couleur d’écume, couverte d’un filet (seule zone texturée) -->
+    <path d="M41 94 L26 118 L34 122 L41 110 Z M79 94 L94 118 L86 122 L79 110 Z" fill="#F4E4C4"/>
+    <use href="#outfit-luoi-body" fill="#F4E4C4"/>
+    <use href="#outfit-luoi-body" fill="url(#outfit-luoi-net)" stroke="none"/>
+    <!-- col croisé et poignets indigo -->
+    <path d="M51 91 L60 105 L69 91" fill="none" stroke="#2B4E6E" stroke-width="2.6"/>
+    <path d="M29.5 113 L36 117.5 M90.5 113 L84 117.5" fill="none" stroke="#2B4E6E" stroke-width="2.6"/>
+    <!-- ceinture de corde -->
+    <path d="M40 118 L80 118 L80 124 L40 124 Z" fill="#D9A93A" stroke-width="2"/>
+    <path d="M44 118.5 L42 123.5 M50 118.5 L48 123.5 M56 118.5 L54 123.5 M62 118.5 L60 123.5 M68 118.5 L66 123.5 M74 118.5 L72 123.5" fill="none" stroke-width="1"/>
+    <!-- flotteur vermillon et petit poisson de jade pendus à la ceinture -->
+    <path d="M47 124 L47 127 M73 124 L73 127" fill="none" stroke-width="1.4"/>
+    <ellipse cx="47" cy="131.5" rx="3.6" ry="4.6" fill="#B23A2A" stroke-width="1.8"/>
+    <path d="M73 127 Q77.5 131 73 136 Q68.5 131 73 127 Z M73 135 L70.5 139 L75.5 139 Z" fill="#9CC3BB" stroke-width="1.6"/>
+  </g>
+</svg>

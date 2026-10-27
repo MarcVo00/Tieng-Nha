@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <path id="hat-san-ho-coral" d="M60 54 L60 22 M60 40 L51 31 M51 31 L50 24 M51 31 L45 29 M60 34 L68 25 M68 25 L67 19 M48 56 L42 40 M44 46 L35 43 M42 40 L43 32 M72 56 L78 40 M76 46 L85 43 M78 40 L77 32"/>
+  </defs>
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Couronne de corail : branches de corail vermillon qui poussent d’un bandeau d’or, perle d’écume au front -->
+    <g fill="none">
+      <use href="#hat-san-ho-coral" stroke-width="7.5"/>
+      <use href="#hat-san-ho-coral" stroke="#B23A2A" stroke-width="3.8"/>
+    </g>
+    <!-- bandeau d’or -->
+    <path d="M37.5 68 Q60 55 82.5 68 L81.5 58.5 Q60 46 38.5 58.5 Z" fill="#D9A93A"/>
+    <!-- perles de jade et perle d’écume -->
+    <circle cx="47" cy="61" r="2.2" fill="#9CC3BB" stroke-width="1.5"/>
+    <circle cx="73" cy="61" r="2.2" fill="#9CC3BB" stroke-width="1.5"/>
+    <circle cx="60" cy="57.5" r="4.4" fill="#F4E4C4" stroke-width="2"/>
+    <path d="M58 55.8 Q59 54.6 60.6 54.8" fill="none" stroke="#9CC3BB" stroke-width="1.2"/>
+  </g>
+</svg>

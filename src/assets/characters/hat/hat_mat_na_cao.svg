@@ -7,7 +7,7 @@
     <path d="M81 64 L86 78 M81 64 L82 80" fill="none" stroke="#B23A2A" stroke-width="2.2"/>
     <g transform="rotate(-7 60 40)">
       <!-- feux de renard bleus au bout des oreilles -->
-      <path d="M36 14 Q33 8 37 2 Q37.5 7 40.5 6 Q41 10 39 14 Z M84 14 Q87 8 83 2 Q82.5 7 79.5 6 Q79 10 81 14 Z" fill="#9CC3BB" stroke-width="2"/>
+      <path d="M36 17 Q33 11 37 5 Q37.5 10 40.5 9 Q41 13 39 17 Z M84 17 Q87 11 83 5 Q82.5 10 79.5 9 Q79 13 81 17 Z" fill="#9CC3BB" stroke-width="2"/>
       <!-- le masque -->
       <path d="M40 46 Q37 30 38 13 Q48 18 53 28 Q60 26 67 28 Q72 18 82 13 Q83 30 80 46 Q75 56 64 61 Q60 63 56 61 Q45 56 40 46 Z" fill="#F4E4C4"/>
       <!-- intérieur des oreilles -->

@@ -3,7 +3,8 @@
     <!-- long manteau noir du chasseur, manches indigo jusqu'aux mains -->
     <path d="M41 94 L26 117 L34 122 L41 110 Z M79 94 L94 117 L86 122 L79 110 Z" fill="#2B4E6E"/>
     <path d="M40 94 Q60 86 80 94 L80 110 L85 142 L35 142 L40 110 Z" fill="#1F1A17"/>
-    <!-- col croisé crème -->
+    <!-- col croisé crème, cerné de noir -->
+    <path d="M51 91 L60 107 L69 91" fill="none" stroke-width="7.6"/>
     <path d="M51 91 L60 107 L69 91" fill="none" stroke="#F4E4C4" stroke-width="2.6"/>
     <!-- écharpe vermillon en bandoulière et ceinture -->
     <path d="M42 95 L48 92 L82 128 L77 132 Z" fill="#B23A2A" stroke-width="2"/>

@@ -134,3 +134,24 @@ test("its art: Đông Hồ SVGs under 6 KB, no filter, gradient or embedded imag
     expect(svg, file).not.toMatch(/filter|Gradient|<image/);
   }
 });
+
+test("the head and the tail roll over at a stroke: never edge-on as a hairline (scaleY never crosses 0 between keyframes)", () => {
+  for (const k of [0, SEGMENTS - 1]) {
+    const p = dragonPath(k);
+    let flipped = 0;
+    for (let i = 1; i < p.scaleY.length; i++) {
+      const a = p.scaleY[i - 1] ?? 1;
+      const b = p.scaleY[i] ?? 1;
+      expect(Math.abs(b), `${k}#${i}`).toBeGreaterThanOrEqual(0.1);
+      // A roll from one side to the other is a step (no tween through 0), at the middle of its segment.
+      if (Math.sign(a) !== Math.sign(b)) {
+        expect(p.flips, `${k}#${i}`).toContain(i - 1);
+        flipped++;
+      }
+    }
+    expect(flipped, `piece ${k} rolls over`).toBeGreaterThan(0);
+    for (const i of p.flips) expect(Math.sign(p.scaleY[i] ?? 1)).not.toBe(Math.sign(p.scaleY[i + 1] ?? 1));
+  }
+  // The body pieces never roll.
+  expect(dragonPath(5).flips).toEqual([]);
+});

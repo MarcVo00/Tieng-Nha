@@ -522,6 +522,54 @@ const sigBlade = score((s, t) => {
   bell(s, t + 0.1, 3135.96, 0.05, 0.9); // G7, the gold
 });
 
+// The signature of La renarde à neuf queues (spec more-banners §4.4): a breath per lantern, the cold fire, the bells.
+
+/** A lantern blown out: a soft puff of breath falling in pitch, the small « fwup » of the flame dying. ≤ 260 ms. */
+const sigLantern = score((s, t) => {
+  whoosh(s, t, 0.24, 900, 260, 0.3, 0.035, 0.9);
+  const flame = s.ctx.createOscillator();
+  flame.type = "sine";
+  flame.frequency.setValueAtTime(150, t);
+  flame.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+  const g = envelope(s, t, 0.18, 0.01, t + 0.14);
+  flame.connect(g).connect(s.out);
+  s.run(flame, t, t + 0.14);
+});
+
+/**
+ * Foxfire catching: a cold « whomp » of ignition, a hiss of blue flame that swells as the tails fan out, crackles
+ * scattered through it (high and dry, never warm), and a faint glassy shimmer, two sines a few hertz apart. ≈ 1.3 s.
+ */
+const sigFoxfire = score((s, t) => {
+  const len = 1.3;
+  whoosh(s, t, 0.42, 220, 1400, 0.32, 0.06, 0.9);
+  const hiss = s.ctx.createBufferSource();
+  hiss.buffer = noise(s.ctx);
+  const cold = filter(s.ctx, "highpass", 3800, 0.6);
+  const g = envelope(s, t, 0.12, len * 0.4, t + len);
+  hiss.connect(cold).connect(g).connect(s.out);
+  s.run(hiss, t, t + len);
+  const rnd = lcg(9);
+  for (let i = 0; i < 14; i++) {
+    const at = t + 0.05 + (i / 14) * (len - 0.25) + rnd() * 0.05;
+    rattle(s, at, 2400 + rnd() * 3600, 0.22 + rnd() * 0.2);
+  }
+  for (const f of [1318.5, 1323.5]) {
+    const osc = s.ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = f;
+    const gs = envelope(s, t + 0.1, 0.025, 0.3, t + len);
+    osc.connect(gs).connect(s.out);
+    s.run(osc, t + 0.1, t + len);
+  }
+});
+
+/** A ring of small bells (clochettes) shaken once round her: seven, quick, high and cold, the last one lingering. ≈ 1.8 s. */
+const sigBells = score((s, t) => {
+  [N.A5, N.D6, N.E5 * 2, N.G5 * 2, N.A5 * 2, N.D6 * 2, N.A5 * 2].forEach((f, i) => bell(s, t + i * 0.06, f, 0.07 + (i === 6 ? 0.04 : 0), 1.0 + i * 0.1));
+  whoosh(s, t, 0.6, 4000, 8000, 0.03, 0.2, 0.7);
+});
+
 // The fights (spec sound-and-reveal §4.2): each fighter strikes with the sound of its gear. A blow is ≤ 450 ms, so it
 // ends before the defender's recoil; a critical (`strong`) strikes sharper here, the player also plays it louder.
 
@@ -697,6 +745,9 @@ export const recipes: Record<SoundCue, Recipe> = {
   "sig.gong": sigGong,
   "sig.roar": sigRoar,
   "sig.blade": sigBlade,
+  "sig.lantern": sigLantern,
+  "sig.foxfire": sigFoxfire,
+  "sig.bells": sigBells,
 
   "blow.blade": blowBlade,
   "blow.staff": blowStaff,

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 112">
+  <!-- Une queue de la renarde en flamme bleue (hồ ly) : dodue et courbée comme sur son corps, indigo cerné d'encre, cœur de feu froid, bout de pinceau crème en langue de flamme. Racine en bas au centre ; elle se courbe vers la droite (l'autre côté est son miroir) -->
+  <g stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M9 66 Q0 60 2 48 Q6 55 11 54 Z M38 52 Q46 46 44 34 Q40 42 37 42 Z M12 86 Q5 84 4 76 Q9 80 13 78 Z" fill="#3F7FB8"/>
+    <path d="M18 110 C14 98 10 86 8 72 C5 54 8 38 16 26 C20 18 26 10 32 4 C34 12 38 20 38 30 C40 48 38 66 32 82 C29 92 27 102 26 110 Z" fill="#2B4E6E"/>
+    <path d="M20 104 C15 92 13 78 13 66 C13 52 17 42 23 36 C29 38 34 46 34 58 C33 74 29 90 24 104 Z" fill="#3F7FB8" stroke="none"/>
+    <path d="M22 84 C19 74 19 62 21 54 C23 48 26 44 29 44 C31 52 30 64 28 72 C26 78 24 82 22 84 Z" fill="#7CC3EC" stroke="none"/>
+    <path d="M18 70 C17 60 19 50 23 44 M30 72 C32 62 31 52 29 47" fill="none" stroke="#C9EAFB" stroke-width="1.4"/>
+    <path d="M16 26 C20 18 26 10 32 4 C34 12 38 20 38 30 C36 25 34 27 33 22 C31 28 28 26 27 20 C25 27 20 24 16 26 Z" fill="#F4E4C4"/>
+  </g>
+</svg>

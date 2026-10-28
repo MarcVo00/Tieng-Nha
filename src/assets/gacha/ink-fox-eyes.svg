@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <!-- Ses yeux s'ouvrent dans le noir : amandes d'or relevées vers les tempes, pupille fendue d'encre, une touche vermillon au coin -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M42 66 Q50 62 58 71 Q49 76 42 66 Z M78 66 Q70 62 62 71 Q71 76 78 66 Z" fill="#D9A93A" stroke="#D9A93A" stroke-width="1.2"/>
+    <path d="M50.5 65.5 L50.5 72.5 M69.5 65.5 L69.5 72.5" stroke="#1F1A17" stroke-width="2.2"/>
+    <path d="M42 66 L37 62 M78 66 L83 62" stroke="#B23A2A" stroke-width="1.8"/>
+  </g>
+</svg>

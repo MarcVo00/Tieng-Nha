@@ -42,6 +42,7 @@ Toutes les paires ci-dessous ont été vérifiées (WCAG 2.1) : texte normal ≥
 | `--frame-son-mai` | `var(--color-gold)` | cadre d'avatar « sơn mài » : anneau or + filet intérieur encre 1 px (l'or reste une récompense : on l'a acheté) | décoratif |
 | `--altar-sea` | `#1F7A80` (sombre `#5FB8B8`) | teinte de l'autel pendant le présage, bannière « Seigneur des mers » (vert-bleu de mer) | décoratif |
 | `--altar-night` | `#3A3F8F` (sombre `#8F93E6`) | teinte de l'autel pendant le présage, bannière « Esprits de la nuit » (indigo de nuit) | décoratif |
+| `--fx-foxfire` | `#7CC3EC` (identique en sombre) | feu froid bleu de la renarde à neuf queues (signature de `char_ho_ly`) : lueurs et anneau de clochettes, sur le noir de la scène | décoratif |
 
 ### 2.2 Thème sombre — « Laque noire »
 | Token CSS | Hex | Contraste |

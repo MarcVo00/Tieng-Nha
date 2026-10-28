@@ -32,6 +32,10 @@ const DRAWN = [...PATHS].reverse();
  * sword faded 0.3 s early); the holds are written into the keyframes, so they run linear between them.
  */
 const HELD = "linear";
+/** A roll over: the head or tail flips side at the middle of its segment, at a stroke (never edge-on as a hairline). */
+const STEP = (p: number) => (p < 0.5 ? 0 : 1);
+/** Per-segment easing of `scaleY`: linear between samples, a step where the piece rolls over. */
+const rollEase = (p: { times: number[]; flips: number[] }) => p.times.slice(1).map((_, i) => (p.flips.includes(i) ? STEP : "linear"));
 const GLOW = 240;
 const GLOW_AT = { x: BLADE.x + BLADE.w / 2, y: BLADE.y + 80 } as const;
 
@@ -198,7 +202,13 @@ export function DragonSword({ onEnd, reduced }: SignatureProps) {
               animate={{ x: p.x, y: p.y, rotate: p.rotate, scale: p.scale, scaleY: p.scaleY, opacity: p.opacity }}
               // "linear" between samples: the path is already sampled densely, so an eased segment would make the ink
               // hesitate at every sample; the catalogue easings are for one-segment moves.
-              transition={{ duration: FX.piece(k).length, delay: since("dragon", FX.piece(k).delay), times: p.times, ease: "linear" }}
+              transition={{
+                duration: FX.piece(k).length,
+                delay: since("dragon", FX.piece(k).delay),
+                times: p.times,
+                ease: "linear",
+                scaleY: { duration: FX.piece(k).length, delay: since("dragon", FX.piece(k).delay), times: p.times, ease: rollEase(p) },
+              }}
             />
           ))
         : null}

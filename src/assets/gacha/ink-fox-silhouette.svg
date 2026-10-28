@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <!-- La renarde dans le noir : une seule tache d'encre, cernée du bleu de son feu froid (ses queues brûlent derrière elle). Oreilles, longue chevelure, épaules tombantes, larges manches -->
+  <defs>
+    <g id="fox-shape">
+      <path d="M40 58 L35 27 Q48 33 55 48 Z M80 58 L85 27 Q72 33 65 48 Z"/>
+      <path d="M39 62 Q30 82 33 100 Q34 108 30 116 L48 112 Q46 100 52 86 Z M81 62 Q90 82 87 100 Q86 108 90 116 L72 112 Q74 100 68 86 Z"/>
+      <circle cx="60" cy="70" r="22"/>
+      <path d="M46 90 Q60 86 74 90 Q86 94 92 104 L100 124 Q94 129 86 124 L82 116 L84 140 Q88 146 82 151 L38 151 Q32 146 36 140 L38 116 L34 124 Q26 129 20 124 L28 104 Q34 94 46 90 Z"/>
+    </g>
+  </defs>
+  <use href="#fox-shape" fill="#7CC3EC" stroke="#7CC3EC" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#fox-shape" fill="#1F1A17"/>
+  <!-- l'intérieur des oreilles, vermillon, à peine -->
+  <path d="M40.5 50 L38.5 33 Q46 37 49.5 45 Z M79.5 50 L81.5 33 Q74 37 70.5 45 Z" fill="#B23A2A"/>
+</svg>

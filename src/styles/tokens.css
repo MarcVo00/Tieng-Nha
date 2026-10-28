@@ -9,7 +9,7 @@
   --color-scrim: rgb(31 26 23 / 0.35);
   --shine: rgb(255 248 238 / 0.38); /* lacquer glint on the primary button, same in every theme */
   --color-paper: #F4E4C4; /* giấy điệp: the medallion characters stand on, same in both themes */
-  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; /* Dong Ho pigments (art-direction 2), same in every theme */
+  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; --fx-foxfire: #7CC3EC; /* Dong Ho pigments (art-direction 2) and the fox's cold fire, same in every theme */
   --frame-bronze: #9A6A3A; --frame-jade: #2E7D6B; --frame-son-mai: var(--color-gold);
   --altar-sea: #1F7A80; --altar-night: #3A3F8F; /* altar tint of the omen per theme (sea green-blue, night indigo) */
   --tone-ngang: #4A5560; --tone-huyen: #3D5A99; --tone-sac: #9A5B00; --tone-hoi: #7A4B9A; --tone-nga: #1E6E78; --tone-nang: #6B4A2F;
@@ -29,7 +29,7 @@
   --color-info: #8FB0E0; --color-streak: #F07A3C;
   --color-scrim: rgb(0 0 0 / 0.55);
   --color-paper: #F4E4C4; /* giấy điệp: the medallion characters stand on, same in both themes */
-  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; /* Dong Ho pigments (art-direction 2), same in every theme */
+  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; --fx-foxfire: #7CC3EC; /* Dong Ho pigments (art-direction 2) and the fox's cold fire, same in every theme */
   --frame-bronze: #C79563; --frame-jade: #5DBB9E; --frame-son-mai: var(--color-gold);
   --altar-sea: #5FB8B8; --altar-night: #8F93E6; /* altar tint of the omen per theme (sea green-blue, night indigo) */
   --tone-ngang: #B8C2CC; --tone-huyen: #8FB0E0; --tone-sac: #E8A54B; --tone-hoi: #C9A3E6; --tone-nga: #6CC4CF; --tone-nang: #C9A27E;
@@ -49,7 +49,7 @@
   --color-info: #2C4A7A; --color-streak: #D9531E;
   --color-scrim: rgb(31 26 23 / 0.35);
   --color-paper: #F4E4C4; /* giấy điệp: the medallion characters stand on, same in both themes */
-  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; /* Dong Ho pigments (art-direction 2), same in every theme */
+  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; --fx-foxfire: #7CC3EC; /* Dong Ho pigments (art-direction 2) and the fox's cold fire, same in every theme */
   --frame-bronze: #9A6A3A; --frame-jade: #2E7D6B; --frame-son-mai: var(--color-gold);
   --altar-sea: #1F7A80; --altar-night: #3A3F8F; /* altar tint of the omen per theme (sea green-blue, night indigo) */
   --tone-ngang: #4A5560; --tone-huyen: #3D5A99; --tone-sac: #9A5B00; --tone-hoi: #7A4B9A; --tone-nga: #1E6E78; --tone-nang: #6B4A2F;
@@ -70,7 +70,7 @@
   --color-info: #8FB0E0; --color-streak: #F07A3C;
   --color-scrim: rgb(0 0 0 / 0.55);
   --color-paper: #F4E4C4; /* giấy điệp: the medallion characters stand on, same in both themes */
-  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; /* Dong Ho pigments (art-direction 2), same in every theme */
+  --fx-ink: #1F1A17; --fx-vermilion: #B23A2A; --fx-gold: #D9A93A; --fx-foxfire: #7CC3EC; /* Dong Ho pigments (art-direction 2) and the fox's cold fire, same in every theme */
   --frame-bronze: #C79563; --frame-jade: #5DBB9E; --frame-son-mai: var(--color-gold);
   --altar-sea: #5FB8B8; --altar-night: #8F93E6; /* altar tint of the omen per theme (sea green-blue, night indigo) */
   --tone-ngang: #B8C2CC; --tone-huyen: #8FB0E0; --tone-sac: #E8A54B; --tone-hoi: #C9A3E6; --tone-nga: #6CC4CF; --tone-nang: #C9A27E;

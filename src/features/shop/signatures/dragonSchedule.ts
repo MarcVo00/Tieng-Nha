@@ -227,6 +227,11 @@ export type DragonPath = {
   opacity: number[];
   /** Keyframe offsets, 0..1 over the piece's own flight (`FX.piece(k)`). */
   times: number[];
+  /**
+   * Segments (keyframe `i` to `i + 1`) where the head or the tail rolls over: `scaleY` changes sign there, so it steps
+   * at the middle of the segment instead of tweening through 0 (a 1 px hairline for a frame).
+   */
+  flips: number[];
 };
 
 /**
@@ -237,7 +242,7 @@ export type DragonPath = {
 export function dragonPath(k: number): DragonPath {
   const flight = FX.piece(k).length;
   const rolls = k === 0 || k === SEGMENTS - 1;
-  const out: DragonPath = { x: [], y: [], rotate: [], scale: [], scaleY: [], opacity: [], times: [] };
+  const out: DragonPath = { x: [], y: [], rotate: [], scale: [], scaleY: [], opacity: [], times: [], flips: [] };
   let heading: number | null = null;
   let side = 1;
   for (let i = 0; i <= SAMPLES; i++) {
@@ -265,7 +270,9 @@ export function dragonPath(k: number): DragonPath {
     out.y.push(round(p.y));
     out.rotate.push(round(angle));
     out.scale.push(Math.round(p.scale * 100) / 100);
-    out.scaleY.push(Math.round(roll * p.squeeze * 100) / 100);
+    const rolled = Math.round(roll * p.squeeze * 100) / 100;
+    if (i > 0 && Math.sign(rolled) !== Math.sign(out.scaleY[i - 1] ?? 1)) out.flips.push(i - 1);
+    out.scaleY.push(rolled);
     out.opacity.push(Math.round(p.opacity * 100) / 100);
   }
   return out;

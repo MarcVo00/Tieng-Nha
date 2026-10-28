@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { DragonSword } from "@/features/shop/signatures/DragonSword";
 import { TalismanGuardian } from "@/features/shop/signatures/TalismanGuardian";
 import type { SignatureProps } from "@/features/shop/signatures/types";
 
@@ -10,6 +11,7 @@ export type { SignatureProps };
 /** Registered signatures by item id. A legendary without an entry gets the generic gold treatment. */
 export const SIGNATURES: Readonly<Record<string, ComponentType<SignatureProps>>> = {
   char_phap_su: TalismanGuardian,
+  acc_kiem_rong: DragonSword,
 };
 
 export function hasSignature(itemId: string): boolean {

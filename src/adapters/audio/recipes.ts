@@ -429,6 +429,99 @@ const sigGong = score((s, t) => {
   wood(s, t, 260, 0.3, 0.12, true); // the mallet
 });
 
+// The signature of L'épée du dragon (spec more-banners §4.4): the roar of the ink dragon, the ring of the blade.
+
+/**
+ * The ink dragon rising: a deep growl and a rumble, ≈ 1.5 s. Low detuned saws through a lowpass that opens like a jaw
+ * then closes, roughened by a fast flutter (the throat); a rumble of low noise under it; a band of growling noise in
+ * the mid range carries it on a phone speaker, which barely plays the low voices.
+ */
+const sigRoar = score((s, t) => {
+  const len = 1.5;
+  const end = t + len;
+  // The throat's flutter: a gain whose level is shaken ≈ 28 times a second.
+  const throat = s.ctx.createGain();
+  throat.gain.value = 0.7;
+  const flutter = s.ctx.createOscillator();
+  flutter.type = "triangle";
+  flutter.frequency.setValueAtTime(22, t);
+  flutter.frequency.linearRampToValueAtTime(32, t + len * 0.4);
+  flutter.frequency.linearRampToValueAtTime(18, end);
+  const depth = s.ctx.createGain();
+  depth.gain.value = 0.3;
+  flutter.connect(depth).connect(throat.gain);
+  s.run(flutter, t, end);
+  const shape = envelope(s, t, 1, len * 0.22, end, len * 0.28);
+  throat.connect(shape).connect(s.out);
+
+  // The voice: three detuned saws, the jaw opening and closing (lowpass sweep), a slight fall in pitch.
+  const jaw = filter(s.ctx, "lowpass", 220, 4);
+  jaw.frequency.setValueAtTime(220, t);
+  jaw.frequency.exponentialRampToValueAtTime(950, t + len * 0.3);
+  jaw.frequency.exponentialRampToValueAtTime(600, t + len * 0.55);
+  jaw.frequency.exponentialRampToValueAtTime(180, end);
+  jaw.connect(throat);
+  for (const v of [
+    { f: 55, level: 0.22 },
+    { f: 57.4, level: 0.18 },
+    { f: 82.4, level: 0.12 },
+  ]) {
+    const osc = s.ctx.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(v.f * 1.08, t);
+    osc.frequency.exponentialRampToValueAtTime(v.f, t + len * 0.3);
+    osc.frequency.exponentialRampToValueAtTime(v.f * 0.86, end);
+    const g = s.ctx.createGain();
+    g.gain.value = v.level;
+    osc.connect(g).connect(jaw);
+    s.run(osc, t, end);
+  }
+
+  // The growl a phone speaker can play: band-passed noise in the mid range, shaken by the same throat.
+  const rasp = s.ctx.createBufferSource();
+  rasp.buffer = noise(s.ctx);
+  const band = filter(s.ctx, "bandpass", 420, 2.2);
+  band.frequency.setValueAtTime(380, t);
+  band.frequency.exponentialRampToValueAtTime(820, t + len * 0.3);
+  band.frequency.exponentialRampToValueAtTime(300, end);
+  const gr = s.ctx.createGain();
+  gr.gain.value = 0.55;
+  rasp.connect(band).connect(gr).connect(throat);
+  s.run(rasp, t, end);
+
+  // The rumble: low noise that swells and lingers, felt more than heard.
+  const rumble = s.ctx.createBufferSource();
+  rumble.buffer = noise(s.ctx);
+  const low = filter(s.ctx, "lowpass", 140, 0.8);
+  const gu = envelope(s, t, 0.5, len * 0.35, end);
+  rumble.connect(low).connect(gu).connect(s.out);
+  s.run(rumble, t, end);
+});
+
+/**
+ * The blade lit: a short « shing » of steel, then a bright metallic ring that sings on, beating softly (two partials a
+ * few hertz apart), with a high shimmer of gold. ≈ 1.8 s.
+ */
+const sigBlade = score((s, t) => {
+  swish(s, t, 0.12, 0.5, 0.03, 2600, 7000);
+  metal(s, t + 0.08, 1760, 0.22, 0.6);
+  for (const p of [
+    { f: 2489, amp: 0.12, len: 1.8 },
+    { f: 2493.5, amp: 0.1, len: 1.7 }, // the beat of a long blade
+    { f: 3951, amp: 0.05, len: 1.1 },
+    { f: 5274, amp: 0.025, len: 0.7 },
+  ]) {
+    const osc = s.ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = p.f;
+    const end = t + 0.08 + p.len;
+    const g = envelope(s, t + 0.08, p.amp, 0.002, end);
+    osc.connect(g).connect(s.out);
+    s.run(osc, t + 0.08, end);
+  }
+  bell(s, t + 0.1, 3135.96, 0.05, 0.9); // G7, the gold
+});
+
 // The fights (spec sound-and-reveal §4.2): each fighter strikes with the sound of its gear. A blow is ≤ 450 ms, so it
 // ends before the defender's recoil; a critical (`strong`) strikes sharper here, the player also plays it louder.
 
@@ -602,6 +695,8 @@ export const recipes: Record<SoundCue, Recipe> = {
   "sig.wind": sigWind,
   "sig.brush": sigBrush,
   "sig.gong": sigGong,
+  "sig.roar": sigRoar,
+  "sig.blade": sigBlade,
 
   "blow.blade": blowBlade,
   "blow.staff": blowStaff,

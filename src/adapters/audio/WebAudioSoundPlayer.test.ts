@@ -427,6 +427,21 @@ test("signature cues: a long gust, a dry brush stroke shorter than the gap betwe
   expect(end("sig.gong")).toBeGreaterThan(end("gacha.flip.legendary"));
 });
 
+test("the dragon sword's cues: a roar of about 1.5 s, then a blade that rings on", () => {
+  const render = (cue: SoundCue) => {
+    const ctx = new FakeAudioContext();
+    const voice = recipes[cue](ctx as unknown as AudioContext, ctx.createGain() as unknown as AudioNode, 0, false);
+    return { end: voice.end, starts: ctx.starts };
+  };
+  const roar = render("sig.roar");
+  expect(roar.end).toBeGreaterThanOrEqual(1.3);
+  expect(roar.end).toBeLessThanOrEqual(1.8);
+  expect(roar.starts).toBeGreaterThanOrEqual(4); // noise and detuned low voices together, not one tone
+  const blade = render("sig.blade");
+  expect(blade.end).toBeGreaterThanOrEqual(1.2);
+  expect(blade.end).toBeLessThanOrEqual(2.5);
+});
+
 test("fight cues: every blow has its own sound, a critical strikes sharper, the blows and the hurt stay short", () => {
   const render = (cue: SoundCue, strong = false) => {
     const ctx = new FakeAudioContext();

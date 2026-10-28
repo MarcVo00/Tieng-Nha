@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { BUDGET, peakConcurrency, STAGE } from "@/features/shop/gachaReveal";
 import { hasSignature, SIGNATURES } from "@/features/shop/signatures";
 import { DragonSword } from "@/features/shop/signatures/DragonSword";
-import { animatedSpans, BLADE, BOX, dragonCues, dragonPath, FX, MOUNTED, SEGMENTS, SIG, VEIN_BANDS } from "@/features/shop/signatures/dragonSchedule";
+import { animatedSpans, AXIS, BLADE, BODY_TURNS, BOX, dragonCues, dragonPath, FX, MOUNTED, occluderPath, poseAt, SEGMENTS, SIG, SLICE_H, VEIN_BANDS } from "@/features/shop/signatures/dragonSchedule";
 
 test("the registry: the dragon sword has its signature, next to the guardian's", () => {
   expect(hasSignature("acc_kiem_rong")).toBe(true);
@@ -35,8 +35,7 @@ test("budget (signature exception): ≤ 16 animated at once, ≤ 12 pieces of dr
   expect(MOUNTED.dragon.to).toBe(SIG.ring);
 });
 
-test("the dragon rises out of the altar, coils round the blade (big in front, small and faint behind), and dives into it", () => {
-  const axis = BLADE.x + BLADE.w / 2;
+test("the dragon rises out of the altar, coils round the blade (big in front, smaller behind, solid ink), and dives into it", () => {
   for (let k = 0; k < SEGMENTS; k++) {
     const p = dragonPath(k);
     const n = p.times.length;
@@ -47,51 +46,84 @@ test("the dragon rises out of the altar, coils round the blade (big in front, sm
     // Out of the altar: it starts hidden in its ink, on the tray.
     expect(p.opacity[0]).toBe(0);
     expect(p.y[0]).toBeGreaterThan(BLADE.y + BLADE.h - 20);
-    // The coil: it rises, and depth reads.
+    // The coil: it rises, hugging the sword, and depth reads in its size.
     expect(Math.max(...p.y) - Math.min(...p.y)).toBeGreaterThanOrEqual(150);
     expect(Math.max(...p.scale)).toBeGreaterThanOrEqual(1.05);
-    const visible = p.opacity.map((o, i) => (o > 0.05 ? (p.scale[i] ?? 0) : Infinity));
-    expect(Math.min(...visible)).toBeLessThanOrEqual(0.7);
-    expect(Math.max(...p.x) - Math.min(...p.x)).toBeGreaterThanOrEqual(120);
-    // Into the blade: it ends on the blade's axis, swallowed (invisible), never left lying around.
-    expect(p.x[n - 1]).toBeCloseTo(axis, 0);
+    const solid = p.scale.filter((_, i) => (p.opacity[i] ?? 0) === 1);
+    expect(Math.max(...solid) / Math.min(...solid)).toBeGreaterThanOrEqual(1.35);
+    for (const x of p.x) expect(Math.abs(x - AXIS)).toBeLessThanOrEqual(55);
+    // Into the blade: narrowed to it, it ends on the blade's axis, swallowed (invisible), never left lying around.
+    expect(Math.min(...p.scaleY.map(Math.abs))).toBeLessThanOrEqual(0.45);
+    expect(p.x[n - 1]).toBeCloseTo(AXIS, 0);
     expect(p.opacity[n - 1]).toBe(0);
-    for (const x of p.x) expect(x).toBeGreaterThanOrEqual(0);
-    for (const x of p.x) expect(x).toBeLessThanOrEqual(BOX.w);
     for (const y of p.y) expect(y).toBeGreaterThanOrEqual(0);
     for (const y of p.y) expect(y).toBeLessThanOrEqual(BOX.h);
   }
 });
 
-test("it passes behind the blade: where it crosses the blade at the back, it is hidden by it", () => {
-  const half = BLADE.w / 2;
-  const axis = BLADE.x + half;
-  const head = dragonPath(0);
-  let behind = 0;
-  head.x.forEach((x, i) => {
-    // Seconds since it rose: past its birth out of the pool (small, in front), before the dive.
-    const t = (head.times[i] ?? 0) * FX.flight.length;
-    const coiling = t > 0.2 && t < SIG.coil;
-    const back = (head.scale[i] ?? 1) < 0.75;
-    const crossing = Math.abs(x - axis) < half && (head.y[i] ?? 0) > BLADE.tipY;
-    if (coiling && back && crossing) {
-      behind++;
-      expect(head.opacity[i]).toBeLessThanOrEqual(0.15);
+test("it truly coils: the body wraps three quarters of a turn at once, solid ink all round", () => {
+  expect(BODY_TURNS).toBeGreaterThanOrEqual(0.75);
+  // At the end of the head's coil, the body is still wrapped round the sword: in front of it and behind it at once.
+  const at = SIG.rise + SIG.coil - 0.01;
+  const pieces = Array.from({ length: SEGMENTS }, (_, k) => poseAt(k, at));
+  expect(pieces.some((p) => p.depth > 0.5)).toBe(true);
+  expect(pieces.some((p) => p.depth < -0.5)).toBe(true);
+  expect(pieces.some((p) => p.x < AXIS - 20)).toBe(true);
+  expect(pieces.some((p) => p.x > AXIS + 20)).toBe(true);
+  // Never ghosted: once risen and until it plunges, every piece is fully opaque.
+  for (let k = 0; k < SEGMENTS; k++) {
+    for (let at = SIG.rise + k * SIG.lag + 0.2; at < SIG.headTip + k * SIG.lag; at += 0.02) expect(poseAt(k, at).opacity, `${k}@${at}`).toBe(1);
+  }
+});
+
+test("behind the sword, a slice of the blade hides it; in front, nothing does", () => {
+  const o = occluderPath();
+  expect(o.y).toHaveLength(o.times.length);
+  expect(o.opacity).toHaveLength(o.times.length);
+  let hidden = 0;
+  o.times.forEach((t, i) => {
+    const at = FX.occluder.delay + t * FX.occluder.length;
+    const pieces = Array.from({ length: SEGMENTS }, (_, k) => poseAt(k, at)).filter((p) => p.opacity > 0.05);
+    const top = o.y[i] ?? 0;
+    // A piece right behind the blade: the slice is on it.
+    for (const p of pieces.filter((q) => q.depth < -0.2 && Math.abs(q.x - AXIS) <= BLADE.half)) {
+      expect(o.opacity[i], `t=${at}`).toBe(1);
+      expect(p.y).toBeGreaterThanOrEqual(top);
+      expect(p.y).toBeLessThanOrEqual(top + SLICE_H);
+      hidden++;
+    }
+    // While shown, no piece in front crosses it.
+    if (o.opacity[i] === 1) {
+      for (const p of pieces.filter((q) => q.depth > 0.2 && Math.abs(q.x - AXIS) <= BLADE.half)) {
+        expect(p.y < top - 10 || p.y > top + SLICE_H + 10, `front at ${at}`).toBe(true);
+      }
     }
   });
-  expect(behind).toBeGreaterThan(0);
+  expect(hidden).toBeGreaterThan(0);
+  // Every pass behind is over before the veins light (the slice is of the unlit blade).
+  for (let k = 0; k < SEGMENTS; k++) {
+    for (let at = FX.occluder.delay + FX.occluder.length; at < SIG.ring; at += 0.02) {
+      const p = poseAt(k, at);
+      if (p.opacity > 0.05 && Math.abs(p.x - AXIS) <= BLADE.half + 13) expect(p.depth, `${k}@${at}`).toBeGreaterThanOrEqual(0);
+    }
+  }
 });
 
 test("the veins light down the blade as it dives, the last as it rings; no empty beat before the piece", () => {
   expect(VEIN_BANDS).toHaveLength(3);
   for (let i = 1; i < VEIN_BANDS.length; i++) expect(FX.vein(i).delay).toBeGreaterThan(FX.vein(i - 1).delay);
-  expect(FX.vein(0).delay).toBeGreaterThanOrEqual(FX.dive.delay);
+  expect(FX.vein(0).delay).toBe(SIG.headTip);
   expect(FX.vein(VEIN_BANDS.length - 1).delay + FX.vein(VEIN_BANDS.length - 1).length).toBeLessThanOrEqual(SIG.ring + 1e-9);
   // Bands tile the blade from its tip to its guard.
   expect(VEIN_BANDS[0]?.top).toBe(0);
   for (let i = 1; i < VEIN_BANDS.length; i++) expect(VEIN_BANDS[i]?.top).toBe((VEIN_BANDS[i - 1]?.top ?? 0) + (VEIN_BANDS[i - 1]?.h ?? 0));
-  expect(SIG.end - SIG.ring).toBeLessThanOrEqual(0.6);
-  expect(FX.lift.delay + FX.lift.length).toBeLessThanOrEqual(SIG.end + 1e-9);
+  // The climax holds: the dark stays until the glow peaks, the lit sword stays whole until the dark has lifted, then
+  // it gives way to the scroll at once (no empty beat).
+  expect(FX.lift.delay).toBe(SIG.blazed);
+  expect(SIG.blazed - SIG.ring).toBeGreaterThanOrEqual(0.2);
+  expect(FX.lift.delay + FX.lift.length).toBe(SIG.lifted);
+  expect(SIG.end - SIG.lifted).toBeLessThanOrEqual(0.15 + 1e-9);
+  expect(SIG.end - SIG.ring).toBeLessThanOrEqual(0.75);
   expect(FX.fade.delay + FX.fade.length).toBeLessThanOrEqual(SIG.end + 1e-9);
 });
 

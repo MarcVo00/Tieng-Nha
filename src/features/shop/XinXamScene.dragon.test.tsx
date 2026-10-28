@@ -8,6 +8,7 @@ import type { GachaPull, GachaPullItem, ShopItem } from "@/domain/types";
 import { omenDuration, REVEAL } from "@/features/shop/gachaReveal";
 import { DragonSword } from "@/features/shop/signatures/DragonSword";
 import { SIG } from "@/features/shop/signatures/dragonSchedule";
+import { SIG as GUARDIAN_SIG } from "@/features/shop/signatures/talismanSchedule";
 import { XinXamScene } from "@/features/shop/XinXamScene";
 import { fr } from "@/i18n/fr";
 
@@ -156,7 +157,7 @@ test("the sword and the guardian in one pull: each card plays its own signature 
     expect(dialog).toHaveAttribute("data-phase", "signature");
     expect(dialog.querySelectorAll("[data-signature]")).toHaveLength(1);
     expect(dialog.querySelector(`[data-signature='${id}']`)).not.toBeNull();
-    await advance(4.05);
+    await advance(Math.max(SIG.end, GUARDIAN_SIG.end) + 0.05);
     expect(dialog).toHaveAttribute("data-phase", "focus");
     expect(within(dialog).getByRole("heading", { name })).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole("button", { name: fr.gacha.resultContinue }));

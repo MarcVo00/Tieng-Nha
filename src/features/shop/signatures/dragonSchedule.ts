@@ -1,20 +1,20 @@
 import type { SoundCue } from "@/domain/sound";
 import { duration } from "@/ui/motion";
 
-// L'épée du dragon (spec more-banners §4.4) as data: one pure schedule for the beats, the sounds and the path of each
-// piece of the ink dragon. Beats are composed from the motion tokens; positions are constants of the focus view (no DOM
-// measure during the scene). The component only reads this.
+// L'épée du dragon (spec more-banners §4.4) as data: one pure schedule for the beats, the sounds, the path of each piece
+// of the ink dragon and of the slice of blade that hides it when it passes behind. Beats are composed from the motion
+// tokens; positions are constants of the focus view (no DOM measure during the scene). The component only reads this.
 
 /** The focus view the signature fills: the 256 x 264 paper stage of the reveal (a test keeps it equal to `STAGE`). */
 export const BOX = { w: 256, h: 264 } as const;
 /**
  * The sword standing on the altar tray (ink-dragon-blade.svg is 40 x 180, drawn 1:1): the pearl in its flame on top,
- * the point at 20 of the art, the guard at 112–131, its tassel over the front of the tray.
+ * the point at 20 of the art, the blade 18 px wide, the guard at 112–131, its tassel over the front of the tray.
  */
-export const BLADE = { w: 40, h: 180, x: (BOX.w - 40) / 2, y: 34, tipY: 34 + 20 } as const;
-const AXIS = BLADE.x + BLADE.w / 2;
-/** Where the dragon is born: the ink pooled on the altar tray, at the foot of the sword. */
-export const POOL = { x: AXIS, y: 206, w: 150, h: 40 } as const;
+export const BLADE = { w: 40, h: 180, x: (BOX.w - 40) / 2, y: 34, tipY: 34 + 20, half: 9 } as const;
+export const AXIS = BLADE.x + BLADE.w / 2;
+/** Where the dragon is born: ink splashed on the altar tray, at the foot of the sword. */
+export const POOL = { x: AXIS, y: 206, w: 116, h: 40 } as const;
 /** The lit veins, in three bands of the blade art from the point down to the guard (art px). */
 export const VEIN_BANDS = [
   { top: 0, h: 64 },
@@ -24,28 +24,32 @@ export const VEIN_BANDS = [
 /** The dragon: its head, ten pieces of body, its tail (each piece an element: ≤ 12 per scene). */
 export const SEGMENTS = 12;
 /**
- * The coil: a rising helix round the sword, flattened (ry = rx · FLAT) so the pass in front is low and the pass behind
- * high. It springs out wide from the pool, then tightens as it climbs towards the point.
+ * The coil: one turn of a rising helix hugging the sword. It starts at the left of the blade, low on the tray, springs
+ * out of the ink, passes behind the blade, comes round in front of it higher up and ends at the left again, near the
+ * point, where it dives. The climb between the pass behind and the pass in front keeps them apart in height, so the
+ * slice of blade that hides the pass behind never hides the pass in front.
  */
-const COIL = { cyFrom: 200, cyTo: 78, rxStart: 12, rxWide: 100, rxTo: 52, flat: 0.3, open: 0.12, turns: 1.25 } as const;
-/** Depth cues: scale of a piece at the back (-1) and the front (+1) of the coil, and its opacity behind. */
-const DEPTH = { back: 0.68, front: 1.15, dim: 0.65 } as const;
-/** Behind the sword: a piece whose centre is this close to its axis is hidden by the blade. */
-const BEHIND = 22;
-/** How dark the card gets: a storm over the altar (the black ink must still read on it). */
-export const DARK = 0.55;
+const COIL = { cyFrom: 210, cyTo: 50, rxStart: 26, rxWide: 50, rxTo: 30, flat: 0.45, open: 0.2, turns: 1, from: Math.PI } as const;
+/** How much of a turn the body wraps at once (head to tail): it visibly coils round the sword. */
+export const BODY_TURNS = 0.78;
+/** Depth: the scale of a piece at the back (-1) and the front (+1) of the coil. The ink stays solid black all round. */
+const DEPTH = { back: 0.78, front: 1.12 } as const;
+/** How dark the card gets: a storm over the altar (the black ink must still read on it, the gold must blaze). */
+export const DARK = 0.6;
 
-/** Beats in seconds from the start of the signature (≈ 3.8 s in all). */
+/** Beats in seconds from the start of the signature (≈ 3.7 s in all). */
 export const SIG = (() => {
   const darken = duration.slow; // the card darkens, the sword waits on the altar
   const rise = duration.base; // the dragon rises out of the ink on the tray, roaring
-  const coil = duration.loop + duration.slow + duration.base; // one and a quarter turns round the sword
+  const coil = duration.loop; // one turn round the sword (the head's)
   const dive = duration.slow; // up over the point, and down onto it
   const plunge = duration.base; // into the blade, swallowed by it
-  const lag = duration.base / 5; // each piece follows the one before it along the same path
+  const lag = (coil * BODY_TURNS) / COIL.turns / (SEGMENTS - 1); // each piece follows the one before along the same path
   const headTip = rise + coil + dive;
   const ring = headTip + plunge + (SEGMENTS - 1) * lag; // the tail is in: the blade rings
-  const flare = duration.slow + duration.base; // the blade blazes and the dark lifts
+  const blaze = duration.base; // the glow swells to its peak, on the dark
+  const lift = duration.slow; // then the dark lifts round the blazing sword
+  const handOver = duration.fast; // the sword gives way to the scroll
   return {
     darken,
     rise,
@@ -57,8 +61,12 @@ export const SIG = (() => {
     headTip,
     /** The whole dragon is inside the blade: the metallic ring, the flare. */
     ring,
-    /** The scroll takes over as the flare fades: no empty beat between the ring and the sword. */
-    end: ring + flare,
+    /** The glow at its peak: until then the dark holds. */
+    blazed: ring + blaze,
+    /** The dark has lifted; the lit sword is still whole. */
+    lifted: ring + blaze + lift,
+    /** The sword has given way: the scroll takes over (no empty beat). */
+    end: ring + blaze + lift + handOver,
   } as const;
 })();
 
@@ -73,7 +81,7 @@ export function dragonCues(): SignatureCue[] {
 }
 
 /** What is on screen: mounted between `from` and `to` (seconds), unmounted outside. */
-export type Beat = "blade" | "pool" | "dragon" | "veins" | "flare";
+export type Beat = "blade" | "pool" | "dragon" | "occluder" | "veins" | "flare";
 
 export type Span = { delay: number; length: number };
 
@@ -82,35 +90,43 @@ export type Span = { delay: number; length: number };
  * relative to its element's mount), so the budget below counts what is actually animated.
  */
 export const FX = {
-  /** The ink overlay: it spreads, then lifts at the ring. */
+  /** The ink overlay: it spreads, holds through the ring, then lifts once the glow has peaked (one element, two spans
+   * that never overlap, so it counts once at any time). */
   darken: { delay: 0, length: SIG.darken },
-  lift: { delay: SIG.ring, length: duration.slow },
+  lift: { delay: SIG.blazed, length: SIG.lifted - SIG.blazed },
   /** The sword appears on the altar. */
   bladeIn: { delay: 0, length: SIG.darken },
-  /** The ink pooled on the tray: it spreads as the dragon rises out of it, and is gone once it has left. */
-  pool: { delay: SIG.rise, length: duration.celebrate },
-  /** One piece of the dragon: the whole flight, from the pool to inside the blade. */
+  /** The ink splashed on the tray: it spreads as the dragon rises out of it, and is gone once its tail has left. */
+  pool: { delay: SIG.rise, length: duration.celebrate + (SEGMENTS - 1) * SIG.lag }, // until the tail has risen out of it
+  /** The head's whole flight, from the pool to inside the blade. */
   flight: { delay: SIG.rise, length: SIG.ring - SIG.rise },
-  /** The dive itself (the head leaves the coil). */
-  dive: { delay: SIG.rise + SIG.coil, length: SIG.dive + SIG.plunge },
+  /**
+   * Piece `k`'s flight: from the moment it rises out of the pool (it waits unseen before), so the twelve start on
+   * different frames rather than all at once (4x CPU), to inside the blade with the tail.
+   */
+  piece: (k: number): Span => ({ delay: SIG.rise + k * SIG.lag, length: SIG.ring - SIG.rise - k * SIG.lag }),
+  /** The slice of blade drawn over the dragon where it passes behind (two elements: the slice and the art in it). */
+  occluder: { delay: SIG.darken, length: SIG.headTip - SIG.darken },
   /** Vein band `i` lights, from the point down, as the dragon pours in; the last as it rings. */
   vein: (i: number): Span => {
     const step = (SIG.ring - duration.base - SIG.headTip) / (VEIN_BANDS.length - 1);
     return { delay: SIG.headTip + i * step, length: duration.base };
   },
-  /** The ring: the blade pulses and fades out as the scroll comes. */
+  /** The ring: the lit blade swells, holds whole while the dark lifts, then gives way to the scroll. */
   fade: { delay: SIG.ring, length: SIG.end - SIG.ring },
-  /** The flare of gold behind the blade. */
+  /** The flare of gold behind the blade: it swells on the dark, then fades with it. */
   glow: { delay: SIG.ring, length: SIG.end - SIG.ring },
 } as const;
 
 export const MOUNTED: Readonly<Record<Beat, { from: number; to: number }>> = {
   blade: { from: 0, to: SIG.end },
+  // Every part lands on a frame of its own, away from the card opening and from any other mount or start, so no frame
+  // carries two of them (4x CPU): the pool, the dragon's pieces, the occluder when it starts, the veins mid-coil, well
+  // before they light.
   pool: { from: duration.instant, to: FX.pool.delay + FX.pool.length },
-  // The pool and the dragon's pieces land on frames of their own after the card opens, so neither weighs on the open
-  // (4x CPU: no 50 ms frame).
   dragon: { from: duration.instant * 2, to: SIG.ring },
-  veins: { from: FX.vein(0).delay, to: SIG.end },
+  occluder: { from: FX.occluder.delay, to: FX.occluder.delay + FX.occluder.length },
+  veins: { from: SIG.rise + SIG.coil / 2, to: SIG.end },
   flare: { from: SIG.ring, to: SIG.end },
 };
 
@@ -121,7 +137,9 @@ export function animatedSpans(): Span[] {
     FX.lift,
     FX.bladeIn,
     FX.pool,
-    ...Array.from({ length: SEGMENTS }, () => FX.flight),
+    ...Array.from({ length: SEGMENTS }, (_, k) => FX.piece(k)),
+    FX.occluder,
+    FX.occluder,
     ...VEIN_BANDS.map((_, i) => FX.vein(i)),
     FX.fade,
     FX.glow,
@@ -136,29 +154,16 @@ export function segmentSize(k: number): { w: number; h: number } {
   return { w: Math.round(40 * t), h: Math.round(28 * t) };
 }
 
-export type DragonPath = {
-  x: number[];
-  y: number[];
-  /** Heading, degrees (applied before `scaleY`, see the component's transform). */
-  rotate: number[];
-  scale: number[];
-  /** -1..1: the head and the tail roll over so their crest stays up whichever way they go. 1 for the body. */
-  scaleY: number[];
-  opacity: number[];
-  /** Keyframe offsets, 0..1 over the flight (`SIG.rise` → `SIG.ring`). */
-  times: number[];
-};
-
-type Pose = { x: number; y: number; scale: number; opacity: number };
+type Pose = { x: number; y: number; scale: number; opacity: number; /** 1 in front of the sword, -1 behind it. */ depth: number; /** 1, or less as it squeezes into the blade. */ squeeze: number };
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 const round = (n: number) => Math.round(n * 10) / 10;
 
-/** The coil's end, and the dive from it over the point of the blade and down onto it (a cubic, arriving straight down). */
+/** The coil's end (left of the blade, near the point), and the dive from it over the point and down onto it. */
 const COIL_END = { x: AXIS - COIL.rxTo, y: COIL.cyTo } as const;
-const DIVE = [COIL_END, { x: COIL_END.x, y: 20 }, { x: AXIS, y: 0 }, { x: AXIS, y: BLADE.tipY }] as const;
-const SWALLOWED = { y: BLADE.tipY + 70, scale: 0.55 } as const;
+const DIVE = [COIL_END, { x: COIL_END.x, y: 18 }, { x: AXIS, y: 2 }, { x: AXIS, y: BLADE.tipY }] as const;
+const SWALLOWED = { y: BLADE.tipY + 70, scale: 0.55, squeeze: 0.4 } as const;
 const bezier = (a: number, b: number, c: number, d: number, t: number) =>
   (1 - t) ** 3 * a + 3 * (1 - t) ** 2 * t * b + 3 * (1 - t) * t ** 2 * c + t ** 3 * d;
 
@@ -170,44 +175,74 @@ function headAt(tau: number): Pose {
     const rx = u < COIL.open ? lerp(COIL.rxStart, COIL.rxWide, 1 - (1 - u / COIL.open) ** 2) : lerp(COIL.rxWide, COIL.rxTo, (u - COIL.open) / (1 - COIL.open));
     const ry = rx * COIL.flat;
     const cy = lerp(COIL.cyFrom, COIL.cyTo, u);
-    const theta = Math.PI / 2 + u * COIL.turns * Math.PI * 2;
-    const x = AXIS + rx * Math.cos(theta);
-    const y = cy + ry * Math.sin(theta);
-    const depth = Math.sin(theta); // 1 in front of the sword, -1 behind it
+    const theta = COIL.from + u * COIL.turns * Math.PI * 2;
+    const depth = Math.sin(theta);
     const near = (depth + 1) / 2;
-    const born = clamp01(tau / duration.fast); // it rises out of the ink
-    let opacity = DEPTH.dim + (1 - DEPTH.dim) * Math.min(1, near * 1.6);
-    // Behind the blade: hidden by it.
-    if (depth < 0 && Math.abs(x - AXIS) < BEHIND && y > BLADE.tipY - 10) opacity *= 0.1;
-    return { x, y, scale: lerp(0.3, DEPTH.back + (DEPTH.front - DEPTH.back) * near, born), opacity: opacity * born };
+    const born = clamp01(tau / duration.instant); // it rises out of the ink, solid at once
+    return {
+      x: AXIS + rx * Math.cos(theta),
+      y: cy + ry * depth,
+      scale: lerp(0.6, DEPTH.back + (DEPTH.front - DEPTH.back) * near, born),
+      opacity: born,
+      depth,
+      squeeze: 1,
+    };
   }
   if (tau < SIG.coil + SIG.dive) {
     const t = (tau - SIG.coil) / SIG.dive;
     const [a, b, c, d] = DIVE;
-    return { x: bezier(a.x, b.x, c.x, d.x, t), y: bezier(a.y, b.y, c.y, d.y, t), scale: lerp(0.85, 1, t), opacity: 1 };
+    return { x: bezier(a.x, b.x, c.x, d.x, t), y: bezier(a.y, b.y, c.y, d.y, t), scale: lerp(0.85, 1, t), opacity: 1, depth: 1, squeeze: 1 };
   }
-  // Into the blade: it plunges, faster and faster, shrinking and swallowed.
+  // Into the blade: it narrows to the blade's width at once, then plunges faster and faster, shrinking and swallowed.
   const t = clamp01((tau - SIG.coil - SIG.dive) / SIG.plunge);
   const e = t * t;
-  return { x: AXIS, y: lerp(BLADE.tipY, SWALLOWED.y, e), scale: lerp(1, SWALLOWED.scale, e), opacity: 1 - e };
+  return {
+    x: AXIS,
+    y: lerp(BLADE.tipY, SWALLOWED.y, e),
+    scale: lerp(1, SWALLOWED.scale, e),
+    opacity: 1 - e,
+    depth: 1,
+    squeeze: lerp(1, SWALLOWED.squeeze, Math.min(1, t * 3)),
+  };
 }
 
+/** Piece `k` at `at` seconds from the start of the scene. */
+const pieceAt = (k: number, at: number): Pose => headAt(at - SIG.rise - k * SIG.lag);
+
 const SAMPLES = 60;
+/** Keyframes per second, shared by the pieces and the occluder. */
+const RATE = SAMPLES / FX.flight.length;
+
+export type DragonPath = {
+  x: number[];
+  y: number[];
+  /** Heading, degrees (applied before `scaleY`, see the component's transform). */
+  rotate: number[];
+  scale: number[];
+  /**
+   * Across the piece: the head and the tail roll over so their crest stays up whichever way they go (-1..1); every
+   * piece narrows to the blade's width as it plunges into it.
+   */
+  scaleY: number[];
+  opacity: number[];
+  /** Keyframe offsets, 0..1 over the piece's own flight (`FX.piece(k)`). */
+  times: number[];
+};
 
 /**
- * The flight of piece `k` (0 the head, `SEGMENTS - 1` the tail): out of the pool, one and a quarter turns rising round
- * the sword (big and dark in front, small, faint and hidden by the blade behind it), up over the point and down into
- * the blade where it is swallowed, `k` lags after the head.
+ * The flight of piece `k` (0 the head, `SEGMENTS - 1` the tail): out of the pool, one turn rising round the sword (big
+ * in front, smaller behind, solid ink all round), up over the point and down into the blade where it is swallowed,
+ * `k` lags after the head.
  */
 export function dragonPath(k: number): DragonPath {
-  const flight = FX.flight.length;
+  const flight = FX.piece(k).length;
   const rolls = k === 0 || k === SEGMENTS - 1;
   const out: DragonPath = { x: [], y: [], rotate: [], scale: [], scaleY: [], opacity: [], times: [] };
   let heading: number | null = null;
   let side = 1;
   for (let i = 0; i <= SAMPLES; i++) {
     const t = i / SAMPLES;
-    const tau = t * flight - k * SIG.lag;
+    const tau = t * flight;
     const p = headAt(tau);
     // Heading along the path (finite difference), unwrapped so it never spins the long way round.
     const ahead = headAt(Math.max(tau, 0) + 0.01);
@@ -230,8 +265,60 @@ export function dragonPath(k: number): DragonPath {
     out.y.push(round(p.y));
     out.rotate.push(round(angle));
     out.scale.push(Math.round(p.scale * 100) / 100);
-    out.scaleY.push(Math.round(roll * 100) / 100);
+    out.scaleY.push(Math.round(roll * p.squeeze * 100) / 100);
     out.opacity.push(Math.round(p.opacity * 100) / 100);
   }
   return out;
+}
+
+/** The occluder: a slice of the blade art this tall, drawn over the dragon. */
+export const SLICE_H = 30;
+/** A piece behind the sword whose centre is this close to its axis is under the blade (its half-width at the back, plus the blade's). */
+const UNDER = 24;
+
+export type OccluderPath = {
+  /** Top of the slice in the stage (the art inside it moves by the opposite, so it stays exactly over the blade). */
+  y: number[];
+  opacity: number[];
+  /** Keyframe offsets, 0..1 over `FX.occluder`. */
+  times: number[];
+};
+
+/**
+ * Where the slice of blade sits over time: on the piece passing behind the sword nearest its axis, shown only then (and
+ * never while a piece in front crosses the same slice). It is the blade's own art at the blade's own place, so where no
+ * ink is under it, it changes nothing on screen.
+ */
+export function occluderPath(): OccluderPath {
+  const { delay, length } = FX.occluder;
+  const n = Math.max(1, Math.round(length * RATE));
+  const out: OccluderPath = { y: [], opacity: [], times: [] };
+  let top = BLADE.tipY;
+  for (let i = 0; i <= n; i++) {
+    const at = delay + (i / n) * length;
+    const pieces = Array.from({ length: SEGMENTS }, (_, k) => pieceAt(k, at)).filter((p) => p.opacity > 0.05);
+    const under = pieces.filter((p) => p.depth < 0 && Math.abs(p.x - AXIS) < UNDER).sort((a, b) => Math.abs(a.x - AXIS) - Math.abs(b.x - AXIS))[0];
+    let shown = 0;
+    if (under) {
+      const next = Math.round(under.y - SLICE_H / 2);
+      // A piece in front whose body lies over the blade in the same band: the slice would cut it, so it stays off (the
+      // climb keeps the two passes apart, so this is rare and brief; a front piece only grazing the blade with its snout
+      // does not count).
+      const crossed = pieces.some((p) => p.depth >= 0 && Math.abs(p.x - AXIS) < BLADE.half + 8 && p.y + 12 > next && p.y - 12 < next + SLICE_H);
+      if (!crossed) {
+        top = next;
+        shown = 1;
+      }
+    }
+    out.times.push(Math.round((i / n) * 1000) / 1000);
+    out.y.push(top);
+    out.opacity.push(shown);
+  }
+  return out;
+}
+
+/** Test helper: piece `k` at `at` s, with its depth (1 in front of the sword, -1 behind). */
+export function poseAt(k: number, at: number): { x: number; y: number; depth: number; opacity: number } {
+  const p = pieceAt(k, at);
+  return { x: p.x, y: p.y, depth: p.depth, opacity: p.opacity };
 }

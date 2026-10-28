@@ -6,7 +6,7 @@ import { finishRevealAll, fixGachaRolls, onboard, seedCoins, seedCompleteGachaSe
 const BAMBOO = fr.shop.items.acc_giao_tre!.name;
 const FAN = fr.shop.items.acc_quat_sat!.name;
 
-const banner = (page: Page) => page.getByRole("heading", { name: fr.shop.themes.legendes_sombres! }).locator("xpath=ancestor::section");
+const banner = (page: Page) => page.getByRole("tabpanel", { name: fr.shop.themes.legendes_sombres! });
 const openShop = (page: Page) => page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
 const balance = (page: Page, xu: number) => expect(page.getByText(fr.shop.balance(xu), { exact: true })).toBeVisible();
 

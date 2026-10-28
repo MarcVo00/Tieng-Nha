@@ -44,7 +44,7 @@ test("pull once from the dark legends banner, see the result, and the set fills 
   await page.reload();
   await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
 
-  const banner = page.getByRole("heading", { name: fr.shop.themes.legendes_sombres! }).locator("xpath=ancestor::section");
+  const banner = page.getByRole("tabpanel", { name: fr.shop.themes.legendes_sombres! });
   await expect(banner.getByText(fr.gacha.ownedCount(0, 12))).toBeVisible();
   await banner.getByRole("button", { name: fr.gacha.pullOne(40) }).click();
 
@@ -62,10 +62,25 @@ test("pull once from the dark legends banner, see the result, and the set fills 
   await expect(banner.getByText(fr.gacha.ownedCount(1, 12))).toBeVisible();
 });
 
+test("three banners to choose from: the chosen tab shows its banner and is remembered after a reload", async ({ page }) => {
+  await onboard(page);
+  await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
+  const tabs = page.getByRole("tablist", { name: fr.gacha.tabsLabel }).getByRole("tab");
+  await expect(tabs).toHaveText([fr.shop.themes.legendes_sombres!, fr.shop.themes.seigneur_des_mers!, fr.shop.themes.esprits_de_la_nuit!]);
+  await page.getByRole("tab", { name: fr.shop.themes.seigneur_des_mers! }).click();
+  const sea = page.getByRole("tabpanel", { name: fr.shop.themes.seigneur_des_mers! });
+  await expect(sea.getByRole("heading", { name: "Long Vương — Le seigneur des mers" })).toBeVisible();
+  await expect(sea.getByText(fr.gacha.ownedCount(0, 12))).toBeVisible();
+  await expect(page.getByRole("tabpanel")).toHaveCount(1);
+  await page.reload();
+  await expect(page.getByRole("tab", { name: fr.shop.themes.seigneur_des_mers! })).toHaveAttribute("aria-selected", "true");
+  await expect(sea.getByRole("heading", { name: "Long Vương — Le seigneur des mers" })).toBeVisible();
+});
+
 test("the rates sheet lists the four rarities", async ({ page }) => {
   await onboard(page);
   await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
-  await page.getByRole("button", { name: fr.gacha.rates }).click();
+  await page.getByRole("tabpanel", { name: fr.shop.themes.legendes_sombres! }).getByRole("button", { name: fr.gacha.rates }).click();
   const sheet = page.getByRole("dialog", { name: fr.gacha.ratesTitle });
   for (const label of Object.values(fr.shop.rarities)) await expect(sheet.getByText(label, { exact: true })).toBeVisible();
   await expect(sheet.getByText(fr.gacha.ratePercent(2), { exact: true })).toBeVisible();
@@ -77,7 +92,7 @@ test("a x10 pull deals ten face-down cards; « Tout découvrir » ends on the re
   await page.reload();
   await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
 
-  const banner = page.getByRole("heading", { name: fr.shop.themes.legendes_sombres! }).locator("xpath=ancestor::section");
+  const banner = page.getByRole("tabpanel", { name: fr.shop.themes.legendes_sombres! });
   await banner.getByRole("button", { name: fr.gacha.pullTen(360) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(360) });
   await shakeTube(page);
@@ -105,7 +120,7 @@ test.describe("reduced motion", () => {
     await seedCoins(page, 40);
     await page.reload();
     await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
-    const banner = page.getByRole("heading", { name: fr.shop.themes.legendes_sombres! }).locator("xpath=ancestor::section");
+    const banner = page.getByRole("tabpanel", { name: fr.shop.themes.legendes_sombres! });
     await banner.getByRole("button", { name: fr.gacha.pullOne(40) }).click();
     const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
     await expect(scene).toHaveAttribute("data-phase", "recap");

@@ -40,6 +40,8 @@ Toutes les paires ci-dessous ont été vérifiées (WCAG 2.1) : texte normal ≥
 | `--frame-bronze` | `#9A6A3A` (sombre `#C79563`) | cadre d'avatar bronze (anneau 3 px), boutique | décoratif |
 | `--frame-jade` | `#2E7D6B` (sombre `#5DBB9E`) | cadre d'avatar jade (anneau 3 px) | décoratif |
 | `--frame-son-mai` | `var(--color-gold)` | cadre d'avatar « sơn mài » : anneau or + filet intérieur encre 1 px (l'or reste une récompense : on l'a acheté) | décoratif |
+| `--altar-sea` | `#1F7A80` (sombre `#5FB8B8`) | teinte de l'autel pendant le présage, bannière « Seigneur des mers » (vert-bleu de mer) | décoratif |
+| `--altar-night` | `#3A3F8F` (sombre `#8F93E6`) | teinte de l'autel pendant le présage, bannière « Esprits de la nuit » (indigo de nuit) | décoratif |
 
 ### 2.2 Thème sombre — « Laque noire »
 | Token CSS | Hex | Contraste |
@@ -95,6 +97,7 @@ colors: {
   error: { DEFAULT: 'var(--color-error)', soft: 'var(--color-error-soft)' },
   info: 'var(--color-info)', streak: 'var(--color-streak)', scrim: 'var(--color-scrim)',
   frame: { bronze: 'var(--frame-bronze)', jade: 'var(--frame-jade)', sonmai: 'var(--frame-son-mai)' },
+  altar: { sea: 'var(--altar-sea)', night: 'var(--altar-night)' },
   tone: { ngang: 'var(--tone-ngang)', huyen: 'var(--tone-huyen)', sac: 'var(--tone-sac)', hoi: 'var(--tone-hoi)', nga: 'var(--tone-nga)', nang: 'var(--tone-nang)' },
 }
 ```

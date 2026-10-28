@@ -12,6 +12,8 @@ type Props = {
   items: readonly ShopItem[];
   inventory: readonly string[];
   baseLook: Look;
+  /** Overrides the art (by default the theme's legendary on the base look), e.g. a character holding its accessory. */
+  artLook?: Partial<Look>;
   /** Pity counter of the player for this theme, null until the journal has been read (nothing is shown meanwhile). */
   pity: number | null;
   /** Xu of the local journal and of the server (null until known): pulls are checked against the smaller one. */
@@ -31,13 +33,14 @@ type Props = {
 
 // Hierarchy: the legendary piece of the set is the art; the x10 pull is the one primary action, the single pull and
 // the rates stay quiet. The banner sits on the forced lacquer surface (like the rare showcase) with a gold fillet.
-export function GachaBanner({ theme, items, inventory, baseLook, pity, localCoins, serverCoins, online, unreachable, pulling, notice, onPull, onRates }: Props) {
+export function GachaBanner({ theme, items, inventory, baseLook, artLook, pity, localCoins, serverCoins, online, unreachable, pulling, notice, onPull, onRates }: Props) {
   const total = items.length;
   const owned = items.filter((i) => inventory.includes(i.id)).length;
   const complete = total > 0 && owned === total;
   const art = items.find((i) => i.rarity === "legendary") ?? items[0];
   const artSlot = art ? characterSlotOf(art) : null;
-  const look: Look = art && artSlot ? { ...baseLook, [artSlot]: art.id } : baseLook;
+  const look: Look = artLook ? { ...baseLook, ...artLook } : art && artSlot ? { ...baseLook, [artSlot]: art.id } : baseLook;
+  const title = fr.gacha.bannerTitles[theme];
   const busy = pulling !== null;
 
   const one = GACHA.costs[1];
@@ -68,7 +71,13 @@ export function GachaBanner({ theme, items, inventory, baseLook, pity, localCoin
             {fr.gacha.overline}
           </span>
           <h2 id={`shop-theme-${theme}`} className="text-heading text-ink">
-            {fr.shop.themes[theme] ?? theme}
+            {title ? (
+              <>
+                <span lang="vi">{title.vi}</span> — {title.fr}
+              </>
+            ) : (
+              (fr.shop.themes[theme] ?? theme)
+            )}
           </h2>
           <p className="tabular text-body-strong text-ink">{fr.gacha.ownedCount(owned, total)}</p>
           {complete ? (

@@ -609,3 +609,137 @@ describe("gacha banner and set", () => {
     expect(useRecoveredPulls.getState().recovered).toEqual([]);
   });
 });
+
+describe("banner tabs", () => {
+  const TAB_KEY = "tn-gacha-tab";
+  const LABELS = ["Légendes sombres", "Seigneur des mers", "Esprits de la nuit"];
+  const SEA_TITLE = "Long Vương — Le seigneur des mers";
+  const NIGHT_TITLE = "Hồ ly — Les esprits de la nuit";
+  const DARK_TITLE = fr.shop.themes["legendes_sombres"] ?? "";
+  const make = async (coins = 0) => {
+    const services = createFakeServices({ clock: () => NOW }, { gachaRng: () => 0 });
+    if (coins > 0) await services.activity.demoGrant(coins, 0);
+    return services;
+  };
+  const panel = () => screen.findByRole("tabpanel");
+  const tab = (label: string | undefined) => screen.getByRole("tab", { name: label ?? "" });
+  const selected = () =>
+    screen
+      .getAllByRole("tab")
+      .filter((t) => t.getAttribute("aria-selected") === "true")
+      .map((t) => t.textContent);
+
+  test("three tabs in order with their short labels, the first one selected", async () => {
+    setup(await make());
+    const list = await screen.findByRole("tablist", { name: fr.gacha.tabsLabel });
+    const tabs = within(list).getAllByRole("tab");
+    expect(tabs.map((t) => t.textContent)).toEqual(LABELS);
+    expect(tabs.map((t) => t.getAttribute("aria-selected"))).toEqual(["true", "false", "false"]);
+    expect(within(await panel()).getByRole("heading", { name: DARK_TITLE })).toBeInTheDocument();
+    expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
+  });
+
+  test("switching shows that theme's banner only: its full title (Vietnamese name in lang=vi), its x/12 and its guarantee", async () => {
+    const user = setup(await make());
+    await screen.findByRole("tablist");
+    await user.click(tab(LABELS[1]));
+    const sea = await panel();
+    const title = within(sea).getByRole("heading", { name: SEA_TITLE });
+    expect(title.querySelector('[lang="vi"]')).toHaveTextContent("Long Vương");
+    expect(within(sea).getByText(fr.gacha.ownedCount(0, 12))).toBeInTheDocument();
+    expect(within(sea).getByText(fr.gacha.pityLine(40))).toBeInTheDocument();
+    expect(sea.querySelector("[data-banner]")).toHaveAttribute("data-banner", "seigneur_des_mers");
+    expect(screen.queryByRole("heading", { name: DARK_TITLE })).toBeNull();
+    expect(selected()).toEqual([LABELS[1]]);
+    expect(sea).toHaveAttribute("aria-labelledby", tab(LABELS[1]).id);
+
+    await user.click(tab(LABELS[2]));
+    const night = await panel();
+    expect(within(night).getByRole("heading", { name: NIGHT_TITLE }).querySelector('[lang="vi"]')).toHaveTextContent("Hồ ly");
+    expect(within(night).getByText(fr.gacha.ownedCount(0, 12))).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: SEA_TITLE })).toBeNull();
+  });
+
+  test("the sea lord's banner shows Lạc Long Quân holding the dragon sword", async () => {
+    const user = setup(await make());
+    await screen.findByRole("tablist");
+    await user.click(tab(LABELS[1]));
+    const look = (await panel()).querySelector("[data-banner] [data-look]")?.getAttribute("data-look") ?? "";
+    expect(look).toContain("char_lac_long_quan");
+    expect(look).toContain("acc_kiem_rong");
+  });
+
+  test("arrow keys move between tabs (roving focus)", async () => {
+    const user = setup(await make());
+    await screen.findByRole("tablist");
+    expect(tab(LABELS[0])).toHaveAttribute("tabindex", "0");
+    expect(tab(LABELS[1])).toHaveAttribute("tabindex", "-1");
+    tab(LABELS[0]).focus();
+    await user.keyboard("{ArrowRight}");
+    expect(tab(LABELS[1])).toHaveFocus();
+    expect(selected()).toEqual([LABELS[1]]);
+    await user.keyboard("{ArrowLeft}{ArrowLeft}");
+    expect(tab(LABELS[2])).toHaveFocus(); // wraps around
+    await user.keyboard("{Home}");
+    expect(selected()).toEqual([LABELS[0]]);
+  });
+
+  test("pulling on « Seigneur des mers » leaves the guarantee and the x/12 of « Légendes sombres » unchanged", async () => {
+    const services = await make(100);
+    const user = setup(services);
+    await screen.findByRole("tablist");
+    await user.click(tab(LABELS[1]));
+    await user.click(within(await panel()).getByRole("button", { name: fr.gacha.pullOne(40) }));
+    const sheet = await screen.findByRole("dialog", { name: fr.gacha.resultLabel(40) });
+    expect(within(sheet).getByRole("heading", { name: fr.shop.themes["seigneur_des_mers"] ?? "" })).toBeInTheDocument();
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.scene.skip }));
+    await user.click(within(sheet).getByRole("button", { name: fr.gacha.resultContinue }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    const sea = await panel();
+    expect(await within(sea).findByText(fr.gacha.pityLine(39))).toBeInTheDocument();
+    expect(within(sea).getByText(fr.gacha.ownedCount(1, 12))).toBeInTheDocument();
+
+    await user.click(tab(LABELS[0]));
+    const dark = await panel();
+    expect(within(dark).getByText(fr.gacha.pityLine(40))).toBeInTheDocument();
+    expect(within(dark).getByText(fr.gacha.ownedCount(0, 12))).toBeInTheDocument();
+    await user.click(tab(LABELS[2]));
+    expect(within(await panel()).getByText(fr.gacha.pityLine(40))).toBeInTheDocument();
+    await user.click(tab(LABELS[1]));
+    expect(within(await panel()).getByText(fr.gacha.pityLine(39))).toBeInTheDocument();
+  });
+
+  test("the last opened tab is remembered on the device", async () => {
+    const user = setup(await make());
+    await screen.findByRole("tablist");
+    await user.click(tab(LABELS[2]));
+    expect(localStorage.getItem(TAB_KEY)).toBe("esprits_de_la_nuit");
+  });
+
+  test("a stored tab is restored", async () => {
+    localStorage.setItem(TAB_KEY, "seigneur_des_mers");
+    setup(await make());
+    expect(within(await panel()).getByRole("heading", { name: SEA_TITLE })).toBeInTheDocument();
+    expect(selected()).toEqual([LABELS[1]]);
+  });
+
+  test("an unknown stored tab opens the first one", async () => {
+    localStorage.setItem(TAB_KEY, "theme_from_the_future");
+    setup(await make());
+    expect(within(await panel()).getByRole("heading", { name: DARK_TITLE })).toBeInTheDocument();
+    expect(selected()).toEqual([LABELS[0]]);
+  });
+
+  test("blocked storage (reading and writing throw): the first tab opens and switching still works", async () => {
+    const services = await make();
+    const blocked = () => {
+      throw new DOMException("blocked", "SecurityError");
+    };
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(blocked);
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(blocked);
+    const user = setup(services);
+    expect(within(await panel()).getByRole("heading", { name: DARK_TITLE })).toBeInTheDocument();
+    await user.click(tab(LABELS[2]));
+    expect(within(await panel()).getByRole("heading", { name: NIGHT_TITLE })).toBeInTheDocument();
+  });
+});

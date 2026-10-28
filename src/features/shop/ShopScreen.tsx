@@ -4,13 +4,14 @@ import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { runGachaPull, useRecoveredPulls } from "@/app/useGachaPulls";
 import { OfflineError } from "@/domain/errors";
-import type { EnergyState, GachaPull, ShopItem, Wallet } from "@/domain/types";
+import type { EnergyState, GachaPull, Look, ShopItem, Wallet } from "@/domain/types";
 import { useEquipToggle } from "@/app/useEquipToggle";
 import { characterSlotOf } from "@/services/look";
 import { gachaCost, isGachaItem, pityFromEvents } from "@/services/gacha";
 import { useHeroLook } from "@/app/useHeroLook";
 import { fr } from "@/i18n/fr";
 import { BalanceLine, Button, Card, ConfirmDialog, EmptyState, SectionTitle, Skeleton, TryOnSheet, useToast } from "@/ui";
+import { BannerTabs, panelIdOf, tabIdOf } from "@/features/shop/BannerTabs";
 import { GachaBanner, type PullCount } from "@/features/shop/GachaBanner";
 import { GachaRates } from "@/features/shop/GachaRates";
 import { GachaSet } from "@/features/shop/GachaSet";
@@ -31,6 +32,30 @@ function verdictOf(item: ShopItem, wallet: Wallet, energy: EnergyState | null): 
   return { label: fr.shop.buy(item.price), disabled: false, action: "buy" };
 }
 
+/** The banner tab last opened on this device. Site data may be blocked: reading or writing can throw. */
+const TAB_KEY = "tn-gacha-tab";
+function readTab(): string | null {
+  try {
+    return localStorage.getItem(TAB_KEY);
+  } catch {
+    return null;
+  }
+}
+function writeTab(theme: string): void {
+  try {
+    localStorage.setItem(TAB_KEY, theme);
+  } catch {
+    // not remembered: the first tab opens next time
+  }
+}
+
+/** Banner art overrides: the sea lord holds his dragon sword (spec more-banners §4.6). */
+const ART_LOOK: Record<string, Partial<Look>> = {
+  seigneur_des_mers: { character: "char_lac_long_quan", accessory: "acc_kiem_rong" },
+};
+/** Tab order: the order of `fr.shop.themes` (Légendes sombres, Seigneur des mers, Esprits de la nuit). */
+const THEME_ORDER = Object.keys(fr.shop.themes);
+
 function useNavigatorOnline(): boolean {
   const [online, setOnline] = useState(() => (typeof navigator === "undefined" ? true : navigator.onLine));
   useEffect(() => {
@@ -47,7 +72,7 @@ function useNavigatorOnline(): boolean {
 }
 
 // Hierarchy: the balance is the hero (gold, big). Below, the consumables as quiet cards (one action per card), then one
-// gacha banner per theme (its x10 pull is the screen's primary action) with the set underneath.
+// tab selector of the gacha themes and the chosen theme's banner (its x10 pull is the screen's primary action) with the set underneath.
 // Only consumables are bought, always through a confirmation; gacha pieces are never sold. Every button is locked
 // while a request is running.
 export function ShopScreen() {
@@ -78,6 +103,7 @@ export function ShopScreen() {
   const reachableRef = useRef(true);
   const [ratesOpen, setRatesOpen] = useState(false);
   const [shown, setShown] = useState<{ pull: GachaPull; recovered: boolean } | null>(null);
+  const [tab, setTab] = useState<string | null>(readTab);
   const recoveredPulls = useRecoveredPulls((s) => s.recovered);
   const dismissRecovered = useRecoveredPulls((s) => s.dismiss);
 
@@ -263,6 +289,14 @@ export function ShopScreen() {
     }
     group.items.push(i);
   }
+  themes.sort((a, b) => THEME_ORDER.indexOf(a.id) - THEME_ORDER.indexOf(b.id));
+  // An unknown or missing remembered tab opens the first one.
+  const theme = themes.find((t) => t.id === tab) ?? themes[0];
+  function selectTab(id: string): void {
+    setTab(id);
+    writeTab(id);
+    setNotice(null); // a failed attempt belongs to the banner it was made on
+  }
   const asked = asking ? fr.shop.items[asking.id] : undefined;
   const currentKey = `${wallet?.coins}|${serverCoins}|${navOnline && reachable}`;
   const liveNotice = notice !== null && notice.key === currentKey ? notice.text : null;
@@ -315,29 +349,40 @@ export function ShopScreen() {
             </SectionTitle>
             <ul className="flex list-none flex-col gap-3">{play.map((i) => card(i, wallet))}</ul>
           </section>
-          {themes.map((t) => (
-            <section key={t.id} aria-labelledby={`shop-theme-${t.id}`} className="flex flex-col gap-5">
-              <GachaBanner
-                theme={t.id}
-                items={t.items}
-                inventory={wallet.inventory}
-                baseLook={baseLook}
-                pity={pity[t.id] ?? null}
-                localCoins={wallet.coins}
-                serverCoins={serverCoins}
-                online={navOnline}
-                unreachable={!reachable}
-                pulling={pulling}
-                notice={liveNotice}
-                onPull={(count) => void pull(t.id, count)}
-                onRates={() => setRatesOpen(true)}
+          {theme ? (
+            <div className="flex flex-col gap-4">
+              <BannerTabs
+                label={fr.gacha.tabsLabel}
+                tabs={themes.map((t) => ({ id: t.id, label: fr.shop.themes[t.id] ?? t.id }))}
+                current={theme.id}
+                disabled={busy || pulling !== null}
+                onSelect={selectTab}
               />
-              <div className="flex flex-col gap-3">
-                <SectionTitle id={`shop-set-${t.id}`}>{fr.gacha.setTitle}</SectionTitle>
-                <GachaSet items={t.items} inventory={wallet.inventory} baseLook={baseLook} busy={busy || pulling !== null} onOpen={tryOn} />
-              </div>
-            </section>
-          ))}
+              <section role="tabpanel" id={panelIdOf(theme.id)} aria-labelledby={tabIdOf(theme.id)} className="flex flex-col gap-5">
+                <GachaBanner
+                  key={theme.id}
+                  theme={theme.id}
+                  items={theme.items}
+                  inventory={wallet.inventory}
+                  baseLook={baseLook}
+                  {...(ART_LOOK[theme.id] ? { artLook: ART_LOOK[theme.id] } : {})}
+                  pity={pity[theme.id] ?? null}
+                  localCoins={wallet.coins}
+                  serverCoins={serverCoins}
+                  online={navOnline}
+                  unreachable={!reachable}
+                  pulling={pulling}
+                  notice={liveNotice}
+                  onPull={(count) => void pull(theme.id, count)}
+                  onRates={() => setRatesOpen(true)}
+                />
+                <div className="flex flex-col gap-3">
+                  <SectionTitle id={`shop-set-${theme.id}`}>{fr.gacha.setTitle}</SectionTitle>
+                  <GachaSet items={theme.items} inventory={wallet.inventory} baseLook={baseLook} busy={busy || pulling !== null} onOpen={tryOn} />
+                </div>
+              </section>
+            </div>
+          ) : null}
           <p className="text-caption text-ink-muted">
             {fr.rewards.hint}{" "}
             <Link to="/me#me-rewards" className="inline-flex min-h-11 items-center text-body-strong text-primary underline">

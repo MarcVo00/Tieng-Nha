@@ -756,6 +756,12 @@ export const fr = {
     recovered: "Tirage récupéré",
     recoveredBody: "Un tirage interrompu a été ajouté à ta collection.",
     overline: "Xin xăm",
+    tabsLabel: "Bannières",
+    /** Full banner titles, the Vietnamese name first (`lang="vi"`); a theme without one shows its short name. */
+    bannerTitles: {
+      seigneur_des_mers: { vi: "Long Vương", fr: "Le seigneur des mers" },
+      esprits_de_la_nuit: { vi: "Hồ ly", fr: "Les esprits de la nuit" },
+    } as Record<string, { vi: string; fr: string }>,
     pullOne: (cost: number) => `1 tirage — ${cost} xu`,
     pullTen: (cost: number) => `10 tirages — ${cost} xu`,
     rates: "Taux",

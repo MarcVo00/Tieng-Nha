@@ -12,7 +12,7 @@ import scrollSrc from "@/assets/gacha/scroll.svg?url";
 import stickSrc from "@/assets/gacha/stick.svg?url";
 import { SIGNATURES } from "@/features/shop/signatures";
 import { CardGrid, nameOf, SEAL } from "@/features/shop/XinXamCards";
-import { GoldFlood, GoldRays, JadeGlow, Lanterns } from "@/features/shop/XinXamOmen";
+import { altarTintOf, AltarTintWash, GoldFlood, GoldRays, JadeGlow, Lanterns } from "@/features/shop/XinXamOmen";
 import {
   ALTAR,
   autoAdvance,
@@ -68,11 +68,12 @@ function useLookFor(items: readonly ShopItem[], baseLook: Look) {
   }, [items, baseLook]);
 }
 
-type StageProps = { state: RevealState; count: number; dispatch: (a: RevealAction) => void };
+type StageProps = { state: RevealState; count: number; theme: string; dispatch: (a: RevealAction) => void };
 
 /** The paper inlay: the altar, the tube to shake, then the bare sticks rising and the omen. */
-function Stage({ state, count, dispatch }: StageProps) {
+function Stage({ state, count, theme, dispatch }: StageProps) {
   const omen = state.phase === "omen";
+  const tint = omen ? altarTintOf(theme) : null;
   const sticks = useMemo(() => risingSticks(count), [count]);
   const stickW = STICK_H * STICK_RATIO;
   return (
@@ -80,9 +81,11 @@ function Stage({ state, count, dispatch }: StageProps) {
       data-theme="light"
       data-stage=""
       {...(omen ? { "data-omen": state.top } : {})}
+      {...(tint ? { "data-altar-tint": tint } : {})}
       className="relative mx-auto overflow-hidden rounded-md bg-paper"
       style={{ width: STAGE.w, height: STAGE.h }}
     >
+      {tint ? <AltarTintWash tint={tint} /> : null}
       {omen && state.top === "rare" ? <JadeGlow /> : null}
       <img src={altarSrc} alt="" draggable={false} className="pointer-events-none absolute select-none" style={{ left: ALTAR.x, top: ALTAR.y, width: ALTAR.w, height: ALTAR.h }} />
       {omen && state.top === "legendary" ? <GoldFlood /> : null}
@@ -446,7 +449,7 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
             transition={{ duration: duration.fast, ease: ease.out }}
           >
             {view === "stage" ? (
-              <Stage state={state} count={count} dispatch={dispatch} />
+              <Stage state={state} count={count} theme={pull.theme} dispatch={dispatch} />
             ) : view === "cards" ? (
               <CardGrid pull={pull} state={state} dealing={!dealt} onShown={() => setDealt(true)} lookFor={lookFor} onFlip={(index) => dispatch({ type: "flip", index })} />
             ) : view === "focus" && current ? (

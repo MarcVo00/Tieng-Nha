@@ -10,7 +10,7 @@ import altarSrc from "@/assets/gacha/altar.svg?url";
 import tubeSrc from "@/assets/gacha/tube.svg?url";
 import scrollSrc from "@/assets/gacha/scroll.svg?url";
 import stickSrc from "@/assets/gacha/stick.svg?url";
-import { SIGNATURES } from "@/features/shop/signatures";
+import { SIGNATURES, signatureLine } from "@/features/shop/signatures";
 import { CardGrid, nameOf, SEAL } from "@/features/shop/XinXamCards";
 import { altarTintOf, AltarTintWash, GoldFlood, GoldRays, JadeGlow, Lanterns } from "@/features/shop/XinXamOmen";
 import {
@@ -24,6 +24,7 @@ import {
   recapOrder,
   revealReducer,
   risingSticks,
+  scrollBeats,
   STAGE,
   STICK_RATIO,
   TUBE,
@@ -136,17 +137,19 @@ function Stage({ state, count, theme, dispatch }: StageProps) {
 
 // --- The focus view: the card opened large, the scroll and the hero wearing the piece ---
 
-type ScrollProps = { it: GachaPullItem; look: Look; delay: number };
+type ScrollProps = { it: GachaPullItem; look: Look; delay: number; /** It follows a signature (see `scrollBeats`). */ signed: boolean };
 
 /** The quẻ: the paper unrolls from its top roller (scaleY), then the hero wearing the piece, its name and the seal. */
-function Scroll({ it, look, delay }: ScrollProps) {
+function Scroll({ it, look, delay, signed }: ScrollProps) {
   const name = nameOf(it.itemId);
+  const beats = scrollBeats(delay, signed);
   return (
     <motion.div
       data-scroll={it.rarity}
+      data-signed={signed ? "" : undefined}
       className="absolute"
       style={{ left: (STAGE.w - SCROLL.w) / 2, top: 0, width: SCROLL.w, height: SCROLL.h, transformOrigin: "50% 0%" }}
-      initial={{ scaleY: 0.08, opacity: 0 }}
+      initial={{ scaleY: 0.08, opacity: beats.paper }}
       animate={{ scaleY: 1, opacity: 1 }}
       transition={{ duration: REVEAL.unroll, delay, ease: ease.out }}
     >
@@ -156,7 +159,7 @@ function Scroll({ it, look, delay }: ScrollProps) {
         style={{ left: ZONE.left, top: ZONE.top, width: ZONE.w, height: ZONE.h }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: REVEAL.content, delay: delay + REVEAL.unroll, ease: ease.out }}
+        transition={{ duration: REVEAL.content, delay: beats.contentAt, ease: ease.out }}
       >
         <span className="relative">
           <HeroMedallion look={look} size={88} label={fr.gacha.scene.wearing(name)} />
@@ -165,7 +168,7 @@ function Scroll({ it, look, delay }: ScrollProps) {
             className={`absolute -right-5 -top-1 -rotate-6 whitespace-nowrap rounded-sm border-2 border-paper px-1.5 py-0.5 text-caption font-semibold shadow-card ${SEAL[it.rarity]}`}
             initial={{ opacity: 0, scale: 1.6 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ scale: { ...spring.bouncy, delay: delay + REVEAL.seal }, opacity: { duration: duration.instant, delay: delay + REVEAL.seal } }}
+            transition={{ scale: { ...spring.bouncy, delay: beats.sealAt }, opacity: { duration: duration.instant, delay: beats.sealAt } }}
           >
             {fr.shop.rarities[it.rarity]}
           </motion.span>
@@ -209,7 +212,7 @@ function FocusView({ it, look, signing, signed, reduced, onSignatureEnd }: Focus
         <>
           {/* A legendary without a signature: the generic gold treatment, rays first, then the scroll. */}
           {gold ? <GoldRays x={STAGE.w / 2} y={STAGE.h / 2} /> : null}
-          <Scroll it={it} look={look} delay={gold ? REVEAL.goldHold : 0} />
+          <Scroll it={it} look={look} delay={gold ? REVEAL.goldHold : 0} signed={signed} />
         </>
       )}
     </div>
@@ -375,8 +378,8 @@ function Scene({ pull, recovered, items, baseLook, onClose }: Props & { pull: Ga
           ? fr.gacha.scene.shaking
           : state.phase === "omen"
             ? fr.gacha.scene.omen
-            : state.phase === "signature"
-              ? fr.gacha.scene.signature
+            : state.phase === "signature" && current
+              ? signatureLine(current.itemId)
               : state.phase === "focus" && current && state.current !== null
                 ? // « Tout découvrir » announces each card as it turns; a touched card says it is turning.
                   chaining

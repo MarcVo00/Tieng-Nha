@@ -105,9 +105,12 @@ export type Span = { delay: number; length: number };
 export const FX = {
   /** The ink overlay: dusk, then a step darker as each lantern dies (one element; its lift never overlaps this). */
   darken: { delay: 0, length: SIG.lastOut + SIG.out },
-  lift: { delay: SIG.blazed, length: SIG.lifted - SIG.blazed },
+  /** From the bells: it holds until the fire peaks (`SIG.blazed`), then lifts round her (`liftKeys`). */
+  lift: { delay: SIG.bells, length: SIG.lifted - SIG.bells },
   /** The lanterns (one wrapper) come out of the dusk. */
   lanternsIn: { delay: 0, length: SIG.dusk },
+  /** The dead lanterns fade with the lifting dark, gone halfway through it, so they never show lit again (`lanternsOutKeys`). */
+  lanternsOut: { delay: SIG.bells, length: SIG.lifted - SIG.bells },
   /**
    * Lantern `i`'s halo: it lights with the dusk (a frame after the lanterns land), holds, gutters and dies with its
    * breath (one keyframed timeline).
@@ -136,7 +139,7 @@ export type Beat = "lanterns" | "lights" | "smoke" | "fox" | "tails" | "sparks" 
 export const MOUNTED: Readonly<Record<Beat, { from: number; to: number }>> = {
   // The lanterns hang lit from the first frame; the rest lands on frames of its own, away from the card opening and
   // from any breath, so no frame carries two mounts (4x CPU).
-  lanterns: { from: 0, to: SIG.end },
+  lanterns: { from: 0, to: (SIG.blazed + SIG.lifted) / 2 },
   lights: { from: duration.instant, to: SIG.lastOut + SIG.out },
   smoke: { from: (SIG.dusk + outAt(0)) / 2 - duration.instant, to: outAt(LANTERN_COUNT - 1) + duration.celebrate },
   // She mounts unseen in the dark between two breaths, her tails between the last two, before her fire catches.
@@ -152,6 +155,7 @@ export function animatedSpans(): Span[] {
     FX.darken,
     FX.lift,
     FX.lanternsIn,
+    FX.lanternsOut,
     ...LANTERNS.map((_, i) => FX.light(i)),
     ...LANTERNS.map((_, i) => FX.smoke(i)),
     FX.glow,
@@ -189,4 +193,15 @@ export function lightKeys(i: number): Keys {
     opacity: [0, LIT, LIT, 1, 0.3, 0.55, 0],
     times: [0, offset(SIG.dusk - delay, length), offset(at, length), ...gutter],
   };
+}
+
+/** The dark over `FX.lift`: it holds at `DARK` until the fire peaks, then lifts. */
+export function liftKeys(): Keys {
+  return { opacity: [DARK, DARK, 0], times: [0, offset(SIG.blazed - SIG.bells, FX.lift.length), 1] };
+}
+
+/** The lantern wrapper over `FX.lanternsOut`: whole while the dark holds, then gone by halfway through the lift. */
+export function lanternsOutKeys(): Keys {
+  const len = FX.lanternsOut.length;
+  return { opacity: [1, 1, 0, 0], times: [0, offset(SIG.blazed - SIG.bells, len), offset((SIG.blazed + SIG.lifted) / 2 - SIG.bells, len), 1] };
 }

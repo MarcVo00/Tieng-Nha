@@ -71,7 +71,9 @@ test("her card turns: the signature plays in the focus view (wind, twelve seals,
   fireEvent.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(2) }));
   expect(dialog).toHaveAttribute("data-phase", "signature");
   expect(dialog.querySelector("[data-focus] [data-signature='char_phap_su']")).not.toBeNull();
-  expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.signature);
+  // The status line is its own, read aloud: what is happening on this stage.
+  expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.signatures.char_phap_su ?? "");
+  expect(fr.gacha.scene.signatures.char_phap_su).toBeTruthy();
   expect(within(dialog).queryByRole("heading", { name: GUARDIAN })).toBeNull();
   await advance(SIG.wind - 0.05);
   expect(dialog.querySelectorAll("[data-fx='talisman']")).toHaveLength(12); // lying on the altar

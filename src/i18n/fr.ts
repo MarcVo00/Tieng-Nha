@@ -798,7 +798,13 @@ export const fr = {
       tapOne: "Touche la carte pour la retourner.",
       tapMany: (n: number) => `Touche une carte\u202f: encore ${n}.`,
       turning: "La carte se retourne…",
-      signature: "Un vent se lève sur l'autel…",
+      /** While a signature plays (role=status, read aloud): its own line, keyed by item id; `signature` for any other. */
+      signature: "L'autel s'illumine…",
+      signatures: {
+        char_phap_su: "Un vent se lève sur l'autel…",
+        acc_kiem_rong: "Un dragon s'éveille dans l'encre…",
+        char_ho_ly: "Les lanternes s'éteignent une à une…",
+      } as Readonly<Record<string, string>>,
       revealAll: "Tout découvrir",
       card: (n: number) => `Carte ${n}, face cachée`,
       cardOpen: (n: number, name: string, rarity: string) => `Carte ${n}\u202f: ${name}, ${rarity}`,

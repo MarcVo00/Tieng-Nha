@@ -75,7 +75,9 @@ test("its card turns: the dragon coils with a roar, dives into the blade, it rin
   fireEvent.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(2) }));
   expect(dialog).toHaveAttribute("data-phase", "signature");
   expect(dialog.querySelector("[data-focus] [data-signature='acc_kiem_rong']")).not.toBeNull();
-  expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.signature);
+  // The status line is its own, read aloud: what is happening on this stage.
+  expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.signatures.acc_kiem_rong ?? "");
+  expect(fr.gacha.scene.signatures.acc_kiem_rong).toBeTruthy();
   expect(within(dialog).queryByRole("heading", { name: SWORD })).toBeNull();
   expect(dialog.querySelector("[data-fx='blade']")).not.toBeNull(); // the sword waits on the altar
 

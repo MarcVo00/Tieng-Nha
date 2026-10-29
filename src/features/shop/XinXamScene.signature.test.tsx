@@ -18,7 +18,7 @@ vi.mock("@/features/shop/signatures", async () => {
     return createElement("span", { "data-signature-stub": "" });
   }
   const SIGNATURES = { char_phap_su: Stub };
-  return { SIGNATURES, hasSignature: (id: string) => id in SIGNATURES };
+  return { SIGNATURES, hasSignature: (id: string) => id in SIGNATURES, signatureLine: (id: string) => `line of ${id}` };
 });
 
 const SLOW = { timeout: 5000 };
@@ -61,6 +61,7 @@ test("a signature plays in the focus view, then the piece appears there: no flas
   watch.observe(dialog, { subtree: true, childList: true, attributes: true });
 
   expect(dialog).toHaveAttribute("data-phase", "signature");
+  expect(within(dialog).getByRole("status")).toHaveTextContent("line of char_phap_su");
   expect(dialog.querySelector("[data-focus] [data-signature-stub]")).not.toBeNull();
   expect(dialog.querySelector("[data-cards]")).toBeNull(); // the card face would tell the piece before its signature
   expect(within(dialog).queryByRole("heading", { name: GUARDIAN })).toBeNull();
@@ -74,6 +75,8 @@ test("a signature plays in the focus view, then the piece appears there: no flas
   expect(dialog.querySelector("[data-signature-stub]")).toBeNull(); // unmounted with its phase
   expect(dialog.querySelector("[data-focus] [data-fx='rays']")).toBeNull(); // the signature replaced the generic gold
   expect(within(dialog).getByRole("status").textContent).toBe(fr.gacha.scene.announce(GUARDIAN, fr.shop.rarities.legendary, fr.gacha.resultNew));
+  // The scroll takes over from the signature at once (paper there, content rising during the unroll: `scrollBeats`).
+  expect(dialog.querySelector("[data-focus] [data-scroll]")).toHaveAttribute("data-signed");
   await waitFor(() => expect(within(dialog).getByRole("button", { name: fr.gacha.resultContinue })).toHaveFocus());
 
   // Back on the grid, touching it again opens it without a second signature.
@@ -82,6 +85,12 @@ test("a signature plays in the focus view, then the piece appears there: no flas
   expect(dialog).toHaveAttribute("data-phase", "focus");
   expect(dialog.querySelector("[data-signature-stub]")).toBeNull();
   expect(flips(sound)).toEqual(["gacha.flip.legendary"]); // reopening is silent
+
+  // A card without a signature keeps the plain unroll (its flip bridges the gap).
+  await user.click(within(dialog).getByRole("button", { name: fr.gacha.resultContinue }));
+  await user.click(await within(dialog).findByRole("button", { name: fr.gacha.scene.card(1) }));
+  await waitFor(() => expect(dialog.querySelector("[data-focus] [data-scroll]")).not.toBeNull(), SLOW);
+  expect(dialog.querySelector("[data-focus] [data-scroll]")).not.toHaveAttribute("data-signed");
 });
 
 test("« Passer » during a signature stops its sound, and the piece never rings afterwards", async () => {

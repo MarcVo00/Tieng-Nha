@@ -77,7 +77,9 @@ test("her card turns: the lanterns go out one by one, nine tails of cold fire fa
   fireEvent.click(within(dialog).getByRole("button", { name: fr.gacha.scene.card(2) }));
   expect(dialog).toHaveAttribute("data-phase", "signature");
   expect(dialog.querySelector("[data-focus] [data-signature='char_ho_ly']")).not.toBeNull();
-  expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.signature);
+  // The status line is its own, read aloud: what is happening on this stage.
+  expect(within(dialog).getByRole("status")).toHaveTextContent(fr.gacha.scene.signatures.char_ho_ly ?? "");
+  expect(fr.gacha.scene.signatures.char_ho_ly).toBeTruthy();
   expect(within(dialog).queryByRole("heading", { name: FOX })).toBeNull();
   // The lanterns hang there, and light up a frame later.
   expect(count(dialog, "fox-lantern")).toBe(LANTERN_COUNT);

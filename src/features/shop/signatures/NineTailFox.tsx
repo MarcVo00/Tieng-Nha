@@ -11,7 +11,6 @@ import sparksSrc from "@/assets/gacha/foxfire-sparks.svg?url";
 import type { SignatureProps } from "@/features/shop/signatures/types";
 import {
   BOX,
-  DARK,
   darkKeys,
   FOX,
   foxCues,
@@ -20,6 +19,8 @@ import {
   lanternOutAt,
   LANTERNS,
   LIGHT,
+  lanternsOutKeys,
+  liftKeys,
   lightKeys,
   MOUNTED,
   ROOT,
@@ -57,8 +58,8 @@ const GLOW = 288;
 const EYES_Y = 72 / 160;
 const CHIME = 236;
 const SPARKS = { w: 240, h: 170, x: 8, y: 30 } as const;
-/** Lift: the dark holds at the bells until the fire peaks, then lifts. */
-const LIFT_TIMES = [0, (SIG.blazed - SIG.bells) / (SIG.lifted - SIG.bells), 1];
+const LIFT_KEYS = liftKeys();
+const LANTERNS_OUT_KEYS = lanternsOutKeys();
 
 export function NineTailFox({ onEnd, reduced }: SignatureProps) {
   const { sound } = useServices();
@@ -102,13 +103,19 @@ export function NineTailFox({ onEnd, reduced }: SignatureProps) {
       className="pointer-events-none absolute inset-0 overflow-hidden"
       style={{ width: BOX.w, height: BOX.h }}
     >
-      {/* The lanterns hang over the altar, under the dark: as it deepens, the dead ones sink into it. */}
+      {/* The lanterns hang over the altar, under the dark: as it deepens, the dead ones sink into it; as it lifts, they
+          fade with it (their art is a lit lantern: they must never show lit again). */}
       {on.has("lanterns") ? (
         <motion.span
+          data-fx="fox-lanterns"
           className="absolute inset-0"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: FX.lanternsIn.length, ease: ease.out }}
+          animate={{ opacity: rung ? LANTERNS_OUT_KEYS.opacity : 1 }}
+          transition={
+            rung
+              ? { duration: FX.lanternsOut.length, times: LANTERNS_OUT_KEYS.times, ease: HELD }
+              : { duration: FX.lanternsIn.length, ease: ease.out }
+          }
         >
           {LANTERNS.map((l, i) => (
             <span key={i}>
@@ -132,10 +139,10 @@ export function NineTailFox({ onEnd, reduced }: SignatureProps) {
       <motion.span
         className="absolute inset-0 bg-fx-ink"
         initial={{ opacity: 0 }}
-        animate={{ opacity: rung ? [DARK, DARK, 0] : DARK_KEYS.opacity }}
+        animate={{ opacity: rung ? LIFT_KEYS.opacity : DARK_KEYS.opacity }}
         transition={
           rung
-            ? { duration: SIG.lifted - SIG.bells, times: LIFT_TIMES, ease: HELD }
+            ? { duration: FX.lift.length, times: LIFT_KEYS.times, ease: HELD }
             : { duration: FX.darken.length, times: DARK_KEYS.times, ease: HELD }
         }
       />

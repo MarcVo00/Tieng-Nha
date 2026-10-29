@@ -13,6 +13,8 @@ import {
   LANTERN_COUNT,
   lanternOutAt,
   lightKeys,
+  liftKeys,
+  lanternsOutKeys,
   MOUNTED,
   outAt,
   ROOT,
@@ -117,14 +119,38 @@ test("nine tails of fire fan out from behind her, from the middle outward, wide 
 });
 
 test("the climax holds: the bells, the fire at its peak on the dark, then the dark lifts round her, and the scroll at once", () => {
-  expect(FX.lift.delay).toBe(SIG.blazed);
-  expect(SIG.blazed - SIG.bells).toBeGreaterThanOrEqual(0.2);
+  // The dark's last keyframes run from the bells (so the budget counts them from there) and hold until the fire peaks.
+  expect(FX.lift.delay).toBe(SIG.bells);
   expect(FX.lift.delay + FX.lift.length).toBe(SIG.lifted);
+  const lift = liftKeys();
+  expect(lift.opacity).toEqual([DARK, DARK, 0]);
+  expect(valueAt(lift.opacity, lift.times, (SIG.blazed - SIG.bells) / FX.lift.length)).toBeCloseTo(DARK, 2);
+  expect(SIG.blazed - SIG.bells).toBeGreaterThanOrEqual(0.2);
   expect(SIG.end - SIG.lifted).toBeLessThanOrEqual(0.15 + 1e-9);
   expect(FX.handOver.delay).toBe(SIG.lifted);
   expect(FX.handOver.delay + FX.handOver.length).toBeLessThanOrEqual(SIG.end + 1e-9);
   // Her eyes open with the bells.
   expect(FX.eyes.delay).toBe(SIG.bells);
+});
+
+test("the dead lanterns never light up again: they fade with the dark as it lifts, and are gone before she leaves", () => {
+  const out = lanternsOutKeys();
+  expect(out.opacity).toHaveLength(out.times.length);
+  expect(out.opacity[0]).toBe(1);
+  expect(out.opacity.at(-1)).toBe(0);
+  // Whole while the dark holds, then gone by halfway through the lift: seen through the lifting dark (lantern × light),
+  // a dead lantern stays dim all the way.
+  expect(FX.lanternsOut.delay).toBe(SIG.bells);
+  expect(FX.lanternsOut.length).toBe(FX.lift.length);
+  const lift = liftKeys();
+  for (let t = 0; t <= 1.0001; t += 0.02) {
+    const shown = valueAt(out.opacity, out.times, t) * (1 - valueAt(lift.opacity, lift.times, t));
+    expect(shown, `t=${t.toFixed(2)}`).toBeLessThanOrEqual(0.3);
+  }
+  expect(valueAt(out.opacity, out.times, (SIG.lifted - SIG.bells) / FX.lift.length)).toBe(0);
+  // Unmounted once gone, before the hand-over: no pop of four lanterns at the cut.
+  expect(MOUNTED.lanterns.to).toBeLessThanOrEqual(SIG.lifted);
+  expect(MOUNTED.lanterns.to).toBeLessThan(SIG.end);
 });
 
 test("its art: Đông Hồ SVGs under 6 KB, no filter, gradient or embedded image", () => {

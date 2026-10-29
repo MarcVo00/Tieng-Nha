@@ -62,8 +62,9 @@ async function signedIn(): Promise<Services> {
 describe("changelog content", () => {
   test("the bundled changelog is valid: newest first, semver, real dates", () => {
     const entries = ChangelogFileSchema.parse(changelog).entries;
-    expect(entries.map((e) => e.version)).toEqual(["1.9.0", "1.8.0", "1.7.0", "1.6.1", "1.6.0", "1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"]);
+    expect(entries.map((e) => e.version)).toEqual(["1.10.0", "1.9.0", "1.8.0", "1.7.0", "1.6.1", "1.6.0", "1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"]);
     expect(entries.map((e) => e.date)).toEqual([
+      "2026-10-29",
       "2026-10-29",
       "2026-10-29",
       "2026-10-27",
@@ -134,7 +135,7 @@ describe("changelog content", () => {
       shop: async () => ({}),
       changelog: async () => changelog,
     });
-    expect((await src.getChangelog())[0]?.title).toBe("Le lì xì du jour");
+    expect((await src.getChangelog())[0]?.title).toBe("Plus d'énergie, plus de succès");
   });
 });
 
@@ -171,11 +172,11 @@ describe("« Nouveautés »", () => {
     const versions = within(list)
       .getAllByText(/^Version \d/)
       .map((n) => n.textContent);
-    expect(versions).toEqual(["1.9.0", "1.8.0", "1.7.0", "1.6.1", "1.6.0", "1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"].map(fr.news.version));
+    expect(versions).toEqual(["1.10.0", "1.9.0", "1.8.0", "1.7.0", "1.6.1", "1.6.0", "1.5.2", "1.5.1", "1.5.0", "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0"].map(fr.news.version));
     expect(within(list).getAllByText(fr.news.current)).toHaveLength(1);
     const first = within(list).getAllByRole("listitem")[0];
     expect(within(first!).getByText(fr.news.current)).toBeInTheDocument();
-    expect(within(first!).getByText("Le lì xì du jour")).toBeInTheDocument();
+    expect(within(first!).getByText("Plus d'énergie, plus de succès")).toBeInTheDocument();
     expect(within(first!).getByText("29 octobre 2026")).toBeInTheDocument();
   });
 

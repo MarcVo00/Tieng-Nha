@@ -9,6 +9,8 @@ function holds(rule: BadgeDef["rule"], s: ProgressSnapshot): boolean {
     case "vocab_reviewed": return s.vocabReviewed >= rule.gte;
     case "dialogues_done": return s.dialoguesDone.length >= rule.gte;
     case "exam_score": return (s.examBest ?? 0) >= rule.gte;
+    case "xp_total": return s.xpTotal >= rule.gte;
+    case "active_days": return s.activeDays.length >= rule.gte;
   }
 }
 

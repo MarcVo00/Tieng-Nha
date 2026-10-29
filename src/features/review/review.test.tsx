@@ -229,7 +229,7 @@ test(
     completeReview.mockImplementation(async (i) => ({
       ...(await realCompleteReview(i)),
       newBadges: [
-        { id: "streak_7", title: "Une semaine", description: "7 jours d'affilée.", icon: "🏮", rule: { kind: "streak" as const, gte: 7 }, reward: "frame_bronze" },
+        { id: "streak_7", title: "Une semaine", description: "7 jours d'affilée.", icon: "🏮", rule: { kind: "streak" as const, gte: 7 }, coins: 60, reward: "frame_bronze" },
       ],
     }));
     await seedKnownWords(services, ["v_ca_phe"]);

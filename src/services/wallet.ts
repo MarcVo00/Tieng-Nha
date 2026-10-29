@@ -51,6 +51,11 @@ export function coinsForEvent(e: AppEvent, bestBefore: number | null): number {
   }
 }
 
+/** xu paid by the first unlock of a badge; 0 for an unknown id. Mirrors `badge_coins`. */
+export function badgeCoins(badges: readonly BadgeDef[], badgeId: string): number {
+  return badges.find((b) => b.id === badgeId)?.coins ?? 0;
+}
+
 /** The item a badge grants when first unlocked, or null (no such badge, or no reward). */
 export function rewardItem(badges: readonly BadgeDef[], badgeId: string): string | null {
   return badges.find((b) => b.id === badgeId)?.reward ?? null;
@@ -159,7 +164,7 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
     }
     if (e.type === "badge_unlocked") {
       if (!unlocked.has(e.refId)) {
-        w.coins += coinsForEvent(e, best);
+        w.coins += badgeCoins(badgeDefs, e.refId);
         const reward = rewardItem(badgeDefs, e.refId);
         if (reward !== null && !w.inventory.includes(reward)) w.inventory.push(reward);
       }

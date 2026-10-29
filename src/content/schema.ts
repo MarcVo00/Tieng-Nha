@@ -129,9 +129,11 @@ export const BadgeRuleSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("vocab_reviewed"), gte: z.number().int().min(1) }).strict(),
   z.object({ kind: z.literal("dialogues_done"), gte: z.number().int().min(1) }).strict(),
   z.object({ kind: z.literal("exam_score"), gte: z.number().int().min(1).max(100) }).strict(),
+  z.object({ kind: z.literal("xp_total"), gte: z.number().int().min(1) }).strict(),
+  z.object({ kind: z.literal("active_days"), gte: z.number().int().min(1) }).strict(),
 ]);
 export const BadgeDefSchema = z
-  .object({ id: z.string().regex(/^[a-z0-9_]+$/), title: z.string().min(1), description: z.string().min(1), icon: z.string().min(1), rule: BadgeRuleSchema, reward: z.string().regex(/^[a-z0-9_]+$/).optional() })
+  .object({ id: z.string().regex(/^[a-z0-9_]+$/), title: z.string().min(1), description: z.string().min(1), icon: z.string().min(1), rule: BadgeRuleSchema, coins: z.number().int().min(0), reward: z.string().regex(/^[a-z0-9_]+$/).optional() })
   .strict();
 export const BadgesFileSchema = z.object({ badges: z.array(BadgeDefSchema).min(1) }).strict();
 

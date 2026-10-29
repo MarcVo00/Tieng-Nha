@@ -13,9 +13,9 @@ const shop: ShopItem[] = [
 ];
 const rule = { kind: "lessons_done" as const, gte: 1 };
 const badges: BadgeDef[] = [
-  { id: "streak_7", title: "t", description: "d", icon: "i", rule, reward: "frame_bronze" },
-  { id: "perfect_5", title: "t", description: "d", icon: "i", rule, reward: "fx_ink" },
-  { id: "plain", title: "t", description: "d", icon: "i", rule },
+  { id: "streak_7", title: "t", description: "d", icon: "i", rule, coins: 10, reward: "frame_bronze" },
+  { id: "perfect_5", title: "t", description: "d", icon: "i", rule, coins: 10, reward: "fx_ink" },
+  { id: "plain", title: "t", description: "d", icon: "i", rule, coins: 10 },
 ];
 let n = 0;
 const ev = (type: AppEvent["type"], payload: Record<string, unknown> = {}, refId = "x", day = 10, hour = 10): AppEvent => ({
@@ -39,8 +39,13 @@ describe("earning", () => {
     expect(coinsOf([ev("session_started", { kind: "lesson" })])).toBe(0);
   });
   test("a badge pays only the first time", () => {
-    const events = [ev("badge_unlocked", {}, "b1", 10, 1), ev("badge_unlocked", {}, "b1", 10, 2), ev("badge_unlocked", {}, "b2", 10, 3)];
+    const events = [ev("badge_unlocked", {}, "plain", 10, 1), ev("badge_unlocked", {}, "plain", 10, 2), ev("badge_unlocked", {}, "perfect_5", 10, 3)];
     expect(coinsOf(events)).toBe(20);
+  });
+  test("a badge pays its own amount, and an unknown badge pays nothing (mirrors badge_coins)", () => {
+    const rich: BadgeDef[] = [{ id: "big", title: "t", description: "d", icon: "i", rule, coins: 150 }];
+    expect(walletAt([ev("badge_unlocked", {}, "big", 10, 1)], shop, rich).coins).toBe(150);
+    expect(walletAt([ev("badge_unlocked", {}, "forged", 10, 1)], shop, rich).coins).toBe(0);
   });
   test("first exam win 50, later wins 20, fails 0", () => {
     expect(coinsOf([exam(69, 1)])).toBe(0);

@@ -86,6 +86,10 @@ function BadgeSheet({ badge, unlocked, onClose }: { badge: BadgeDef | null; unlo
         <div className="flex flex-col items-center gap-3 pb-2 text-center">
           <BadgeMedal icon={badge.icon} title={badge.title} unlocked={unlocked} size="lg" />
           <p className="text-body text-ink">{badge.description}</p>
+          <p className="tabular inline-flex items-center gap-1 text-body-strong text-gold-ink">
+            <Icon name="coin" size={18} className="text-gold" />
+            {fr.profile.badges.coins(badge.coins, unlocked)}
+          </p>
           <p className="text-caption text-ink-muted">{unlocked ? fr.profile.badges.unlocked : fr.profile.badges.locked}</p>
           <Button variant="secondary" fullWidth onClick={onClose}>
             {fr.profile.badges.close}

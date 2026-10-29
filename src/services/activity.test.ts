@@ -68,7 +68,7 @@ test("startSession spends energy in the local journal only, and refuses when the
   const s = createFakeServices({ clock: () => "2026-10-14T08:00:00.000Z" });
   expect(await s.activity.getEnergy()).toEqual({ current: 5, max: 5, nextAt: null });
   const boss = await s.activity.startSession("boss", "boss_thuy_tinh");
-  expect(boss).toEqual({ ok: true, energy: { current: 2, max: 5, nextAt: "2026-10-14T11:00:00.000Z" } });
+  expect(boss).toEqual({ ok: true, energy: { current: 2, max: 5, nextAt: "2026-10-14T08:10:00.000Z" } });
   await s.activity.startSession("lesson", "l05");
   await s.activity.startSession("lesson", "l05");
   const refused = await s.activity.startSession("lesson", "l05");
@@ -99,8 +99,9 @@ describe("shop", () => {
   test("coinsGained on a perfect first lesson is 15 (10 + 5)", async () => {
     const { s } = shopSetup();
     const r = await s.activity.completeLesson({ lessonId: "l05", mistakes: 0, durationMs: 1, vocabIds: [] });
-    // 15 for the lesson plus 10 per badge unlocked (first_lesson, perfect_lesson).
-    expect(r.coinsGained).toBe(15 + 10 * r.newBadges.length);
+    // 15 for the lesson plus each badge unlocked (first_lesson, perfect_lesson) at its own amount.
+    expect(r.coinsGained).toBe(15 + r.newBadges.reduce((n, b) => n + b.coins, 0));
+    expect(r.newBadges.map((b) => b.coins)).toEqual([20, 20]);
     expect((await s.activity.getWallet()).coins).toBe(r.coinsGained);
   });
 

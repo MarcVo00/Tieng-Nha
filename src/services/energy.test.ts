@@ -2,6 +2,8 @@ import type { AppEvent } from "@/domain/types";
 import { ENERGY, energyAt, formatCountdown, msUntilFull, waitParts } from "@/services/energy";
 
 const H = 3_600_000;
+// A third of the refill period: energy timelines below are written in thirds (3 * T = one +1).
+const T = ENERGY.refillMs / 3;
 const T0 = Date.parse("2026-10-14T08:00:00.000Z");
 const at = (ms: number) => new Date(T0 + ms).toISOString();
 let n = 0;
@@ -25,12 +27,13 @@ test("energy never goes below 0 and other events are ignored", () => {
   expect(energyAt(events, at(4)).current).toBe(0);
 });
 
-test("+1 every 3 hours from the moment it dropped below the maximum, capped at 5", () => {
-  const events = [start("lesson", 0), start("lesson", 1 * H)]; // 5 → 4 at T0 (timer starts), → 3 at T0+1h
-  expect(energyAt(events, at(2 * H))).toEqual({ current: 3, max: 5, nextAt: at(3 * H) });
-  expect(energyAt(events, at(3 * H)).current).toBe(4); // first refill at T0+3h
-  expect(energyAt(events, at(6 * H))).toEqual({ current: 5, max: 5, nextAt: null });
-  expect(energyAt(events, at(50 * H)).current).toBe(5);
+test("+1 every 10 minutes from the moment it dropped below the maximum, capped at 5", () => {
+  expect(ENERGY.refillMs).toBe(10 * 60_000);
+  const events = [start("lesson", 0), start("lesson", 1 * T)]; // 5 → 4 at T0 (timer starts), → 3 at T0+T
+  expect(energyAt(events, at(2 * T))).toEqual({ current: 3, max: 5, nextAt: at(3 * T) });
+  expect(energyAt(events, at(3 * T)).current).toBe(4); // first refill one period after T0
+  expect(energyAt(events, at(6 * T))).toEqual({ current: 5, max: 5, nextAt: null });
+  expect(energyAt(events, at(50 * T)).current).toBe(5);
 });
 
 test("a finished review session gives +1, never above the maximum", () => {
@@ -39,14 +42,14 @@ test("a finished review session gives +1, never above the maximum", () => {
 });
 
 test("when a gain refills to the maximum the refill timer stops, and restarts at the next spend", () => {
-  const events = [start("lesson", 0), ev("review_session_completed", 1 * H), start("lesson", 2 * H)];
-  // full again at T0+1h, then 4 at T0+2h: the next +1 is 3h after T0+2h
-  expect(energyAt(events, at(2 * H + 1))).toEqual({ current: 4, max: 5, nextAt: at(5 * H) });
+  const events = [start("lesson", 0), ev("review_session_completed", 1 * T), start("lesson", 2 * T)];
+  // full again at T0+T, then 4 at T0+2h: the next +1 is 3h after T0+2h
+  expect(energyAt(events, at(2 * T + 1))).toEqual({ current: 4, max: 5, nextAt: at(5 * T) });
 });
 
 test("events are replayed in time order whatever the input order", () => {
-  const events = [start("lesson", 1 * H), start("lesson", 0)];
-  expect(energyAt(events, at(2 * H)).current).toBe(3);
+  const events = [start("lesson", 1 * T), start("lesson", 0)];
+  expect(energyAt(events, at(2 * T)).current).toBe(3);
 });
 
 test("waitParts rounds up to the minute and never goes negative", () => {
@@ -76,19 +79,19 @@ test("msUntilFull adds one period per further point needed", () => {
 
 
 test("an event dated in the future (clock moved back) is treated as happening now", () => {
-  expect(energyAt([start("lesson", 2 * H)], at(0))).toEqual({ current: 4, max: 5, nextAt: at(3 * H) });
+  expect(energyAt([start("lesson", 2 * T)], at(0))).toEqual({ current: 4, max: 5, nextAt: at(3 * T) });
 });
 
 test("a bought refill restores the maximum and the timer stops", () => {
   const events = [start("boss", 0), start("boss", 1)];
-  expect(energyAt(events, at(2 * H), [at(H)])).toEqual({ current: 5, max: 5, nextAt: null });
+  expect(energyAt(events, at(2 * T), [at(T)])).toEqual({ current: 5, max: 5, nextAt: null });
 });
 
 test("spending after a refill restarts the timer from that spend", () => {
-  const events = [start("boss", 0), start("lesson", 2 * H)];
-  const e = energyAt(events, at(2 * H + 1), [at(H)]);
+  const events = [start("boss", 0), start("lesson", 2 * T)];
+  const e = energyAt(events, at(2 * T + 1), [at(T)]);
   expect(e.current).toBe(4);
-  expect(e.nextAt).toBe(at(5 * H));
+  expect(e.nextAt).toBe(at(5 * T));
 });
 
 test("demo_grant stays in the local journal like session_started", async () => {

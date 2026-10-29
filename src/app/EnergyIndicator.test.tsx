@@ -29,7 +29,7 @@ test("opens the explanation sheet with the countdown and a review link", async (
   const dialog = await screen.findByRole("dialog", { name: fr.energy.title });
   expect(dialog).toHaveTextContent(fr.energy.explain);
   expect(dialog).toHaveTextContent(fr.energy.nextIn("02:14:00"));
-  expect(dialog).toHaveTextContent(fr.energy.fullIn("05:14:00")); // 3/5: one more point after the next one, 3 h later
+  expect(dialog).toHaveTextContent(fr.energy.fullIn("02:24:00")); // 3/5: one more point after the next one, 10 min later
   expect(screen.getByRole("link", { name: fr.energy.review })).toHaveAttribute("href", "/review");
   expect(dialog).toHaveTextContent(fr.energy.label(3, 5), { normalizeWhitespace: false });
 });

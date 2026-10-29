@@ -18,6 +18,7 @@
 | [Plan Gacha](superpowers/plans/2026-10-24-gacha.md) | orchestrateur + sous-agents | gacha par thème : dessins, migration, règles, reprise, bannières, animation Xin xăm |
 | [Plan Sons et révélation](superpowers/plans/2026-10-26-sound-and-reveal.md) | orchestrateur + sous-agents | sons synthétisés (leçons, combats, arène), présage crescendo, cartes, signature de la Gardienne |
 | [Plan Deux nouveaux tirages](superpowers/plans/2026-10-27-more-banners.md) | orchestrateur + sous-agents | « Seigneur des mers » et « Esprits de la nuit » : dessins, migration, sélecteur, signatures, sons |
+| [Spec Lì xì du jour](superpowers/specs/2026-10-29-daily-bonus-design.md) | tous | bonus de connexion quotidien : enveloppe rouge, suite de 7 jours, règle serveur |
 | [Déploiement](deploy.md) | toi | runbook Netlify/Supabase, et version démo sur le deploy preview de la PR « Démo (ne pas fusionner) » |
 | [Plan arbre + boss](superpowers/plans/2026-10-14-tree-and-boss.md) | orchestrateur + sous-agents | étapes 1–2 de la Progression V2 : arbre de compétences, boss Thủy Tinh |
 | [Plan énergie](superpowers/plans/2026-10-14-energy.md) | orchestrateur + sous-agents | étape 3 de la Progression V2 : énergie ⚡ |

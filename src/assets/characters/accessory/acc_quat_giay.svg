@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <g id="accessory-joss">
+      <path d="M86.5 117 L86.5 93 L97.5 93 L97.5 117 Z" fill="#F4E4C4"/>
+      <path d="M88.6 95.5 L95.4 95.5 L95.4 102.3 L88.6 102.3 Z" fill="#D9A93A" stroke-width="1.3"/>
+      <path d="M92 105.5 L92 111" fill="none" stroke="#B23A2A" stroke-width="1.8"/>
+    </g>
+  </defs>
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Éventail de papier-monnaie : cinq feuilles de vàng mã crème à feuille d'or, déployées en éventail dans la main droite (92,122) -->
+    <use href="#accessory-joss" transform="rotate(-62 92 120)"/>
+    <use href="#accessory-joss" transform="rotate(-31 92 120)"/>
+    <use href="#accessory-joss"/>
+    <use href="#accessory-joss" transform="rotate(31 92 120)"/>
+    <use href="#accessory-joss" transform="rotate(62 92 120)"/>
+    <!-- rivet vermillon et le poing qui le tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="129.5" r="2.4" fill="#B23A2A" stroke-width="1.5"/>
+  </g>
+</svg>

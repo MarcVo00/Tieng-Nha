@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 180">
+  <!-- La même épée, illuminée : le dragon est entré dans la lame. Tranchants d'or, veines d'or dans l'écume, flamme et garde d'or (comme l'objet). Posée exactement sur ink-dragon-blade.svg -->
+  <g stroke="#1F1A17" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M20 0.8 Q22 4.4 25 3.9 Q24.5 7.4 27 9.4 Q26.5 16 20 18.4 Q13.5 16 13 9.4 Q15.5 7.4 15 3.9 Q18 4.4 20 0.8 Z" fill="#D9A93A" stroke-width="1.8"/>
+    <circle cx="20" cy="10.4" r="3.6" fill="#F4E4C4" stroke-width="1.5"/>
+    <path d="M11 127 L11 38 L20 20 L29 38 L29 127 Z" fill="#D9A93A"/>
+    <path d="M15 123 L15 40 L20 29 L25 40 L25 123 Z" fill="#F4E4C4" stroke-width="1.3"/>
+    <!-- les veines : la veine d'or au centre, et ses branches comme des éclairs -->
+    <path d="M19 119 L19 38 L20 35 L21 38 L21 119 Z" fill="#D9A93A" stroke-width="0.8"/>
+    <path d="M20 46 L17.2 51 L16.6 56 M20 58 L22.8 63.5 L23.4 69 M20 72 L17 77.5 L16.4 83 M20 87 L23 92.5 L23.6 98 M20 100 L17.2 105.5 L16.6 111 M20 64 L17.4 67 M20 93 L17.4 96 M20 79 L22.6 82" fill="none" stroke="#D9A93A" stroke-width="1.3"/>
+    <path d="M4 126 Q5 117 13 118 L16 112 L20 117 L24 112 L27 118 Q35 117 36 126 Q28 131 20 130 Q12 131 4 126 Z" fill="#D9A93A"/>
+    <circle cx="13" cy="124" r="2" fill="#B23A2A" stroke-width="1.1"/>
+    <circle cx="27" cy="124" r="2" fill="#B23A2A" stroke-width="1.1"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Tunique de la nuit : tunique indigo toute simple, col croisé noir, ceinture noire, un croissant de lune brodé -->
+    <path d="M40 94 Q60 86 80 94 L94 118 L86 122 L80 110 L82 138 L38 138 L40 110 L34 122 L26 118 Z" fill="#2B4E6E"/>
+    <path d="M51 91 L60 107 L69 91" fill="none" stroke-width="3"/>
+    <path d="M39.4 119 L80.6 119 L81 125 L39 125 Z" fill="#1F1A17" stroke-width="2"/>
+    <!-- croissant de lune vàng hoè -->
+    <path d="M71 98.5 A5 5 0 1 0 75.5 106 A3.8 3.8 0 1 1 71 98.5 Z" fill="#D9A93A" stroke-width="1.4"/>
+  </g>
+</svg>

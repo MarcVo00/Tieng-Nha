@@ -13,6 +13,7 @@ import {
   recapOrder,
   revealAllOrder,
   revealReducer,
+  scrollBeats,
   topRarity,
   type RevealAction,
   type RevealState,
@@ -204,4 +205,17 @@ describe("the sequence", () => {
     expect(revealReducer(recap, { type: "press" })).toBe(recap);
     expect(revealReducer(recap, { type: "skip" })).toBe(recap);
   });
+});
+
+test("the scroll after a signature: paper there from the first frame, her medallion rising halfway through the unroll", () => {
+  // Without a signature (the card flip bridges the gap): unchanged, the paper fades in, then the content, then the seal.
+  expect(scrollBeats(0, false)).toEqual({ paper: 0, contentAt: REVEAL.unroll, sealAt: REVEAL.seal });
+  expect(scrollBeats(REVEAL.goldHold, false).contentAt).toBe(REVEAL.goldHold + REVEAL.unroll);
+  // After a signature: never a bare stage, never an empty scroll.
+  const signed = scrollBeats(0, true);
+  expect(signed.paper).toBe(1);
+  expect(signed.contentAt).toBeLessThan(REVEAL.unroll);
+  expect(signed.contentAt).toBeGreaterThan(0);
+  expect(signed.contentAt + REVEAL.content).toBeLessThanOrEqual(REVEAL.unroll + 0.1);
+  expect(signed.sealAt).toBe(signed.contentAt + REVEAL.content);
 });

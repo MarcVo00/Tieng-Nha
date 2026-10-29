@@ -27,6 +27,14 @@ Palette fermée, inspirée des pigments Đông Hồ. Un personnage utilise **4 �
 | Peau | `#F6DDBF` | — | peau humaine |
 | Peau d'esprit | `#9CC3BB` | — | êtres surnaturels (Thủy Tinh…) |
 
+**Feu froid (hồ ly).** Le feu bleu de la renarde à neuf queues (sa signature : queues de flamme, étincelles, cerne de sa silhouette) éclaircit l'indigo en trois tons, à réutiliser pour tout feu follet ou feu froid plutôt que d'inventer d'autres bleus :
+
+| Nom | Hex | Usage |
+|---|---|---|
+| Lửa chàm (flamme indigo) | `#3F7FB8` | corps de flamme, langues au bord des queues |
+| Lửa lạnh (feu froid) | `#7CC3EC` | cœur de flamme, cerne de silhouette, étincelles ; aussi le token `--fx-foxfire` |
+| Tro băng (cendre de givre) | `#C9EAFB` | traînées de pinceau dans la flamme, cœur des étincelles |
+
 Ces couleurs sont **réservées aux personnages** ; elles ne remplacent pas les tokens d'interface (`--color-primary`, tons pédagogiques…).
 
 ## 3. Règles de dessin

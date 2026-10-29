@@ -429,6 +429,147 @@ const sigGong = score((s, t) => {
   wood(s, t, 260, 0.3, 0.12, true); // the mallet
 });
 
+// The signature of L'épée du dragon (spec more-banners §4.4): the roar of the ink dragon, the ring of the blade.
+
+/**
+ * The ink dragon rising: a deep growl and a rumble, ≈ 1.5 s. Low detuned saws through a lowpass that opens like a jaw
+ * then closes, roughened by a fast flutter (the throat); a rumble of low noise under it; a band of growling noise in
+ * the mid range carries it on a phone speaker, which barely plays the low voices.
+ */
+const sigRoar = score((s, t) => {
+  const len = 1.5;
+  const end = t + len;
+  // The throat's flutter: a gain whose level is shaken ≈ 28 times a second.
+  const throat = s.ctx.createGain();
+  throat.gain.value = 0.7;
+  const flutter = s.ctx.createOscillator();
+  flutter.type = "triangle";
+  flutter.frequency.setValueAtTime(22, t);
+  flutter.frequency.linearRampToValueAtTime(32, t + len * 0.4);
+  flutter.frequency.linearRampToValueAtTime(18, end);
+  const depth = s.ctx.createGain();
+  depth.gain.value = 0.3;
+  flutter.connect(depth).connect(throat.gain);
+  s.run(flutter, t, end);
+  const shape = envelope(s, t, 1, len * 0.22, end, len * 0.28);
+  throat.connect(shape).connect(s.out);
+
+  // The voice: three detuned saws, the jaw opening and closing (lowpass sweep), a slight fall in pitch.
+  const jaw = filter(s.ctx, "lowpass", 220, 4);
+  jaw.frequency.setValueAtTime(220, t);
+  jaw.frequency.exponentialRampToValueAtTime(950, t + len * 0.3);
+  jaw.frequency.exponentialRampToValueAtTime(600, t + len * 0.55);
+  jaw.frequency.exponentialRampToValueAtTime(180, end);
+  jaw.connect(throat);
+  for (const v of [
+    { f: 55, level: 0.22 },
+    { f: 57.4, level: 0.18 },
+    { f: 82.4, level: 0.12 },
+  ]) {
+    const osc = s.ctx.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(v.f * 1.08, t);
+    osc.frequency.exponentialRampToValueAtTime(v.f, t + len * 0.3);
+    osc.frequency.exponentialRampToValueAtTime(v.f * 0.86, end);
+    const g = s.ctx.createGain();
+    g.gain.value = v.level;
+    osc.connect(g).connect(jaw);
+    s.run(osc, t, end);
+  }
+
+  // The growl a phone speaker can play: band-passed noise in the mid range, shaken by the same throat.
+  const rasp = s.ctx.createBufferSource();
+  rasp.buffer = noise(s.ctx);
+  const band = filter(s.ctx, "bandpass", 420, 2.2);
+  band.frequency.setValueAtTime(380, t);
+  band.frequency.exponentialRampToValueAtTime(820, t + len * 0.3);
+  band.frequency.exponentialRampToValueAtTime(300, end);
+  const gr = s.ctx.createGain();
+  gr.gain.value = 0.55;
+  rasp.connect(band).connect(gr).connect(throat);
+  s.run(rasp, t, end);
+
+  // The rumble: low noise that swells and lingers, felt more than heard.
+  const rumble = s.ctx.createBufferSource();
+  rumble.buffer = noise(s.ctx);
+  const low = filter(s.ctx, "lowpass", 140, 0.8);
+  const gu = envelope(s, t, 0.5, len * 0.35, end);
+  rumble.connect(low).connect(gu).connect(s.out);
+  s.run(rumble, t, end);
+});
+
+/**
+ * The blade lit: a short « shing » of steel, then a bright metallic ring that sings on, beating softly (two partials a
+ * few hertz apart), with a high shimmer of gold. ≈ 1.8 s.
+ */
+const sigBlade = score((s, t) => {
+  swish(s, t, 0.12, 0.5, 0.03, 2600, 7000);
+  metal(s, t + 0.08, 1760, 0.22, 0.6);
+  for (const p of [
+    { f: 2489, amp: 0.12, len: 1.8 },
+    { f: 2493.5, amp: 0.1, len: 1.7 }, // the beat of a long blade
+    { f: 3951, amp: 0.05, len: 1.1 },
+    { f: 5274, amp: 0.025, len: 0.7 },
+  ]) {
+    const osc = s.ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = p.f;
+    const end = t + 0.08 + p.len;
+    const g = envelope(s, t + 0.08, p.amp, 0.002, end);
+    osc.connect(g).connect(s.out);
+    s.run(osc, t + 0.08, end);
+  }
+  bell(s, t + 0.1, 3135.96, 0.05, 0.9); // G7, the gold
+});
+
+// The signature of La renarde à neuf queues (spec more-banners §4.4): a breath per lantern, the cold fire, the bells.
+
+/** A lantern blown out: a soft puff of breath falling in pitch, the small « fwup » of the flame dying. ≤ 260 ms. */
+const sigLantern = score((s, t) => {
+  whoosh(s, t, 0.24, 900, 260, 0.3, 0.035, 0.9);
+  const flame = s.ctx.createOscillator();
+  flame.type = "sine";
+  flame.frequency.setValueAtTime(150, t);
+  flame.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+  const g = envelope(s, t, 0.18, 0.01, t + 0.14);
+  flame.connect(g).connect(s.out);
+  s.run(flame, t, t + 0.14);
+});
+
+/**
+ * Foxfire catching: a cold « whomp » of ignition, a hiss of blue flame that swells as the tails fan out, crackles
+ * scattered through it (high and dry, never warm), and a faint glassy shimmer, two sines a few hertz apart. ≈ 1.3 s.
+ */
+const sigFoxfire = score((s, t) => {
+  const len = 1.3;
+  whoosh(s, t, 0.42, 220, 1400, 0.32, 0.06, 0.9);
+  const hiss = s.ctx.createBufferSource();
+  hiss.buffer = noise(s.ctx);
+  const cold = filter(s.ctx, "highpass", 3800, 0.6);
+  const g = envelope(s, t, 0.12, len * 0.4, t + len);
+  hiss.connect(cold).connect(g).connect(s.out);
+  s.run(hiss, t, t + len);
+  const rnd = lcg(9);
+  for (let i = 0; i < 14; i++) {
+    const at = t + 0.05 + (i / 14) * (len - 0.25) + rnd() * 0.05;
+    rattle(s, at, 2400 + rnd() * 3600, 0.22 + rnd() * 0.2);
+  }
+  for (const f of [1318.5, 1323.5]) {
+    const osc = s.ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = f;
+    const gs = envelope(s, t + 0.1, 0.025, 0.3, t + len);
+    osc.connect(gs).connect(s.out);
+    s.run(osc, t + 0.1, t + len);
+  }
+});
+
+/** A ring of small bells (clochettes) shaken once round her: seven, quick, high and cold, the last one lingering. ≈ 1.8 s. */
+const sigBells = score((s, t) => {
+  [N.A5, N.D6, N.E5 * 2, N.G5 * 2, N.A5 * 2, N.D6 * 2, N.A5 * 2].forEach((f, i) => bell(s, t + i * 0.06, f, 0.07 + (i === 6 ? 0.04 : 0), 1.0 + i * 0.1));
+  whoosh(s, t, 0.6, 4000, 8000, 0.03, 0.2, 0.7);
+});
+
 // The fights (spec sound-and-reveal §4.2): each fighter strikes with the sound of its gear. A blow is ≤ 450 ms, so it
 // ends before the defender's recoil; a critical (`strong`) strikes sharper here, the player also plays it louder.
 
@@ -534,6 +675,43 @@ const blowKiemKhach = score((s, t, strong) => {
   metal(s, t + 0.17, 3136, 0.1 * f.k, 0.13);
 });
 
+/** L'épée du dragon (legendary): the blade's swish, then a roar that echoes under the steel. ≈ 0.44 s. */
+const blowKiemRong = score((s, t, strong) => {
+  const f = force(strong);
+  swish(s, t, 0.13, 0.45 * f.k, f.attack(0.05), 1500, 4600);
+  metal(s, t + 0.11, 2200, 0.1 * f.k, 0.18);
+  whoosh(s, t + 0.1, 0.24, 140, 420, 0.4 * f.k, 0.07, 0.8); // the roar, low and breathy
+  gong(s, t + 0.11, 110, 0.1 * f.k, 0.33);
+  whoosh(s, t + 0.24, 0.19, 120, 300, 0.16 * f.k, 0.07, 0.8); // its echo
+});
+
+/** Hồ ly (legendary), bare-handed: a cold-fire crackle, sparks that snap and a high ghostly ring. ≈ 0.4 s. */
+const blowHoLy = score((s, t, strong) => {
+  const f = force(strong);
+  const sparks = [
+    { at: 0, f: 4200, l: 0.9 },
+    { at: 0.018, f: 6200, l: 0.6 },
+    { at: 0.04, f: 3600, l: 1 },
+    { at: 0.062, f: 5600, l: 0.7 },
+    { at: 0.09, f: 4800, l: 0.8 },
+    { at: 0.121, f: 6800, l: 0.5 },
+    { at: 0.15, f: 3900, l: 0.6 },
+  ];
+  for (const k of sparks) burst(s, t + k.at, "bandpass", k.f, 4, k.l * 1.2 * f.k, 0.02);
+  whoosh(s, t, 0.18, 900, 3200, 0.18 * f.k, f.attack(0.05), 1.6);
+  bell(s, t + 0.1, 1760, 0.09 * f.k, 0.3); // A6, cold
+  bell(s, t + 0.115, 2489, 0.05 * f.k, 0.26); // a tritone-ish shimmer above
+});
+
+/** Lạc Long Quân (legendary), bare-handed: a wave builds, crashes, and drains back. ≈ 0.44 s. */
+const blowLacLongQuan = score((s, t, strong) => {
+  const f = force(strong);
+  whoosh(s, t, 0.16, 300, 1400, 0.4 * f.k, f.attack(0.12), 0.8); // the swell
+  thud(s, t + 0.14, 100, 0.5 * f.k, 0.18, f.attack(0.004)); // the crash
+  burst(s, t + 0.14, "lowpass", 2400, 0.7, 0.5 * f.k, 0.18); // spray
+  whoosh(s, t + 0.17, 0.27, 1800, 350, 0.22 * f.k, 0.05, 0.7); // the water draining back
+});
+
 /** Dégâts: a dull impact, felt in the chest. ≤ 0.26 s. */
 const fightHurt = score((s, t) => {
   thud(s, t, 95, 0.7, 0.24);
@@ -602,6 +780,11 @@ export const recipes: Record<SoundCue, Recipe> = {
   "sig.wind": sigWind,
   "sig.brush": sigBrush,
   "sig.gong": sigGong,
+  "sig.roar": sigRoar,
+  "sig.blade": sigBlade,
+  "sig.lantern": sigLantern,
+  "sig.foxfire": sigFoxfire,
+  "sig.bells": sigBells,
 
   "blow.blade": blowBlade,
   "blow.staff": blowStaff,
@@ -610,6 +793,9 @@ export const recipes: Record<SoundCue, Recipe> = {
   "blow.acc_thuan_thien": blowThuanThien,
   "blow.char_phap_su": blowPhapSu,
   "blow.char_kiem_khach": blowKiemKhach,
+  "blow.acc_kiem_rong": blowKiemRong,
+  "blow.char_ho_ly": blowHoLy,
+  "blow.char_lac_long_quan": blowLacLongQuan,
 
   "fight.hurt": fightHurt,
   "fight.miss": fightMiss,

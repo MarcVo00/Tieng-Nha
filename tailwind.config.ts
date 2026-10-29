@@ -20,8 +20,9 @@ export default {
       streak: "var(--color-streak)",
       scrim: "var(--color-scrim)",
       paper: "var(--color-paper)",
-      fx: { ink: "var(--fx-ink)", vermilion: "var(--fx-vermilion)", gold: "var(--fx-gold)" },
+      fx: { ink: "var(--fx-ink)", vermilion: "var(--fx-vermilion)", gold: "var(--fx-gold)", foxfire: "var(--fx-foxfire)" },
       frame: { bronze: "var(--frame-bronze)", jade: "var(--frame-jade)", sonmai: "var(--frame-son-mai)" },
+      altar: { sea: "var(--altar-sea)", night: "var(--altar-night)" },
       tone: {
         ngang: "var(--tone-ngang)", huyen: "var(--tone-huyen)", sac: "var(--tone-sac)",
         hoi: "var(--tone-hoi)", nga: "var(--tone-nga)", nang: "var(--tone-nang)",

@@ -44,6 +44,17 @@ export const REVEAL = {
   goldHold: duration.slow + duration.base,
 } as const;
 
+/**
+ * When the scroll's parts appear, from `delay` (seconds). Without a signature the card flip bridges the gap: the paper
+ * fades in as it unrolls, then the content, then the seal. After a signature the scene hands over to it directly, so
+ * the paper is there from the first frame (never a bare altar) and the content rises halfway through the unroll
+ * (never an empty scroll).
+ */
+export function scrollBeats(delay: number, signed: boolean): { paper: number; contentAt: number; sealAt: number } {
+  const contentAt = delay + (signed ? REVEAL.unroll / 2 : REVEAL.unroll);
+  return { paper: signed ? 1 : 0, contentAt, sealAt: contentAt + REVEAL.content };
+}
+
 /** Performance budgets (audit §D.4). */
 export const BUDGET = { animated: 8, particles: 12 } as const;
 

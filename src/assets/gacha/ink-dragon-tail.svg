@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 24">
+  <!-- La queue : l'encre s'effile, nageoire vermillon en éventail ; elle suit le corps (attache à droite) -->
+  <g stroke="#1F1A17" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M11 12 L1 2 L5.5 8.6 L0.5 12 L5.5 15.4 L1 22 Z" fill="#B23A2A"/>
+    <path d="M34 5.5 Q22 5 13 9.6 Q9.5 11 8 12 Q9.5 13 13 14.4 Q22 19 34 18.5 Z" fill="#1F1A17"/>
+    <path d="M17 12 Q21 8.6 25 12 M25 12 Q29 8.6 33 12" fill="none" stroke="#9CC3BB" stroke-width="1.2"/>
+    <path d="M12 12 Q22 11 33 12" fill="none" stroke="#D9A93A" stroke-width="1"/>
+  </g>
+</svg>

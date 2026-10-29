@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-base" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Lạc Long Quân, le roi dragon : bottes noires -->
+    <path d="M47 134 L45 150 L58 150 L60 137 L62 150 L75 150 L73 134 Z" fill="#1F1A17"/>
+    <!-- mains -->
+    <circle cx="28" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <!-- petites cornes de dragon en jade, derrière la tête -->
+    <path d="M48 52 Q42 42 37 30 Q41 31 43 35 Q43 28 46 24 Q48 31 47 37 Q50 44 55 49 Z M72 52 Q78 42 83 30 Q79 31 77 35 Q77 28 74 24 Q72 31 73 37 Q70 44 65 49 Z" fill="#9CC3BB"/>
+    <!-- longue chevelure qui tombe sur les deux épaules, pointes en écume -->
+    <path d="M40 64 Q31 78 34 94 Q36 104 30 110 Q38 110 41 104 Q41 112 46 113 Q44 104 46 94 Q46 80 50 70 Z M80 64 Q89 78 86 94 Q84 104 90 110 Q82 110 79 104 Q79 112 74 113 Q76 104 74 94 Q74 80 70 70 Z" fill="#1F1A17"/>
+    <!-- tête -->
+    <circle cx="60" cy="70" r="22" fill="#F6DDBF"/>
+    <!-- chignon haut serré dans un anneau d'or -->
+    <circle cx="60" cy="42" r="6.5" fill="#1F1A17"/>
+    <path d="M54.5 44.5 L65.5 44.5 L65 49 L55 49 Z" fill="#D9A93A" stroke-width="1.6"/>
+    <!-- cheveux en pointe de veuve, comme une crête -->
+    <path d="M38 73 Q37 49 60 47 Q83 49 82 73 Q79 60 67 57 L60 63 L53 57 Q41 60 38 73 Z" fill="#1F1A17"/>
+  </g>
+</svg>

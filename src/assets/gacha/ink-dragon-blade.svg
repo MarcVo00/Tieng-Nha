@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 180">
+  <!-- L'épée du dragon, éteinte, debout sur l'autel : tranchants d'acier de jade, cœur d'écume, garde d'encre ; elle attend le dragon -->
+  <g stroke="#1F1A17" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+    <!-- la perle du dragon dans sa flamme, au-dessus de la pointe -->
+    <path d="M20 0.8 Q22 4.4 25 3.9 Q24.5 7.4 27 9.4 Q26.5 16 20 18.4 Q13.5 16 13 9.4 Q15.5 7.4 15 3.9 Q18 4.4 20 0.8 Z" fill="#B23A2A" stroke-width="1.8"/>
+    <circle cx="20" cy="10.4" r="3.6" fill="#F4E4C4" stroke-width="1.5"/>
+    <!-- lame -->
+    <path d="M11 127 L11 38 L20 20 L29 38 L29 127 Z" fill="#9CC3BB"/>
+    <path d="M15 123 L15 40 L20 29 L25 40 L25 123 Z" fill="#F4E4C4" stroke-width="1.3"/>
+    <path d="M19 119 L19 38 L20 35 L21 38 L21 119 Z" fill="#1F1A17" stroke-width="0.8"/>
+    <!-- garde en tête de dragon, d'encre, yeux de corail -->
+    <path d="M4 126 Q5 117 13 118 L16 112 L20 117 L24 112 L27 118 Q35 117 36 126 Q28 131 20 130 Q12 131 4 126 Z" fill="#1F1A17"/>
+    <circle cx="13" cy="124" r="2" fill="#B23A2A" stroke-width="1.1"/>
+    <circle cx="27" cy="124" r="2" fill="#B23A2A" stroke-width="1.1"/>
+    <!-- poignée, pommeau de jade, gland vermillon -->
+    <path d="M17 130 L23 130 L23 158 L17 158 Z" fill="#1F1A17"/>
+    <path d="M17 137 L23 134 M17 144 L23 141 M17 151 L23 148" fill="none" stroke="#F4E4C4" stroke-width="1"/>
+    <circle cx="20" cy="162.5" r="4.2" fill="#9CC3BB"/>
+    <path d="M20 166.6 Q19 173 14.5 178.6 L19 179 Q22 173 21.6 167 Z" fill="#B23A2A" stroke-width="1.6"/>
+  </g>
+</svg>

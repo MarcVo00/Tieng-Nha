@@ -38,6 +38,26 @@ export function GoldRays({ x, y, delay = 0, length = REVEAL.raysIn }: { x: numbe
 
 // --- The omen: built up by the best rarity of the pull, the only hint before the cards ---
 
+/** The altar tint of each theme during the omen (spec more-banners §4.3): a color token, the omen itself is the same. */
+export type AltarTint = "sea" | "night";
+const ALTAR_TINTS: Record<string, AltarTint> = { seigneur_des_mers: "sea", esprits_de_la_nuit: "night" };
+export const altarTintOf = (theme: string): AltarTint | null => ALTAR_TINTS[theme] ?? null;
+
+/** The theme's tint washes the paper behind the altar as the omen starts (under every omen layer). */
+export function AltarTintWash({ tint }: { tint: AltarTint }) {
+  return (
+    <motion.span
+      aria-hidden="true"
+      data-tint={tint}
+      className="pointer-events-none absolute inset-0"
+      style={{ background: `radial-gradient(closest-side at 50% ${ALTAR.y + ALTAR.h / 2}px, var(--altar-${tint}), transparent)` }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.45 }}
+      transition={{ duration: duration.slow, ease: ease.out }}
+    />
+  );
+}
+
 /** Rare: a jade light spreads around the altar (behind its print, so the lacquer keeps its red). */
 export function JadeGlow() {
   return (

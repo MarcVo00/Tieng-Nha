@@ -321,3 +321,22 @@ test("sounds: a recovered pull opens on its recap in silence", () => {
   const { sound } = show(pullOf([item("char_phap_su", "legendary")]), { recovered: true });
   expect(sound.played).toEqual([]);
 });
+
+test("the omen stage carries the altar tint of its theme (none for the dark legends); the omen itself is unchanged", async () => {
+  const cases = [
+    { theme: "legendes_sombres", tint: null },
+    { theme: "seigneur_des_mers", tint: "sea" },
+    { theme: "esprits_de_la_nuit", tint: "night" },
+  ];
+  for (const c of cases) {
+    const { user, dialog } = show({ ...pullOf([item("acc_giao_tre", "common")]), id: `tint-${c.theme}`, theme: c.theme });
+    expect(dialog.querySelector("[data-stage]")?.getAttribute("data-altar-tint")).toBeNull(); // only during the omen
+    await user.click(within(dialog).getByRole("button", { name: fr.gacha.scene.shake }));
+    await waitFor(() => expect(dialog).toHaveAttribute("data-phase", "omen"), SLOW);
+    const stage = dialog.querySelector("[data-stage]");
+    expect(stage?.getAttribute("data-altar-tint")).toBe(c.tint);
+    expect(stage?.querySelectorAll("[data-tint]")).toHaveLength(c.tint === null ? 0 : 1);
+    expect(stage?.querySelector("[data-fx]")).toBeNull(); // a common pull keeps the bare wood
+    dialog.closest("body")?.replaceChildren();
+  }
+}, 15000);

@@ -317,6 +317,20 @@ describe("gacha_pulled", () => {
     expect(w.inventory).toEqual([]);
   });
 
+  test("an older app (deploy order: server first) replaying a pull of a theme it does not know: no crash, no unknown item, later pulls still count", () => {
+    // gshop stands for the 1.7 catalogue: no seigneur_des_mers items. The whole pull is ignored locally (no debit,
+    // no refund, no item); the server stays the reference for xu and inventory.
+    const newTheme = ev("gacha_pulled", { theme: "seigneur_des_mers", cost: 360, items: [
+      { itemId: "acc_kiem_rong", rarity: "legendary", duplicate: false, refund: 0 },
+      { itemId: "acc_mai_cheo", rarity: "common", duplicate: true, refund: 8 },
+    ] }, "p_sea", 10, 9);
+    const mixed = pull("p_mix", 40, [item("g_hat"), item("char_ho_ly")], 10);
+    const w = walletAt([earn, newTheme, mixed, pull("p_ok", 40, [item("g_aura")], 11), equip("accessory", "acc_kiem_rong", 12)], gshop, badges);
+    expect(w.coins).toBe(1000 - 40);
+    expect(w.inventory).toEqual(["g_aura"]);
+    expect(w.equipped).toEqual({});
+  });
+
   test("each refund is capped at the catalogue rarity's refund, whatever the payload claims", () => {
     // g_hat is rare (20 xu), g_aura common (8 xu); the payload lies about the rarity and the refund
     const forged = [

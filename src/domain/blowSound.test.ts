@@ -7,6 +7,10 @@ const RARITY: Record<string, Rarity> = {
   acc_giao_tre: "common",
   char_phap_su: "legendary",
   char_kiem_khach: "epic",
+  acc_kiem_rong: "legendary",
+  char_ho_ly: "legendary",
+  char_lac_long_quan: "legendary",
+  char_thay_phap: "epic",
 };
 const rarityOf = (id: string): Rarity | null => RARITY[id] ?? null;
 
@@ -44,4 +48,19 @@ test("an unknown accessory is bare hands", () => {
 
 test("every weapon family has a blow sound", () => {
   expect(WEAPON_FAMILY).toMatchObject({ acc_giao_tre: "staff", acc_quat_sat: "fan", acc_con_vo: "staff", acc_thuan_thien: "blade" });
+});
+
+test("the new gear: the oar, trident and lantern pole are staves, the paper fan is a fan", () => {
+  expect(WEAPON_FAMILY).toMatchObject({ acc_mai_cheo: "staff", acc_dinh_ba: "staff", acc_long_den: "staff", acc_quat_giay: "fan" });
+});
+
+test("the dragon sword and the new legendary characters ring their own sound", () => {
+  expect(blowCue({ accessory: "acc_kiem_rong", character: null }, rarityOf)).toBe("blow.acc_kiem_rong");
+  expect(blowCue({ accessory: null, character: "char_ho_ly" }, rarityOf)).toBe("blow.char_ho_ly");
+  expect(blowCue({ accessory: null, character: "char_lac_long_quan" }, rarityOf)).toBe("blow.char_lac_long_quan");
+});
+
+test("the dragon sword falls back to the blade while the catalogue loads; Thầy pháp, epic, keeps the fist", () => {
+  expect(blowCue({ accessory: "acc_kiem_rong", character: null }, () => null)).toBe("blow.blade");
+  expect(blowCue({ accessory: null, character: "char_thay_phap" }, rarityOf)).toBe("blow.fist");
 });

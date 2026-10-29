@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <pattern id="outfit-vay-scale" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 4 Q4 -1 8 4 M-4 8 Q0 3 4 8 M4 8 Q8 3 12 8" fill="none" stroke="#1F1A17" stroke-width="1" opacity="0.5"/>
+    </pattern>
+    <path id="outfit-vay-chest" d="M40 92 Q60 86 80 92 L82 128 L38 128 Z"/>
+  </defs>
+  <g id="layer-outfit" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Armure d’écailles de dragon : manches vertes, plastron de jade écaillé (seule zone texturée), épaulières d’or en écailles -->
+    <path d="M42 94 L26 118 L34 122 L42 108 Z M78 94 L94 118 L86 122 L78 108 Z" fill="#4E7A4A"/>
+    <use href="#outfit-vay-chest" fill="#9CC3BB"/>
+    <use href="#outfit-vay-chest" fill="url(#outfit-vay-scale)" stroke="none"/>
+    <!-- miroir de cœur d’or, perle de jade -->
+    <circle cx="60" cy="106" r="6.5" fill="#D9A93A" stroke-width="2"/>
+    <circle cx="60" cy="106" r="4" fill="#F4E4C4" stroke-width="1.2"/>
+    <circle cx="60" cy="106" r="2.2" fill="#1F1A17" stroke="none"/>
+    <!-- ceinture noire, boucle de corail, tassettes vertes -->
+    <path d="M38 126 L82 126 L82 132 L38 132 Z" fill="#1F1A17"/>
+    <path d="M38 132 L59 132 L56 142 L40 140 Z M61 132 L82 132 L80 140 L64 142 Z" fill="#4E7A4A"/>
+    <path d="M42 136 Q46 133 50 136 M70 136 Q74 133 78 136" fill="none" stroke-width="1.2"/>
+    <path d="M56 125 L64 125 L64 133 L56 133 Z" fill="#B23A2A" stroke-width="1.5"/>
+    <!-- nageoires dorsales vermillon sur les épaules -->
+    <path d="M30 95 L27 85 L33 90 L35 81 L40 92 Z M90 95 L93 85 L87 90 L85 81 L80 92 Z" fill="#B23A2A" stroke-width="2"/>
+    <!-- épaulières : trois écailles d’or superposées -->
+    <path d="M23 107 Q21 98 29 95 Q33 88 41 91 Q48 89 50 97 Q51 104 46 106 Q35 110 23 107 Z" fill="#D9A93A"/>
+    <path d="M97 107 Q99 98 91 95 Q87 88 79 91 Q72 89 70 97 Q69 104 74 106 Q85 110 97 107 Z" fill="#D9A93A"/>
+    <path d="M27 103 Q32 98 37 102 M37 99 Q42 94 47 99 M93 103 Q88 98 83 102 M83 99 Q78 94 73 99" fill="none" stroke-width="1.4"/>
+  </g>
+</svg>

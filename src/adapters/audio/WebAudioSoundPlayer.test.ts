@@ -427,6 +427,40 @@ test("signature cues: a long gust, a dry brush stroke shorter than the gap betwe
   expect(end("sig.gong")).toBeGreaterThan(end("gacha.flip.legendary"));
 });
 
+test("the dragon sword's cues: a roar of about 1.5 s, then a blade that rings on", () => {
+  const render = (cue: SoundCue) => {
+    const ctx = new FakeAudioContext();
+    const voice = recipes[cue](ctx as unknown as AudioContext, ctx.createGain() as unknown as AudioNode, 0, false);
+    return { end: voice.end, starts: ctx.starts };
+  };
+  const roar = render("sig.roar");
+  expect(roar.end).toBeGreaterThanOrEqual(1.3);
+  expect(roar.end).toBeLessThanOrEqual(1.8);
+  expect(roar.starts).toBeGreaterThanOrEqual(4); // noise and detuned low voices together, not one tone
+  const blade = render("sig.blade");
+  expect(blade.end).toBeGreaterThanOrEqual(1.2);
+  expect(blade.end).toBeLessThanOrEqual(2.5);
+});
+
+test("the nine-tailed fox's cues: a breath shorter than the gap between two lanterns, a crackle of cold fire, a ring of bells", () => {
+  const render = (cue: SoundCue) => {
+    const ctx = new FakeAudioContext();
+    const voice = recipes[cue](ctx as unknown as AudioContext, ctx.createGain() as unknown as AudioNode, 0, false);
+    return { end: voice.end, starts: ctx.starts };
+  };
+  const breath = render("sig.lantern");
+  expect(breath.end).toBeGreaterThanOrEqual(0.15);
+  expect(breath.end).toBeLessThanOrEqual(0.3); // the lanterns go out 300 ms apart
+  const fire = render("sig.foxfire");
+  expect(fire.end).toBeGreaterThanOrEqual(0.9);
+  expect(fire.end).toBeLessThanOrEqual(1.6);
+  expect(fire.starts).toBeGreaterThanOrEqual(8); // a hiss and many crackles, not one tone
+  const bells = render("sig.bells");
+  expect(bells.end).toBeGreaterThanOrEqual(1);
+  expect(bells.end).toBeLessThanOrEqual(2.2);
+  expect(bells.starts).toBeGreaterThanOrEqual(5 * 4); // a ring of at least five small bells
+});
+
 test("fight cues: every blow has its own sound, a critical strikes sharper, the blows and the hurt stay short", () => {
   const render = (cue: SoundCue, strong = false) => {
     const ctx = new FakeAudioContext();
@@ -435,7 +469,7 @@ test("fight cues: every blow has its own sound, a critical strikes sharper, the 
     return { end: voice.end, shape: JSON.stringify(ctx.gains.map((g) => g.gain.events)) };
   };
   const blows = SOUND_CUES.filter((c) => c.startsWith("blow."));
-  expect(blows).toHaveLength(7);
+  expect(blows).toHaveLength(10);
   const shapes = new Set(blows.map((c) => render(c).shape));
   expect(shapes.size).toBe(blows.length);
   for (const cue of blows) {

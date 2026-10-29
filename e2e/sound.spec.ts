@@ -89,7 +89,7 @@ test("a x10 pull: the shake, the omen of the forced rare, then ten flips, the be
   await seedCoins(page, 400);
   await page.reload();
   await page.getByRole("link", { name: fr.app.tabs.shop, exact: true }).click();
-  const banner = page.getByRole("heading", { name: fr.shop.themes.legendes_sombres! }).locator("xpath=ancestor::section");
+  const banner = page.getByRole("tabpanel", { name: fr.shop.themes.legendes_sombres! });
   await banner.getByRole("button", { name: fr.gacha.pullTen(360) }).click();
   const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(360) });
   await shakeTube(page);

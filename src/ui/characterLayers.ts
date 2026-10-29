@@ -17,7 +17,13 @@ const CHARACTERS: Record<string, Defaults> = {
   hero: HERO,
   char_kiem_khach: { base: "char_kiem_khach", face: "char_kiem_khach", outfit: "char_kiem_khach", hat: null },
   char_phap_su: { base: "char_phap_su", face: "char_phap_su", outfit: "char_phap_su", hat: null },
+  char_lac_long_quan: { base: "char_lac_long_quan", face: "char_lac_long_quan", outfit: "char_lac_long_quan", hat: null },
+  char_thay_phap: { base: "char_thay_phap", face: "char_thay_phap", outfit: "char_thay_phap", hat: null },
+  char_ho_ly: { base: "char_ho_ly", face: "char_ho_ly", outfit: "char_ho_ly", hat: null },
 };
+
+/** Every body a player can wear, the starting hero first. */
+export const CHARACTER_BODIES: readonly string[] = Object.keys(CHARACTERS);
 
 function urlOf(slot: string, id: string): string | undefined {
   return URLS.get(`${slot}/${id}`);

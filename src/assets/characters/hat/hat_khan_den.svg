@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-hat" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Voile noir : un khăn de crêpe noire posé sur la tête, qui retombe sur les épaules, liseré indigo -->
+    <path d="M38 62 Q37 39 60 36 Q83 39 82 62 Q86 70 87 82 Q88 92 92 99 L80 98 Q81.5 88 80.5 77 Q79.5 67 75 62 Q60 55 45 62 Q40.5 67 39.5 77 Q38.5 88 40 98 L28 99 Q32 92 33 82 Q34 70 38 62 Z" fill="#1F1A17"/>
+    <path d="M40.5 62.5 Q60 50 79.5 62.5" fill="none" stroke="#2B4E6E" stroke-width="2.6"/>
+    <path d="M30.5 96 L39.5 95.5 M89.5 96 L80.5 95.5" fill="none" stroke="#2B4E6E" stroke-width="2"/>
+  </g>
+</svg>

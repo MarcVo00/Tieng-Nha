@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <path id="acc-kiem-rong-coil" d="M92 108 C107 103 107 93 92 89 C77 85 77 75 92 71 C106 67 106 57 93 53 Q85 51 84 44"/>
+  </defs>
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- L’épée du dragon : large lame à tranchants d’or et cœur d’écume veiné d’or, un dragon de jade enroulé qui sort de la garde, la perle du dragon à la pointe, main droite (92,122) -->
+    <!-- la perle du dragon dans sa flamme, au-dessus de la pointe -->
+    <path d="M92 0.5 Q94 4 97 3.5 Q96.5 7 99 9 Q98.5 15.5 92 18 Q85.5 15.5 85 9 Q87.5 7 87 3.5 Q90 4 92 0.5 Z" fill="#B23A2A" stroke-width="2"/>
+    <circle cx="92" cy="10" r="3.6" fill="#F4E4C4" stroke-width="1.6"/>
+    <!-- lame : tranchants d’or, cœur d’écume, veine d’or -->
+    <path d="M85 110 L85 31 L92 16 L99 31 L99 110 Z" fill="#D9A93A"/>
+    <path d="M88.6 106 L88.6 32 L92 24.5 L95.4 32 L95.4 106 Z" fill="#F4E4C4" stroke-width="1.4"/>
+    <path d="M90.9 102 L90.9 33 L92 30 L93.1 33 L93.1 102 Z" fill="#D9A93A" stroke-width="1"/>
+    <!-- le dragon enroulé : contour noir, corps jade -->
+    <g fill="none">
+      <use href="#acc-kiem-rong-coil" stroke-width="9.6"/>
+      <use href="#acc-kiem-rong-coil" stroke="#9CC3BB" stroke-width="4.6"/>
+    </g>
+    <!-- nageoire de la queue -->
+    <path d="M84 44 L79 36 L85 39 L87 32 Z" fill="#B23A2A" stroke-width="1.8"/>
+    <!-- garde en tête de dragon d’or, cornes et yeux de corail -->
+    <path d="M76 112 Q77 103 85 104 L88 98 L92 103 L96 98 L99 104 Q107 103 108 112 Q100 117 92 116 Q84 117 76 112 Z" fill="#D9A93A"/>
+    <circle cx="85" cy="110" r="2" fill="#B23A2A" stroke-width="1.2"/>
+    <circle cx="99" cy="110" r="2" fill="#B23A2A" stroke-width="1.2"/>
+    <!-- poignée noire, pommeau perle de jade, gland vermillon -->
+    <path d="M89 116 L95 116 L95 132 L89 132 Z" fill="#1F1A17"/>
+    <path d="M92 138 Q91 146 86.5 151 L91 151.5 Q94 146 93.6 138.5 Z" fill="#B23A2A" stroke-width="1.8"/>
+    <circle cx="92" cy="135.5" r="3.6" fill="#9CC3BB"/>
+    <!-- le poing qui la tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

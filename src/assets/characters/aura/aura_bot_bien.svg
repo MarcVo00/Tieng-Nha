@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-aura" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Écume marine : une mer de jade au ras du sol, deux petites lames d’écume de chaque côté, quelques bulles -->
+    <!-- petites lames qui s’enroulent -->
+    <path d="M17 134 Q8 122 13 111 Q18 102 28 105 Q34 108 31 114 Q28 117 25 115 Q27 111 23 111 Q19 113 20 120 Q21 127 26 131 Z" fill="#9CC3BB"/>
+    <path d="M103 134 Q112 122 107 111 Q102 102 92 105 Q86 108 89 114 Q92 117 95 115 Q93 111 97 111 Q101 113 100 120 Q99 127 94 131 Z" fill="#9CC3BB"/>
+    <path d="M13.3 110.5 Q18 102 28 105 Q34 108 31 114 Q28 117 25 115 Q27 111 23 111 Q20.5 108.5 17.5 110.5 Q15.5 108.5 13.3 110.5 Z" fill="#F4E4C4" stroke-width="1.8"/>
+    <path d="M106.7 110.5 Q102 102 92 105 Q86 108 89 114 Q92 117 95 115 Q93 111 97 111 Q99.5 108.5 102.5 110.5 Q104.5 108.5 106.7 110.5 Z" fill="#F4E4C4" stroke-width="1.8"/>
+    <!-- la mer, crêtes en vagues -->
+    <path d="M12 149 Q5 149 5 142 L4 134 Q8 127 13 131 Q19 124 25 131 Q31 125 37 131 L83 131 Q89 125 95 131 Q101 124 107 131 Q112 127 116 134 L115 142 Q115 149 108 149 Z" fill="#9CC3BB"/>
+    <path d="M10 141 Q14 138 18 141 M24 145 Q28 142 32 145 M88 145 Q92 142 96 145 M102 141 Q106 138 110 141" fill="none" stroke-width="1.4"/>
+    <!-- bulles -->
+    <g fill="#9CC3BB" stroke-width="1.6">
+      <circle cx="10" cy="99" r="2.6"/>
+      <circle cx="19" cy="92" r="1.8"/>
+      <circle cx="110" cy="99" r="2.6"/>
+      <circle cx="101" cy="92" r="1.8"/>
+    </g>
+  </g>
+</svg>

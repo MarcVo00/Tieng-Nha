@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-base" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Le chasseur d'esprits : jambes indigo, bottes noires -->
+    <path d="M47 134 L45 150 L58 150 L60 137 L62 150 L75 150 L73 134 Z" fill="#2B4E6E"/>
+    <path d="M45.6 145 L58.4 145 M61.6 145 L74.4 145" fill="none" stroke-width="1.4"/>
+    <path d="M45.6 145 L45 150 L58 150 L58.6 145 Z M61.4 145 L62 150 L75 150 L74.4 145 Z" fill="#1F1A17" stroke-width="2"/>
+    <!-- mains -->
+    <circle cx="28" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <!-- tête -->
+    <circle cx="60" cy="70" r="22" fill="#F6DDBF"/>
+    <!-- chignon serré, cordon vermillon et épingle de bois d'or -->
+    <circle cx="60" cy="43" r="6.5" fill="#1F1A17"/>
+    <path d="M47 41 L73 45" fill="none" stroke="#D9A93A" stroke-width="2.6"/>
+    <path d="M54.5 47.5 Q60 44.5 65.5 47.5" fill="none" stroke="#B23A2A" stroke-width="3"/>
+    <!-- cheveux tirés en arrière, tempes rasées -->
+    <path d="M39 69 Q37 49 60 47 Q83 49 81 69 Q78 60 72 57 Q60 54 48 57 Q42 60 39 69 Z" fill="#1F1A17"/>
+  </g>
+</svg>

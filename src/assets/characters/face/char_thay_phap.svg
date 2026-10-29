@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- sourcils épais froncés : il guette les esprits -->
+    <path d="M47 65.5 L56.5 68 M73 65.5 L63.5 68" stroke-width="3"/>
+    <!-- yeux décidés, paupière droite et pupille -->
+    <path d="M49 72.5 L57 72.5 M63 72.5 L71 72.5"/>
+    <ellipse cx="53" cy="74.3" rx="1.7" ry="1.9" fill="#1F1A17" stroke="none"/>
+    <ellipse cx="67" cy="74.3" rx="1.7" ry="1.9" fill="#1F1A17" stroke="none"/>
+    <!-- fine moustache tombante et barbiche -->
+    <path d="M57 80.5 Q52.5 81 51 85.5 M63 80.5 Q67.5 81 69 85.5" stroke-width="1.8"/>
+    <path d="M58 87.5 L60 92 L62 87.5 Z" fill="#1F1A17" stroke-width="1.4" stroke-linejoin="round"/>
+    <!-- bouche droite -->
+    <path d="M57.5 84 L62.5 84"/>
+    <!-- joues vermillon -->
+    <circle cx="45.5" cy="79.5" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74.5" cy="79.5" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 170">
+  <!-- Le feu froid crépite : des étincelles bleues à quatre branches jaillies des queues (une seule pièce, neuf étincelles) -->
+  <g fill="#C9EAFB" stroke="#7CC3EC" stroke-width="1.2" stroke-linejoin="round">
+    <path d="M120 2 L122 9 L129 11 L122 13 L120 20 L118 13 L111 11 L118 9 Z"/>
+    <path d="M66 20 L67.5 25.5 L73 27 L67.5 28.5 L66 34 L64.5 28.5 L59 27 L64.5 25.5 Z"/>
+    <path d="M174 16 L175.8 22.2 L182 24 L175.8 25.8 L174 32 L172.2 25.8 L166 24 L172.2 22.2 Z"/>
+    <path d="M28 58 L29.4 62.6 L34 64 L29.4 65.4 L28 70 L26.6 65.4 L22 64 L26.6 62.6 Z"/>
+    <path d="M212 54 L213.5 58.5 L218 60 L213.5 61.5 L212 66 L210.5 61.5 L206 60 L210.5 58.5 Z"/>
+    <path d="M12 106 L13 109 L16 110 L13 111 L12 114 L11 111 L8 110 L11 109 Z"/>
+    <path d="M228 102 L229 105 L232 106 L229 107 L228 110 L227 107 L224 106 L227 105 Z"/>
+    <path d="M94 40 L95 43 L98 44 L95 45 L94 48 L93 45 L90 44 L93 43 Z"/>
+    <path d="M148 36 L149 39 L152 40 L149 41 L148 44 L147 41 L144 40 L147 39 Z"/>
+  </g>
+</svg>

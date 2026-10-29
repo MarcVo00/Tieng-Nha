@@ -72,10 +72,10 @@ end $$;
 select is((select count(*)::int from public.shop_items() where theme = 'legendes_sombres' and rarity is not null and currency = 'xu' and price is null), 12, 'legendes_sombres has 12 gacha items');
 select is((select string_agg(rarity || ':' || n, ',' order by rarity) from (
   select rarity, count(*) n from public.shop_items() where theme = 'legendes_sombres' group by rarity) q), 'common:4,epic:3,legendary:1,rare:4', 'rarities: 4 common, 4 rare, 3 epic, 1 legendary');
-select is((select string_agg(id, ',' order by id) from public.shop_items() where rarity = 'common'), 'acc_giao_tre,aura_suong_mu,hat_khan_vanh,outfit_ao_chen', 'the common items');
-select is((select string_agg(id, ',' order by id) from public.shop_items() where rarity = 'rare'), 'acc_quat_sat,aura_waves,hat_mu_chien,hat_thuy_tinh', 'the rare items');
-select is((select string_agg(id, ',' order by id) from public.shop_items() where rarity = 'epic'), 'acc_thuan_thien,char_kiem_khach,outfit_son_tinh', 'the epic items');
-select is((select string_agg(id, ',') from public.shop_items() where rarity = 'legendary'), 'char_phap_su', 'the legendary item');
+select is((select string_agg(id, ',' order by id) from public.shop_items() where theme = 'legendes_sombres' and rarity = 'common'), 'acc_giao_tre,aura_suong_mu,hat_khan_vanh,outfit_ao_chen', 'the common items');
+select is((select string_agg(id, ',' order by id) from public.shop_items() where theme = 'legendes_sombres' and rarity = 'rare'), 'acc_quat_sat,aura_waves,hat_mu_chien,hat_thuy_tinh', 'the rare items');
+select is((select string_agg(id, ',' order by id) from public.shop_items() where theme = 'legendes_sombres' and rarity = 'epic'), 'acc_thuan_thien,char_kiem_khach,outfit_son_tinh', 'the epic items');
+select is((select string_agg(id, ',') from public.shop_items() where theme = 'legendes_sombres' and rarity = 'legendary'), 'char_phap_su', 'the legendary item');
 select is((select count(*)::int from public.shop_items() where rarity is not null and (price is not null or currency <> 'xu' or theme is null)), 0, 'every rarity item is an xu cosmetic with a theme and no price');
 select is((select count(*)::int from public.shop_items() where theme = 'arene' and (rarity is not null or currency <> 'kim_bai' or price is null)), 0, 'arena items are unchanged (Kim bai, priced, no rarity)');
 select is((select count(*)::int from public.shop_items() where kind = 'consumable' and (rarity is not null or theme is not null or price is null)), 0, 'consumables are unchanged');
@@ -162,7 +162,7 @@ select is(pg_temp.rar(public.gacha_draw('only_ce', '{}', 0, 10, pg_temp.rep(0.1,
 select throws_ok($$ select public.gacha_draw('arene', '{}', 0, 1, array[0.1, 0.0]::float8[]) $$, 'P0001', null, 'a theme without gacha items raises (internal function)');
 drop function public.shop_items();
 alter function public.shop_items_real() rename to shop_items;
-select is((select count(*)::int from public.shop_items()), 23, 'the real catalogue is restored');
+select is((select count(*)::int from public.shop_items()), 47, 'the real catalogue is restored');
 
 -- ---------- setup: players ----------
 select pg_temp.login('a0000000-0000-0000-0000-000000000001');

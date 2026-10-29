@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- yeux de renarde en amande, trait vermillon relevé vers les tempes -->
+    <path d="M48.5 73 Q53 69.8 57.5 72.4 M71.5 73 Q67 69.8 62.5 72.4"/>
+    <path d="M48.5 72.6 L44.5 69 M71.5 72.6 L75.5 69" stroke="#B23A2A" stroke-width="2.2"/>
+    <ellipse cx="53.3" cy="74.4" rx="1.7" ry="2" fill="#1F1A17" stroke="none"/>
+    <ellipse cx="66.7" cy="74.4" rx="1.7" ry="2" fill="#1F1A17" stroke="none"/>
+    <!-- flamme de feu de renard au front -->
+    <path d="M60 63.5 Q62.6 67 60 69.5 Q57.4 67 60 63.5 Z" fill="#9CC3BB" stroke-width="1.2"/>
+    <!-- sourire en coin -->
+    <path d="M57 82.6 Q60.5 84.6 63.8 81.8"/>
+    <!-- joues vermillon -->
+    <circle cx="46" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="74" cy="80" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+  </g>
+</svg>

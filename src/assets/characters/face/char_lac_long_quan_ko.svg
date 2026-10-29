@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-face" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <!-- sourcils apaisés -->
+    <path d="M47.5 66.5 Q52 64.5 56.5 66 M72.5 66.5 Q68 64.5 63.5 66"/>
+    <!-- yeux fermés en arcs doux : le salut après le combat -->
+    <path d="M49 72 Q53 75.5 57 72"/>
+    <path d="M63 72 Q67 75.5 71 72"/>
+    <!-- moustaches de dragon -->
+    <path d="M58.5 79.5 Q52 79.5 48 83.5 Q46 86.5 48.5 88 M61.5 79.5 Q68 79.5 72 83.5 Q74 86.5 71.5 88" stroke-width="1.8"/>
+    <!-- petit sourire respectueux -->
+    <path d="M57 83.5 Q60 85.8 63 83.5"/>
+    <!-- joues vermillon -->
+    <circle cx="45" cy="79" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+    <circle cx="75" cy="79" r="3.2" fill="#B23A2A" stroke="none" opacity="0.85"/>
+  </g>
+</svg>

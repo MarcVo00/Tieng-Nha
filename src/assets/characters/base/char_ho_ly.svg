@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <path id="base-tail0" d="M60 104C58 80 62 54 60 27" pathLength="100"/>
+    <path id="base-tail1" d="M58 104C48 88 42 60 32 37" pathLength="100"/>
+    <path id="base-tail2" d="M56 106C40 96 30 74 18 57" pathLength="100"/>
+    <path id="base-tail3" d="M54 108C36 104 26 94 17 84" pathLength="100"/>
+    <path id="base-tail4" d="M54 112C38 118 28 114 20 106" pathLength="100"/>
+  </defs>
+  <g id="layer-base" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- La renarde à neuf queues : neuf queues de renard indigo, dodues, bout de pinceau crème, en éventail derrière le corps -->
+    <g fill="none">
+      <use href="#base-tail0" stroke-width="12"/><use href="#base-tail0" stroke-width="20" stroke-dasharray="58 100" stroke-dashoffset="-38"/><use href="#base-tail0" stroke="#2B4E6E" stroke-width="7"/><use href="#base-tail0" stroke="#2B4E6E" stroke-width="15" stroke-dasharray="57 100" stroke-dashoffset="-38"/><use href="#base-tail0" stroke-width="18" stroke-dasharray="5 100" stroke-dashoffset="-95"/><use href="#base-tail0" stroke="#F4E4C4" stroke-width="13" stroke-dasharray="5 100" stroke-dashoffset="-95"/>
+      <g id="base-fox-tail1"><use href="#base-tail1" stroke-width="12"/><use href="#base-tail1" stroke-width="20" stroke-dasharray="58 100" stroke-dashoffset="-38"/><use href="#base-tail1" stroke="#2B4E6E" stroke-width="7"/><use href="#base-tail1" stroke="#2B4E6E" stroke-width="15" stroke-dasharray="57 100" stroke-dashoffset="-38"/><use href="#base-tail1" stroke-width="18" stroke-dasharray="5 100" stroke-dashoffset="-95"/><use href="#base-tail1" stroke="#F4E4C4" stroke-width="13" stroke-dasharray="5 100" stroke-dashoffset="-95"/></g>
+      <use href="#base-fox-tail1" transform="matrix(-1 0 0 1 120 0)"/>
+      <g id="base-fox-tail2"><use href="#base-tail2" stroke-width="12"/><use href="#base-tail2" stroke-width="20" stroke-dasharray="58 100" stroke-dashoffset="-38"/><use href="#base-tail2" stroke="#2B4E6E" stroke-width="7"/><use href="#base-tail2" stroke="#2B4E6E" stroke-width="15" stroke-dasharray="57 100" stroke-dashoffset="-38"/><use href="#base-tail2" stroke-width="18" stroke-dasharray="5 100" stroke-dashoffset="-95"/><use href="#base-tail2" stroke="#F4E4C4" stroke-width="13" stroke-dasharray="5 100" stroke-dashoffset="-95"/></g>
+      <use href="#base-fox-tail2" transform="matrix(-1 0 0 1 120 0)"/>
+      <g id="base-fox-tail3"><use href="#base-tail3" stroke-width="12"/><use href="#base-tail3" stroke-width="20" stroke-dasharray="58 100" stroke-dashoffset="-38"/><use href="#base-tail3" stroke="#2B4E6E" stroke-width="7"/><use href="#base-tail3" stroke="#2B4E6E" stroke-width="15" stroke-dasharray="57 100" stroke-dashoffset="-38"/><use href="#base-tail3" stroke-width="18" stroke-dasharray="5 100" stroke-dashoffset="-95"/><use href="#base-tail3" stroke="#F4E4C4" stroke-width="13" stroke-dasharray="5 100" stroke-dashoffset="-95"/></g>
+      <use href="#base-fox-tail3" transform="matrix(-1 0 0 1 120 0)"/>
+      <g id="base-fox-tail4"><use href="#base-tail4" stroke-width="12"/><use href="#base-tail4" stroke-width="20" stroke-dasharray="58 100" stroke-dashoffset="-38"/><use href="#base-tail4" stroke="#2B4E6E" stroke-width="7"/><use href="#base-tail4" stroke="#2B4E6E" stroke-width="15" stroke-dasharray="57 100" stroke-dashoffset="-38"/><use href="#base-tail4" stroke-width="18" stroke-dasharray="5 100" stroke-dashoffset="-95"/><use href="#base-tail4" stroke="#F4E4C4" stroke-width="13" stroke-dasharray="5 100" stroke-dashoffset="-95"/></g>
+      <use href="#base-fox-tail4" transform="matrix(-1 0 0 1 120 0)"/>
+    </g>
+    <!-- petits souliers noirs -->
+    <path d="M47 134 L45 150 L58 150 L60 137 L62 150 L75 150 L73 134 Z" fill="#1F1A17"/>
+    <!-- mains -->
+    <circle cx="28" cy="122" r="5" fill="#F6DDBF"/>
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+    <!-- oreilles de renarde indigo, intérieur vermillon -->
+    <path d="M40 58 L35 27 Q48 33 55 48 Z M80 58 L85 27 Q72 33 65 48 Z" fill="#2B4E6E"/>
+    <path d="M40.5 50 L38.5 33 Q46 37 49.5 45 Z M79.5 50 L81.5 33 Q74 37 70.5 45 Z" fill="#B23A2A" stroke-width="1.5"/>
+    <!-- longue chevelure noire qui tombe dans le dos -->
+    <path d="M39 64 Q31 82 34 100 Q35 108 32 114 L46 112 Q44 100 46 88 Z M81 64 Q89 82 86 100 Q85 108 88 114 L74 112 Q76 100 74 88 Z" fill="#1F1A17"/>
+    <!-- tête -->
+    <circle cx="60" cy="70" r="22" fill="#F6DDBF"/>
+    <!-- frange droite et mèches qui encadrent le visage -->
+    <path d="M38 80 Q35 50 60 47 Q85 50 82 80 L79 80 Q79 70 76 62 L44 62 Q41 70 41 80 Z" fill="#1F1A17"/>
+  </g>
+</svg>

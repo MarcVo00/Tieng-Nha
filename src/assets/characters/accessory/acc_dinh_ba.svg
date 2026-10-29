@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <defs>
+    <path id="acc-dinh-ba-coral" d="M92 48 L92 13 M92 46 Q80 44 79.5 32 L79 19 M92 46 Q104 44 104.5 32 L105 19 M80 34 L74 29 M104 34 L110 29 M92 27 L86.5 22 M92 32 L97 27"/>
+  </defs>
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Trident de corail : hampe d’or, trois branches de corail vermillon, tenu dans la main droite (92,122) -->
+    <g transform="rotate(4 92 122)">
+      <rect x="89.5" y="46" width="5" height="104" rx="2.5" fill="#D9A93A"/>
+      <!-- branches de corail : contour noir, cœur vermillon -->
+      <g fill="none">
+        <use href="#acc-dinh-ba-coral" stroke-width="8.6"/>
+        <use href="#acc-dinh-ba-coral" stroke="#B23A2A" stroke-width="3.6"/>
+      </g>
+      <!-- bague d’or et perle d’écume -->
+      <path d="M88 49 L96 49 L96 55 L88 55 Z" fill="#D9A93A" stroke-width="1.8"/>
+      <circle cx="92" cy="46" r="3.6" fill="#F4E4C4" stroke-width="1.8"/>
+    </g>
+    <!-- le poing qui le tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

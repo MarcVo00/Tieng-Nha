@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
+  <g id="layer-accessory" stroke="#1F1A17" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Rame de pêcheur : manche de bois, pale vermillon peinte d’un œil de barque, tenue dans la main droite (92,122) -->
+    <g transform="rotate(5 92 122)">
+      <rect x="89.5" y="40" width="5" height="108" rx="2.5" fill="#D9A93A"/>
+      <path d="M86.5 147 L97.5 147 L97.5 151.5 L86.5 151.5 Z" fill="#D9A93A" stroke-width="2"/>
+      <!-- pale -->
+      <path d="M85 18 Q92 9 99 18 L99 46 Q95 52 92 52 Q89 52 85 46 Z" fill="#B23A2A"/>
+      <!-- l’œil de barque (mắt thuyền) qui veille sur le pêcheur -->
+      <path d="M87.3 30 Q92 24.5 96.7 30 Q92 35.5 87.3 30 Z" fill="#F4E4C4" stroke-width="1.6"/>
+      <circle cx="92" cy="30" r="1.8" fill="#1F1A17" stroke="none"/>
+      <!-- ligature de corde -->
+      <path d="M89 54 L95 54 L95 59 L89 59 Z" fill="#1F1A17" stroke-width="1.6"/>
+    </g>
+    <!-- le poing qui la tient -->
+    <circle cx="92" cy="122" r="5" fill="#F6DDBF"/>
+  </g>
+</svg>

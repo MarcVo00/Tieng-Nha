@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { BUDGET, peakConcurrency, STAGE } from "@/features/shop/gachaReveal";
-import { hasSignature, SIGNATURES } from "@/features/shop/signatures";
+import { hasSignature, signatureLine, SIGNATURES } from "@/features/shop/signatures";
+import { fr } from "@/i18n/fr";
 import { TalismanGuardian } from "@/features/shop/signatures/TalismanGuardian";
 import { animatedSpans, BOX, FX, MOUNTED, SIG, talismanCues, talismanPath, TALISMAN_COUNT } from "@/features/shop/signatures/talismanSchedule";
 
@@ -77,4 +78,17 @@ test("its art: Đông Hồ SVGs under 6 KB, no filter, gradient or embedded imag
     expect(svg.length, file).toBeLessThan(6 * 1024);
     expect(svg, file).not.toMatch(/filter|Gradient|<image/);
   }
+});
+
+test("each signature has its own status line, read aloud while it plays; an unknown piece gets the neutral one", () => {
+  const lines = Object.keys(SIGNATURES).map((id) => signatureLine(id));
+  for (const [i, id] of Object.keys(SIGNATURES).entries()) {
+    expect(fr.gacha.scene.signatures[id], id).toBeTruthy();
+    expect(lines[i]).toBe(fr.gacha.scene.signatures[id]);
+  }
+  expect(new Set(lines).size).toBe(lines.length);
+  expect(signatureLine("char_phap_su")).toBe("Un vent se lève sur l'autel…");
+  expect(signatureLine("acc_thuan_thien")).toBe(fr.gacha.scene.signature);
+  expect(signatureLine("toString")).toBe(fr.gacha.scene.signature); // own entries only
+  expect(lines).not.toContain(fr.gacha.scene.signature);
 });

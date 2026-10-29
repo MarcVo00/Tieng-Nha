@@ -469,7 +469,7 @@ test("fight cues: every blow has its own sound, a critical strikes sharper, the 
     return { end: voice.end, shape: JSON.stringify(ctx.gains.map((g) => g.gain.events)) };
   };
   const blows = SOUND_CUES.filter((c) => c.startsWith("blow."));
-  expect(blows).toHaveLength(7);
+  expect(blows).toHaveLength(10);
   const shapes = new Set(blows.map((c) => render(c).shape));
   expect(shapes.size).toBe(blows.length);
   for (const cue of blows) {

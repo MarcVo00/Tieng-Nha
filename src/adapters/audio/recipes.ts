@@ -675,6 +675,43 @@ const blowKiemKhach = score((s, t, strong) => {
   metal(s, t + 0.17, 3136, 0.1 * f.k, 0.13);
 });
 
+/** L'épée du dragon (legendary): the blade's swish, then a roar that echoes under the steel. ≈ 0.44 s. */
+const blowKiemRong = score((s, t, strong) => {
+  const f = force(strong);
+  swish(s, t, 0.13, 0.45 * f.k, f.attack(0.05), 1500, 4600);
+  metal(s, t + 0.11, 2200, 0.1 * f.k, 0.18);
+  whoosh(s, t + 0.1, 0.24, 140, 420, 0.4 * f.k, 0.07, 0.8); // the roar, low and breathy
+  gong(s, t + 0.11, 110, 0.1 * f.k, 0.33);
+  whoosh(s, t + 0.24, 0.19, 120, 300, 0.16 * f.k, 0.07, 0.8); // its echo
+});
+
+/** Hồ ly (legendary), bare-handed: a cold-fire crackle, sparks that snap and a high ghostly ring. ≈ 0.4 s. */
+const blowHoLy = score((s, t, strong) => {
+  const f = force(strong);
+  const sparks = [
+    { at: 0, f: 4200, l: 0.9 },
+    { at: 0.018, f: 6200, l: 0.6 },
+    { at: 0.04, f: 3600, l: 1 },
+    { at: 0.062, f: 5600, l: 0.7 },
+    { at: 0.09, f: 4800, l: 0.8 },
+    { at: 0.121, f: 6800, l: 0.5 },
+    { at: 0.15, f: 3900, l: 0.6 },
+  ];
+  for (const k of sparks) burst(s, t + k.at, "bandpass", k.f, 4, k.l * 1.2 * f.k, 0.02);
+  whoosh(s, t, 0.18, 900, 3200, 0.18 * f.k, f.attack(0.05), 1.6);
+  bell(s, t + 0.1, 1760, 0.09 * f.k, 0.3); // A6, cold
+  bell(s, t + 0.115, 2489, 0.05 * f.k, 0.26); // a tritone-ish shimmer above
+});
+
+/** Lạc Long Quân (legendary), bare-handed: a wave builds, crashes, and drains back. ≈ 0.44 s. */
+const blowLacLongQuan = score((s, t, strong) => {
+  const f = force(strong);
+  whoosh(s, t, 0.16, 300, 1400, 0.4 * f.k, f.attack(0.12), 0.8); // the swell
+  thud(s, t + 0.14, 100, 0.5 * f.k, 0.18, f.attack(0.004)); // the crash
+  burst(s, t + 0.14, "lowpass", 2400, 0.7, 0.5 * f.k, 0.18); // spray
+  whoosh(s, t + 0.17, 0.27, 1800, 350, 0.22 * f.k, 0.05, 0.7); // the water draining back
+});
+
 /** Dégâts: a dull impact, felt in the chest. ≤ 0.26 s. */
 const fightHurt = score((s, t) => {
   thud(s, t, 95, 0.7, 0.24);
@@ -756,6 +793,9 @@ export const recipes: Record<SoundCue, Recipe> = {
   "blow.acc_thuan_thien": blowThuanThien,
   "blow.char_phap_su": blowPhapSu,
   "blow.char_kiem_khach": blowKiemKhach,
+  "blow.acc_kiem_rong": blowKiemRong,
+  "blow.char_ho_ly": blowHoLy,
+  "blow.char_lac_long_quan": blowLacLongQuan,
 
   "fight.hurt": fightHurt,
   "fight.miss": fightMiss,

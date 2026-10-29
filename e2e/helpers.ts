@@ -5,8 +5,17 @@ export const PSEUDO = "Marc";
 export const EMAIL = "test@example.com";
 export const PASSWORD = "secret-pass-1";
 
-/** Welcome -> invite + email -> OTP -> new password -> pseudo + avatar -> device check -> install, ending on the home path. */
-export async function onboard(page: Page): Promise<void> {
+/**
+ * Welcome -> invite + email -> OTP -> new password -> pseudo + avatar -> device check -> install, ending on the home path.
+ * The daily-bonus sheet opens by itself on the first home visit of the day; it is marked as already shown unless `dailyBonus`.
+ */
+export async function onboard(page: Page, opts: { dailyBonus?: boolean } = {}): Promise<void> {
+  if (!opts.dailyBonus) {
+    await page.addInitScript(() => {
+      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
+      localStorage.setItem("tn-bonus-shown", today);
+    });
+  }
   await page.goto("/");
   await page.waitForURL("**/welcome");
   await page.getByRole("button", { name: fr.onboarding.welcome.start }).click();

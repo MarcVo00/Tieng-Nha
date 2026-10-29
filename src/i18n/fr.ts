@@ -321,6 +321,24 @@ export const fr = {
     loadError: { title: "Le parcours n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
     review: { title: "Révision du jour", count: (n: number) => `${n} ${n > 1 ? "mots" : "mot"}` },
     start: "Commencer",
+    // Daily bonus: the red envelope (Lì xì) is rendered in lang="vi" between the French parts.
+    bonus: {
+      word: "Lì xì",
+      cardBefore: "Ton",
+      cardAfter: "du jour t'attend",
+      titleAfter: "du jour",
+      dayLine: (day: number, coins: number) => `Jour ${day} sur 7 · +${coins}\u00A0xu`,
+      hint: "Reviens chaque jour pour garder ta suite\u202f: le 7ᵉ jour vaut 50\u00A0xu.",
+      open: "Ouvrir",
+      continue: "Continuer",
+      gained: (n: number) => `+${n}\u00A0xu`,
+      wish: "Chúc may mắn\u202f!",
+      wishFr: "Bonne chance\u202f!",
+      run: "Ta suite de 7 jours",
+      dayAria: (day: number, coins: number, state: "spent" | "today" | "ahead") =>
+        `Jour ${day}, ${coins}\u00A0xu, ${state === "spent" ? "ouvert" : state === "today" ? "aujourd'hui" : "à venir"}`,
+      failed: "L'enveloppe n'a pas pu s'ouvrir. Réessaie.",
+    },
     lesson: {
       aria: (n: number, title: string, state: "done" | "available" | "locked", perfect: boolean) =>
         `Leçon ${n}\u202f: ${title}, ${state === "done" ? (perfect ? "terminée sans faute" : "terminée") : state === "available" ? "disponible" : "verrouillée"}`,
@@ -638,7 +656,7 @@ export const fr = {
         noCorrection: "Pas de correction",
         noCorrectionBody: "Tu la verras à la fin.",
         noCorrectionAria: "Pinceau barré",
-        tries: "3 essais par jour ; le certificat s'obtient en le battant.",
+        tries: "3 essais par jour\u202f; le certificat s'obtient en le battant.",
       },
       won: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
       locked: {

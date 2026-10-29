@@ -2,6 +2,15 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "1.9.0",
+      "date": "2026-10-29",
+      "title": "Le lì xì du jour",
+      "items": [
+        "Chaque jour, une enveloppe rouge t'attend sur l'accueil : ouvre-la pour gagner des xu.",
+        "Reviens plusieurs jours de suite : le 7ᵉ jour, l'enveloppe vaut 50 xu."
+      ]
+    },
+    {
       "version": "1.8.0",
       "date": "2026-10-29",
       "title": "Deux nouveaux sanctuaires",

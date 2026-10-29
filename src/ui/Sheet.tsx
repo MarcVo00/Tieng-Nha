@@ -1,4 +1,5 @@
 import { useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { duration, EXIT_RATIO, spring } from "@/ui/motion";
 import { useFocusTrap } from "@/ui/useFocusTrap";
@@ -45,14 +46,17 @@ function Layer({ onClose, children, label, tone }: Omit<SheetProps, "open"> & { 
   );
 }
 
+// Portalled to <body>: a sheet opened while its page is still sliding in would otherwise be fixed to the moving page
+// (a transformed ancestor) and stack under the tab bar.
 export function Sheet({ open, onClose, children, label, tone = "neutral" }: SheetProps) {
-  return (
+  return createPortal(
     <AnimatePresence>
       {open ? (
         <Layer {...(onClose ? { onClose } : {})} label={label} tone={tone}>
           {children}
         </Layer>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

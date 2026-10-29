@@ -8,9 +8,13 @@ import { useServices } from "@/app/ServicesProvider";
 import { useDuelSummary } from "@/app/usePendingDuels";
 import type { Boss, LessonSummary, Tree } from "@/domain/types";
 import { lookOf } from "@/services/look";
+import { nextDailyBonus } from "@/services/wallet";
+import { parisDay } from "@/services/time";
+import { BONUS_SHOWN_KEY } from "@/domain/storageKeys";
 import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
 import { PathStop } from "@/features/home/PathStop";
 import { HeroToken } from "@/features/home/HeroToken";
+import { DailyBonusCard, DailyBonusSheet, type DailyBonusOffer } from "@/features/home/DailyBonus";
 import { buildPathLayout, PATH_MARGIN, PATH_WIDTH, type PathLayout } from "@/features/home/pathLayout";
 
 // Hero: the winding path with the next stop pulsing. One primary action: the next stop.
@@ -51,6 +55,17 @@ function DuelBanner({ label, to }: { label: string; to: string }) {
   );
 }
 
+/** Opens the daily-bonus sheet by itself once per Paris day on this device; false when storage is unavailable. */
+function firstShowToday(today: string): boolean {
+  try {
+    if (localStorage.getItem(BONUS_SHOWN_KEY) === today) return false;
+    localStorage.setItem(BONUS_SHOWN_KEY, today);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function heroLabel(layout: PathLayout): string {
   const stop = layout.nodes.find((n) => n.kind === "lesson" && n.key === layout.hero.at);
   return stop && stop.kind === "lesson" ? fr.home.heroAt(stop.lesson.title) : fr.home.heroStart;
@@ -70,11 +85,12 @@ function SkeletonStops() {
 }
 
 export function HomeScreen() {
-  const { content } = useServices();
+  const { content, activity, clock, sound } = useServices();
   const refresh = useRefreshProgress();
   const snapshot = useAppState((s) => s.snapshot);
   const dueCount = useAppState((s) => s.dueCount);
-  const equipped = useAppState((s) => s.wallet?.equipped);
+  const wallet = useAppState((s) => s.wallet);
+  const equipped = wallet?.equipped;
   const look = useMemo(() => lookOf(equipped ?? {}), [equipped]);
   const reduced = useReducedMotion();
   const { pending: pendingDuels, unseen: unseenResults } = useDuelSummary();
@@ -113,6 +129,23 @@ export function HomeScreen() {
     nextEl.current?.scrollIntoView?.({ block: "center", behavior: reduced ? "auto" : "smooth" });
   }, [ready, reduced]);
 
+  const today = parisDay(clock());
+  const offer = wallet ? nextDailyBonus(wallet, today) : null;
+  // The sheet keeps the offer it was opened with: once claimed, `offer` turns null but the sheet still shows the amount.
+  const [sheetOffer, setSheetOffer] = useState<DailyBonusOffer | null>(null);
+  const autoShown = useRef(false);
+  useEffect(() => {
+    if (!ready || !offer || autoShown.current) return;
+    autoShown.current = true;
+    if (firstShowToday(today)) setSheetOffer(offer);
+  }, [ready, offer, today]);
+  const claimBonus = useCallback(async () => {
+    const r = await activity.claimDailyBonus();
+    if (r.ok) sound.play("arena.coins");
+    await refresh();
+    return r.ok;
+  }, [activity, sound, refresh]);
+
   const nextRef = useCallback((el: HTMLElement | null) => {
     nextEl.current = el;
   }, []);
@@ -137,6 +170,7 @@ export function HomeScreen() {
       </div>
       <h1 className="sr-only">{fr.home.pathLabel}</h1>
       <div className="relative">
+        {offer ? <DailyBonusCard offer={offer} onOpen={() => setSheetOffer(offer)} /> : null}
         {pendingDuels[0] ? (
           <DuelBanner to="/duels" label={fr.duels.banner(pendingDuels[0].opponentPseudo, pendingDuels.length - 1)} />
         ) : unseenResults[0] ? (
@@ -178,6 +212,7 @@ export function HomeScreen() {
           </div>
         )}
       </div>
+      <DailyBonusSheet offer={sheetOffer} onClose={() => setSheetOffer(null)} onClaim={claimBonus} />
     </div>
   );
 }

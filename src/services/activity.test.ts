@@ -259,3 +259,19 @@ test("demoGrant appends a local-only demo_grant event and credits the wallet", a
   expect(same.coins).toBe(500);
   expect((await progress.listEvents())).toHaveLength(1);
 });
+
+test("the daily bonus opens once per Paris day, is synced and never gives XP", async () => {
+  const { svc, progress, outbox, appended, setNow } = setup("2026-10-10T08:00:00.000Z");
+  const [a, b] = await Promise.all([svc.claimDailyBonus(), svc.claimDailyBonus()]);
+  expect(a).toMatchObject({ ok: true, day: 1, coins: 10 });
+  expect(b).toMatchObject({ ok: false, coins: 0 });
+  expect(a.wallet.coins).toBe(10);
+  const events = await progress.listEvents();
+  expect(events.map((e) => [e.type, e.refId, e.xp, e.payload])).toEqual([["daily_bonus_claimed", "2026-10-10", 0, { day: 1, coins: 10 }]]);
+  expect(await outbox.size()).toBe(1);
+  expect(appended.length).toBe(1);
+  expect((await svc.getSnapshot()).xpTotal).toBe(0);
+  // 23:30 UTC on the 10th is already the 11th in Paris: day 2 of the run
+  setNow("2026-10-10T23:30:00.000Z");
+  expect(await svc.claimDailyBonus()).toMatchObject({ ok: true, day: 2, coins: 10 });
+});

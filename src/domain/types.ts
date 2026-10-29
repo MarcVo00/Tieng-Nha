@@ -40,6 +40,7 @@ export type AppEventType =
   | "item_equipped"
   | "duel_settled"
   | "gacha_pulled"
+  | "daily_bonus_claimed"
   | "demo_grant";
 
 /** Payload shapes by event type (stored as JSON). */
@@ -54,6 +55,7 @@ export type EventPayload = {
   item_equipped: { slot: ItemSlot; itemId: string | null };
   duel_settled: { kimBai: number };
   gacha_pulled: { theme: string; cost: number; items: { itemId: string; rarity: Rarity; duplicate: boolean; refund: number }[] };
+  daily_bonus_claimed: { day: number; coins: number };
   demo_grant: { coins: number; kimBai: number };
 };
 
@@ -179,6 +181,9 @@ export type Wallet = {
   /** Streak value right after the last active day (time-ordered replay, identical to the server). */
   streak: number;
   lastActiveDay: string | null;
+  /** Paris day of the last daily bonus (null = never) and its place in the 7-day run (1..7, 0 = never). */
+  bonusDay: string | null;
+  bonusStreak: number;
 };
 
 /** A question reference stored in a duel: the exercise is resolved from the lesson content. */

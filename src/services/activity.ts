@@ -5,7 +5,8 @@ import { evaluateBadges } from "@/services/badges";
 import { dialogueXp, examXpDelta, lessonXp, reviewXp } from "@/services/xp";
 import { introduce, record } from "@/services/leitner";
 import { ENERGY, energyAt } from "@/services/energy";
-import { equippable, purchasable, walletAt } from "@/services/wallet";
+import { equippable, nextDailyBonus, purchasable, walletAt } from "@/services/wallet";
+import { parisDay } from "@/services/time";
 
 export type ActivityResult = { xpGained: number; newBadges: BadgeDef[]; snapshot: ProgressSnapshot; firstTime: boolean; energyGained?: number; coinsGained: number };
 export type ActivityService = {
@@ -31,6 +32,8 @@ export type ActivityService = {
    * Idempotent and serialised. Returns the pulls newly appended (in the given order).
    */
   claimGachaPulls(pulls: readonly GachaPull[]): Promise<GachaPull[]>;
+  /** Opens today's daily bonus (once per Paris day, serialised). `coins` is what the local wallet credited (0 when refused). */
+  claimDailyBonus(): Promise<{ ok: boolean; day: number; coins: number; wallet: Wallet }>;
   /** Demo mode only: credits xu / Kim bài in the local journal (never synced). Non-negative integers. */
   demoGrant(coins: number, kimBai: number): Promise<Wallet>;
 };
@@ -121,6 +124,8 @@ export function createActivityService(deps: {
     return added;
   }
 
+  let claimingBonus: Promise<unknown> = Promise.resolve();
+
   return {
     getSnapshot: snapshot,
     async getEnergy() {
@@ -178,6 +183,18 @@ export function createActivityService(deps: {
     claimGachaPulls(pulls) {
       const run = claimingPulls.then(() => claimPulls(pulls));
       claimingPulls = run.catch(() => undefined);
+      return run;
+    },
+    claimDailyBonus() {
+      const run = claimingBonus.then(async () => {
+        const today = parisDay(clock());
+        const next = nextDailyBonus(await wallet(), today);
+        if (!next) return { ok: false, day: 0, coins: 0, wallet: await wallet() };
+        await append(ev("daily_bonus_claimed", today, 0, next));
+        deps.onEventAppended?.();
+        return { ok: true, ...next, wallet: await wallet() };
+      });
+      claimingBonus = run.catch(() => undefined);
       return run;
     },
     async demoGrant(coins, kimBai) {

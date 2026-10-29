@@ -1,6 +1,6 @@
 import type { AppEvent, AppEventType, EnergyState, SessionKind } from "@/domain/types";
 
-export const ENERGY = { max: 5, refillMs: 10_800_000, cost: { lesson: 1, dialogue: 1, boss: 3 }, reviewGain: 1 } as const;
+export const ENERGY = { max: 5, refillMs: 600_000, cost: { lesson: 1, dialogue: 1, boss: 3 }, reviewGain: 1 } as const;
 
 /** Recorded in the local journal only: the server neither accepts nor needs them (energy is not checked server-side). */
 export const LOCAL_ONLY_EVENT_TYPES: readonly AppEventType[] = ["session_started", "demo_grant"];
@@ -8,7 +8,7 @@ export const LOCAL_ONLY_EVENT_TYPES: readonly AppEventType[] = ["session_started
 const isKind = (v: unknown): v is SessionKind => v === "lesson" || v === "dialogue" || v === "boss";
 
 /**
- * Replays the journal: session starts spend, finished reviews give, and +1 comes back every 3 h counted from the
+ * Replays the journal: session starts spend, finished reviews give, and +1 comes back every 10 min counted from the
  * moment energy dropped below the maximum (the timer stops while full). Each bought refill (`refills`, ISO times)
  * puts energy back to the maximum. Pure: `nowIso` is injected.
  */

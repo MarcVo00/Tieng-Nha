@@ -66,10 +66,10 @@ select is(pg_temp.coins(), 500, 'a reward-only frame cannot be bought: coins unc
 select is(cardinality(pg_temp.inv()), 0, 'a reward-only frame cannot be bought: inventory unchanged');
 
 select pg_temp.ev('badge_unlocked', '{}', now(), 'streak_7');
-select is(pg_temp.coins(), 510, 'first streak_7 credits 10');
+select is(pg_temp.coins(), 560, 'first streak_7 credits its amount (60, badge_coins since 20261030)');
 select ok('frame_bronze' = any(pg_temp.inv()), 'streak_7 adds frame_bronze to the inventory');
 select pg_temp.ev('badge_unlocked', '{}', now(), 'streak_7');
-select is(pg_temp.coins(), 510, 'second streak_7 credits nothing');
+select is(pg_temp.coins(), 560, 'second streak_7 credits nothing');
 select is(cardinality(pg_temp.inv()), 1, 'second streak_7 leaves the inventory as is');
 
 select pg_temp.ev('item_equipped', '{"slot": "frame", "itemId": "frame_bronze"}');

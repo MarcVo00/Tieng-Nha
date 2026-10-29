@@ -49,7 +49,16 @@ function rewardRows() {
   return [...body.matchAll(/\(\s*'([a-z0-9_]+)'\s*,\s*'([a-z_]+)'\s*\)/g)].map((m) => ({ badge: m[1] ?? "", item: m[2] ?? "" }));
 }
 
+function badgeCoinRows() {
+  const body = valuesOf(latestMigrationDefining("badge_coins"), "badge_coins");
+  return [...body.matchAll(/\(\s*'([a-z0-9_]+)'\s*,\s*(\d+)\s*\)/g)].map((m) => ({ badge: m[1] ?? "", coins: Number(m[2]) }));
+}
+
 describe("catalogue parity with the SQL migrations", () => {
+  test("badge_coins rows equal the coins of badges.json", () => {
+    expect(badgeCoinRows()).toEqual(badges.badges.map((b) => ({ badge: b.id, coins: b.coins })));
+  });
+
   test("shop_item rows equal shop.json items", () => {
     const fromJson = shop.items.map((i) => ({
       id: i.id,

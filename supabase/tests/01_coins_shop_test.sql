@@ -53,23 +53,23 @@ select pg_temp.ev('dialogue_completed', '{}', now(), 'd01');
 select is(pg_temp.coins(), 30, 'dialogue credits 5');
 select pg_temp.ev('review_session_completed');
 select is(pg_temp.coins(), 33, 'review session credits 3');
-select pg_temp.ev('badge_unlocked', '{}', now(), 'b01');
-select is(pg_temp.coins(), 43, 'badge credits 10');
+select pg_temp.ev('badge_unlocked', '{}', now(), 'first_lesson');
+select is(pg_temp.coins(), 53, 'a badge credits its own amount (first_lesson 20, badge_coins since 20261030)');
 select pg_temp.ev('lesson_completed', '{"perfect": "true"}', now(), 'l03');
-select is(pg_temp.coins(), 53, 'perfect as a string is not perfect (10 only)');
+select is(pg_temp.coins(), 63, 'perfect as a string is not perfect (10 only)');
 
 -- ---------- alice: exams ----------
 select is(pg_temp.start_attempt('a1'), 2, 'attempt 1');
 select pg_temp.ev('exam_finished', jsonb_build_object('score', 85, 'attemptId', current_setting('t.a1')));
-select is(pg_temp.coins(), 103, 'first exam win credits 50');
+select is(pg_temp.coins(), 113, 'first exam win credits 50');
 select is(pg_temp.start_attempt('a2'), 1, 'attempt 2');
 select pg_temp.ev('exam_finished', jsonb_build_object('score', 85, 'attemptId', current_setting('t.a2')));
-select is(pg_temp.coins(), 123, 'second exam win credits 20');
+select is(pg_temp.coins(), 133, 'second exam win credits 20');
 select is(pg_temp.start_attempt('a3'), 0, 'attempt 3');
 select pg_temp.ev('exam_finished', jsonb_build_object('score', 40, 'attemptId', current_setting('t.a3')));
-select is(pg_temp.coins(), 123, 'lost exam credits 0');
+select is(pg_temp.coins(), 133, 'lost exam credits 0');
 select pg_temp.ev('exam_finished', jsonb_build_object('score', 90, 'attemptId', gen_random_uuid()));
-select is(pg_temp.coins(), 123, 'forged attempt id credits 0 coins');
+select is(pg_temp.coins(), 133, 'forged attempt id credits 0 coins');
 select is((select exam_best from public.user_stats where user_id = auth.uid()), 85, 'exam_best unchanged by lost and forged exams');
 
 -- malformed payloads never raise and never credit
@@ -86,7 +86,7 @@ select lives_ok($$ insert into public.events (client_id, user_id, type, ref_id, 
   (gen_random_uuid(), auth.uid(), 'lesson_completed', 'x', 0, 'null', now()),
   (gen_random_uuid(), auth.uid(), 'badge_unlocked', 'x', 0, '[1,2]', now()) $$,
   'malformed payloads do not raise');
-select is(pg_temp.coins(), 143, 'malformed payloads credit only the flat types (lesson 10 + badge 10), nothing else');
+select is(pg_temp.coins(), 143, 'malformed payloads credit only the lesson (10); an unknown badge pays 0');
 
 -- ---------- alice: shop ----------
 -- frames became reward-only in 20261019: the purchase is refused (see 02_), so the old
@@ -163,9 +163,9 @@ select is(pg_temp.coins(), current_setting('t.c0')::int + 50, '69.6 (rounded 70)
 select is(pg_temp.start_attempt('b2'), 1, 'bob attempt 2');
 select pg_temp.ev('exam_finished', jsonb_build_object('score', 75, 'attemptId', current_setting('t.b2')));
 select is(pg_temp.coins(), current_setting('t.c0')::int + 70, 'next win: +20');
-select pg_temp.ev('badge_unlocked', '{}', now(), 'bx');
-select pg_temp.ev('badge_unlocked', '{}', now(), 'bx');
-select is(pg_temp.coins(), current_setting('t.c0')::int + 80, 'a duplicate badge_unlocked credits 0 coins');
+select pg_temp.ev('badge_unlocked', '{}', now(), 'first_lesson');
+select pg_temp.ev('badge_unlocked', '{}', now(), 'first_lesson');
+select is(pg_temp.coins(), current_setting('t.c0')::int + 90, 'a duplicate badge_unlocked credits 0 coins');
 select set_config('t.xp0', (select xp_total from public.user_stats where user_id = auth.uid())::text, true);
 insert into public.events (client_id, user_id, type, ref_id, xp, payload, client_created_at)
 values (gen_random_uuid(), auth.uid(), 'item_purchased', 'x', 50, '{"itemId": "frame_bronze"}', now());

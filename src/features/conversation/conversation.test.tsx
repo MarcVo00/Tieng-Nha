@@ -14,7 +14,7 @@ import { TYPING_MS } from "@/features/conversation/useDialogue";
 const SLOW = { timeout: 5000 };
 const HOME = "page d'accueil";
 
-const REWARD_BADGE: BadgeDef = { id: "streak_7", title: "Une semaine", description: "7 jours d'affilée.", icon: "🏮", rule: { kind: "streak", gte: 7 }, reward: "frame_bronze" };
+const REWARD_BADGE: BadgeDef = { id: "streak_7", title: "Une semaine", description: "7 jours d'affilée.", icon: "🏮", rule: { kind: "streak", gte: 7 }, coins: 60, reward: "frame_bronze" };
 
 function setup(opts: { strict?: boolean; noCoins?: boolean; badge?: boolean } = {}) {
   const stt = new FakeSpeechRecognizer();

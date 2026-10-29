@@ -37,7 +37,7 @@ async function setup(given: Partial<Services> | Services = {}) {
       <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </ServicesProvider>,
   );
-  await screen.findByText(/ sur 13$/);
+  await screen.findByText(/ sur 24$/);
   return { services, router, user: userEvent.setup() };
 }
 
@@ -50,22 +50,22 @@ beforeEach(() => {
   });
 });
 
-test("shows the header and all 13 badges, unlocked first", async () => {
+test("shows the header and all 24 badges, unlocked first", async () => {
   useAppState.setState({ snapshot: snapshot({ badges: ["first_lesson"] }) });
   await setup();
   expect(screen.getByText("Marc")).toBeInTheDocument();
   expect(screen.getByText(fr.leaderboard.xp(120))).toBeInTheDocument();
   const badgeItems = (await screen.findAllByRole("listitem")).filter((li) => within(li).queryByRole("button") && !within(li).queryByRole("heading", { level: 3 }));
-  // Earned medals first; the 12 locked ones stay folded behind « +12 à découvrir ».
+  // Earned medals first; the 23 locked ones stay folded behind « +23 à découvrir ».
   expect(badgeItems).toHaveLength(1);
   expect(within(badgeItems[0] as HTMLElement).queryByText(fr.ui.badge.locked, { exact: false })).toBeNull();
-  const more = screen.getByRole("button", { name: fr.ui.badge.more(12) });
+  const more = screen.getByRole("button", { name: fr.ui.badge.more(23) });
   expect(more).toHaveAttribute("aria-expanded", "false");
-  expect(more).toHaveTextContent(fr.ui.badge.more(12));
+  expect(more).toHaveTextContent(fr.ui.badge.more(23));
   await userEvent.click(more);
   expect(more).toHaveAttribute("aria-expanded", "true");
   const all = screen.getAllByRole("listitem").filter((li) => within(li).queryByRole("button") && !within(li).queryByRole("heading", { level: 3 }));
-  expect(all).toHaveLength(13);
+  expect(all).toHaveLength(24);
 });
 
 test("theme change persists in the stored settings", async () => {
@@ -561,4 +561,17 @@ describe("wardrobe section", () => {
       expect(screen.queryByText(fr.rewards.removedToast)).toBeNull();
     });
   });
+});
+
+test("a badge sheet shows the xu it pays, or has paid once unlocked", async () => {
+  useAppState.setState({ snapshot: snapshot({ badges: ["first_lesson"] }) });
+  const { user } = await setup();
+  const items = (await screen.findAllByRole("listitem")).filter((li) => within(li).queryByRole("button") && !within(li).queryByRole("heading", { level: 3 }));
+  await user.click(within(items[0] as HTMLElement).getByRole("button"));
+  const sheet = await screen.findByRole("dialog", { name: "Premier pas" });
+  expect(sheet).toHaveTextContent(/20\sxu gagnés/);
+  await user.click(within(sheet).getByRole("button", { name: fr.profile.badges.close }));
+  await user.click(screen.getByRole("button", { name: fr.ui.badge.more(23) }));
+  await user.click(screen.getByRole("button", { name: /Inarrêtable/ }));
+  expect(await screen.findByRole("dialog", { name: "Inarrêtable" })).toHaveTextContent(/Rapporte 200\sxu/);
 });

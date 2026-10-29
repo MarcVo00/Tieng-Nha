@@ -4,7 +4,7 @@ export const fr = {
   energy: {
     label: (n: number, max: number) => `Énergie\u202f: ${n} sur ${max}`,
     title: "Ton énergie",
-    explain: "Commencer une leçon ou un dialogue coûte 1 ⚡, défier le boss en coûte 3. Une révision terminée rend 1 ⚡, et l'énergie remonte toute seule de 1 toutes les 3 h.",
+    explain: "Commencer une leçon ou un dialogue coûte 1 ⚡, défier le boss en coûte 3. Une révision terminée rend 1 ⚡, et l'énergie remonte toute seule de 1 toutes les 10 minutes.",
     full: "Énergie au maximum",
     next: (h: number, m: number) => `+1 ⚡ dans ${h > 0 ? `${h} h ` : ""}${m} min`,
     /** Minute-precision phrase for the header button, so screen readers are not told the time every second. */
@@ -984,7 +984,7 @@ export const fr = {
       save: "Enregistrer",
       saved: "Profil mis à jour",
     },
-    badges: { title: "Badges", count: (unlocked: number, total: number) => `${unlocked} sur ${total}`, locked: "Pas encore débloqué", unlocked: "Débloqué", close: "Fermer", loadError: "Les badges n'ont pas pu se charger." },
+    badges: { title: "Badges", count: (unlocked: number, total: number) => `${unlocked} sur ${total}`, locked: "Pas encore débloqué", unlocked: "Débloqué", close: "Fermer", loadError: "Les badges n'ont pas pu se charger.", coins: (n: number, unlocked: boolean) => (unlocked ? `${n}\u00A0xu gagnés` : `Rapporte ${n}\u00A0xu`) },
     settings: {
       title: "Réglages",
       theme: { label: "Thème", system: "Système", light: "Clair", dark: "Sombre" },

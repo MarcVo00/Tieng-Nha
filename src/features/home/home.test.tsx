@@ -8,6 +8,9 @@ import { createFakeServices } from "@/adapters/fakes";
 import { ToastViewport } from "@/ui";
 import { HomeScreen } from "@/features/home";
 import "@/test/routerTestEnv";
+import { BONUS_SHOWN_KEY } from "@/domain/storageKeys";
+import { parisDay } from "@/services/time";
+import type { FakeSoundPlayer } from "@/adapters/fakes/FakeSoundPlayer";
 
 function renderHome(services = createFakeServices()) {
   render(
@@ -21,8 +24,12 @@ function renderHome(services = createFakeServices()) {
   return services;
 }
 
+const NOW = "2026-10-29T08:00:00.000Z";
+
 beforeEach(() => {
   useAppState.setState({ snapshot: null, dueCount: 0, wallet: null });
+  // The daily-bonus sheet already opened today: the path tests see the home alone.
+  localStorage.setItem(BONUS_SHOWN_KEY, parisDay(new Date().toISOString()));
 });
 
 test("shows the first lesson as available with a start chip, and a locked exam", async () => {
@@ -94,4 +101,50 @@ test("a perfect lesson shows three gold stars", async () => {
   );
   await screen.findByRole("link", { name: /Au café.*terminée sans faute/ });
   expect(container.querySelector("[data-stars]")).toHaveAttribute("data-stars", "3");
+});
+
+describe("daily bonus", () => {
+  beforeEach(() => localStorage.removeItem(BONUS_SHOWN_KEY));
+
+  test("opens by itself once a day, pays the day's xu with a clink, then leaves the home alone", async () => {
+    const user = userEvent.setup();
+    const services = renderHome(createFakeServices({ clock: () => NOW }));
+    const sheet = await screen.findByRole("dialog", { name: "Lì xì du jour" });
+    expect(sheet).toHaveTextContent(/Jour 1 sur 7 · \+10\sxu/);
+    expect(screen.getByRole("list", { name: "Ta suite de 7 jours" }).children).toHaveLength(7);
+    expect(screen.getByRole("listitem", { name: "Jour 1, 10\u00A0xu, aujourd'hui" })).toBeInTheDocument();
+    expect(localStorage.getItem(BONUS_SHOWN_KEY)).toBe("2026-10-29");
+
+    await user.click(screen.getByRole("button", { name: "Ouvrir" }));
+    expect(await screen.findByText("+10\u00A0xu")).toBeInTheDocument();
+    expect(screen.getByRole("listitem", { name: "Jour 1, 10\u00A0xu, ouvert" })).toBeInTheDocument();
+    expect((services.sound as FakeSoundPlayer).played.map((p) => p.cue)).toEqual(["arena.coins"]);
+    expect((await services.activity.getWallet()).coins).toBe(10);
+    await waitFor(() => expect(useAppState.getState().wallet?.coins).toBe(10));
+
+    await user.click(screen.getByRole("button", { name: "Continuer" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: /du jour t'attend/ })).not.toBeInTheDocument();
+  });
+
+  test("closed without opening, the card stays and reopens the sheet; it does not open by itself again today", async () => {
+    const user = userEvent.setup();
+    localStorage.setItem(BONUS_SHOWN_KEY, "2026-10-29");
+    const services = renderHome(createFakeServices({ clock: () => NOW }));
+    const card = await screen.findByRole("button", { name: /Ton lì xì du jour t'attend/ });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(card).toHaveTextContent(/Jour 1 sur 7 · \+10\sxu/);
+    await user.click(card);
+    expect(await screen.findByRole("dialog", { name: "Lì xì du jour" })).toBeInTheDocument();
+    expect((await services.activity.getWallet()).coins).toBe(0);
+  });
+
+  test("no card once today's envelope is open", async () => {
+    const services = createFakeServices({ clock: () => NOW });
+    await services.activity.claimDailyBonus();
+    renderHome(services);
+    await screen.findByRole("link", { name: /Au café/ });
+    expect(screen.queryByRole("button", { name: /du jour t'attend/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
 });

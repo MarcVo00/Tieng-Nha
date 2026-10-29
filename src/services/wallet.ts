@@ -7,6 +7,25 @@ export const COINS = { lesson: 10, perfectBonus: 5, dialogue: 5, review: 3, badg
 
 const DEFAULT_MAX_FREEZES = 2;
 
+/** xu of day 1..7 of the daily-bonus run. Mirrors `daily_bonus_amount`. */
+export const DAILY_BONUS = [10, 10, 15, 15, 20, 20, 50] as const;
+
+export function dailyBonusAmount(day: number): number {
+  return DAILY_BONUS[day - 1] ?? 0;
+}
+
+/** Place in the run (1..7) of a bonus claimed on `day`, given the last one. Same rule as the server. */
+function bonusRunDay(w: Pick<Wallet, "bonusDay" | "bonusStreak">, day: string): number {
+  return w.bonusDay !== null && daysBetween(w.bonusDay, day) === 1 ? (w.bonusStreak % DAILY_BONUS.length) + 1 : 1;
+}
+
+/** The bonus still to open on Paris day `today`, or null once it is claimed. */
+export function nextDailyBonus(w: Wallet, today: string): { day: number; coins: number } | null {
+  if (w.bonusDay !== null && w.bonusDay >= today) return null;
+  const day = bonusRunDay(w, today);
+  return { day, coins: dailyBonusAmount(day) };
+}
+
 /** Same normalisation as the server: rounded, clamped to 0..100, anything non-numeric counts as 0. */
 export function normalisedScore(v: unknown): number {
   const n = typeof v === "number" ? v : typeof v === "string" && /^[0-9]+(\.[0-9]+)?$/.test(v) ? Number(v) : NaN;
@@ -81,7 +100,7 @@ function gachaEffect(payload: Record<string, unknown>, shop: readonly ShopItem[]
 /** Replays the journal in time order with the server rules (earning, purchase acceptance, equipment). */
 export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[], badgeDefs: readonly BadgeDef[]): Wallet {
   const sorted = [...events].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  const w: Wallet = { coins: 0, kimBai: 0, inventory: [], equipped: {}, freezes: 0, refills: [], streak: 0, lastActiveDay: null };
+  const w: Wallet = { coins: 0, kimBai: 0, inventory: [], equipped: {}, freezes: 0, refills: [], streak: 0, lastActiveDay: null, bonusDay: null, bonusStreak: 0 };
   const unlocked = new Set<string>();
   const settledDuels = new Set<string>();
   const pulls = new Set<string>();
@@ -120,6 +139,15 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
       pulls.add(e.refId);
       w.coins += fx.refunds - fx.cost;
       for (const id of fx.itemIds) if (!w.inventory.includes(id)) w.inventory.push(id);
+      continue;
+    }
+    if (e.type === "daily_bonus_claimed") {
+      // Same as the server (minus its "today or yesterday" check): refId is the event's Paris day, later than the last bonus.
+      const day = parisDay(e.createdAt);
+      if (e.refId !== day || (w.bonusDay !== null && day <= w.bonusDay)) continue;
+      w.bonusStreak = bonusRunDay(w, day);
+      w.bonusDay = day;
+      w.coins += dailyBonusAmount(w.bonusStreak);
       continue;
     }
     if (e.type === "demo_grant") {

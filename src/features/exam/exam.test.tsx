@@ -298,7 +298,7 @@ describe("run", () => {
 
   /** Opens a fight against a boss with the given HP / lives (to reach the end in one answer). */
   function setupShortFight(over: { hp?: number; playerLives?: number }, equipped?: Wallet["equipped"]) {
-    const wallet: Wallet | null = equipped ? { coins: 0, kimBai: 0, inventory: [], equipped, freezes: 0, refills: [], streak: 0, lastActiveDay: null } : null;
+    const wallet: Wallet | null = equipped ? { coins: 0, kimBai: 0, inventory: [], equipped, freezes: 0, refills: [], streak: 0, lastActiveDay: null, bonusDay: null, bonusStreak: 0 } : null;
     useAppState.setState({ settings: withCapabilities(false), wallet });
     markAttempt("pending", ATTEMPT.attemptId);
     const services = createFakeServices();

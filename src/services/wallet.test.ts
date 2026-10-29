@@ -1,6 +1,6 @@
 import type { AppEvent, BadgeDef, ShopItem } from "@/domain/types";
 import { streakAtDay } from "@/services/streak";
-import { COINS, walletAt } from "@/services/wallet";
+import { COINS, DAILY_BONUS, dailyBonusAmount, nextDailyBonus, walletAt } from "@/services/wallet";
 
 const shop: ShopItem[] = [
   { id: "energy_refill", kind: "consumable", slot: null, price: 30, currency: "xu" },
@@ -345,5 +345,55 @@ describe("gacha_pulled", () => {
     const w = walletAt([earn, buy("g_hat", 9), buy("g_aura", 10)], gshop, badges);
     expect(w.inventory).toEqual([]);
     expect(w.coins).toBe(1000);
+  });
+});
+
+describe("daily bonus (mirrors supabase/tests/08_daily_bonus_test.sql)", () => {
+  const bonus = (day: number, refDay = day) => ev("daily_bonus_claimed", { day: 7, coins: 999 }, `2026-10-${String(refDay).padStart(2, "0")}`, day);
+  const walletOf = (events: AppEvent[]) => walletAt(events, shop, badges);
+
+  test("the 7-day run pays 10, 10, 15, 15, 20, 20, 50", () => {
+    expect(DAILY_BONUS).toEqual([10, 10, 15, 15, 20, 20, 50]);
+    expect([1, 2, 3, 4, 5, 6, 7].map(dailyBonusAmount)).toEqual([10, 10, 15, 15, 20, 20, 50]);
+  });
+
+  test("the first bonus pays day 1 whatever the payload says, never XP nor the streak", () => {
+    const w = walletOf([bonus(10)]);
+    expect(w.coins).toBe(10);
+    expect(w).toMatchObject({ bonusDay: "2026-10-10", bonusStreak: 1, streak: 0, lastActiveDay: null });
+  });
+
+  test("one bonus per day", () => {
+    expect(walletOf([bonus(10), bonus(10)]).coins).toBe(10);
+  });
+
+  test("consecutive days follow the run, then restart after day 7", () => {
+    const days = [1, 2, 3, 4, 5, 6, 7, 8].map((d) => bonus(d));
+    const w = walletOf(days);
+    expect(w.coins).toBe(140 + 10);
+    expect(w.bonusStreak).toBe(1);
+  });
+
+  test("a missed day restarts the run", () => {
+    const w = walletOf([bonus(1), bonus(2), bonus(4)]);
+    expect(w.coins).toBe(30);
+    expect(w.bonusStreak).toBe(1);
+  });
+
+  test("a refId other than the event day pays nothing", () => {
+    expect(walletOf([bonus(10, 9)]).coins).toBe(0);
+    expect(walletOf([ev("daily_bonus_claimed", {}, "not-a-day", 10)]).coins).toBe(0);
+  });
+
+  test("nextDailyBonus: the day's bonus, or null once claimed", () => {
+    const empty = walletOf([]);
+    expect(nextDailyBonus(empty, "2026-10-10")).toEqual({ day: 1, coins: 10 });
+    const w = walletOf([bonus(1), bonus(2)]);
+    expect(nextDailyBonus(w, "2026-10-02")).toBeNull();
+    expect(nextDailyBonus(w, "2026-10-03")).toEqual({ day: 3, coins: 15 });
+    expect(nextDailyBonus(w, "2026-10-04")).toEqual({ day: 1, coins: 10 });
+    const full = walletOf([1, 2, 3, 4, 5, 6, 7].map((d) => bonus(d)));
+    expect(nextDailyBonus(full, "2026-10-08")).toEqual({ day: 1, coins: 10 });
+    expect(nextDailyBonus(walletOf([1, 2, 3, 4, 5, 6].map((d) => bonus(d))), "2026-10-07")).toEqual({ day: 7, coins: 50 });
   });
 });

@@ -181,3 +181,38 @@ test("a pending id the server never saw is dropped: no surprise pull, no xu spen
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => localStorage.getItem("tn-gacha-pending:me"))).toBe("[]");
 });
+
+test("three banners: a pull in « Esprits de la nuit » counts only there, and the tab is remembered after a reload", async ({ page }) => {
+  await fixGachaRolls(page);
+  await onboard(page);
+  await seedCoins(page, 100);
+  await page.reload();
+  await openShop(page);
+
+  const night = fr.shop.themes.esprits_de_la_nuit!;
+  const nightPanel = page.getByRole("tabpanel", { name: night });
+  const nightPiece = fr.shop.items.acc_long_den!.name; // the first common by id of the theme
+  await page.getByRole("tab", { name: night }).click();
+  await expect(nightPanel).toBeVisible();
+  await expect(nightPanel.getByText(fr.gacha.ownedCount(0, 12))).toBeVisible();
+
+  await nightPanel.getByRole("button", { name: fr.gacha.pullOne(40) }).click();
+  const scene = page.getByRole("dialog", { name: fr.gacha.resultLabel(40) });
+  await shakeTube(page);
+  await scene.getByRole("button", { name: fr.gacha.scene.card(1) }).click();
+  await expect(scene.getByRole("heading", { name: nightPiece })).toBeVisible();
+  await scene.getByRole("button", { name: fr.gacha.resultContinue }).click();
+  await expect(scene).toHaveCount(0);
+  await balance(page, 60);
+  await expect(nightPanel.getByText(fr.gacha.ownedCount(1, 12))).toBeVisible();
+
+  // The first banner is untouched.
+  await page.getByRole("tab", { name: fr.shop.themes.legendes_sombres! }).click();
+  await expect(banner(page).getByText(fr.gacha.ownedCount(0, 12))).toBeVisible();
+
+  // The chosen tab is remembered.
+  await page.getByRole("tab", { name: night }).click();
+  await page.reload();
+  await expect(page.getByRole("tab", { name: night })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel", { name: night }).getByText(fr.gacha.ownedCount(1, 12))).toBeVisible();
+});

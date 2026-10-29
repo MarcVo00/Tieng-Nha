@@ -18,7 +18,12 @@ const TEN = Array.from({ length: 10 }, (_, i) => `l${String(i + 1).padStart(2, "
 
 /** The page must not scroll sideways, and no element may poke out of the viewport (the widest offenders are named). */
 async function expectNoOverflow(page: Page, label: string): Promise<void> {
-  await page.waitForTimeout(500); // route transitions
+  // Wait for the screen to settle (not a fixed pause): main content in, skeleton shimmers gone (they loop forever and sweep outside their clipped box), transitions and animations finished.
+  await page.locator("main").first().waitFor();
+  await page.waitForFunction(
+    () => document.querySelectorAll('[aria-busy="true"], [aria-hidden="true"] > .overflow-hidden > span.absolute.inset-0.opacity-60').length === 0 && document.getAnimations().every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity),
+  );
+  await page.evaluate(() => new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
   const report = await page.evaluate(() => {
     const vw = document.documentElement.clientWidth;
     const out = Array.from(document.querySelectorAll("body *"))

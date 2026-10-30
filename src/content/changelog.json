@@ -2,6 +2,16 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "1.11.0",
+      "date": "2026-10-30",
+      "title": "Bùa hộ mệnh",
+      "items": [
+        "Bloqué sur une leçon ? Après 2 échecs, l'appli te montre les mots qui te résistent.",
+        "Après 3 échecs, entraîne-toi sur tes erreurs, sans cœurs ni énergie.",
+        "L'entraînement te donne un talisman : 5 cœurs et un essai offert."
+      ]
+    },
+    {
       "version": "1.10.0",
       "date": "2026-10-29",
       "title": "Plus d'énergie, plus de succès",

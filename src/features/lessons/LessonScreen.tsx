@@ -9,8 +9,10 @@ import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
 import { formatCountdown } from "@/services/energy";
 import { Button, ConfirmDialog, EmptyState, FocusHeader, Hearts, NoEnergy, ReportSheet, Skeleton } from "@/ui";
-import { LESSON_HEARTS, liveVocab, useLessonRun } from "@/features/lessons/useLessonRun";
+import { liveVocab, useLessonRun } from "@/features/lessons/useLessonRun";
 import { VocabDeck } from "@/features/lessons/VocabDeck";
+import { StuckWords } from "@/features/lessons/StuckWords";
+import { STRUGGLE } from "@/services/struggle";
 
 // Hero: the current card or exercise, big, on cream. Header: quit, progress, hearts.
 // One primary action per phase (Suivant / C'est parti / Réessayer).
@@ -69,6 +71,9 @@ export function LessonScreen() {
 
   const { lesson, vocabIndex } = run.load;
   const inExercises = run.phase === "exercises";
+  const failures = run.struggle?.failures ?? 1;
+  const canTrain = failures >= STRUGGLE.trainingAfter && (run.struggle?.missedExercises.length ?? 0) > 0;
+  const training = run.mode === "training";
 
   return (
     <div className="pb-8">
@@ -76,7 +81,13 @@ export function LessonScreen() {
         progress={inExercises || run.phase === "saving" ? run.progress : 0}
         onClose={() => setQuitting(true)}
         closeLabel={fr.lessons.quit.aria}
-        right={<Hearts count={run.hearts ?? LESSON_HEARTS} max={LESSON_HEARTS} />}
+        right={
+          training ? (
+            <span className="text-caption text-ink-muted">{fr.lessons.stuck.training}</span>
+          ) : (
+            <Hearts count={run.hearts ?? run.heartsMax} max={run.heartsMax} />
+          )
+        }
       />
 
       {run.phase === "intro" ? (
@@ -108,17 +119,49 @@ export function LessonScreen() {
       ) : null}
 
       {run.phase === "failed" ? (
+        // Help grows with the failures since the last completion (spec 2026-10-30): words from 2, training from 3.
         <EmptyState
           title={fr.lessons.failed.title}
-          body={fr.lessons.failed.body}
-          scene={{ look: heroLook, line: fr.lessons.failed.line, expression: "hurt" }}
+          body={fr.lessons.failed.bodyFor(failures)}
+          scene={{ look: heroLook, line: fr.lessons.failed.lineFor(failures), expression: "hurt" }}
           action={
             <>
-              <Button size="lg" onClick={() => void run.restart()} disabled={run.failPending}>
+              {failures >= STRUGGLE.wordsAfter && run.struggle ? (
+                <StuckWords
+                  ids={run.struggle.missedVocab}
+                  vocabIndex={vocabIndex}
+                  canSpeak={capabilities.tts}
+                  onSpeak={(vi) => void tts.speak(vi, { rate: voiceRateOf(settings) }).catch(() => undefined)}
+                />
+              ) : null}
+              {canTrain ? (
+                <Button size="lg" onClick={run.startTraining} disabled={run.failPending}>
+                  {fr.lessons.stuck.train}
+                </Button>
+              ) : null}
+              <Button size="lg" variant={canTrain ? "secondary" : "primary"} onClick={() => void run.restart()} disabled={run.failPending}>
                 {fr.lessons.failed.retry}
               </Button>
-              <Button variant="secondary" onClick={goHome} disabled={run.failPending}>
+              <Button variant={canTrain ? "ghost" : "secondary"} onClick={goHome} disabled={run.failPending}>
                 {fr.lessons.failed.back}
+              </Button>
+            </>
+          }
+        />
+      ) : null}
+
+      {run.phase === "trained" ? (
+        <EmptyState
+          title={fr.lessons.stuck.trained.title}
+          body={fr.lessons.stuck.trained.body}
+          scene={{ look: heroLook, line: fr.lessons.stuck.trained.line, tone: "reward" }}
+          action={
+            <>
+              <Button size="lg" onClick={() => void run.restart()}>
+                {fr.lessons.stuck.trained.retry}
+              </Button>
+              <Button variant="secondary" onClick={goHome}>
+                {fr.lessons.stuck.trained.back}
               </Button>
             </>
           }

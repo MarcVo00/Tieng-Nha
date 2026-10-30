@@ -41,6 +41,8 @@ export type AppEventType =
   | "duel_settled"
   | "gacha_pulled"
   | "daily_bonus_claimed"
+  | "lesson_failed"
+  | "training_done"
   | "demo_grant";
 
 /** Payload shapes by event type (stored as JSON). */
@@ -50,7 +52,9 @@ export type EventPayload = {
   review_session_completed: { correctCount: number; total: number };
   exam_finished: { score: number; attemptId: string; noSpeaking: boolean; bossId?: string; won?: boolean; livesLeft?: number; bossHpLeft?: number };
   badge_unlocked: Record<string, never>;
-  session_started: { kind: SessionKind };
+  session_started: { kind: SessionKind; free?: boolean };
+  lesson_failed: { vocabIds: VocabId[]; exerciseIds: string[] };
+  training_done: Record<string, never>;
   item_purchased: { itemId: string };
   item_equipped: { slot: ItemSlot; itemId: string | null };
   duel_settled: { kimBai: number };

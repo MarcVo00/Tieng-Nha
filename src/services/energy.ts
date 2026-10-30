@@ -3,7 +3,7 @@ import type { AppEvent, AppEventType, EnergyState, SessionKind } from "@/domain/
 export const ENERGY = { max: 5, refillMs: 600_000, cost: { lesson: 1, dialogue: 1, boss: 3 }, reviewGain: 1 } as const;
 
 /** Recorded in the local journal only: the server neither accepts nor needs them (energy is not checked server-side). */
-export const LOCAL_ONLY_EVENT_TYPES: readonly AppEventType[] = ["session_started", "demo_grant"];
+export const LOCAL_ONLY_EVENT_TYPES: readonly AppEventType[] = ["session_started", "demo_grant", "lesson_failed", "training_done"];
 
 const isKind = (v: unknown): v is SessionKind => v === "lesson" || v === "dialogue" || v === "boss";
 
@@ -39,7 +39,8 @@ export function energyAt(events: readonly AppEvent[], nowIso: string, refills: r
     }
     const wasFull = current >= ENERGY.max;
     const kind = e.payload["kind"];
-    if (e.type === "session_started" && isKind(kind)) {
+    // A free start (the attempt after a training, spec 2026-10-30) spends nothing.
+    if (e.type === "session_started" && isKind(kind) && e.payload["free"] !== true) {
       current = Math.max(0, current - ENERGY.cost[kind]);
       if (wasFull && current < ENERGY.max) anchor = t;
     } else if (e.type === "review_session_completed") {

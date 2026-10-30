@@ -477,3 +477,52 @@ describe("sounds", () => {
     TEST_TIMEOUT,
   );
 });
+
+describe("stuck on a lesson (spec 2026-10-30)", () => {
+  async function failOnce() {
+    for (const ex of ORDER.slice(0, 3)) await play(ex, false);
+    await screen.findByRole("heading", { name: fr.lessons.failed.title });
+    await waitFor(() => expect(screen.getByRole("button", { name: fr.lessons.failed.retry })).toBeEnabled());
+  }
+  async function retry() {
+    await userEvent.click(screen.getByRole("button", { name: fr.lessons.failed.retry }));
+    await screen.findByRole("progressbar");
+  }
+
+  test(
+    "the words that resist show from the 2nd failure, the training from the 3rd; it earns a free attempt with 5 hearts",
+    async () => {
+      const { services } = setup();
+      await skipIntro();
+      await failOnce();
+      expect(screen.getByText(fr.lessons.failed.bodyFor(1))).toBeInTheDocument();
+      expect(screen.queryByText(fr.lessons.stuck.wordsTitle)).toBeNull();
+
+      await retry();
+      await failOnce();
+      expect(screen.getByText(fr.lessons.failed.bodyFor(2))).toBeInTheDocument();
+      expect(screen.getByText(fr.lessons.failed.lineFor(2))).toHaveAttribute("lang", "vi");
+      expect(screen.getByRole("heading", { name: fr.lessons.stuck.wordsTitle })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: fr.lessons.stuck.train })).toBeNull();
+
+      await retry();
+      await failOnce();
+      expect(screen.getByText(fr.lessons.failed.bodyFor(3))).toBeInTheDocument();
+      const energyBefore = (await services.activity.getEnergy()).current;
+      await userEvent.click(screen.getByRole("button", { name: fr.lessons.stuck.train }));
+      expect(await screen.findByText(fr.lessons.stuck.training)).toBeInTheDocument();
+      expect(screen.queryByRole("img", { name: /Vies/ })).toBeNull();
+      const missed = (await services.activity.getStruggle("l05")).missedExercises;
+      for (const id of missed) await play(ORDER.find((e) => e.id === id)!, true);
+
+      expect(await screen.findByRole("heading", { name: fr.lessons.stuck.trained.title })).toBeInTheDocument();
+      expect((await services.activity.getStruggle("l05")).talisman).toBe(true);
+      await userEvent.click(screen.getByRole("button", { name: fr.lessons.stuck.trained.retry }));
+      expect(await screen.findByRole("img", { name: fr.ui.hearts(5, 5) })).toBeInTheDocument();
+      expect((await services.activity.getEnergy()).current).toBe(energyBefore);
+      expect((await services.activity.getStruggle("l05")).talisman).toBe(false);
+      expect(await services.outbox.size()).toBe(0);
+    },
+    TEST_TIMEOUT * 3,
+  );
+});

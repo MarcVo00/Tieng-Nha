@@ -276,3 +276,16 @@ test("the daily bonus opens once per Paris day, is synced and never gives XP", a
   setNow("2026-10-10T23:30:00.000Z");
   expect(await svc.claimDailyBonus()).toMatchObject({ ok: true, day: 2, coins: 10 });
 });
+
+test("a lesson failure and a training stay in the local journal, and the talisman attempt is free", async () => {
+  const { svc, outbox } = setup();
+  await svc.startSession("lesson", "l05");
+  await svc.recordLessonFailure("l05", { vocabIds: ["v_ly", "v_ly", "v_da"], exerciseIds: ["e1"] });
+  expect(await svc.getStruggle("l05")).toEqual({ failures: 1, missedVocab: ["v_ly", "v_da"], missedExercises: ["e1"], talisman: false });
+  await svc.completeTraining("l05");
+  expect((await svc.getStruggle("l05")).talisman).toBe(true);
+  const before = (await svc.getEnergy()).current;
+  expect((await svc.startSession("lesson", "l05", { free: true })).energy.current).toBe(before);
+  expect((await svc.getStruggle("l05")).talisman).toBe(false);
+  expect(await outbox.size()).toBe(0);
+});

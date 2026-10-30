@@ -387,6 +387,28 @@ export const fr = {
       retry: "Réessayer",
       back: "Retour",
       line: "Cố lên!",
+      /** Body and Vietnamese line by failures since the last completion (spec 2026-10-30). */
+      bodyFor: (failures: number) =>
+        failures >= 3
+          ? "Entraîne-toi sur tes erreurs\u202f: tu gagnes un talisman, 2 cœurs de plus et un essai offert."
+          : failures === 2
+            ? "Regarde les mots qui te résistent, puis réessaie."
+            : "Les mots ont été ajoutés à tes révisions.",
+      lineFor: (failures: number) => (failures >= 3 ? "Đừng bỏ cuộc!" : failures === 2 ? "Chậm mà chắc!" : "Cố lên!"),
+    },
+    stuck: {
+      wordsTitle: "Les mots qui te résistent",
+      listen: (word: string) => `Écouter «\u202f${word}\u202f»`,
+      train: "M'entraîner sur mes erreurs",
+      training: "Entraînement",
+      talisman: "Talisman\u202f: 2 cœurs de plus, essai offert",
+      trained: {
+        title: "Talisman gagné\u202f!",
+        line: "Bùa hộ mệnh!",
+        body: "Ton prochain essai commence avec 5 cœurs et ne coûte pas d'énergie.",
+        retry: "Retenter la leçon",
+        back: "Plus tard",
+      },
     },
     saving: { title: "On enregistre ta leçon…" },
     saveError: { title: "Ta leçon n'a pas pu être enregistrée", body: "Tes réponses sont gardées. Réessaie dans un instant." },

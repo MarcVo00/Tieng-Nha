@@ -7,6 +7,7 @@ import { introduce, record } from "@/services/leitner";
 import { ENERGY, energyAt } from "@/services/energy";
 import { equippable, nextDailyBonus, purchasable, walletAt } from "@/services/wallet";
 import { parisDay } from "@/services/time";
+import { struggleAt, type Struggle } from "@/services/struggle";
 
 export type ActivityResult = { xpGained: number; newBadges: BadgeDef[]; snapshot: ProgressSnapshot; firstTime: boolean; energyGained?: number; coinsGained: number };
 export type ActivityService = {
@@ -15,7 +16,14 @@ export type ActivityService = {
   getWallet(): Promise<Wallet>;
   purchase(itemId: string): Promise<{ ok: boolean; wallet: Wallet }>;
   equip(slot: ItemSlot, itemId: string | null): Promise<{ ok: boolean; wallet: Wallet }>;
-  startSession(kind: SessionKind, refId: string): Promise<{ ok: boolean; energy: EnergyState }>;
+  /** `free`: the attempt after a training (spec 2026-10-30) spends no energy. */
+  startSession(kind: SessionKind, refId: string, opts?: { free?: boolean }): Promise<{ ok: boolean; energy: EnergyState }>;
+  /** Where the learner stands on a lesson: failures since its last completion, missed words, talisman. */
+  getStruggle(lessonId: LessonId): Promise<Struggle>;
+  /** Notes a lost lesson (local journal only) with the words and exercises missed in that attempt. */
+  recordLessonFailure(lessonId: LessonId, missed: { vocabIds: readonly VocabId[]; exerciseIds: readonly string[] }): Promise<void>;
+  /** Notes a finished training (local journal only): the next attempt of the lesson gets the talisman. */
+  completeTraining(lessonId: LessonId): Promise<void>;
   introduceVocab(vocabIds: readonly VocabId[]): Promise<void>;
   recordAnswer(vocabIds: readonly VocabId[], correct: boolean): Promise<void>;
   completeLesson(i: { lessonId: LessonId; mistakes: number; durationMs: number; vocabIds: readonly VocabId[] }): Promise<ActivityResult>;
@@ -146,11 +154,21 @@ export function createActivityService(deps: {
       deps.onEventAppended?.();
       return { ok: true, wallet: await wallet() };
     },
-    async startSession(kind, refId) {
+    async startSession(kind, refId, opts) {
       const before = await energy();
-      if (before.current < ENERGY.cost[kind]) return { ok: false, energy: before };
-      await progress.appendEvent({ type: "session_started", refId, xp: 0, payload: { kind } }, clock()); // local only: never enqueued
+      const free = opts?.free === true;
+      if (!free && before.current < ENERGY.cost[kind]) return { ok: false, energy: before };
+      await progress.appendEvent({ type: "session_started", refId, xp: 0, payload: free ? { kind, free } : { kind } }, clock()); // local only: never enqueued
       return { ok: true, energy: await energy() };
+    },
+    async getStruggle(lessonId) {
+      return struggleAt(await progress.listEvents(), lessonId);
+    },
+    async recordLessonFailure(lessonId, { vocabIds, exerciseIds }) {
+      await progress.appendEvent({ type: "lesson_failed", refId: lessonId, xp: 0, payload: { vocabIds: [...vocabIds], exerciseIds: [...exerciseIds] } }, clock()); // local only
+    },
+    async completeTraining(lessonId) {
+      await progress.appendEvent({ type: "training_done", refId: lessonId, xp: 0, payload: {} }, clock()); // local only
     },
     introduceVocab,
     async recordAnswer(ids, correct) {

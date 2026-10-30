@@ -5,6 +5,7 @@ import { useServices } from "@/app/ServicesProvider";
 import type { Exercise, Lesson, VocabId, VocabItem } from "@/domain/types";
 import type { GradeResult } from "@/exercises/types";
 import type { ActivityResult } from "@/services/activity";
+import { STRUGGLE, type Struggle } from "@/services/struggle";
 import { createRng, seedFromString, shuffleWithinGroups } from "@/services/random";
 import {
   accuracyOf,
@@ -17,9 +18,12 @@ import {
 } from "@/services/lessonSession";
 
 export const LESSON_HEARTS = 3;
-const OPTIONS: SessionOptions = { hearts: LESSON_HEARTS, retryWrong: true };
+const lessonOptions = (talisman: boolean): SessionOptions => ({ hearts: LESSON_HEARTS + (talisman ? STRUGGLE.talismanHearts : 0), retryWrong: true });
+/** Training on the missed exercises (spec 2026-10-30): no hearts, so it cannot be lost. */
+const TRAINING: SessionOptions = { hearts: null, retryWrong: true };
 
-export type LessonPhase = "intro" | "exercises" | "failed" | "saving";
+/** "trained": the training is over and the talisman waits for the next attempt. */
+export type LessonPhase = "intro" | "exercises" | "failed" | "saving" | "trained";
 export type LessonDoneState = ActivityResult & { accuracy: number; perfect: boolean };
 export type LessonLoad =
   | { status: "loading" }
@@ -49,6 +53,9 @@ export function useLessonRun(lessonId: string | undefined) {
   const [session, setSession] = useState<SessionState | null>(null);
   const [saveError, setSaveError] = useState(false);
   const [failPending, setFailPending] = useState(false);
+  const [struggle, setStruggle] = useState<Struggle | null>(null);
+  const [mode, setMode] = useState<"lesson" | "training">("lesson");
+  const [heartsMax, setHeartsMax] = useState(LESSON_HEARTS);
 
   // Latest values for async callbacks, plus the idempotence guards.
   const sessionRef = useRef<SessionState | null>(null);
@@ -63,6 +70,8 @@ export function useLessonRun(lessonId: string | undefined) {
   refreshRef.current = refreshProgress;
   const restarting = useRef(false); // one « Réessayer » spend at a time
   const prefetched = useRef<string | null>(null);
+  const optionsRef = useRef<SessionOptions>(lessonOptions(false));
+  const modeRef = useRef<"lesson" | "training">("lesson");
 
   useEffect(() => {
     mounted.current = true;
@@ -71,8 +80,9 @@ export function useLessonRun(lessonId: string | undefined) {
     };
   }, []);
 
-  const begin = useCallback((lesson: Lesson) => {
-    const fresh = createSession(orderExercises(lesson, clock()), OPTIONS);
+  const begin = useCallback((lesson: Lesson, options: SessionOptions, exercises?: Exercise[]) => {
+    optionsRef.current = options;
+    const fresh = createSession(exercises ?? orderExercises(lesson, clock()), options);
     sessionRef.current = fresh;
     setSession(fresh);
     completing.current = false;
@@ -82,6 +92,20 @@ export function useLessonRun(lessonId: string | undefined) {
     setSaveError(false);
     setFailPending(false);
   }, [clock]);
+
+  /** Starts an attempt: free and with extra hearts when a training earned the talisman. */
+  const spend = useCallback(async (lesson: Lesson) => {
+    const { talisman } = await activity.getStruggle(lesson.id);
+    const spent = await activity.startSession("lesson", lesson.id, talisman ? { free: true } : undefined);
+    return { ...spent, talisman };
+  }, [activity]);
+
+  const enterLesson = useCallback((lesson: Lesson, talisman: boolean) => {
+    modeRef.current = "lesson";
+    setMode("lesson");
+    setHeartsMax(lessonOptions(talisman).hearts ?? LESSON_HEARTS);
+    begin(lesson, lessonOptions(talisman));
+  }, [begin]);
 
   useEffect(() => {
     if (!lessonId) {
@@ -94,14 +118,14 @@ export function useLessonRun(lessonId: string | undefined) {
       .then(async ([lesson, vocabIndex]) => {
         if (cancelled) return;
         // Spend only once the content is here and this run is still the live one (StrictMode double-runs effects).
-        const spent = await activity.startSession("lesson", lesson.id);
+        const spent = await spend(lesson);
         if (cancelled) return;
         if (!spent.ok) {
           setLoad({ status: "no-energy", nextAt: spent.energy.nextAt });
           return;
         }
         lessonRef.current = lesson;
-        begin(lesson);
+        enterLesson(lesson, spent.talisman);
         setPhase("intro");
         setLoad({ status: "ready", lesson, vocabIndex });
         void refreshRef.current().catch(() => undefined);
@@ -112,7 +136,7 @@ export function useLessonRun(lessonId: string | undefined) {
     return () => {
       cancelled = true;
     };
-  }, [content, activity, lessonId, begin, loadAttempt]);
+  }, [content, activity, lessonId, spend, enterLesson, loadAttempt]);
 
   // Prefetch the next lesson while the learner is busy with exercises (ADR 0010).
   useEffect(() => {
@@ -133,6 +157,25 @@ export function useLessonRun(lessonId: string | undefined) {
     const lesson = lessonRef.current;
     if (!lesson || completing.current) return;
     completing.current = true;
+    if (modeRef.current === "training") {
+      // A training never completes the lesson: it only earns the talisman for the next attempt.
+      try {
+        await answers.current;
+        await activity.completeTraining(lesson.id);
+        const next = await activity.getStruggle(lesson.id);
+        if (!mounted.current) return;
+        setStruggle(next);
+        sound.play("lesson.won");
+        setPhase("trained");
+      } catch {
+        completing.current = false;
+        if (mounted.current) {
+          setPhase("saving"); // shows the save error and its retry
+          setSaveError(true);
+        }
+      }
+      return;
+    }
     setSaveError(false);
     setPhase("saving");
     let result: ActivityResult;
@@ -155,7 +198,7 @@ export function useLessonRun(lessonId: string | undefined) {
     if (!mounted.current) return;
     const state: LessonDoneState = { ...result, accuracy: accuracyOf(final), perfect: mistakes === 0 };
     navigate(`/lesson/${lesson.id}/done`, { state, replace: true });
-  }, [activity, clock, navigate, refreshProgress]);
+  }, [activity, clock, navigate, refreshProgress, sound]);
 
   const fail = useCallback(async () => {
     const lesson = lessonRef.current;
@@ -164,11 +207,22 @@ export function useLessonRun(lessonId: string | undefined) {
     sound.play("lesson.lost");
     setPhase("failed");
     setFailPending(true);
+    const wrong = (sessionRef.current?.results ?? []).filter((r) => !r.result.correct && !r.result.skipped);
     try {
       await answers.current;
       await activity.introduceVocab(liveVocab(lesson).map((v) => v.id));
     } catch {
       // The words simply will not be in the reviews; the failed panel still works.
+    }
+    try {
+      await activity.recordLessonFailure(lesson.id, {
+        vocabIds: wrong.flatMap((r) => r.result.vocabIds),
+        exerciseIds: wrong.map((r) => r.exerciseId),
+      });
+      const next = await activity.getStruggle(lesson.id);
+      if (mounted.current) setStruggle(next);
+    } catch {
+      // No help this time: the plain failed panel still offers a retry.
     }
     if (mounted.current) setFailPending(false);
   }, [activity, sound]);
@@ -187,7 +241,7 @@ export function useLessonRun(lessonId: string | undefined) {
         .then(() => activity.recordAnswer(result.vocabIds, result.correct))
         .catch(() => undefined);
     }
-    const next = applyResult(s, OPTIONS, result);
+    const next = applyResult(s, optionsRef.current, result);
     sessionRef.current = next;
     setSession(next);
     if (next.status === "done") void finish(next);
@@ -210,13 +264,13 @@ export function useLessonRun(lessonId: string | undefined) {
     if (!lesson || failPending || restarting.current) return;
     restarting.current = true;
     try {
-      const spent = await activity.startSession("lesson", lesson.id);
+      const spent = await spend(lesson);
       if (!mounted.current) return;
       if (!spent.ok) {
         setLoad({ status: "no-energy", nextAt: spent.energy.nextAt });
         return;
       }
-      begin(lesson);
+      enterLesson(lesson, spent.talisman);
       setPhase("exercises");
       void refreshProgress().catch(() => undefined);
     } catch {
@@ -224,7 +278,19 @@ export function useLessonRun(lessonId: string | undefined) {
     } finally {
       restarting.current = false;
     }
-  }, [activity, begin, failPending, refreshProgress]);
+  }, [spend, enterLesson, failPending, refreshProgress]);
+
+  /** Replays the exercises missed since the last completion, free and without hearts (spec 2026-10-30). */
+  const startTraining = useCallback(() => {
+    const lesson = lessonRef.current;
+    if (!lesson || failPending || !struggle) return;
+    const live = liveExercises(lesson);
+    const missed = struggle.missedExercises.flatMap((id) => live.filter((e) => e.id === id));
+    modeRef.current = "training";
+    setMode("training");
+    begin(lesson, TRAINING, missed.length > 0 ? missed : orderExercises(lesson, clock()));
+    setPhase("exercises");
+  }, [begin, clock, failPending, struggle]);
 
   const retrySave = useCallback(() => {
     const s = sessionRef.current;
@@ -242,6 +308,10 @@ export function useLessonRun(lessonId: string | undefined) {
     attempt: session && exercise ? session.results.filter((r) => r.exerciseId === exercise.id).length : 0,
     progress: session ? progressOf(session) : 0,
     hearts: session?.hearts ?? null,
+    heartsMax,
+    mode,
+    struggle,
+    startTraining,
     saveError,
     failPending,
     startExercises,

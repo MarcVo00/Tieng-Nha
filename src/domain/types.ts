@@ -5,6 +5,8 @@ import type {
   ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema, ShopItemSchema, RaritySchema, ChangelogEntrySchema,
 } from "@/content/schema";
 
+import type { LanguageId } from "@/domain/languages";
+
 export type { Tone } from "@/domain/tones";
 export type VocabId = string;
 export type LessonId = string;
@@ -99,6 +101,7 @@ export type Settings = {
   capabilities: Capabilities | null; // null = device test not done yet
   onboardingDone: boolean;
   sound: boolean; // sound effects (lessons, fights, gacha); rows saved before 1.7 have none and read back as on
+  language: LanguageId | null; // the language being learned; null = not chosen yet (rows saved before 2.0 have none)
 };
 
 export type Session = { userId: string; email: string };

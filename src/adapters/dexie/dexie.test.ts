@@ -36,12 +36,13 @@ test("listDueVocab orders by dueAt ascending and respects the limit", async () =
 test("settings default, save, and theme mirrored to storage", async () => {
   const store = new Map<string, string>();
   const repo = new DexieProgressRepository(db, { setItem: (k, v) => void store.set(k, v) });
-  expect(await repo.getSettings()).toEqual({ theme: "system", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: false, sound: true });
-  await repo.saveSettings({ theme: "dark", voiceRate: "slow", voice: "north-m", capabilities: { tts: true, stt: false, recorder: true }, onboardingDone: true, sound: false });
+  expect(await repo.getSettings()).toEqual({ theme: "system", voiceRate: "normal", voice: "south-f", capabilities: null, onboardingDone: false, sound: true, language: null });
+  await repo.saveSettings({ theme: "dark", voiceRate: "slow", voice: "north-m", capabilities: { tts: true, stt: false, recorder: true }, onboardingDone: true, sound: false, language: "tl" });
   expect((await repo.getSettings()).theme).toBe("dark");
   expect((await repo.getSettings()).voice).toBe("north-m");
   expect(store.get(THEME_STORAGE_KEY)).toBe("dark");
   expect((await repo.getSettings()).sound).toBe(false);
+  expect((await repo.getSettings()).language).toBe("tl");
 });
 
 test("settings saved before sounds existed read back with sounds on", async () => {
@@ -92,4 +93,12 @@ test("report queue", async () => {
   expect(all).toHaveLength(1);
   await q.remove(all[0]!.id);
   expect(await q.all()).toEqual([]);
+});
+
+test("settings saved before 2.0 read back with no language chosen; unknown languages are reset", async () => {
+  const repo = new DexieProgressRepository(db);
+  await db.kv.put({ key: "settings", value: { theme: "dark", voiceRate: "slow", voice: "north-f", capabilities: null, onboardingDone: true, sound: true } });
+  expect((await repo.getSettings()).language).toBeNull();
+  await db.kv.put({ key: "settings", value: { theme: "dark", voiceRate: "slow", voice: "north-f", capabilities: null, onboardingDone: true, sound: true, language: "klingon" } });
+  expect((await repo.getSettings()).language).toBeNull();
 });

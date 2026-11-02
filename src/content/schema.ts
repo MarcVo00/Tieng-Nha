@@ -4,9 +4,22 @@ const isNfc = (s: string) => s === s.normalize("NFC");
 export const ViTextSchema = z.string().min(1).refine(isNfc, { message: "Vietnamese text must be Unicode NFC" });
 
 export const ToneSchema = z.enum(["ngang", "huyen", "sac", "hoi", "nga", "nang"]);
-export const VocabIdSchema = z.string().regex(/^v_[a-z0-9_]+$/);
-export const LessonIdSchema = z.string().regex(/^l\d{2}$/);
-export const DialogueIdSchema = z.string().regex(/^d\d{2}$/);
+// Tagalog content ids carry the `tl_` prefix (see domain/languages.ts); Vietnamese ids never changed.
+export const VocabIdSchema = z.string().regex(/^(tl_)?v_[a-z0-9_]+$/);
+export const LessonIdSchema = z.string().regex(/^(tl_)?l\d{2}$/);
+export const DialogueIdSchema = z.string().regex(/^(tl_)?d\d{2}$/);
+
+/**
+ * Respelling of a target-language text: syllables joined by «·», words by a space, and in every word at least one
+ * syllable fully upper-case (the stressed one), e.g. `sa·LA·mat`. Optional on vocab and spoken lines.
+ */
+const PRON_SHAPE = /^[\p{L}'-]+(·[\p{L}'-]+)*( [\p{L}'-]+(·[\p{L}'-]+)*)*$/u;
+const hasStressedSyllable = (word: string) =>
+  word.split("·").some((syl) => syl === syl.toUpperCase() && syl !== syl.toLowerCase());
+export const PronSchema = z
+  .string()
+  .regex(PRON_SHAPE)
+  .refine((p) => p.split(" ").every(hasStressedSyllable), { message: "each word needs one fully upper-case (stressed) syllable" });
 const ExerciseIdSchema = z.string().regex(/^[a-z0-9_]+$/);
 
 export const VocabItemSchema = z
@@ -16,7 +29,8 @@ export const VocabItemSchema = z
     fr: z.string().min(1),
     note: z.string().min(1).optional(),
     audio: z.string().min(1).optional(),
-    dialect: z.literal("south"),
+    dialect: z.enum(["south", "manila"]),
+    pron: PronSchema.optional(),
     deprecated: z.boolean().optional(),
   })
   .strict();
@@ -48,7 +62,7 @@ export const WordOrderSchema = z
   })
   .strict();
 export const SpeakSchema = z
-  .object({ ...base, type: z.literal("speak"), vi: ViTextSchema, fr: z.string().min(1), vocabIds: z.array(VocabIdSchema) })
+  .object({ ...base, type: z.literal("speak"), vi: ViTextSchema, fr: z.string().min(1), vocabIds: z.array(VocabIdSchema), pron: PronSchema.optional() })
   .strict();
 
 export const ExerciseSchema = z.discriminatedUnion("type", [
@@ -76,10 +90,10 @@ export const LessonSchema = z
 
 const TurnIdSchema = z.string().regex(/^t\d+$/);
 export const NpcTurnSchema = z
-  .object({ id: TurnIdSchema, speaker: z.literal("npc"), vi: ViTextSchema, fr: z.string().min(1), audio: z.string().optional(), next: TurnIdSchema.nullable() })
+  .object({ id: TurnIdSchema, speaker: z.literal("npc"), vi: ViTextSchema, fr: z.string().min(1), audio: z.string().optional(), next: TurnIdSchema.nullable(), pron: PronSchema.optional() })
   .strict();
 export const UserOptionSchema = z
-  .object({ id: z.string().regex(/^o\d+$/), vi: ViTextSchema, fr: z.string().min(1), next: TurnIdSchema.nullable() })
+  .object({ id: z.string().regex(/^o\d+$/), vi: ViTextSchema, fr: z.string().min(1), next: TurnIdSchema.nullable(), pron: PronSchema.optional() })
   .strict();
 export const UserTurnSchema = z
   .object({ id: TurnIdSchema, speaker: z.literal("user"), options: z.array(UserOptionSchema).min(2).max(3) })
@@ -119,7 +133,7 @@ export const BossSchema = z
     pool: z.literal("exam"),
   })
   .strict();
-export const BossesFileSchema = z.object({ contentVersion: z.number().int().min(1), bosses: z.array(BossSchema).min(1) }).strict();
+export const BossesFileSchema = z.object({ contentVersion: z.number().int().min(1), bosses: z.array(BossSchema).min(0) }).strict();
 
 export const BadgeRuleSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("lessons_done"), gte: z.number().int().min(1) }).strict(),

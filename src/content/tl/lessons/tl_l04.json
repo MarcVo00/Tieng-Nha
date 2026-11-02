@@ -13,7 +13,7 @@
       "fr": "je voudrais, j'aime",
       "dialect": "manila",
       "pron": "gus·TO KO",
-      "note": "« Gusto ko ng adobo. » Le petit mot « ng », prononcé « nang », relie à ce que tu veux."
+      "note": "« Gusto ko po ng adobo. » Le petit mot « ng », prononcé « nang », relie à ce que tu veux."
     },
     {
       "id": "tl_v_isa_pa_po",
@@ -170,11 +170,11 @@
       "id": "tl_l04_e05",
       "type": "translate_choose",
       "promptFr": "Je voudrais du poulet.",
-      "answerVi": "Gusto ko ng manok.",
+      "answerVi": "Gusto ko po ng manok.",
       "distractorsVi": [
-        "Gusto ko ng baboy.",
-        "Gusto ko ng isda.",
-        "Gusto ko ng kanin."
+        "Gusto ko po ng baboy.",
+        "Gusto ko po ng isda.",
+        "Gusto ko po ng kanin."
       ]
     },
     {
@@ -191,9 +191,9 @@
     {
       "id": "tl_l04_e07",
       "type": "word_order",
-      "fr": "Un café, sans glaçons, s'il vous plaît.",
+      "fr": "De l'eau, sans glaçons, s'il vous plaît.",
       "tokensVi": [
-        "Kape",
+        "Tubig",
         "po",
         "walang",
         "yelo"
@@ -230,13 +230,13 @@
     {
       "id": "tl_l04_e10",
       "type": "speak",
-      "vi": "Gusto ko ng adobo.",
+      "vi": "Gusto ko po ng adobo.",
       "fr": "Je voudrais de l'adobo.",
       "vocabIds": [
         "tl_v_gusto_ko",
         "tl_v_adobo"
       ],
-      "pron": "gus·TO KO NANG a·DO·bo"
+      "pron": "gus·TO KO PO NANG a·DO·bo"
     },
     {
       "id": "tl_l04_e11",

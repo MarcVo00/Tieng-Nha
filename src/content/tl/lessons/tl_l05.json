@@ -82,7 +82,7 @@
       "fr": "possible, on peut",
       "dialect": "manila",
       "pron": "PWE·de",
-      "note": "« Pwede bang… ? » : est-ce qu'on peut… ? De l'espagnol « puede »."
+      "note": "« Pwede po bang… ? » : est-ce qu'on peut… ? De l'espagnol « puede »."
     },
     {
       "id": "tl_v_card",
@@ -169,9 +169,9 @@
       "id": "tl_l05_e06",
       "type": "translate_choose",
       "promptFr": "Je peux payer par carte ?",
-      "answerVi": "Pwede bang card?",
+      "answerVi": "Pwede po bang card?",
       "distractorsVi": [
-        "Pwede bang cash?",
+        "Pwede po bang cash?",
         "May discount po ba?",
         "Magkano po?"
       ]
@@ -196,6 +196,7 @@
       "fr": "Je peux payer en espèces ?",
       "tokensVi": [
         "Pwede",
+        "po",
         "bang",
         "cash"
       ],
@@ -230,7 +231,7 @@
       "id": "tl_l05_e11",
       "type": "speak",
       "vi": "Bayad po.",
-      "fr": "Voilà mon paiement.",
+      "fr": "Voilà, je paie.",
       "vocabIds": [
         "tl_v_bayad"
       ],

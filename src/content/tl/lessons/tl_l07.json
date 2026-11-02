@@ -53,7 +53,7 @@
       "fr": "jusqu'à",
       "dialect": "manila",
       "pron": "hang·GANG",
-      "note": "« Magkano hanggang airport? » : combien jusqu'à l'aéroport ? Négocie avant de monter dans un tricycle."
+      "note": "« Magkano po hanggang airport? » : combien jusqu'à l'aéroport ? Négocie avant de monter dans un tricycle."
     },
     {
       "id": "tl_v_metro",
@@ -151,7 +151,7 @@
       "id": "tl_l07_e05",
       "type": "translate_choose",
       "promptFr": "Combien jusqu'à l'aéroport ?",
-      "answerVi": "Magkano hanggang airport?",
+      "answerVi": "Magkano po hanggang airport?",
       "distractorsVi": [
         "Magkano po ito?",
         "Nasaan po ang airport?",
@@ -221,14 +221,14 @@
     {
       "id": "tl_l07_e11",
       "type": "speak",
-      "vi": "Magkano hanggang airport?",
+      "vi": "Magkano po hanggang airport?",
       "fr": "Combien jusqu'à l'aéroport ?",
       "vocabIds": [
         "tl_v_magkano",
         "tl_v_hanggang",
         "tl_v_airport"
       ],
-      "pron": "mag·KA·no hang·GANG ER·port"
+      "pron": "mag·KA·no PO hang·GANG ER·port"
     }
   ]
 }

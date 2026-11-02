@@ -35,10 +35,10 @@
     {
       "id": "t3",
       "speaker": "npc",
-      "vi": "Hindi po maanghang. Kanin po?",
-      "fr": "Ce n'est pas épicé. Avec du riz ?",
+      "vi": "Opo. Kanin po?",
+      "fr": "Oui. Avec du riz ?",
       "next": "t4",
-      "pron": "hin·DI PO ma·ang·HANG KA·nin PO"
+      "pron": "O·po KA·nin PO"
     },
     {
       "id": "t4",

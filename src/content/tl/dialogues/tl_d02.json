@@ -38,7 +38,7 @@
       "vi": "Taga-Maynila ako. Marunong ka bang mag-Ingles?",
       "fr": "Moi, je suis de Manille. Tu parles anglais ?",
       "next": "t4",
-      "pron": "ta·GA-may·NI·la a·KO ma·RU·nong KA BANG mag·ing·LES"
+      "pron": "ta·GA-may·NI·la a·KO ma·RU·nong KA BANG mag·ing·GLES"
     },
     {
       "id": "t4",
@@ -53,10 +53,10 @@
         },
         {
           "id": "o2",
-          "vi": "Oo! Hindi ko maintindihan ang Tagalog.",
-          "fr": "Oui ! Je ne comprends pas le tagalog.",
+          "vi": "Oo! Hindi ko maintindihan.",
+          "fr": "Oui ! Je ne comprends pas.",
           "next": "t7",
-          "pron": "O·o hin·DI KO ma·in·tin·di·HAN ANG ta·GA·log"
+          "pron": "O·o hin·DI KO ma·in·tin·di·HAN"
         }
       ]
     },
@@ -66,7 +66,7 @@
       "vi": "Marunong ka bang mag-Ingles?",
       "fr": "Tu parles anglais ?",
       "next": "t6",
-      "pron": "ma·RU·nong KA BANG mag·ing·LES"
+      "pron": "ma·RU·nong KA BANG mag·ing·GLES"
     },
     {
       "id": "t6",
@@ -74,15 +74,15 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Oo, salamat!",
-          "fr": "Oui, merci !",
+          "vi": "Oo!",
+          "fr": "Oui !",
           "next": "t7",
-          "pron": "O·o sa·LA·mat"
+          "pron": "O·o"
         },
         {
           "id": "o2",
           "vi": "Oo. Konti lang ang Tagalog ko.",
-          "fr": "Oui. Mon tagalog, c'est juste un peu.",
+          "fr": "Oui. Je parle juste un peu tagalog.",
           "next": "t7",
           "pron": "O·o KON·ti LANG ANG ta·GA·log KO"
         }
@@ -94,7 +94,7 @@
       "vi": "Sige! Mag-Ingles tayo.",
       "fr": "D'accord ! On parle anglais.",
       "next": null,
-      "pron": "SI·ge mag·ing·LES TA·yo"
+      "pron": "SI·ge mag·ing·GLES TA·yo"
     }
   ]
 }

@@ -89,10 +89,10 @@
         },
         {
           "id": "o2",
-          "vi": "Opo, salamat po! Ingat!",
-          "fr": "Oui, merci ! Prenez soin de vous !",
+          "vi": "Salamat po! Ingat!",
+          "fr": "Merci ! Prenez soin de vous !",
           "next": "t8",
-          "pron": "O·po sa·LA·mat PO I·ngat"
+          "pron": "sa·LA·mat PO I·ngat"
         }
       ]
     },

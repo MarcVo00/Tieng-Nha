@@ -124,6 +124,14 @@
       "dialect": "manila",
       "pron": "PE·sos",
       "note": "« Singkuwenta pesos » : cinquante pesos. Beaucoup de vendeurs disent aussi le prix en anglais : « fifty pesos »."
+    },
+    {
+      "id": "tl_v_fifty_pesos",
+      "vi": "fifty pesos",
+      "fr": "cinquante pesos",
+      "dialect": "manila",
+      "pron": "FIF·ti PE·sos",
+      "note": "Le même prix, dit en anglais : beaucoup de vendeurs annoncent leurs prix ainsi."
     }
   ],
   "exercises": [
@@ -155,6 +163,17 @@
       "vocabId": "tl_v_singkuwenta",
       "choices": [
         "tl_v_singkuwenta",
+        "tl_v_bente",
+        "tl_v_sandaan",
+        "tl_v_dosyentos"
+      ]
+    },
+    {
+      "id": "tl_l03_e12",
+      "type": "listen_choose",
+      "vocabId": "tl_v_fifty_pesos",
+      "choices": [
+        "tl_v_fifty_pesos",
         "tl_v_bente",
         "tl_v_sandaan",
         "tl_v_dosyentos"
@@ -196,7 +215,7 @@
     {
       "id": "tl_l03_e07",
       "type": "word_order",
-      "fr": "Deux cents pesos, monsieur.",
+      "fr": "Deux cents pesos, s'il vous plaît.",
       "tokensVi": [
         "Dosyentos",
         "pesos",

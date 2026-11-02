@@ -7,10 +7,10 @@
     {
       "id": "t1",
       "speaker": "npc",
-      "vi": "Magandang hapon po! Kain po tayo!",
-      "fr": "Bon après-midi ! Venez manger !",
+      "vi": "Magandang hapon po! Ano po ang gusto ninyo?",
+      "fr": "Bon après-midi ! Qu'est-ce que vous voulez ?",
       "next": "t2",
-      "pron": "ma·gan·DANG HA·pon PO KA·in PO TA·yo"
+      "pron": "ma·gan·DANG HA·pon PO a·NO PO ANG gus·TO nin·YO"
     },
     {
       "id": "t2",
@@ -54,10 +54,10 @@
       "options": [
         {
           "id": "o1",
-          "vi": "Okay lang. Gusto ko ng manok.",
+          "vi": "Okay lang. Gusto ko po ng manok.",
           "fr": "Pas de souci. Je voudrais du poulet.",
           "next": "t6",
-          "pron": "o·KEY LANG gus·TO KO NANG ma·NOK"
+          "pron": "o·KEY LANG gus·TO KO PO NANG ma·NOK"
         },
         {
           "id": "o2",
@@ -89,10 +89,10 @@
         },
         {
           "id": "o2",
-          "vi": "Opo, salamat po! Bayad po.",
-          "fr": "Oui, merci ! Voilà l'argent.",
+          "vi": "Opo, salamat po! Magkano po?",
+          "fr": "Oui, merci ! C'est combien ?",
           "next": "t8",
-          "pron": "O·po sa·LA·mat PO BA·yad PO"
+          "pron": "O·po sa·LA·mat PO mag·KA·no PO"
         }
       ]
     },

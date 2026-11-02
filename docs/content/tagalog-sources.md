@@ -6,7 +6,7 @@ Consulté le 2026-11-02.
 
 ## Méthode
 
-- **Source** : la prononciation (API) du Wiktionnaire anglais, section *Tagalog* (`#Tagalog`). Pour les mots anglais du taglish sans section tagalog (`card`, `cash`, `discount`, `airport`…), la section *English* (`#English`). Quand le mot a une forme tagalog sur le Wiktionnaire (`taksi`, `traysikel`, `mall`), c'est elle qui donne l'accent, puisque c'est ainsi qu'on l'entend à Manille.
+- **Source** : la prononciation (API) du Wiktionnaire anglais, section *Tagalog* (`#Tagalog`). Pour les mots anglais du taglish sans section tagalog (`card`, `cash`, `discount`, `airport`, `fifty` dans un prix dit en anglais…), la section *English* (`#English`). Quand le mot a une forme tagalog sur le Wiktionnaire (`taksi`, `traysikel`, `mall`), c'est elle qui donne l'accent, puisque c'est ainsi qu'on l'entend à Manille.
 - **Plusieurs entrées** : on prend celle du sens enseigné (indiqué entre parenthèses : *Etymology 1*, « open »…), par exemple `bukas` « ouvert » /buˈkas/ et non « demain » /ˈbukas/.
 - **Expressions** : quand le Wiktionnaire a une entrée pour l'expression (`magandang umaga`, `walang anuman`, `hindi ko alam`, `hindi ko maintindihan`, `pasensya na`, `excuse me`), c'est elle qui sert.
 - **Transcription** : l'orthographe du mot, coupée en syllabes par `·`, la syllabe accentuée (`ˈ`, ou `ˌ` pour le premier mot d'une expression) en capitales : /saˈlamat/ → `sa·LA·mat`. Les mots d'une syllabe sont en capitales (`PO`, `KO`). Les mots anglais sont réécrits avec les lettres du tagalog, comme les Philippins les écrivent (`DIS·kawnt`, `KARD`, `ER·port`, `DYIP·ni`). `ng` se dit `NANG`.
@@ -46,6 +46,7 @@ Consulté le 2026-11-02.
 | doon | do·ON | /doˈʔon/ | https://en.wiktionary.org/wiki/doon#Tagalog |
 | dosyentos | dos·YEN·tos | /dosˈjentos/ | https://en.wiktionary.org/wiki/dosyentos#Tagalog |
 | excuse | eks·KYUS | /ɛksˈkjuːz mi/ (phrase entry « excuse me ») | https://en.wiktionary.org/wiki/excuse_me#English |
+| fifty | FIF·ti | /ˈfɪfti/ (General American, RP) | https://en.wiktionary.org/wiki/fifty#English |
 | france | FRANS | /fɹæns/ (monosyllable) | https://en.wiktionary.org/wiki/France#English |
 | gabi | ga·BI | /ɡaˈbi/ (« night ») | https://en.wiktionary.org/wiki/gabi#Tagalog |
 | gets | GETS | /ˈɡets/ | https://en.wiktionary.org/wiki/gets#Tagalog |
@@ -78,7 +79,7 @@ Consulté le 2026-11-02.
 | lima | li·MA | /liˈma/ (from the page source `tl-pr: limá`; the rendered page timed out) | https://en.wiktionary.org/wiki/lima#Tagalog |
 | maanghang | ma·ang·HANG | /maʔaŋˈhaŋ/ | https://en.wiktionary.org/wiki/maanghang#Tagalog |
 | mabuti | ma·BU·ti | /maˈbuti/ | https://en.wiktionary.org/wiki/mabuti#Tagalog |
-| mag-ingles | mag·ing·LES | /maɡʔiŋˈɡles/ | https://en.wiktionary.org/wiki/mag-Ingles#Tagalog |
+| mag-ingles | mag·ing·GLES | /maɡʔiŋˈɡles/ (the stressed syllable is /ˈɡles/: the [g] belongs to it) | https://en.wiktionary.org/wiki/mag-Ingles#Tagalog |
 | magandang | ma·gan·DANG | /maɡanˌdaŋ ʔuˈmaɡa/ (phrase entries « magandang umaga / hapon / gabi ») | https://en.wiktionary.org/wiki/magandang_umaga#Tagalog |
 | magkano | mag·KA·no | /maɡˈkano/ | https://en.wiktionary.org/wiki/magkano#Tagalog |
 | mahal | ma·HAL | /maˈhal/ | https://en.wiktionary.org/wiki/mahal#Tagalog |
@@ -191,14 +192,14 @@ Chaque transcription ci-dessous est la concaténation des transcriptions des mot
 | tl_l02 | dahan-dahan po | DA·han DA·han PO |
 | tl_l02 | ano po? | a·NO PO |
 | tl_l02 | marunong | ma·RU·nong |
-| tl_l02 | mag-Ingles | mag·ing·LES |
+| tl_l02 | mag-Ingles | mag·ing·GLES |
 | tl_l02 | Tagalog | ta·GA·log |
 | tl_l02 | hindi ko maintindihan | hin·DI KO ma·in·tin·di·HAN |
 | tl_l02 | hindi ko gets | hin·DI KO GETS |
 | tl_l02 | konti lang | KON·ti LANG |
 | tl_l02 | Pakiulit po. | pa·ki·u·LIT PO |
 | tl_l02 | Hindi ko maintindihan. | hin·DI KO ma·in·tin·di·HAN |
-| tl_l02 | Marunong ka bang mag-Ingles? | ma·RU·nong KA BANG mag·ing·LES |
+| tl_l02 | Marunong ka bang mag-Ingles? | ma·RU·nong KA BANG mag·ing·GLES |
 | tl_l03 | isa | i·SA |
 | tl_l03 | dalawa | da·la·WA |
 | tl_l03 | tatlo | tat·LO |
@@ -218,6 +219,7 @@ Chaque transcription ci-dessous est la concaténation des transcriptions des mot
 | tl_l03 | Isa, dalawa, tatlo, apat, lima. | i·SA da·la·WA tat·LO A·pat li·MA |
 | tl_l03 | Anim, pito, walo, siyam, sampu. | A·nim pi·TO wa·LO si·YAM sam·PU |
 | tl_l03 | Singkuwenta pesos po. | sing·ku·WEN·ta PE·sos PO |
+| tl_l03 | fifty pesos | FIF·ti PE·sos |
 | tl_l04 | gusto ko | gus·TO KO |
 | tl_l04 | isa pa po | i·SA PA PO |
 | tl_l04 | pahingi | pa·hi·NGI |
@@ -234,7 +236,7 @@ Chaque transcription ci-dessous est la concaténation des transcriptions des mot
 | tl_l04 | maanghang | ma·ang·HANG |
 | tl_l04 | ito | i·TO |
 | tl_l04 | Pahingi po ng tubig. | pa·hi·NGI PO NANG TU·big |
-| tl_l04 | Gusto ko ng adobo. | gus·TO KO NANG a·DO·bo |
+| tl_l04 | Gusto ko po ng adobo. | gus·TO KO PO NANG a·DO·bo |
 | tl_l04 | Isa pa po. Masarap! | i·SA PA PO ma·sa·RAP |
 | tl_l05 | magkano | mag·KA·no |
 | tl_l05 | bayad | BA·yad |
@@ -283,7 +285,7 @@ Chaque transcription ci-dessous est la concaténation des transcriptions des mot
 | tl_l07 | taxi | TAK·si |
 | tl_l07 | Para po! | PA·ra PO |
 | tl_l07 | Pakibuksan po ang metro. | pa·ki·buk·SAN PO ANG ME·tro |
-| tl_l07 | Magkano hanggang airport? | mag·KA·no hang·GANG ER·port |
+| tl_l07 | Magkano po hanggang airport? | mag·KA·no PO hang·GANG ER·port |
 | tl_l08 | excuse me po | eks·KYUS MI PO |
 | tl_l08 | pasensya na | pa·SEN·sya NA |
 | tl_l08 | okay lang | o·KEY LANG |

@@ -3,7 +3,7 @@
     python scripts/tts/generate_audio.py --onnx-dir <path to onnx_update> [--voices south-f,south-m,north-f,north-m]
                                          [--out public/audio] [--limit N]
 
-Reads scripts/tts/texts.json (run extract_texts.mjs first), writes public/audio/<voiceId>/<key>.mp3
+Reads the "vi" list of scripts/tts/texts.json (run extract_texts.mjs first), writes public/audio/<voiceId>/<key>.mp3
 (mono, 24 kHz, 32 kbps) and public/audio/manifest.json. Existing files are skipped, so re-running after a
 content change only generates the new texts. See scripts/tts/README.md.
 """
@@ -36,6 +36,12 @@ def normalize_speech_text(text: str) -> str:
 def speech_key(text: str) -> str:
     """First 16 hex chars of SHA-256 over the UTF-8 bytes of the normalised text (= MP3 file name)."""
     return hashlib.sha256(normalize_speech_text(text).encode("utf-8")).hexdigest()[:16]
+
+
+def load_texts(path: pathlib.Path, language: str) -> list[str]:
+    """Texts of one language from texts.json, shaped { "vi": [...], "tl": [...] } (this generator only voices Vietnamese)."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return list(data[language])
 
 
 def deref_hf_cache() -> int:
@@ -102,7 +108,7 @@ def main() -> int:
 
     if args.deref_hf_cache:
         print("dereferenced", deref_hf_cache(), "cache files")
-    texts = json.loads(pathlib.Path(args.texts).read_text(encoding="utf-8"))
+    texts = load_texts(pathlib.Path(args.texts), "vi")
     texts = sorted({normalize_speech_text(t) for t in texts if normalize_speech_text(t)})
     out = pathlib.Path(args.out)
     if args.manifest_only:

@@ -1,0 +1,27 @@
+{
+  "id": "tl_d01",
+  "contentVersion": 1,
+  "title": "Une rencontre",
+  "scene": "Dans la rue — Sa kalye",
+  "turns": [
+    { "id": "t1", "speaker": "npc", "vi": "Magandang umaga! Kumusta ka?", "fr": "Bonjour ! Comment vas-tu ?", "next": "t2" },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        { "id": "o1", "vi": "Mabuti, salamat.", "fr": "Bien, merci.", "next": "t3" },
+        { "id": "o2", "vi": "Mabuti po, salamat.", "fr": "Bien, merci (poliment).", "next": "t3" }
+      ]
+    },
+    { "id": "t3", "speaker": "npc", "vi": "Walang anuman!", "fr": "De rien !", "next": "t4" },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        { "id": "o1", "vi": "Paalam!", "fr": "Au revoir !", "next": "t5" },
+        { "id": "o2", "vi": "Paalam po!", "fr": "Au revoir (poliment) !", "next": "t5" }
+      ]
+    },
+    { "id": "t5", "speaker": "npc", "vi": "Paalam!", "fr": "Au revoir !", "next": null }
+  ]
+}

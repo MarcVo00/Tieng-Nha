@@ -12,6 +12,15 @@ test("texts.json lists exactly the strings the content can speak (re-run extract
   expect(readJson(`${repo}scripts/tts/texts.json`)).toEqual(extractTexts());
 });
 
+test("extractTexts keeps each language apart", () => {
+  const { vi, tl } = extractTexts();
+  expect(vi).toContain("Chào bạn!");
+  expect(tl).toContain("Kumusta!");
+  expect(vi).not.toContain("Kumusta!");
+  expect(tl).not.toContain("Chào bạn!");
+  expect(tl.length).toBeGreaterThan(1);
+});
+
 // The pack is generated separately; before that there is nothing to check.
 describe.skipIf(!existsSync(manifestPath))("generated voice pack", () => {
   const manifest = () => AudioPackManifestSchema.parse(readJson(manifestPath));
@@ -22,7 +31,7 @@ describe.skipIf(!existsSync(manifestPath))("generated voice pack", () => {
 
   test("every text has a key, and it is the one the app computes", async () => {
     const { keys } = manifest();
-    for (const text of extractTexts()) {
+    for (const text of extractTexts().vi) {
       expect(keys[text], text).toBe(await speechKey(text));
     }
   });

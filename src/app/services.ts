@@ -1,4 +1,5 @@
 import type { Env, Flags } from "@/domain/config";
+import type { LanguageId } from "@/domain/languages";
 import type { Capabilities, VoiceId } from "@/domain/types";
 import type {
   AuthService, ContentReporter, ContentSource, ConversationEngine, EventSink, DuelGateway, ExamGateway, GachaGateway, LeaderboardRepository,
@@ -11,7 +12,10 @@ export type Services = {
   env: Env;
   flags: Flags;
   clock: () => string; // ISO "now"
+  /** The Vietnamese source, for code that runs outside the language-aware provider. */
   content: ContentSource;
+  /** One content source per language. */
+  contents: Readonly<Record<LanguageId, ContentSource>>;
   progress: ProgressRepository;
   outbox: Outbox;
   sink: EventSink;

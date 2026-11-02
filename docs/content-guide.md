@@ -2,6 +2,11 @@
 
 > Le contenu est généré **sans relecture humaine**. Ce guide sert à minimiser le risque d'erreur. En cas de doute sur un mot ou une tournure : **choisir plus simple et plus fréquent**, ou ne pas l'utiliser.
 
+## 0. Où vivent les fichiers
+- Un dossier par langue : `src/content/vi/` (vietnamien, ids inchangés `l01`…) et `src/content/tl/` (tagalog, ids préfixés `tl_` : `tl_l01`, `tl_d01`, `tl_v_*`). Chacun contient `lessons/`, `dialogues/`, `exam.json`, `tree.json`, `bosses.json`.
+- Les catalogues partagés restent à la racine de `src/content/` : `badges.json`, `shop.json`, `changelog.json`.
+- Les textes parlés sont extraits par langue dans `scripts/tts/texts.json` (`{ "vi": [...], "tl": [...] }`).
+
 ## 1. Règles absolues
 1. **Unicode NFC** pour tout texte vietnamien (`str.normalize("NFC")`). `validate-content` rejette le NFD.
 2. **Vocabulaire du Sud** (Sài Gòn) quand il diffère du Nord (tableau §3). Ajouter une `note` FR quand la différence est notable.

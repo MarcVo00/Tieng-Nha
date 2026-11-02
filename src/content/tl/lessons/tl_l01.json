@@ -1,0 +1,32 @@
+{
+  "id": "tl_l01",
+  "contentVersion": 1,
+  "title": "Salamat at kumusta",
+  "description": "Saluer, remercier et prendre congé en tagalog.",
+  "emoji": "👋",
+  "dialogueId": "tl_d01",
+  "vocab": [
+    { "id": "tl_v_kumusta", "vi": "kumusta", "fr": "comment vas-tu", "dialect": "manila" },
+    { "id": "tl_v_salamat", "vi": "salamat", "fr": "merci", "dialect": "manila" },
+    { "id": "tl_v_magandang_umaga", "vi": "magandang umaga", "fr": "bonjour (le matin)", "dialect": "manila" },
+    { "id": "tl_v_magandang_hapon", "vi": "magandang hapon", "fr": "bon après-midi", "dialect": "manila" },
+    { "id": "tl_v_magandang_gabi", "vi": "magandang gabi", "fr": "bonsoir", "dialect": "manila" },
+    { "id": "tl_v_oo", "vi": "oo", "fr": "oui", "dialect": "manila" },
+    { "id": "tl_v_hindi", "vi": "hindi", "fr": "non", "dialect": "manila" },
+    { "id": "tl_v_po", "vi": "po", "fr": "marque de respect", "dialect": "manila" },
+    { "id": "tl_v_opo", "vi": "opo", "fr": "oui (poli)", "dialect": "manila" },
+    { "id": "tl_v_paalam", "vi": "paalam", "fr": "au revoir", "dialect": "manila" },
+    { "id": "tl_v_walang_anuman", "vi": "walang anuman", "fr": "de rien", "dialect": "manila" },
+    { "id": "tl_v_mabuti", "vi": "mabuti", "fr": "bien", "dialect": "manila" }
+  ],
+  "exercises": [
+    { "id": "tl_l01_e01", "type": "listen_choose", "vocabId": "tl_v_salamat", "choices": ["tl_v_salamat", "tl_v_oo", "tl_v_hindi", "tl_v_paalam"] },
+    { "id": "tl_l01_e02", "type": "listen_choose", "vocabId": "tl_v_magandang_umaga", "choices": ["tl_v_magandang_umaga", "tl_v_magandang_hapon", "tl_v_magandang_gabi", "tl_v_kumusta"] },
+    { "id": "tl_l01_e03", "type": "translate_choose", "promptFr": "Merci.", "answerVi": "Salamat.", "distractorsVi": ["Paalam.", "Hindi.", "Oo."] },
+    { "id": "tl_l01_e04", "type": "listen_choose", "vocabId": "tl_v_paalam", "choices": ["tl_v_paalam", "tl_v_salamat", "tl_v_mabuti", "tl_v_po"] },
+    { "id": "tl_l01_e05", "type": "translate_choose", "promptFr": "Non.", "answerVi": "Hindi.", "distractorsVi": ["Oo.", "Opo.", "Salamat."] },
+    { "id": "tl_l01_e06", "type": "word_order", "fr": "Bonjour (le matin), monsieur ou madame.", "tokensVi": ["Magandang", "umaga", "po"] },
+    { "id": "tl_l01_e07", "type": "speak", "vi": "Salamat po.", "fr": "Merci (poliment).", "vocabIds": ["tl_v_salamat", "tl_v_po"] },
+    { "id": "tl_l01_e08", "type": "speak", "vi": "Walang anuman.", "fr": "De rien.", "vocabIds": ["tl_v_walang_anuman"] }
+  ]
+}

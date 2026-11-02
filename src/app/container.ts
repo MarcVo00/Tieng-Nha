@@ -53,7 +53,8 @@ export function createServices(env: Env): Services {
   const db = new TiengNhaDb();
   const progress = new DexieProgressRepository(db);
   const outbox = new DexieOutbox(db);
-  const content = createStaticContentSource();
+  const contents = { vi: createStaticContentSource("vi"), tl: createStaticContentSource("tl") } as const;
+  const content = contents.vi;
 
   // Speech
   const voice = env.VITE_FAKE_SPEECH
@@ -109,7 +110,7 @@ export function createServices(env: Env): Services {
       : undefined;
 
   return {
-    env, flags, clock, content, progress, outbox, ...remote, tts, sound, stt, recorder, detectCapabilities, prefetchVoice,
+    env, flags, clock, content, contents, progress, outbox, ...remote, tts, sound, stt, recorder, detectCapabilities, prefetchVoice,
     conversation: new ScriptedConversationEngine(content), activity, sync, ...(demo ? { demo } : {}),
   };
 }

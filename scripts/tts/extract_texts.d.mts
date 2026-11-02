@@ -1,1 +1,1 @@
-export function extractTexts(contentDir?: string): string[];
+export function extractTexts(contentDir?: string): { vi: string[]; tl: string[] };

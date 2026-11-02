@@ -6,6 +6,7 @@ import { lessonFixture } from "@/adapters/fakes/seed/lesson";
 import { dialogueFixture } from "@/adapters/fakes/seed/dialogue";
 import { examPoolFixture } from "@/adapters/fakes/seed/exam";
 import { treeFixture, bossFixture } from "@/adapters/fakes/seed/tree";
+import { tagalogLessonFixtures, tagalogDialogueFixtures, tagalogExamFixture, tagalogTreeFixture, tagalogBossFixtures } from "@/adapters/fakes/seed/tagalog";
 import { shopFixture } from "@/adapters/fakes/seed/shop";
 import { InMemoryContentSource } from "@/adapters/fakes/InMemoryContentSource";
 import { InMemoryProgressRepository } from "@/adapters/fakes/InMemoryProgressRepository";
@@ -27,13 +28,22 @@ import { lookOf } from "@/services/look";
 
 export function createFakeServices(overrides: Partial<Services> = {}, options: { duelStorage?: Pick<Storage, "getItem" | "setItem">; gachaStorage?: Pick<Storage, "getItem" | "setItem">; gachaRng?: () => number } = {}): Services {
   // Dependent fakes are built from the overridden instances so callers can inject e.g. a Dexie-backed progress repo.
+  const badges = BadgesFileSchema.parse(badgesFile).badges;
+  const changelog = ChangelogFileSchema.parse(changelogFile).entries;
   const clock = overrides.clock ?? (() => new Date().toISOString());
   const progress = overrides.progress ?? new InMemoryProgressRepository();
   const outbox = overrides.outbox ?? new InMemoryOutbox();
   const sink = overrides.sink ?? new FakeEventSink();
   const content =
     overrides.content ??
-    new InMemoryContentSource([lessonFixture], [dialogueFixture], examPoolFixture, BadgesFileSchema.parse(badgesFile).badges, treeFixture, [bossFixture], shopFixture, ChangelogFileSchema.parse(changelogFile).entries);
+    overrides.contents?.vi ??
+    new InMemoryContentSource([lessonFixture], [dialogueFixture], examPoolFixture, badges, treeFixture, [bossFixture], shopFixture, changelog);
+  const contents =
+    overrides.contents ??
+    ({
+      vi: content,
+      tl: new InMemoryContentSource(tagalogLessonFixtures, tagalogDialogueFixtures, tagalogExamFixture, badges, tagalogTreeFixture, tagalogBossFixtures, shopFixture, changelog),
+    } as const);
   const sync = createSyncService({ outbox, sink });
   const auth = overrides.auth ?? new FakeAuthService();
   // The player's own row follows the profile chosen during onboarding (falls back to a fixed persona before it exists).
@@ -50,6 +60,7 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
     flags: { aiConversation: false, streakFreeze: false, humanAudio: false },
     clock,
     content,
+    contents,
     progress,
     outbox,
     sink,

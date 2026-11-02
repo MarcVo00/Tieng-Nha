@@ -1,24 +1,71 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
-import { FINAL_BOSS_ID } from "@/services/tree";
 import { fr } from "@/i18n/fr";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useDuelSummary } from "@/app/usePendingDuels";
+import { useLanguage } from "@/app/useLanguage";
+import type { Language, LanguageId } from "@/domain/languages";
 import type { Boss, LessonSummary, Tree } from "@/domain/types";
 import { lookOf } from "@/services/look";
 import { nextDailyBonus } from "@/services/wallet";
 import { parisDay } from "@/services/time";
 import { BONUS_SHOWN_KEY } from "@/domain/storageKeys";
-import { Button, Card, EmptyState, Icon, Motif, Skeleton, ease, tap } from "@/ui";
+import { Button, Card, EmptyState, Icon, LanguageEmblem, LanguageList, Motif, Sheet, Skeleton, ease, tap, useToast } from "@/ui";
 import { PathStop } from "@/features/home/PathStop";
 import { HeroToken } from "@/features/home/HeroToken";
 import { DailyBonusCard, DailyBonusSheet, type DailyBonusOffer } from "@/features/home/DailyBonus";
 import { buildPathLayout, PATH_MARGIN, PATH_WIDTH, type PathLayout } from "@/features/home/pathLayout";
 
 // Hero: the winding path with the next stop pulsing. One primary action: the next stop.
-// Secondary: the review card on top. Loading: skeleton stops. Error: retry.
+// Secondary: the language switcher and the review card on top. Loading: skeleton stops. Error: retry.
+
+/** Compact chip at the top of the home: the language being learned; opens the sheet to switch. */
+function LanguageSwitcher({ language, onSwitch }: { language: Language; onSwitch: (id: LanguageId) => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const toast = useToast();
+  async function pick(id: LanguageId) {
+    if (id === language.id) {
+      setOpen(false);
+      return;
+    }
+    setBusy(true);
+    try {
+      // The routed screen remounts on the new language, which closes this sheet with it.
+      await onSwitch(id);
+    } catch {
+      toast.show({ title: fr.languages.saveError });
+    } finally {
+      setBusy(false);
+      setOpen(false);
+    }
+  }
+  return (
+    <>
+      <motion.button
+        type="button"
+        whileTap={tap}
+        aria-label={fr.languages.current(language.nameFr)}
+        aria-haspopup="dialog"
+        onClick={() => setOpen(true)}
+        className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-sm border border-line bg-surface py-1.5 pl-2 pr-3 text-body-strong text-ink shadow-card"
+      >
+        <span aria-hidden="true" className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2">
+          <LanguageEmblem id={language.id} size={20} />
+        </span>
+        {language.nameFr}
+        <Icon name="chevron-down" size={18} className="text-ink-muted" />
+      </motion.button>
+      <Sheet open={open} onClose={() => setOpen(false)} label={fr.languages.switch}>
+        <h2 className="text-heading text-ink">{fr.languages.switch}</h2>
+        <p className="mt-1 text-caption text-ink-muted">{fr.languages.switchHint}</p>
+        <LanguageList className="mt-4" current={language.id} onPick={(id) => void pick(id)} disabled={busy} />
+      </Sheet>
+    </>
+  );
+}
 
 function ReviewCard({ count }: { count: number }) {
   return (
@@ -86,6 +133,8 @@ function SkeletonStops() {
 
 export function HomeScreen() {
   const { content, activity, clock, sound } = useServices();
+  const { language, setLanguage } = useLanguage();
+  const bossId = language.finalBossId;
   const refresh = useRefreshProgress();
   const snapshot = useAppState((s) => s.snapshot);
   const dueCount = useAppState((s) => s.dueCount);
@@ -97,7 +146,8 @@ export function HomeScreen() {
   const maskId = useId();
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
   const [tree, setTree] = useState<Tree | null>(null);
-  const [boss, setBoss] = useState<Boss | null>(null);
+  // undefined while loading; null for a language whose path has no boss.
+  const [boss, setBoss] = useState<Boss | null | undefined>(undefined);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const nextEl = useRef<HTMLElement | null>(null);
@@ -106,7 +156,7 @@ export function HomeScreen() {
   useEffect(() => {
     let cancelled = false;
     setFailed(false);
-    Promise.all([content.listLessons(), content.getTree(), content.getBoss(FINAL_BOSS_ID), refresh()]).then(
+    Promise.all([content.listLessons(), content.getTree(), bossId === null ? null : content.getBoss(bossId), refresh()]).then(
       ([list, loadedTree, loadedBoss]) => {
         if (cancelled) return;
         setLessons(list);
@@ -120,9 +170,9 @@ export function HomeScreen() {
     return () => {
       cancelled = true;
     };
-  }, [content, refresh, attempt]);
+  }, [content, refresh, attempt, bossId]);
 
-  const ready = lessons !== null && tree !== null && boss !== null && snapshot !== null;
+  const ready = lessons !== null && tree !== null && boss !== undefined && snapshot !== null;
   useEffect(() => {
     if (!ready || scrolled.current) return;
     scrolled.current = true;
@@ -152,12 +202,15 @@ export function HomeScreen() {
 
   if (failed) {
     return (
-      <EmptyState
+      <div className="px-5 pt-4">
+        <LanguageSwitcher language={language} onSwitch={setLanguage} />
+        <EmptyState
         title={fr.home.loadError.title}
         body={fr.home.loadError.body}
         illustration="boat"
         action={<Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>{fr.app.error.retry}</Button>}
-      />
+        />
+      </div>
     );
   }
 
@@ -170,6 +223,7 @@ export function HomeScreen() {
       </div>
       <h1 className="sr-only">{fr.home.pathLabel}</h1>
       <div className="relative">
+        <LanguageSwitcher language={language} onSwitch={setLanguage} />
         {offer ? <DailyBonusCard offer={offer} onOpen={() => setSheetOffer(offer)} /> : null}
         {pendingDuels[0] ? (
           <DuelBanner to="/duels" label={fr.duels.banner(pendingDuels[0].opponentPseudo, pendingDuels.length - 1)} />

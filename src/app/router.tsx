@@ -12,6 +12,7 @@ import "@/features/onboarding/installPrompt";
 
 const WelcomeScreen = lazy(() => import("@/features/onboarding").then((m) => ({ default: m.WelcomeScreen })));
 const AuthCallbackScreen = lazy(() => import("@/features/onboarding").then((m) => ({ default: m.AuthCallbackScreen })));
+const LanguagePickerScreen = lazy(() => import("@/features/languages").then((m) => ({ default: m.LanguagePickerScreen })));
 const HomeScreen = lazy(() => import("@/features/home").then((m) => ({ default: m.HomeScreen })));
 const ReviewScreen = lazy(() => import("@/features/review").then((m) => ({ default: m.ReviewScreen })));
 const ReviewRunScreen = lazy(() => import("@/features/review").then((m) => ({ default: m.ReviewRunScreen })));
@@ -84,6 +85,15 @@ export const appRoutes: RouteObject[] = [
     children: [
       ...publicRoutes,
       ...devRoutes,
+      // The picker is the one gated screen reachable before a language is chosen; no tab bar, nothing to leave to.
+      {
+        path: "languages",
+        element: (
+          <AuthGate languageOptional>
+            <main className="mx-auto min-h-dvh max-w-md overflow-x-hidden">{screen(LanguagePickerScreen)}</main>
+          </AuthGate>
+        ),
+      },
       { element: <AuthGate><TabLayout /></AuthGate>, children: tabRoutes },
       { element: <AuthGate><FocusLayout /></AuthGate>, children: focusRoutes },
     ],

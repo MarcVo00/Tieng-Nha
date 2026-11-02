@@ -87,3 +87,9 @@ test("a lantern milestone marks every third lesson", () => {
   const lit = nodes.flatMap((n) => (n.kind === "lesson" && n.milestone ? [n.order] : []));
   expect(lit).toEqual([3, 6, 9]);
 });
+
+test("a language without a boss has no exam stop", () => {
+  const layout = buildPathLayout(lessons, snapshot(["l01"]), tree, null);
+  expect(layout.nodes.some((n) => n.kind === "exam")).toBe(false);
+  expect(layout.nodes.filter((n) => n.kind === "lesson")).toHaveLength(10);
+});

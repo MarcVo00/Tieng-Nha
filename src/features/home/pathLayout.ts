@@ -40,8 +40,8 @@ export function lessonStateOf(lessons: readonly LessonSummary[], index: number, 
   return !prev || done.has(prev.id) ? "available" : "locked";
 }
 
-/** Deterministic vertical layout: stops alternate -40/0/+40/0 px around the centre line. */
-export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: ProgressSnapshot, tree: Tree, boss: BossInfo): PathLayout {
+/** Deterministic vertical layout: stops alternate -40/0/+40/0 px around the centre line. No boss (`null`): no exam stop. */
+export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: ProgressSnapshot, tree: Tree, boss: BossInfo | null): PathLayout {
   const done = new Set<string>(snapshot.lessonsDone);
   const perfect = new Set<string>(snapshot.perfectLessons);
   const dialoguesDone = new Set<string>(snapshot.dialoguesDone);
@@ -64,7 +64,7 @@ export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: Pro
       drafts.push({ kind: "dialogue", key: `${lesson.id}-dialogue`, lesson, done: dialoguesDone.has(lesson.dialogueId), offset: dOffset, height: ROW_HEIGHT.dialogue, size: 48 });
     }
   });
-  drafts.push({ kind: "exam", key: "exam", boss: { name: boss.name, illustration: boss.illustration }, locked: examLocked, best: snapshot.examBest, next: nextIndex === -1 && !examLocked && !(snapshot.examBest !== null && snapshot.examBest >= EXAM_PASS), offset: mainOffset(mainCount), height: ROW_HEIGHT.exam, size: 64 });
+  if (boss) drafts.push({ kind: "exam", key: "exam", boss: { name: boss.name, illustration: boss.illustration }, locked: examLocked, best: snapshot.examBest, next: nextIndex === -1 && !examLocked && !(snapshot.examBest !== null && snapshot.examBest >= EXAM_PASS), offset: mainOffset(mainCount), height: ROW_HEIGHT.exam, size: 64 });
 
   let y = PAD;
   const nodes = drafts.map((n) => {

@@ -38,6 +38,8 @@ export { MicButton } from "@/ui/MicButton";
 export { ReportButton } from "@/ui/ReportButton";
 export { Confetti } from "@/ui/Confetti";
 export { Motif } from "@/ui/Motif";
+export { LanguageEmblem } from "@/ui/LanguageEmblem";
+export { LanguageList } from "@/ui/LanguageList";
 export { ChoiceGrid, type ChoiceOption } from "@/ui/ChoiceGrid";
 export { useChoiceKeys } from "@/ui/useChoiceKeys";
 export { DeviceCheck, type DeviceCheckProps } from "@/ui/DeviceCheck";

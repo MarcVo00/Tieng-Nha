@@ -353,6 +353,15 @@ export const fr = {
       aria: (name: string, locked: boolean) => `${name}, boss final${locked ? ", verrouillé" : ""}`,
     },
   },
+  // --- languages: the picker after onboarding and the switcher at the top of the home ---
+  languages: {
+    title: "Quelle langue veux-tu apprendre\u202f?",
+    intro: "Tu pourras en changer à tout moment depuis l'accueil.",
+    current: (name: string) => `Langue\u202f: ${name}`,
+    switch: "Changer de langue",
+    switchHint: "Tes leçons terminées t'attendent dans chaque langue.",
+    saveError: "Ton choix n'a pas pu être enregistré. Réessaie.",
+  },
   // --- report ---
   report: {
     title: "Signaler un problème",

@@ -18,8 +18,7 @@ const LOAD_TIMEOUT_MS = 8000; // cap before the clip's length is known (stalled 
 const END_MARGIN_MS = 2000; // slack after the expected end before a silent clip is given up on
 
 export class WebSpeechSynthesizer implements SpeechSynthesizer {
-  private voice: SpeechSynthesisVoice | null = null;
-  private voiceLang: Language["speechLang"] | null = null; // the language `voice` was picked for
+  private readonly voices = new Map<Language["speechLang"], SpeechSynthesisVoice | null>(); // picked voice per speech language
   private readonly readyPromises = new Map<Language["speechLang"], Promise<void>>();
   // iOS can garbage-collect an utterance mid-speech and never fire `end`; keeping a reference helps.
   private current: SpeechSynthesisUtterance | null = null;
@@ -30,8 +29,8 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
   ) {}
 
   /** Resolves once voices are loaded (Chrome loads them asynchronously) or after 1.5 s. */
-  ready(): Promise<void> {
-    const speechLang = this.getLanguage().speechLang;
+  ready(language: Language = this.getLanguage()): Promise<void> {
+    const speechLang = language.speechLang;
     const existing = this.readyPromises.get(speechLang);
     if (existing) return existing;
     const synth = this.win.speechSynthesis;
@@ -41,10 +40,10 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
         return;
       }
       const pick = () => {
-        this.refreshVoice();
+        this.refreshVoice(speechLang);
       };
       pick();
-      if (this.currentVoice()) {
+      if (this.voices.get(speechLang)) {
         resolve();
         return;
       }
@@ -55,7 +54,7 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
       };
       const onChange = () => {
         pick();
-        if (this.currentVoice()) finish();
+        if (this.voices.get(speechLang)) finish();
       };
       const timer = setTimeout(finish, 1500);
       synth.addEventListener("voiceschanged", onChange);
@@ -65,22 +64,17 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
   }
 
   isAvailable(): boolean {
-    this.refreshVoice();
-    return this.currentVoice() !== null;
-  }
-
-  /** The picked voice, only if it belongs to the active language. */
-  private currentVoice(): SpeechSynthesisVoice | null {
-    return this.voiceLang === this.getLanguage().speechLang ? this.voice : null;
+    return this.refreshVoice(this.getLanguage().speechLang) !== null;
   }
 
   /** Voices may arrive after the 1.5 s cutoff, and the language may change: retry the lookup lazily. */
-  private refreshVoice(): void {
-    const speechLang = this.getLanguage().speechLang;
-    if (this.voiceLang === speechLang && this.voice) return;
+  private refreshVoice(speechLang: Language["speechLang"]): SpeechSynthesisVoice | null {
+    const known = this.voices.get(speechLang);
+    if (known) return known;
     const synth = this.win.speechSynthesis;
-    this.voice = synth ? pickVoiceFor(synth.getVoices(), speechLang) : null;
-    this.voiceLang = speechLang;
+    const picked = synth ? pickVoiceFor(synth.getVoices(), speechLang) : null;
+    this.voices.set(speechLang, picked);
+    return picked;
   }
 
   async speak(text: string, opts: SpeakOptions = {}): Promise<void> {
@@ -88,15 +82,16 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
       await this.playClip(new this.win.Audio(opts.audioUrl), opts.rate ?? 1);
       return;
     }
-    await this.ready();
-    this.refreshVoice();
+    // A call may name its own language (the settings preview is always Vietnamese); otherwise the active one speaks.
+    const language = opts.language ? LANGUAGES[opts.language] : this.getLanguage();
+    await this.ready(language);
     const synth = this.win.speechSynthesis;
     const Utt = this.win.SpeechSynthesisUtterance;
-    const voice = this.currentVoice();
+    const voice = this.refreshVoice(language.speechLang);
     if (!synth || !Utt || !voice) throw new Error("tts_unavailable");
     synth.cancel();
     const u = new Utt(text);
-    u.lang = this.getLanguage().speechLang;
+    u.lang = language.speechLang;
     u.voice = voice;
     u.rate = opts.rate ?? 1;
     this.current = u;

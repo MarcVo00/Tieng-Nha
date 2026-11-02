@@ -83,7 +83,7 @@ function VoicePicker({ value, onChange }: { value: SettingsVoiceId; onChange(v: 
 
   function preview(id: SettingsVoiceId): void {
     // Straight from the click: iOS only starts audio inside a user gesture.
-    tts.speak(PREVIEW_TEXT, { rate: 1, voice: id }).catch(() => toast.show({ title: t.previewError }));
+    tts.speak(PREVIEW_TEXT, { rate: 1, voice: id, language: "vi" }).catch(() => toast.show({ title: t.previewError }));
   }
 
   return (

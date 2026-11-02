@@ -1,8 +1,8 @@
-import type { Language } from "@/domain/languages";
+import type { Language, LanguageId } from "@/domain/languages";
 import type { VoiceId } from "@/domain/types";
 
-/** `voice` overrides the configured voice for this call only (settings preview). */
-export type SpeakOptions = { rate?: number; audioUrl?: string; voice?: VoiceId };
+/** `voice` overrides the configured voice and `language` the active language, for this call only (settings preview). */
+export type SpeakOptions = { rate?: number; audioUrl?: string; voice?: VoiceId; language?: LanguageId };
 export interface SpeechSynthesizer {
   isAvailable(): boolean; // a voice of the active language exists (pack or device; or audioUrl playback possible)
   speak(text: string, opts?: SpeakOptions): Promise<void>; // resolves when finished

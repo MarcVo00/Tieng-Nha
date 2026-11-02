@@ -42,7 +42,7 @@ export type FallbackSynthesizer = SpeechSynthesizer & { ready?(): Promise<void> 
 export type AudioPackOptions = {
   /** The Vietnamese voice the learner chose; other languages ignore it and use their own default pack voice. */
   getVoice: () => VoiceId;
-  getLanguage?: () => Language;
+  getLanguage: () => Language;
   manifestUrl?: string;
   baseUrl?: string; // folder holding <voiceId>/<key>.mp3
   fetchFn?: typeof fetch;
@@ -101,7 +101,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
 
   constructor(private readonly fallback: FallbackSynthesizer, opts: AudioPackOptions) {
     this.chosenVoice = opts.getVoice;
-    this.getLanguage = opts.getLanguage ?? (() => LANGUAGES.vi);
+    this.getLanguage = opts.getLanguage;
     this.baseUrl = (opts.baseUrl ?? "/audio").replace(/\/$/, "");
     this.manifestUrl = opts.manifestUrl ?? `${this.baseUrl}/manifest.json`;
     this.fetchFn = opts.fetchFn ?? ((input, init) => fetch(input, init));
@@ -114,8 +114,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
   }
 
   /** Vietnamese: the learner's choice. Any other language: the first pack voice of that language. */
-  private getVoice(): VoiceId {
-    const language = this.getLanguage();
+  private getVoice(language: Language = this.getLanguage()): VoiceId {
     return language.id === "vi" ? this.chosenVoice() : ((language.packVoices[0] ?? "device") as VoiceId);
   }
 
@@ -136,7 +135,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
     this.stopAudio();
     this.fallback.cancel();
     if (opts.audioUrl) return this.fallback.speak(text, opts);
-    const voice = opts.voice ?? this.getVoice();
+    const voice = opts.voice ?? this.getVoice(opts.language ? LANGUAGES[opts.language] : undefined);
     if (voice !== "device") {
       // Fast path: manifest already loaded and text known -> play() starts synchronously inside the user gesture (iOS).
       // Nothing may be awaited before this.play() on that path.

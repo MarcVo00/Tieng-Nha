@@ -441,7 +441,7 @@ test("prefetchVoice fetches every file of the voice, at most 6 at a time, once p
     return new Response(new Uint8Array([1]));
   }) as typeof fetch;
   const tts = new AudioPackSynthesizer(new FakeSpeechSynthesizer(), {
-    getVoice: () => "south-m",
+    getVoice: () => "south-m", getLanguage: () => LANGUAGES.vi,
     fetchFn,
     gestureTarget: null,
     waitForServiceWorker: async () => undefined,
@@ -478,7 +478,7 @@ test("selecting another voice aborts the download of the previous one", async ()
     });
   }) as typeof fetch;
   const tts = new AudioPackSynthesizer(new FakeSpeechSynthesizer(), {
-    getVoice: () => "south-f",
+    getVoice: () => "south-f", getLanguage: () => LANGUAGES.vi,
     fetchFn,
     gestureTarget: null,
     waitForServiceWorker: async () => undefined,
@@ -557,4 +557,17 @@ describe("Tagalog", () => {
     none.fallback.available = false;
     expect(none.tts.isAvailable()).toBe(false);
   });
+});
+
+test("a Vietnamese preview with Tagalog active uses the Vietnamese voice and tells the fallback to speak Vietnamese", async () => {
+  const { tts, fallback, audio, southKeys } = await setup({ language: "tl" });
+  const first = tts.speak("xin chào", { voice: "south-f", language: "vi" });
+  await vi.waitFor(() => expect(audio().playLog).toHaveLength(1));
+  expect(audio().playLog[0]?.src).toBe(`/audio/south-f/${southKeys[0]}.mp3`);
+  audio().end();
+  await first;
+  expect(fallback.spoken).toEqual([]);
+  await tts.speak("bao nhiêu tiền", { voice: "south-f", language: "vi" }); // file missing -> device fallback
+  expect(fallback.spoken).toEqual(["bao nhiêu tiền"]);
+  expect(fallback.lastOptions?.language).toBe("vi");
 });

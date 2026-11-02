@@ -450,3 +450,19 @@ describe("synthesizer with Tagalog active", () => {
     expect(win.speechSynthesis.speak.mock.calls[0]?.[0]).toMatchObject({ lang: "vi-VN" });
   });
 });
+
+test("a call naming Vietnamese speaks it with the Vietnamese voice even when Tagalog is active", async () => {
+  const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []); // no Filipino voice on the device
+  win.speechSynthesis.speak.mockImplementation((u: { onend: (() => void) | null }) => u.onend?.());
+  const tts = new WebSpeechSynthesizer(() => LANGUAGES.tl, win as never);
+  await tts.speak("Chào bạn!", { language: "vi" });
+  expect(win.speechSynthesis.speak.mock.calls[0]?.[0]).toMatchObject({ text: "Chào bạn!", lang: "vi-VN", voice: { name: "Linh" } });
+  await expect(tts.speak("Salamat po")).rejects.toThrow("tts_unavailable"); // Tagalog is still never read by it
+});
+
+test("a Filipino device voice never reads a Vietnamese preview", async () => {
+  const win = fakeSynthWindow(() => [voice("Blessica", "fil-PH")], []);
+  const tts = new WebSpeechSynthesizer(() => LANGUAGES.tl, win as never);
+  await expect(tts.speak("Chào bạn!", { language: "vi" })).rejects.toThrow("tts_unavailable");
+  expect(win.speechSynthesis.speak).not.toHaveBeenCalled();
+});

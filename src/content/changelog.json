@@ -2,6 +2,17 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "2.0.0",
+      "date": "2026-11-02",
+      "title": "Kumusta ! Le tagalog arrive",
+      "items": [
+        "Choisis ta langue avant de commencer ton parcours, et change-la quand tu veux depuis l'accueil.",
+        "Huit leçons et dialogues de tagalog pour voyager : saluer, commander, payer, demander son chemin, prendre un taxi.",
+        "Une voix tagalog, et la prononciation écrite sous chaque mot.",
+        "Ta progression en vietnamien reste exactement comme elle est."
+      ]
+    },
+    {
       "version": "1.11.0",
       "date": "2026-10-30",
       "title": "Bùa hộ mệnh",

@@ -1,0 +1,100 @@
+{
+  "id": "tl_d04",
+  "contentVersion": 1,
+  "title": "À la cantine",
+  "scene": "Une carinderia, cantine de quartier à Manille : le serveur vient prendre ta commande",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Magandang hapon po! Ano po ang gusto ninyo?",
+      "fr": "Bon après-midi ! Qu'est-ce que vous voulez ?",
+      "next": "t2",
+      "pron": "ma·gan·DANG HA·pon PO a·NO PO ANG gus·TO nin·YO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Gusto ko po ng adobo.",
+          "fr": "Je voudrais de l'adobo.",
+          "next": "t3",
+          "pron": "gus·TO KO PO NANG a·DO·bo"
+        },
+        {
+          "id": "o2",
+          "vi": "Ito po. Maanghang po ba?",
+          "fr": "Ça. C'est épicé ?",
+          "next": "t3",
+          "pron": "i·TO PO ma·ang·HANG PO BA"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Hindi po maanghang. Kanin po?",
+      "fr": "Ce n'est pas épicé. Avec du riz ?",
+      "next": "t4",
+      "pron": "hin·DI PO ma·ang·HANG KA·nin PO"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Opo. Pahingi po ng tubig.",
+          "fr": "Oui. Et de l'eau, s'il vous plaît.",
+          "next": "t5",
+          "pron": "O·po pa·hi·NGI PO NANG TU·big"
+        },
+        {
+          "id": "o2",
+          "vi": "Opo, salamat po.",
+          "fr": "Oui, merci.",
+          "next": "t5",
+          "pron": "O·po sa·LA·mat PO"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Ito po. Masarap po ito!",
+      "fr": "Voilà. C'est délicieux !",
+      "next": "t6",
+      "pron": "i·TO PO ma·sa·RAP PO i·TO"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Masarap! Isa pa po.",
+          "fr": "Délicieux ! Encore un, s'il vous plaît.",
+          "next": "t7",
+          "pron": "ma·sa·RAP i·SA PA PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Maraming salamat po!",
+          "fr": "Merci beaucoup !",
+          "next": "t7",
+          "pron": "ma·RA·ming sa·LA·mat PO"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Walang anuman po!",
+      "fr": "De rien !",
+      "next": null,
+      "pron": "wa·LANG a·nu·MAN PO"
+    }
+  ]
+}

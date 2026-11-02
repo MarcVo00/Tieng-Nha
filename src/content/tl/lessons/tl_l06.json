@@ -1,0 +1,250 @@
+{
+  "id": "tl_l06",
+  "contentVersion": 1,
+  "title": "Demander son chemin",
+  "description": "Demande où sont les toilettes, le marché ou ton hôtel, et comprends la réponse : à gauche, à droite, tout droit, près, loin.",
+  "tagline": "Demander son chemin",
+  "emoji": "🧭",
+  "dialogueId": "tl_d06",
+  "vocab": [
+    {
+      "id": "tl_v_nasaan",
+      "vi": "nasaan",
+      "fr": "où est… ?",
+      "dialect": "manila",
+      "pron": "na·sa·AN",
+      "note": "« Nasaan po ang CR? » : où sont les toilettes ?"
+    },
+    {
+      "id": "tl_v_saan",
+      "vi": "saan",
+      "fr": "où",
+      "dialect": "manila",
+      "pron": "sa·AN",
+      "note": "Dans « Taga-saan ka? » (Tu viens d'où ?) et « Saan po tayo? » (On va où ?)."
+    },
+    {
+      "id": "tl_v_kaliwa",
+      "vi": "kaliwa",
+      "fr": "gauche",
+      "dialect": "manila",
+      "pron": "ka·li·WA",
+      "note": "« Sa kaliwa » : à gauche."
+    },
+    {
+      "id": "tl_v_kanan",
+      "vi": "kanan",
+      "fr": "droite",
+      "dialect": "manila",
+      "pron": "KA·nan",
+      "note": "« Sa kanan » : à droite."
+    },
+    {
+      "id": "tl_v_diretso",
+      "vi": "diretso",
+      "fr": "tout droit",
+      "dialect": "manila",
+      "pron": "di·RET·so",
+      "note": "De l'espagnol « derecho ». « Diretso lang » : continue tout droit."
+    },
+    {
+      "id": "tl_v_malapit",
+      "vi": "malapit",
+      "fr": "près",
+      "dialect": "manila",
+      "pron": "ma·LA·pit",
+      "note": "« Malapit lang » : c'est tout près."
+    },
+    {
+      "id": "tl_v_malayo",
+      "vi": "malayo",
+      "fr": "loin",
+      "dialect": "manila",
+      "pron": "ma·LA·yo",
+      "note": "« Malayo pa » : c'est encore loin."
+    },
+    {
+      "id": "tl_v_dito",
+      "vi": "dito",
+      "fr": "ici",
+      "dialect": "manila",
+      "pron": "DI·to"
+    },
+    {
+      "id": "tl_v_doon",
+      "vi": "doon",
+      "fr": "là-bas",
+      "dialect": "manila",
+      "pron": "do·ON",
+      "note": "Souvent accompagné d'un geste du menton ou des lèvres vers l'endroit."
+    },
+    {
+      "id": "tl_v_cr",
+      "vi": "CR",
+      "fr": "les toilettes",
+      "dialect": "manila",
+      "pron": "SI AR",
+      "note": "« Comfort room » : c'est ainsi qu'on appelle les toilettes aux Philippines. On dit les deux lettres à l'anglaise."
+    },
+    {
+      "id": "tl_v_palengke",
+      "vi": "palengke",
+      "fr": "marché",
+      "dialect": "manila",
+      "pron": "pa·LENG·ke"
+    },
+    {
+      "id": "tl_v_hotel",
+      "vi": "hotel",
+      "fr": "hôtel",
+      "dialect": "manila",
+      "pron": "ho·TEL"
+    },
+    {
+      "id": "tl_v_mall",
+      "vi": "mall",
+      "fr": "centre commercial",
+      "dialect": "manila",
+      "pron": "MOL",
+      "note": "Les malls sont partout : on y trouve à manger, des distributeurs et des toilettes propres."
+    },
+    {
+      "id": "tl_v_tapos",
+      "vi": "tapos",
+      "fr": "puis, ensuite",
+      "dialect": "manila",
+      "pron": "TA·pos",
+      "note": "« Diretso lang, tapos sa kanan. » : tout droit, puis à droite."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l06_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_kaliwa",
+      "choices": [
+        "tl_v_kaliwa",
+        "tl_v_kanan",
+        "tl_v_diretso",
+        "tl_v_doon"
+      ]
+    },
+    {
+      "id": "tl_l06_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_malapit",
+      "choices": [
+        "tl_v_malapit",
+        "tl_v_malayo",
+        "tl_v_dito",
+        "tl_v_doon"
+      ]
+    },
+    {
+      "id": "tl_l06_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_cr",
+      "choices": [
+        "tl_v_cr",
+        "tl_v_palengke",
+        "tl_v_hotel",
+        "tl_v_mall"
+      ]
+    },
+    {
+      "id": "tl_l06_e04",
+      "type": "translate_choose",
+      "promptFr": "Où sont les toilettes ?",
+      "answerVi": "Nasaan po ang CR?",
+      "distractorsVi": [
+        "Nasaan po ang hotel?",
+        "Nasaan po ang palengke?",
+        "Nasaan po ang mall?"
+      ]
+    },
+    {
+      "id": "tl_l06_e05",
+      "type": "translate_choose",
+      "promptFr": "C'est tout près.",
+      "answerVi": "Malapit lang.",
+      "distractorsVi": [
+        "Malayo pa.",
+        "Diretso lang.",
+        "Dito lang."
+      ]
+    },
+    {
+      "id": "tl_l06_e06",
+      "type": "translate_choose",
+      "promptFr": "À gauche.",
+      "answerVi": "Sa kaliwa.",
+      "distractorsVi": [
+        "Sa kanan.",
+        "Diretso.",
+        "Doon."
+      ]
+    },
+    {
+      "id": "tl_l06_e07",
+      "type": "word_order",
+      "fr": "Tout droit, puis à droite.",
+      "tokensVi": [
+        "Diretso",
+        "lang",
+        "tapos",
+        "sa",
+        "kanan"
+      ],
+      "extraTokens": [
+        "kaliwa"
+      ]
+    },
+    {
+      "id": "tl_l06_e08",
+      "type": "word_order",
+      "fr": "Où est le marché ?",
+      "tokensVi": [
+        "Nasaan",
+        "po",
+        "ang",
+        "palengke"
+      ],
+      "extraTokens": [
+        "dito"
+      ]
+    },
+    {
+      "id": "tl_l06_e09",
+      "type": "speak",
+      "vi": "Nasaan po ang CR?",
+      "fr": "Où sont les toilettes ?",
+      "vocabIds": [
+        "tl_v_nasaan",
+        "tl_v_cr"
+      ],
+      "pron": "na·sa·AN PO ANG SI AR"
+    },
+    {
+      "id": "tl_l06_e10",
+      "type": "speak",
+      "vi": "Malayo po ba?",
+      "fr": "C'est loin ?",
+      "vocabIds": [
+        "tl_v_malayo"
+      ],
+      "pron": "ma·LA·yo PO BA"
+    },
+    {
+      "id": "tl_l06_e11",
+      "type": "speak",
+      "vi": "Diretso lang, tapos sa kaliwa.",
+      "fr": "Tout droit, puis à gauche.",
+      "vocabIds": [
+        "tl_v_diretso",
+        "tl_v_tapos",
+        "tl_v_kaliwa"
+      ],
+      "pron": "di·RET·so LANG TA·pos SA ka·li·WA"
+    }
+  ]
+}

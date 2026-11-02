@@ -1,0 +1,108 @@
+{
+  "id": "tl_d06",
+  "contentVersion": 1,
+  "title": "Trouver les toilettes",
+  "scene": "Dans une rue animée de Manille, tu arrêtes un passant",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Ano po?",
+      "fr": "Oui ? Je peux vous aider ?",
+      "next": "t2",
+      "pron": "a·NO PO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Nasaan po ang CR?",
+          "fr": "Où sont les toilettes ?",
+          "next": "t3",
+          "pron": "na·sa·AN PO ANG SI AR"
+        },
+        {
+          "id": "o2",
+          "vi": "Nasaan po ang palengke?",
+          "fr": "Où est le marché ?",
+          "next": "t4",
+          "pron": "na·sa·AN PO ANG pa·LENG·ke"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Doon po, sa kaliwa. Malapit lang.",
+      "fr": "Là-bas, à gauche. C'est tout près.",
+      "next": "t5",
+      "pron": "do·ON PO SA ka·li·WA ma·LA·pit LANG"
+    },
+    {
+      "id": "t4",
+      "speaker": "npc",
+      "vi": "Diretso lang po, tapos sa kanan.",
+      "fr": "Tout droit, puis à droite.",
+      "next": "t5",
+      "pron": "di·RET·so LANG PO TA·pos SA KA·nan"
+    },
+    {
+      "id": "t5",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Malayo po ba?",
+          "fr": "C'est loin ?",
+          "next": "t6",
+          "pron": "ma·LA·yo PO BA"
+        },
+        {
+          "id": "o2",
+          "vi": "Salamat po!",
+          "fr": "Merci !",
+          "next": "t8",
+          "pron": "sa·LA·mat PO"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Hindi po, malapit lang.",
+      "fr": "Non, c'est tout près.",
+      "next": "t7",
+      "pron": "hin·DI PO ma·LA·pit LANG"
+    },
+    {
+      "id": "t7",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Maraming salamat po!",
+          "fr": "Merci beaucoup !",
+          "next": "t8",
+          "pron": "ma·RA·ming sa·LA·mat PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Salamat po! Ingat!",
+          "fr": "Merci ! Prenez soin de vous !",
+          "next": "t8",
+          "pron": "sa·LA·mat PO I·ngat"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "speaker": "npc",
+      "vi": "Walang anuman po!",
+      "fr": "De rien !",
+      "next": null,
+      "pron": "wa·LANG a·nu·MAN PO"
+    }
+  ]
+}

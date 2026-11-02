@@ -1,0 +1,234 @@
+{
+  "id": "tl_l07",
+  "contentVersion": 1,
+  "title": "Prendre un taxi",
+  "description": "Donne ta destination, demande le prix ou le compteur, et fais-toi déposer : en taxi, en Grab, en tricycle ou en jeepney.",
+  "tagline": "Taxi, jeepney, tricycle",
+  "emoji": "🚕",
+  "dialogueId": "tl_d07",
+  "vocab": [
+    {
+      "id": "tl_v_sa",
+      "vi": "sa",
+      "fr": "à, vers (ta destination)",
+      "dialect": "manila",
+      "pron": "SA",
+      "note": "Pour dire où tu vas : « Sa airport po. » Le chauffeur comprend tout de suite."
+    },
+    {
+      "id": "tl_v_airport",
+      "vi": "airport",
+      "fr": "aéroport",
+      "dialect": "manila",
+      "pron": "ER·port",
+      "note": "On dit le mot anglais."
+    },
+    {
+      "id": "tl_v_para_po",
+      "vi": "para po!",
+      "fr": "arrêtez-vous ici !",
+      "dialect": "manila",
+      "pron": "PA·ra PO",
+      "note": "Le mot magique pour descendre du jeepney ou du tricycle."
+    },
+    {
+      "id": "tl_v_dito_na_lang_po",
+      "vi": "dito na lang po",
+      "fr": "ici, ça ira",
+      "dialect": "manila",
+      "pron": "DI·to NA LANG PO",
+      "note": "Pour descendre du taxi : « ici, c'est bon »."
+    },
+    {
+      "id": "tl_v_sa_tabi_lang_po",
+      "vi": "sa tabi lang po",
+      "fr": "sur le côté, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "SA ta·BI LANG PO",
+      "note": "Pour que le chauffeur se range au bord de la route."
+    },
+    {
+      "id": "tl_v_hanggang",
+      "vi": "hanggang",
+      "fr": "jusqu'à",
+      "dialect": "manila",
+      "pron": "hang·GANG",
+      "note": "« Magkano hanggang airport? » : combien jusqu'à l'aéroport ? Négocie avant de monter dans un tricycle."
+    },
+    {
+      "id": "tl_v_metro",
+      "vi": "metro",
+      "fr": "compteur (du taxi)",
+      "dialect": "manila",
+      "pron": "ME·tro"
+    },
+    {
+      "id": "tl_v_pakibuksan_po_ang_metro",
+      "vi": "pakibuksan po ang metro",
+      "fr": "mettez le compteur, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "pa·ki·buk·SAN PO ANG ME·tro",
+      "note": "Si le chauffeur de taxi ne met pas le compteur, demande-le. Sinon, prends un autre taxi ou un Grab."
+    },
+    {
+      "id": "tl_v_jeepney",
+      "vi": "jeepney",
+      "fr": "jeepney",
+      "dialect": "manila",
+      "pron": "DYIP·ni",
+      "note": "Le minibus coloré des Philippines. Ton argent passe de main en main jusqu'au chauffeur : dis « Bayad po » en le tendant."
+    },
+    {
+      "id": "tl_v_tricycle",
+      "vi": "tricycle",
+      "fr": "tricycle (moto à side-car)",
+      "dialect": "manila",
+      "pron": "tray·si·KEL",
+      "note": "Pour les petits trajets. Le prix se discute avant de monter."
+    },
+    {
+      "id": "tl_v_grab",
+      "vi": "Grab",
+      "fr": "Grab (VTC)",
+      "dialect": "manila",
+      "pron": "GRAB",
+      "note": "L'appli de VTC : le plus simple pour un voyageur, le prix est fixé à l'avance."
+    },
+    {
+      "id": "tl_v_taxi",
+      "vi": "taxi",
+      "fr": "taxi",
+      "dialect": "manila",
+      "pron": "TAK·si"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l07_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_jeepney",
+      "choices": [
+        "tl_v_jeepney",
+        "tl_v_tricycle",
+        "tl_v_taxi",
+        "tl_v_grab"
+      ]
+    },
+    {
+      "id": "tl_l07_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_para_po",
+      "choices": [
+        "tl_v_para_po",
+        "tl_v_dito_na_lang_po",
+        "tl_v_sa_tabi_lang_po",
+        "tl_v_bayad"
+      ]
+    },
+    {
+      "id": "tl_l07_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_metro",
+      "choices": [
+        "tl_v_metro",
+        "tl_v_airport",
+        "tl_v_hanggang",
+        "tl_v_sa"
+      ]
+    },
+    {
+      "id": "tl_l07_e04",
+      "type": "translate_choose",
+      "promptFr": "À l'aéroport, s'il vous plaît.",
+      "answerVi": "Sa airport po.",
+      "distractorsVi": [
+        "Sa hotel po.",
+        "Sa mall po.",
+        "Sa palengke po."
+      ]
+    },
+    {
+      "id": "tl_l07_e05",
+      "type": "translate_choose",
+      "promptFr": "Combien jusqu'à l'aéroport ?",
+      "answerVi": "Magkano hanggang airport?",
+      "distractorsVi": [
+        "Magkano po ito?",
+        "Nasaan po ang airport?",
+        "Malayo po ba ang airport?"
+      ]
+    },
+    {
+      "id": "tl_l07_e06",
+      "type": "translate_choose",
+      "promptFr": "Ici, ça ira.",
+      "answerVi": "Dito na lang po.",
+      "distractorsVi": [
+        "Doon po.",
+        "Diretso lang po.",
+        "Sa kanan po."
+      ]
+    },
+    {
+      "id": "tl_l07_e07",
+      "type": "word_order",
+      "fr": "Mettez le compteur, s'il vous plaît.",
+      "tokensVi": [
+        "Pakibuksan",
+        "po",
+        "ang",
+        "metro"
+      ],
+      "extraTokens": [
+        "sa"
+      ]
+    },
+    {
+      "id": "tl_l07_e08",
+      "type": "word_order",
+      "fr": "Sur le côté, s'il vous plaît.",
+      "tokensVi": [
+        "Sa",
+        "tabi",
+        "lang",
+        "po"
+      ],
+      "extraTokens": [
+        "dito"
+      ]
+    },
+    {
+      "id": "tl_l07_e09",
+      "type": "speak",
+      "vi": "Para po!",
+      "fr": "Arrêtez-vous ici !",
+      "vocabIds": [
+        "tl_v_para_po"
+      ],
+      "pron": "PA·ra PO"
+    },
+    {
+      "id": "tl_l07_e10",
+      "type": "speak",
+      "vi": "Pakibuksan po ang metro.",
+      "fr": "Mettez le compteur, s'il vous plaît.",
+      "vocabIds": [
+        "tl_v_pakibuksan_po_ang_metro",
+        "tl_v_metro"
+      ],
+      "pron": "pa·ki·buk·SAN PO ANG ME·tro"
+    },
+    {
+      "id": "tl_l07_e11",
+      "type": "speak",
+      "vi": "Magkano hanggang airport?",
+      "fr": "Combien jusqu'à l'aéroport ?",
+      "vocabIds": [
+        "tl_v_magkano",
+        "tl_v_hanggang",
+        "tl_v_airport"
+      ],
+      "pron": "mag·KA·no hang·GANG ER·port"
+    }
+  ]
+}

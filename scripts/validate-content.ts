@@ -16,14 +16,6 @@ const languages = [
   { id: "tl", strict: false },
 ] as const;
 
-/** The Tagalog tree lists all eight lessons from the start; it is only cross-checked once their files exist. */
-const treeIfComplete = (dir: string, strictTree: boolean): unknown => {
-  const tree = readOptional(join(dir, "tree.json"));
-  if (strictTree || !tree) return tree;
-  const nodes = (tree as { nodes: { id: string; kind: string }[] }).nodes;
-  return nodes.every((n) => n.kind !== "lesson" || existsSync(join(dir, "lessons", `${n.id}.json`))) ? tree : undefined;
-};
-
 const errors: string[] = [];
 for (const language of languages) {
   const dir = join(root, language.id);
@@ -35,7 +27,7 @@ for (const language of languages) {
       badges: readOr(join(root, "badges.json"), { contentVersion: 1, questions: [] }),
       bosses: readOptional(join(dir, "bosses.json")),
       shop: readOptional(join(root, "shop.json")),
-      tree: treeIfComplete(dir, language.strict),
+      tree: readOptional(join(dir, "tree.json")),
     },
     { strict: language.strict },
   );

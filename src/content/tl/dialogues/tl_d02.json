@@ -1,0 +1,100 @@
+{
+  "id": "tl_d02",
+  "contentVersion": 1,
+  "title": "Faire connaissance",
+  "scene": "Sur un banc au bord de la baie de Manille, une Philippine engage la conversation",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Kumusta! Ano ang pangalan mo?",
+      "fr": "Salut ! Comment tu t'appelles ?",
+      "next": "t2",
+      "pron": "ku·mus·TA a·NO ANG pa·NGA·lan MO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Ako si Marc. Pranses ako.",
+          "fr": "Je suis Marc. Je suis français.",
+          "next": "t3",
+          "pron": "a·KO SI MARK pran·SES a·KO"
+        },
+        {
+          "id": "o2",
+          "vi": "Ako si Marc. Taga-France ako.",
+          "fr": "Je suis Marc. Je viens de France.",
+          "next": "t3",
+          "pron": "a·KO SI MARK ta·GA-FRANS a·KO"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Taga-Maynila ako. Marunong ka bang mag-Ingles?",
+      "fr": "Moi, je suis de Manille. Tu parles anglais ?",
+      "next": "t4",
+      "pron": "ta·GA-may·NI·la a·KO ma·RU·nong KA BANG mag·ing·LES"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Pakiulit po. Dahan-dahan po.",
+          "fr": "Répétez, s'il vous plaît. Plus lentement.",
+          "next": "t5",
+          "pron": "pa·ki·u·LIT PO DA·han DA·han PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Oo! Hindi ko maintindihan ang Tagalog.",
+          "fr": "Oui ! Je ne comprends pas le tagalog.",
+          "next": "t7",
+          "pron": "O·o hin·DI KO ma·in·tin·di·HAN ANG ta·GA·log"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Marunong ka bang mag-Ingles?",
+      "fr": "Tu parles anglais ?",
+      "next": "t6",
+      "pron": "ma·RU·nong KA BANG mag·ing·LES"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Oo, salamat!",
+          "fr": "Oui, merci !",
+          "next": "t7",
+          "pron": "O·o sa·LA·mat"
+        },
+        {
+          "id": "o2",
+          "vi": "Oo. Konti lang ang Tagalog ko.",
+          "fr": "Oui. Mon tagalog, c'est juste un peu.",
+          "next": "t7",
+          "pron": "O·o KON·ti LANG ANG ta·GA·log KO"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Sige! Mag-Ingles tayo.",
+      "fr": "D'accord ! On parle anglais.",
+      "next": null,
+      "pron": "SI·ge mag·ing·LES TA·yo"
+    }
+  ]
+}

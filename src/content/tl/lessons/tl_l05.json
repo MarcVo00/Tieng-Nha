@@ -1,0 +1,240 @@
+{
+  "id": "tl_l05",
+  "contentVersion": 1,
+  "title": "Payer",
+  "description": "Demande le prix, trouve que c'est cher, demande une réduction, paie et attends ta monnaie.",
+  "tagline": "Payer et marchander",
+  "emoji": "💸",
+  "dialogueId": "tl_d05",
+  "vocab": [
+    {
+      "id": "tl_v_magkano",
+      "vi": "magkano",
+      "fr": "combien (pour un prix)",
+      "dialect": "manila",
+      "pron": "mag·KA·no",
+      "note": "« Magkano po ito? » : combien ça coûte ?"
+    },
+    {
+      "id": "tl_v_bayad",
+      "vi": "bayad",
+      "fr": "paiement",
+      "dialect": "manila",
+      "pron": "BA·yad",
+      "note": "« Bayad po » en tendant l'argent : c'est ainsi qu'on paie, au marché comme dans le jeepney."
+    },
+    {
+      "id": "tl_v_sukli",
+      "vi": "sukli",
+      "fr": "la monnaie (qu'on te rend)",
+      "dialect": "manila",
+      "pron": "suk·LI"
+    },
+    {
+      "id": "tl_v_barya",
+      "vi": "barya",
+      "fr": "petite monnaie, pièces",
+      "dialect": "manila",
+      "pron": "bar·YA",
+      "note": "Les chauffeurs et les petits vendeurs demandent souvent : « May barya po kayo? » (Vous avez de la monnaie ?)."
+    },
+    {
+      "id": "tl_v_mahal",
+      "vi": "mahal",
+      "fr": "cher",
+      "dialect": "manila",
+      "pron": "ma·HAL"
+    },
+    {
+      "id": "tl_v_ang_mahal",
+      "vi": "ang mahal!",
+      "fr": "c'est cher !",
+      "dialect": "manila",
+      "pron": "ANG ma·HAL",
+      "note": "« Ang » + adjectif : « que c'est… ! »."
+    },
+    {
+      "id": "tl_v_mura",
+      "vi": "mura",
+      "fr": "pas cher, bon marché",
+      "dialect": "manila",
+      "pron": "MU·ra"
+    },
+    {
+      "id": "tl_v_may",
+      "vi": "may",
+      "fr": "il y a, avoir",
+      "dialect": "manila",
+      "pron": "MAY",
+      "note": "« May discount po ba? » : vous avez une réduction ?"
+    },
+    {
+      "id": "tl_v_discount",
+      "vi": "discount",
+      "fr": "réduction",
+      "dialect": "manila",
+      "pron": "DIS·kawnt",
+      "note": "Du taglish : on dit le mot anglais. On le demande au marché ou dans une petite boutique, pas au supermarché."
+    },
+    {
+      "id": "tl_v_pwede",
+      "vi": "pwede",
+      "fr": "possible, on peut",
+      "dialect": "manila",
+      "pron": "PWE·de",
+      "note": "« Pwede bang… ? » : est-ce qu'on peut… ? De l'espagnol « puede »."
+    },
+    {
+      "id": "tl_v_card",
+      "vi": "card",
+      "fr": "carte bancaire",
+      "dialect": "manila",
+      "pron": "KARD",
+      "note": "Les cartes passent au mall et à l'hôtel. Au marché et dans la rue, prévois du cash. Beaucoup paient aussi avec GCash, l'appli de paiement sur téléphone."
+    },
+    {
+      "id": "tl_v_cash",
+      "vi": "cash",
+      "fr": "espèces, liquide",
+      "dialect": "manila",
+      "pron": "KASH",
+      "note": "Du taglish : « cash lang », « seulement en espèces »."
+    },
+    {
+      "id": "tl_v_wala",
+      "vi": "wala",
+      "fr": "il n'y a pas, pas de",
+      "dialect": "manila",
+      "pron": "wa·LA",
+      "note": "« Wala po. » : il n'y en a pas."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l05_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_mahal",
+      "choices": [
+        "tl_v_mahal",
+        "tl_v_mura",
+        "tl_v_sukli",
+        "tl_v_barya"
+      ]
+    },
+    {
+      "id": "tl_l05_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_sukli",
+      "choices": [
+        "tl_v_sukli",
+        "tl_v_bayad",
+        "tl_v_barya",
+        "tl_v_cash"
+      ]
+    },
+    {
+      "id": "tl_l05_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_magkano",
+      "choices": [
+        "tl_v_magkano",
+        "tl_v_may",
+        "tl_v_wala",
+        "tl_v_pwede"
+      ]
+    },
+    {
+      "id": "tl_l05_e04",
+      "type": "translate_choose",
+      "promptFr": "Combien ça coûte ?",
+      "answerVi": "Magkano po ito?",
+      "distractorsVi": [
+        "Masarap po ito?",
+        "Bayad po.",
+        "Ang mahal!"
+      ]
+    },
+    {
+      "id": "tl_l05_e05",
+      "type": "translate_choose",
+      "promptFr": "C'est cher !",
+      "answerVi": "Ang mahal!",
+      "distractorsVi": [
+        "Ang mura!",
+        "Masarap!",
+        "Walang anuman!"
+      ]
+    },
+    {
+      "id": "tl_l05_e06",
+      "type": "translate_choose",
+      "promptFr": "Je peux payer par carte ?",
+      "answerVi": "Pwede bang card?",
+      "distractorsVi": [
+        "Pwede bang cash?",
+        "May discount po ba?",
+        "Magkano po?"
+      ]
+    },
+    {
+      "id": "tl_l05_e07",
+      "type": "word_order",
+      "fr": "Vous avez une réduction ?",
+      "tokensVi": [
+        "May",
+        "discount",
+        "po",
+        "ba"
+      ],
+      "extraTokens": [
+        "wala"
+      ]
+    },
+    {
+      "id": "tl_l05_e08",
+      "type": "word_order",
+      "fr": "Je peux payer en espèces ?",
+      "tokensVi": [
+        "Pwede",
+        "bang",
+        "cash"
+      ],
+      "extraTokens": [
+        "card"
+      ]
+    },
+    {
+      "id": "tl_l05_e09",
+      "type": "speak",
+      "vi": "Magkano po ito?",
+      "fr": "Combien ça coûte ?",
+      "vocabIds": [
+        "tl_v_magkano",
+        "tl_v_ito"
+      ],
+      "pron": "mag·KA·no PO i·TO"
+    },
+    {
+      "id": "tl_l05_e10",
+      "type": "speak",
+      "vi": "Ang mahal! May discount po ba?",
+      "fr": "C'est cher ! Vous avez une réduction ?",
+      "vocabIds": [
+        "tl_v_ang_mahal",
+        "tl_v_may",
+        "tl_v_discount"
+      ],
+      "pron": "ANG ma·HAL MAY DIS·kawnt PO BA"
+    },
+    {
+      "id": "tl_l05_e11",
+      "type": "speak",
+      "vi": "Bayad po.",
+      "fr": "Voilà mon paiement.",
+      "vocabIds": [
+        "tl_v_bayad"
+      ],
+      "pron": "BA·yad PO"
+    }
+  ]
+}

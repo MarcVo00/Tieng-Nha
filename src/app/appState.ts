@@ -65,7 +65,9 @@ export function useSettings() {
 export function useRefreshProgress() {
   const { activity, progress, clock } = useServices();
   return useCallback(async () => {
-    const [snapshot, dueCount, energy, wallet] = await Promise.all([activity.getSnapshot(), progress.countDueVocab(clock()), activity.getEnergy(), activity.getWallet()]);
+    // The language is read when the refresh runs, so the callback stays stable across a language switch.
+    const language = useAppState.getState().settings.language ?? "vi";
+    const [snapshot, dueCount, energy, wallet] = await Promise.all([activity.getSnapshot(), progress.countDueVocab(clock(), language), activity.getEnergy(), activity.getWallet()]);
     useAppState.getState().set({ snapshot, dueCount, energy, wallet });
   }, [activity, progress, clock]);
 }

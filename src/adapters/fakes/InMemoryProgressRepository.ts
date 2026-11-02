@@ -1,4 +1,5 @@
 import type { AppEvent, LeaderboardRow, NewEvent, Settings, VocabId, VocabProgress } from "@/domain/types";
+import { languageOfId, type LanguageId } from "@/domain/languages";
 import { DEFAULT_SETTINGS, type ProgressRepository } from "@/ports/ProgressRepository";
 
 type Period = "week" | "all";
@@ -27,15 +28,15 @@ export class InMemoryProgressRepository implements ProgressRepository {
     this.vocab.set(p.vocabId, p);
   }
 
-  async listDueVocab(nowIso: string, limit: number): Promise<VocabProgress[]> {
+  async listDueVocab(nowIso: string, limit: number, language?: LanguageId): Promise<VocabProgress[]> {
     return [...this.vocab.values()]
-      .filter((p) => p.dueAt <= nowIso)
+      .filter((p) => p.dueAt <= nowIso && (!language || languageOfId(p.vocabId) === language))
       .sort((a, b) => a.dueAt.localeCompare(b.dueAt))
       .slice(0, limit);
   }
 
-  async countDueVocab(nowIso: string): Promise<number> {
-    return [...this.vocab.values()].filter((p) => p.dueAt <= nowIso).length;
+  async countDueVocab(nowIso: string, language?: LanguageId): Promise<number> {
+    return [...this.vocab.values()].filter((p) => p.dueAt <= nowIso && (!language || languageOfId(p.vocabId) === language)).length;
   }
 
   async getSettings(): Promise<Settings> {

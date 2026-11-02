@@ -102,3 +102,16 @@ test("settings saved before 2.0 read back with no language chosen; unknown langu
   await db.kv.put({ key: "settings", value: { theme: "dark", voiceRate: "slow", voice: "north-f", capabilities: null, onboardingDone: true, sound: true, language: "klingon" } });
   expect((await repo.getSettings()).language).toBeNull();
 });
+
+test("due vocab can be limited to one language", async () => {
+  const repo = new DexieProgressRepository(db);
+  const base = { box: 1, correct: 0, wrong: 0, lastSeenAt: NOW } as const;
+  await repo.upsertVocabProgress({ ...base, vocabId: "v_chao", dueAt: "2026-10-08T00:00:00.000Z" });
+  await repo.upsertVocabProgress({ ...base, vocabId: "tl_v_salamat", dueAt: "2026-10-09T00:00:00.000Z" });
+  await repo.upsertVocabProgress({ ...base, vocabId: "tl_v_late", dueAt: "2026-10-09T01:00:00.000Z" });
+  expect(await repo.countDueVocab(NOW, "tl")).toBe(2);
+  expect(await repo.countDueVocab(NOW, "vi")).toBe(1);
+  expect(await repo.countDueVocab(NOW)).toBe(3);
+  expect((await repo.listDueVocab(NOW, 1, "tl")).map((p) => p.vocabId)).toEqual(["tl_v_salamat"]);
+  expect((await repo.listDueVocab(NOW, 10, "vi")).map((p) => p.vocabId)).toEqual(["v_chao"]);
+});

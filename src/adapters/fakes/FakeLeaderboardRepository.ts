@@ -79,10 +79,10 @@ export class FakeLeaderboardRepository implements LeaderboardRepository {
     const since = period === "week" ? weekStartWall(this.now()) : undefined;
     const mine = events.filter((e) => since === undefined || parisWall(new Date(e.createdAt)).wall >= since);
     const myXp = mine.reduce((sum, e) => sum + e.xp, 0);
-    const lessonsDone = new Set(events.filter((e) => e.type === "lesson_completed").map((e) => e.refId)).size;
+    const lessonIds = [...new Set(events.filter((e) => e.type === "lesson_completed").map((e) => e.refId))];
     const me = typeof this.me === "function" ? await this.me() : this.me;
-    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone, frame: await this.getMyFrame(), look: await this.getMyLook(), isMe: true };
-    return [...BOTS.map((b) => ({ ...b, isMe: false })), meRow].sort((a, b) => b.xp - a.xp);
+    const meRow: LeaderboardRow = { ...me, xp: myXp, streak: 0, lessonsDone: lessonIds.length, lessonIds, frame: await this.getMyFrame(), look: await this.getMyLook(), isMe: true };
+    return [...BOTS.map((b) => ({ ...b, lessonIds: [...(MEMBER_PROGRESS[b.userId]?.lessonsDone ?? [])], isMe: false })), meRow].sort((a, b) => b.xp - a.xp);
   }
 
   async getPublicProfile(userId: string): Promise<PublicProfile> {

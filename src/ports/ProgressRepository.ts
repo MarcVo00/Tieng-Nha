@@ -1,11 +1,13 @@
+import type { LanguageId } from "@/domain/languages";
 import type { AppEvent, NewEvent, Settings, VocabId, VocabProgress, LeaderboardRow } from "@/domain/types";
 export interface ProgressRepository {
   appendEvent(e: NewEvent, nowIso: string): Promise<AppEvent>; // assigns clientId (crypto.randomUUID()), createdAt = nowIso, schemaVersion 1
   listEvents(): Promise<AppEvent[]>; // ordered by createdAt asc
   getVocabProgress(id: VocabId): Promise<VocabProgress | undefined>;
   upsertVocabProgress(p: VocabProgress): Promise<void>;
-  listDueVocab(nowIso: string, limit: number): Promise<VocabProgress[]>; // dueAt <= now, ordered by dueAt asc
-  countDueVocab(nowIso: string): Promise<number>;
+  /** dueAt <= now, ordered by dueAt asc; only the words of `language` when it is given (all words otherwise). */
+  listDueVocab(nowIso: string, limit: number, language?: LanguageId): Promise<VocabProgress[]>;
+  countDueVocab(nowIso: string, language?: LanguageId): Promise<number>;
   getSettings(): Promise<Settings>; // returns DEFAULT_SETTINGS if none saved
   saveSettings(s: Settings): Promise<void>;
   getCachedLeaderboard(period: "week" | "all"): Promise<{ rows: LeaderboardRow[]; fetchedAt: string } | undefined>;

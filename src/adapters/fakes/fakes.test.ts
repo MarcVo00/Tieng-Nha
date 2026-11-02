@@ -94,3 +94,15 @@ test("fake auth accepts any non-empty invite only with anyInvite", async () => {
   await demo.joinGroup("whatever", "Marc", "🐉");
   expect(await demo.hasProfile()).toBe(true);
 });
+
+test("due vocab can be limited to one language", async () => {
+  const repo = new InMemoryProgressRepository();
+  const base = { box: 1, correct: 0, wrong: 0, lastSeenAt: now } as const;
+  await repo.upsertVocabProgress({ ...base, vocabId: "v_chao", dueAt: "2026-10-08T00:00:00.000Z" });
+  await repo.upsertVocabProgress({ ...base, vocabId: "tl_v_salamat", dueAt: "2026-10-09T00:00:00.000Z" });
+  expect(await repo.countDueVocab(now, "tl")).toBe(1);
+  expect(await repo.countDueVocab(now, "vi")).toBe(1);
+  expect(await repo.countDueVocab(now)).toBe(2);
+  expect((await repo.listDueVocab(now, 10, "tl")).map((p) => p.vocabId)).toEqual(["tl_v_salamat"]);
+  expect((await repo.listDueVocab(now, 10, "vi")).map((p) => p.vocabId)).toEqual(["v_chao"]);
+});

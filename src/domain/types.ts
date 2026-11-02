@@ -113,6 +113,8 @@ export type LeaderboardRow = {
   xp: number; // xp_week or xp_total depending on period
   streak: number;
   lessonsDone: number;
+  /** Ids of the lessons done, of every language; absent on rows cached before 2.0. */
+  lessonIds?: LessonId[];
   frame: string | null; // equipped frame item id
   look: Look; // equipped hero (character, hat, outfit, accessory, aura)
   isMe: boolean;

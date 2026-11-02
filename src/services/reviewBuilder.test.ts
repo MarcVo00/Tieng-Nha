@@ -50,3 +50,21 @@ test("distractors never equal the answer text (synonyms)", () => {
 test("words missing from the pool are skipped", () => {
   expect(buildReviewSession([introduce("v_unknown", NOW)], pool, createRng(1), { hasStt: true })).toEqual([]);
 });
+test("a word is only ever mixed with words of its own language", () => {
+  const tl = ["salamat", "kumusta", "oo", "hindi", "paalam"].map((w) => ({ id: `tl_v_${w}`, vi: w, fr: `fr_${w}`, dialect: "south" as const }));
+  const mixedPool = [...pool, ...tl];
+  const tagalogDue = [introduce("tl_v_salamat", NOW)];
+  for (let seed = 0; seed < 20; seed++) {
+    const ex = buildReviewSession(tagalogDue, mixedPool, createRng(seed), { hasStt: true });
+    expect(ex).toHaveLength(1);
+    for (const e of ex) {
+      if (e.type === "listen_choose") {
+        expect(e.vocabId).toBe("tl_v_salamat");
+        expect(e.choices.every((c) => c.startsWith("tl_v_"))).toBe(true);
+      } else if (e.type === "translate_choose") {
+        expect(e.answerVi).toBe("salamat");
+        expect(e.distractorsVi.every((d) => tl.some((t) => t.vi === d))).toBe(true);
+      }
+    }
+  }
+});

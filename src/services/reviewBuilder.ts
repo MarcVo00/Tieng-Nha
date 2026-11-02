@@ -1,4 +1,5 @@
 import type { Exercise, VocabItem, VocabProgress } from "@/domain/types";
+import { languageOfId } from "@/domain/languages";
 import { pickN, shuffle } from "@/services/random";
 
 export const REVIEW_MAX = 20;
@@ -14,7 +15,8 @@ export function buildReviewSession(
   for (const [i, p] of [...due].sort((a, b) => a.dueAt.localeCompare(b.dueAt)).slice(0, opts.max ?? REVIEW_MAX).entries()) {
     const word = byId.get(p.vocabId);
     if (!word) continue;
-    const others = live.filter((v) => v.id !== word.id && v.vi !== word.vi);
+    const language = languageOfId(word.id);
+    const others = live.filter((v) => v.id !== word.id && v.vi !== word.vi && languageOfId(v.id) === language);
     if (others.length < 3) continue;
     const kind = kinds[Math.floor(rng() * kinds.length)] ?? "listen_choose";
     const id = `rev_${word.id}_${i}`;

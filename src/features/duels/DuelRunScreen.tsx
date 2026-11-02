@@ -54,7 +54,8 @@ const VERDICT_STYLE: Record<Verdict, string> = {
  */
 export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
   const { id = "" } = useParams();
-  const { content, duels, tts, stt, recorder, sound } = useServices();
+  const { contents, duels, tts, stt, recorder, sound } = useServices();
+  const content = contents.vi; // duels are Vietnamese-only in 2.0, whatever the active language
   const { settings, updateSettings } = useSettings();
   const heroLook = useHeroLook();
   const navigate = useNavigate();

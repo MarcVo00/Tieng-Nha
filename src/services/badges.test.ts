@@ -39,3 +39,21 @@ test("every badge pays between 20 and 200 xu, harder ones more", () => {
   expect([coins["streak_3"], coins["streak_7"], coins["streak_14"], coins["streak_30"]]).toEqual([30, 60, 100, 200]);
   expect(new Set(defs.map((d) => d.id)).size).toBe(defs.length);
 });
+
+test("Tagalog lessons never count toward the Vietnamese lesson badges", () => {
+  const tl = ["tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05", "tl_l06", "tl_l07", "tl_l08"];
+  const ids = evaluateBadges({ ...empty, lessonsDone: ["l01", ...tl, "l02", "l03"] }, defs);
+  expect(ids).toEqual(expect.arrayContaining(["first_lesson", "three_lessons"]));
+  expect(ids).not.toContain("five_lessons");
+  expect(ids).not.toContain("ten_lessons");
+});
+
+test("Tagalog perfect lessons and dialogues do not unlock the Vietnamese badges", () => {
+  const five = { id: "perfect_5", title: "t", description: "d", icon: "i", rule: { kind: "perfect_lessons" as const, gte: 5 }, coins: 60 };
+  const one = { id: "perfect_1", title: "t", description: "d", icon: "i", rule: { kind: "perfect_lesson" as const }, coins: 20 };
+  const dlg = { id: "dlg", title: "t", description: "d", icon: "i", rule: { kind: "dialogues_done" as const, gte: 1 }, coins: 20 };
+  const perfect = ["tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05"];
+  expect(evaluateBadges({ ...empty, perfectLessons: perfect }, [five, one])).toEqual([]);
+  expect(evaluateBadges({ ...empty, dialoguesDone: ["tl_d01"] }, [dlg])).toEqual([]);
+  expect(evaluateBadges({ ...empty, perfectLessons: [...perfect, "l01"] }, [one])).toEqual(["perfect_1"]);
+});

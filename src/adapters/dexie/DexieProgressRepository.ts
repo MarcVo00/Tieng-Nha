@@ -1,7 +1,7 @@
 import type { ProgressRepository } from "@/ports";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { VOICE_IDS, type AppEvent, type LeaderboardRow, type NewEvent, type Settings, type VocabProgress } from "@/domain/types";
-import { LANGUAGE_IDS, type LanguageId } from "@/domain/languages";
+import { LANGUAGE_IDS, languageOfId, type LanguageId } from "@/domain/languages";
 import { THEME_KEY } from "@/domain/storageKeys";
 import type { TiengNhaDb } from "@/adapters/dexie/db";
 
@@ -29,12 +29,14 @@ export class DexieProgressRepository implements ProgressRepository {
   async upsertVocabProgress(p: VocabProgress): Promise<void> {
     await this.db.vocab.put(p);
   }
-  listDueVocab(nowIso: string, limit: number): Promise<VocabProgress[]> {
-    // The dueAt index already yields ascending order; limit applies in that order.
-    return this.db.vocab.where("dueAt").belowOrEqual(nowIso).limit(limit).toArray();
+  listDueVocab(nowIso: string, limit: number, language?: LanguageId): Promise<VocabProgress[]> {
+    // The dueAt index already yields ascending order; the language filter and the limit apply in that order.
+    const due = this.db.vocab.where("dueAt").belowOrEqual(nowIso);
+    return (language ? due.filter((p) => languageOfId(p.vocabId) === language) : due).limit(limit).toArray();
   }
-  countDueVocab(nowIso: string): Promise<number> {
-    return this.db.vocab.where("dueAt").belowOrEqual(nowIso).count();
+  countDueVocab(nowIso: string, language?: LanguageId): Promise<number> {
+    const due = this.db.vocab.where("dueAt").belowOrEqual(nowIso);
+    return (language ? due.filter((p) => languageOfId(p.vocabId) === language) : due).count();
   }
   async getSettings(): Promise<Settings> {
     const row = await this.db.kv.get(SETTINGS_KEY);

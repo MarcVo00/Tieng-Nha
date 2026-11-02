@@ -4,6 +4,7 @@ import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
 import { useResumeAtZero } from "@/app/useCountdown";
 import { useHeroLook } from "@/app/useHeroLook";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
@@ -20,6 +21,7 @@ export function LessonScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tts, stt, recorder, reporter } = useServices();
+  const { language } = useLanguage();
   const { settings, updateSettings } = useSettings();
   const run = useLessonRun(id);
   const remaining = useResumeAtZero(run.load.status === "no-energy" ? run.load.nextAt : null, run.reload);
@@ -109,6 +111,7 @@ export function LessonScreen() {
             vocabIndex={vocabIndex}
             capabilities={capabilities}
             voiceRate={voiceRateOf(settings)}
+            lang={language.htmlLang}
             services={{ tts, stt, recorder }}
             onResult={run.submit}
             onGraded={run.graded}

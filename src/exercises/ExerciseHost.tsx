@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, PresenceContext } from "motion/react";
 import type { Capabilities, Exercise, VocabId, VocabItem } from "@/domain/types";
 import { getPlugin } from "@/exercises/registry";
-import type { ExerciseServices, GradeResult } from "@/exercises/types";
+import type { ExerciseServices, GradeResult, TargetLang } from "@/exercises/types";
 import { seedFromString } from "@/services/random";
 import { duration, EXIT_RATIO, ease, FeedbackSheet } from "@/ui";
 import { ShineContext } from "@/ui/Button";
@@ -19,13 +19,21 @@ export type ExerciseHostProps = {
   onReport?: (refId: string) => void;
   onCapabilityLost?: (c: "stt" | "recorder") => void;
   seedSalt?: string; // fixes the answer shuffle (duels: same order for both players)
+  lang?: TargetLang; // language of the target-language text, Vietnamese when omitted (exam and duels are Vietnamese-only)
   attempt?: number; // bump when the same exercise is presented again (retry)
 };
+
+/** Respelling of the expected answer, when the content carries one (a spoken line, or the word heard). */
+function pronOf(exercise: Exercise, vocabIndex: ReadonlyMap<VocabId, VocabItem>): string | undefined {
+  if (exercise.type === "speak") return exercise.pron;
+  if (exercise.type === "listen_choose") return vocabIndex.get(exercise.vocabId)?.pron;
+  return undefined;
+}
 
 const SHAKE = { x: [0, -6, 6, -4, 4, 0] };
 const SHAKE_TRANSITION = { duration: duration.base, ease: ease.inOut };
 
-export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onGraded, onReport, onCapabilityLost, seedSalt, attempt = 0 }: ExerciseHostProps) {
+export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRate, services, onResult, onGraded, onReport, onCapabilityLost, seedSalt, lang = "vi", attempt = 0 }: ExerciseHostProps) {
   const plugin = getPlugin(exercise.type);
   // Each presentation (exercise id + attempt) owns its result and its one-answer guard.
   const presentation = `${exercise.id}:${attempt}`;
@@ -48,6 +56,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
     }
   };
 
+  const pron = result ? pronOf(exercise, vocabIndex) : undefined;
   const wrong = result !== null && !result.correct && !result.skipped;
   return (
     <>
@@ -65,6 +74,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
               <ShineContext.Provider value={mode !== "exam"}>
               <plugin.Component
                 exercise={exercise}
+                lang={lang}
                 disabled={result !== null}
                 onAnswer={handleAnswer}
                 services={services}
@@ -85,6 +95,8 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
           correct={!!result?.correct}
           skipped={!!result?.skipped}
           expected={result?.expected ?? ""}
+          lang={lang}
+          {...(pron ? { pron } : {})}
           onSpeak={() => {
             if (result) services.tts.speak(result.expected, { rate: voiceRate }).catch(() => undefined);
           }}
@@ -96,7 +108,7 @@ export function ExerciseHost({ exercise, mode, vocabIndex, capabilities, voiceRa
             setState(null);
           }}
         >
-          {result && plugin.Feedback ? <plugin.Feedback exercise={exercise} result={result} /> : null}
+          {result && plugin.Feedback ? <plugin.Feedback exercise={exercise} result={result} lang={lang} /> : null}
         </FeedbackSheet>
       ) : null}
     </>

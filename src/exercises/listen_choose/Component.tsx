@@ -8,7 +8,7 @@ import { Button, ChoiceGrid, SpeakerButton, useChoiceKeys } from "@/ui";
 type ListenChoose = Extract<Exercise, { type: "listen_choose" }>;
 
 // Hero: the big speaker (the sound). Secondary: four French meanings. One action: Vérifier.
-export const Component: FC<ExerciseProps<ListenChoose>> = ({ exercise, disabled, onAnswer, services, capabilities, vocabIndex, voiceRate, seed }) => {
+export const Component: FC<ExerciseProps<ListenChoose>> = ({ exercise, disabled, onAnswer, services, capabilities, vocabIndex, voiceRate, seed, lang = "vi" }) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const mounted = useRef(true);
@@ -67,7 +67,7 @@ export const Component: FC<ExerciseProps<ListenChoose>> = ({ exercise, disabled,
           <SpeakerButton size="xl" playing={playing} onSpeak={() => speak(voiceRate)} onSpeakSlow={() => speak(SLOW_VOICE_RATE)} />
         ) : (
           <>
-            <p lang="vi" className="text-display text-ink">
+            <p lang={lang} className="text-display text-ink">
               {word?.vi}
             </p>
             <p className="text-caption text-ink-muted">{fr.exercises.listenChoose.noAudio}</p>

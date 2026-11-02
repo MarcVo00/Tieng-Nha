@@ -62,6 +62,7 @@ export const fr = {
     close: "Fermer",
     overline: { badges: "Huy hiệu", wardrobe: "Tủ đồ", rewards: "Quà", settings: "Cài đặt", account: "Tài khoản", shop: "Cửa hàng", arena: "Đấu trường", duels: "Thách đấu" },
     button: { loading: "Chargement en cours" },
+    pron: { label: (text: string) => `Prononciation\u202f: ${text}` },
     feedback: {
       sheetLabel: "Résultat de ta réponse",
       correct: "Đúng rồi!",

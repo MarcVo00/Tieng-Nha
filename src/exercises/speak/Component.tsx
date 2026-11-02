@@ -4,7 +4,7 @@ import { SLOW_VOICE_RATE, type ExerciseProps } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import { RecognitionError } from "@/ports";
 import { saidExactly } from "@/services/pronunciation";
-import { Button, MicButton, SpeakerButton } from "@/ui";
+import { Button, MicButton, Pron, SpeakerButton } from "@/ui";
 
 type Speak = Extract<Exercise, { type: "speak" }>;
 type Mode = "stt" | "recorder" | "none";
@@ -21,7 +21,7 @@ function isRecorderLost(e: unknown): boolean {
 
 // Hero: the sentence to say + the mic. Secondary: French meaning, model voice. One action at a time:
 // speak (stt), record then self-assess (recorder), or pass (none).
-export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnswer, services, capabilities, voiceRate, onCapabilityLost }) => {
+export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnswer, services, capabilities, voiceRate, onCapabilityLost, lang = "vi" }) => {
   const baseMode: Mode = capabilities.stt ? "stt" : capabilities.recorder ? "recorder" : "none";
   const [override, setOverride] = useState<Mode | null>(null);
   const mode = override ?? baseMode;
@@ -202,9 +202,10 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
     <div className="flex flex-col gap-6">
       <h2 className="text-heading text-ink">{fr.exercises.speak.prompt}</h2>
       <div className="flex flex-col gap-2">
-        <p lang="vi" className="text-display text-ink">
+        <p lang={lang} className="text-display text-ink">
           {exercise.vi}
         </p>
+        <Pron text={exercise.pron} />
         <p lang="fr" className="text-body text-ink-muted">
           {exercise.fr}
         </p>

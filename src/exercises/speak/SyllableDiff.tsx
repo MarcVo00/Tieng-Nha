@@ -2,7 +2,7 @@ import type { FC } from "react";
 import type { Tone } from "@/domain/types";
 import { toneOfSyllable } from "@/domain/tones";
 import type { Exercise } from "@/domain/types";
-import type { GradeResult } from "@/exercises/types";
+import type { GradeResult, TargetLang } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import type { SyllableDiff } from "@/services/pronunciation";
 import type { SpeakDetail } from "./grade";
@@ -36,19 +36,19 @@ function Syllable({ item }: { item: SyllableDiff & { expected: string } }) {
   return <span className="text-error underline decoration-dotted decoration-2 underline-offset-4">{item.expected}</span>;
 }
 
-export const SyllableDiffView: FC<{ exercise: Speak; result: GradeResult }> = ({ result }) => {
+export const SyllableDiffView: FC<{ exercise: Speak; result: GradeResult; lang?: TargetLang }> = ({ result, lang = "vi" }) => {
   if (result.selfAssessed || result.skipped || !isDetail(result.detail)) return null;
   const { diff, heard } = result.detail;
   const shown = diff.flatMap((d) => (d.expected === null ? [] : [{ ...d, expected: d.expected }]));
   return (
     <div className="flex flex-col gap-2">
-      <p lang="vi" className="text-heading flex flex-wrap gap-x-2">
+      <p lang={lang} className="text-heading flex flex-wrap gap-x-2">
         {shown.map((d, i) => (
           <Syllable key={i} item={d} />
         ))}
       </p>
       {heard ? (
-        <p className="text-caption text-ink-muted">{fr.exercises.speak.heard} «&nbsp;<span lang="vi">{heard}</span>&nbsp;»
+        <p className="text-caption text-ink-muted">{fr.exercises.speak.heard} «&nbsp;<span lang={lang}>{heard}</span>&nbsp;»
         </p>
       ) : null}
     </div>

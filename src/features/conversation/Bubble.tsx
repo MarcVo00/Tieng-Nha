@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
-import { duration, ease, Icon, ReportButton, spring, tap } from "@/ui";
+import { duration, ease, Icon, Pron, ReportButton, spring, tap } from "@/ui";
 
 type MiniSpeakerProps = { onSpeak: () => void; disabled?: boolean };
 
@@ -29,13 +29,16 @@ type BubbleProps = {
   speaker: "npc" | "user";
   vi: string;
   fr: string;
+  /** Language of `vi` (the line in the course language). */
+  lang: "vi" | "tl";
+  pron?: string;
   onReplay: () => void;
   replayDisabled: boolean;
   onReport?: () => void;
 };
 
 // NPC bubbles sit left on `surface`, user bubbles right on `primary`. Each grows from its own corner.
-export function Bubble({ speaker, vi, fr: translation, onReplay, replayDisabled, onReport }: BubbleProps) {
+export function Bubble({ speaker, vi, fr: translation, lang, pron, onReplay, replayDisabled, onReport }: BubbleProps) {
   const reduced = useReducedMotion();
   const [shown, setShown] = useState(false);
   const npc = speaker === "npc";
@@ -50,9 +53,10 @@ export function Bubble({ speaker, vi, fr: translation, onReplay, replayDisabled,
         className={`rounded-md px-4 py-3 ${npc ? "rounded-bl-sm bg-surface text-ink shadow-card" : "rounded-br-sm bg-primary text-primary-on"}`}
       >
         <span className="sr-only">{npc ? fr.conversation.npc : fr.conversation.you}</span>
-        <p lang="vi" className="break-words text-body-strong">
+        <p lang={lang} className="break-words text-body-strong">
           {vi}
         </p>
+        <Pron text={pron} onPrimary={!npc} />
         {npc ? (
           <div className="mt-1 flex items-center gap-1">
             {/* Both labels share one grid cell: the cell keeps the taller height, only opacity changes. */}

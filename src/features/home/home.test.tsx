@@ -10,6 +10,7 @@ import { HomeScreen } from "@/features/home";
 import "@/test/routerTestEnv";
 import { BONUS_SHOWN_KEY } from "@/domain/storageKeys";
 import { parisDay } from "@/services/time";
+import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import type { FakeSoundPlayer } from "@/adapters/fakes/FakeSoundPlayer";
 
 function renderHome(services = createFakeServices()) {
@@ -146,5 +147,34 @@ describe("daily bonus", () => {
     await screen.findByRole("link", { name: /Au café/ });
     expect(screen.queryByRole("button", { name: /du jour t'attend/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+});
+
+describe("with Tagalog active", () => {
+  beforeEach(() => {
+    useAppState.setState({ settings: { ...DEFAULT_SETTINGS, language: "tl" } });
+  });
+  afterEach(() => {
+    useAppState.setState({ settings: { ...DEFAULT_SETTINGS } });
+  });
+
+  test("the path shows the Tagalog lessons, no boss stop and no Vietnamese title", async () => {
+    renderHome();
+    const stop = await screen.findByRole("link", { name: /Salamat at kumusta.*disponible/ });
+    expect(stop).toHaveAttribute("href", "/lesson/tl_l01");
+    expect(screen.getByText("Kain tayo")).toBeInTheDocument();
+    expect(screen.queryByText("Boss final")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Thủy Tinh/ })).not.toBeInTheDocument();
+    expect(screen.queryByText("Au café")).not.toBeInTheDocument();
+  });
+
+  test("finishing every lesson does not conjure an exam stop", async () => {
+    const services = createFakeServices();
+    await services.activity.completeLesson({ lessonId: "tl_l01", mistakes: 0, durationMs: 1000, vocabIds: [] });
+    await services.activity.completeLesson({ lessonId: "tl_l02", mistakes: 0, durationMs: 1000, vocabIds: [] });
+    renderHome(services);
+    await screen.findByRole("link", { name: /Salamat at kumusta.*terminée/ });
+    expect(screen.queryByText("Boss final")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /boss final/i })).not.toBeInTheDocument();
   });
 });

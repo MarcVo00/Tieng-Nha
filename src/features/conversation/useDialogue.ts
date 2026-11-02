@@ -9,10 +9,18 @@ import { saidExactly } from "@/services/pronunciation";
 export const TYPING_MS = 600;
 const LISTEN_TIMEOUT_MS = 8000;
 
-export type ChatLine = { key: string; turnId: string; speaker: "npc" | "user"; vi: string; fr: string };
+export type ChatLine = { key: string; turnId: string; speaker: "npc" | "user"; vi: string; fr: string; pron?: string };
 export type DialoguePhase = "loading" | "error" | "playing" | "user" | "answering" | "saving" | "done";
 export type DialogueNotice = "misunderstood" | "notHeard" | "micDenied" | "micUnsupported" | null;
 export type MicState = "idle" | "listening" | "processing";
+
+/** Respelling of a revealed line: the NPC turn's own, or that of the option the learner chose. */
+function pronOfEntry(d: Dialogue | null, entry: { turnId: string; speaker: "npc" | "user"; vi: string }): string | undefined {
+  const turn = d?.turns.find((t) => t.id === entry.turnId);
+  if (!turn) return undefined;
+  if (turn.speaker === "npc") return turn.pron;
+  return turn.options.find((o) => o.vi === entry.vi)?.pron;
+}
 
 type PendingSleep = { timer: ReturnType<typeof setTimeout>; resolve: () => void };
 
@@ -134,7 +142,8 @@ export function useDialogue(dialogueId: string | undefined) {
           setTyping(false);
         }
         lineSeq.current += 1;
-        const line: ChatLine = { key: `${entry.turnId}-${lineSeq.current}`, turnId: entry.turnId, speaker: entry.speaker, vi: entry.vi, fr: entry.fr };
+        const pron = pronOfEntry(d, entry);
+        const line: ChatLine = { key: `${entry.turnId}-${lineSeq.current}`, turnId: entry.turnId, speaker: entry.speaker, vi: entry.vi, fr: entry.fr, ...(pron ? { pron } : {}) };
         setLines((prev) => [...prev, line]);
         if (entry.speaker === "npc" || speakUser) {
           await speak(entry.vi);

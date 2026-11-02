@@ -46,7 +46,8 @@ export function buildPathLayout(lessons: readonly LessonSummary[], snapshot: Pro
   const perfect = new Set<string>(snapshot.perfectLessons);
   const dialoguesDone = new Set<string>(snapshot.dialoguesDone);
   const nextIndex = lessons.findIndex((_, i) => lessonStateOf(lessons, i, done) === "available");
-  const examLocked = nodeState(tree, FINAL_BOSS_ID, treeProgress(snapshot)) === "locked";
+  // Only a path that has a boss has exam logic at all.
+  const examLocked = boss !== null && nodeState(tree, FINAL_BOSS_ID, treeProgress(snapshot)) === "locked";
 
   const drafts: Draft[] = [];
   let mainCount = 0;

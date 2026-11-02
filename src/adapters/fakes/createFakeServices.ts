@@ -1,3 +1,4 @@
+import { languageOfId } from "@/domain/languages";
 import type { Services } from "@/app/services";
 import badgesFile from "@/content/badges.json";
 import changelogFile from "@/content/changelog.json";
@@ -85,7 +86,7 @@ export function createFakeServices(overrides: Partial<Services> = {}, options: {
     recorder: new FakeVoiceRecorder(),
     detectCapabilities: async () => ({ tts: true, stt: true, recorder: true }),
     prefetchVoice: async () => ({ done: 0, total: 0 }),
-    conversation: new ScriptedConversationEngine(content),
+    conversation: new ScriptedConversationEngine({ getDialogue: (id) => contents[languageOfId(id)].getDialogue(id) }),
     reporter: new FakeContentReporter(),
     activity: createActivityService({ progress, outbox, content, clock, onEventAppended: () => sync.notifyEnqueued() }),
     sync,

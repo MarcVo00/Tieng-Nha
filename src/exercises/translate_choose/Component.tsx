@@ -9,12 +9,12 @@ import { Button, ChoiceGrid, Icon, spring, tap, useChoiceKeys } from "@/ui";
 type TranslateChoose = Extract<Exercise, { type: "translate_choose" }>;
 
 // Hero: the French sentence to translate. Secondary: four Vietnamese options. One action: Vérifier.
-export const Component: FC<ExerciseProps<TranslateChoose>> = ({ exercise, disabled, onAnswer, services, capabilities, voiceRate, seed }) => {
+export const Component: FC<ExerciseProps<TranslateChoose>> = ({ exercise, disabled, onAnswer, services, capabilities, voiceRate, seed, lang = "vi" }) => {
   const [selected, setSelected] = useState<string | null>(null);
 
   const options = useMemo(
-    () => shuffle([exercise.answerVi, ...exercise.distractorsVi], createRng(seed)).map((vi) => ({ id: vi, label: vi, lang: "vi" as const })),
-    [exercise.answerVi, exercise.distractorsVi, seed],
+    () => shuffle([exercise.answerVi, ...exercise.distractorsVi], createRng(seed)).map((vi) => ({ id: vi, label: vi, lang })),
+    [exercise.answerVi, exercise.distractorsVi, seed, lang],
   );
 
   const submit = () => {

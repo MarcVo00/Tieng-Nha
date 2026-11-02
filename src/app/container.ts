@@ -1,3 +1,4 @@
+import { languageOfId } from "@/domain/languages";
 import type { Env } from "@/domain/config";
 import type { VoiceId } from "@/domain/types";
 import type { DemoTools, Services } from "@/app/services";
@@ -111,6 +112,6 @@ export function createServices(env: Env): Services {
 
   return {
     env, flags, clock, content, contents, progress, outbox, ...remote, tts, sound, stt, recorder, detectCapabilities, prefetchVoice,
-    conversation: new ScriptedConversationEngine(content), activity, sync, ...(demo ? { demo } : {}),
+    conversation: new ScriptedConversationEngine({ getDialogue: (id) => contents[languageOfId(id)].getDialogue(id) }), activity, sync, ...(demo ? { demo } : {}),
   };
 }

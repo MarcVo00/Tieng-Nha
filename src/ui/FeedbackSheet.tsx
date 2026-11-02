@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { fr } from "@/i18n/fr";
 import { Button } from "@/ui/Button";
 import { duration, ease } from "@/ui/motion";
+import { Pron } from "@/ui/Pron";
 import { ReportButton } from "@/ui/ReportButton";
 import { Sheet } from "@/ui/Sheet";
 import { SpeakerButton } from "@/ui/SpeakerButton";
@@ -12,6 +13,10 @@ type FeedbackSheetProps = {
   correct: boolean;
   skipped?: boolean; // neither right nor wrong (e.g. microphone unavailable)
   expected: string;
+  /** Language of `expected` and `heard`; Vietnamese when omitted. */
+  lang?: "vi" | "tl";
+  /** Respelling of `expected`, shown under it. */
+  pron?: string;
   heard?: string;
   onContinue: () => void;
   onSpeak?: () => void;
@@ -38,7 +43,7 @@ function ResultIcon({ correct, skipped }: { correct: boolean; skipped: boolean }
   );
 }
 
-function Body({ correct, skipped = false, expected, heard, onContinue, onSpeak, onReport, children }: Omit<FeedbackSheetProps, "open">) {
+function Body({ correct, skipped = false, expected, lang = "vi", pron, heard, onContinue, onSpeak, onReport, children }: Omit<FeedbackSheetProps, "open">) {
   // Enter continues, unless a control already handles the key natively.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -60,14 +65,15 @@ function Body({ correct, skipped = false, expected, heard, onContinue, onSpeak, 
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-caption text-ink-muted">{fr.ui.feedback.expected}</p>
-          <p lang="vi" className="text-heading text-ink">
+          <p lang={lang} className="text-heading text-ink">
             {expected}
           </p>
+          <Pron text={pron} />
           {heard ? (
             <p className="mt-2 text-caption text-ink-muted">
               {fr.ui.feedback.heard}
               <span> : </span>
-              <span lang="vi" className="text-body-strong text-ink">
+              <span lang={lang} className="text-body-strong text-ink">
                 {heard}
               </span>
             </p>

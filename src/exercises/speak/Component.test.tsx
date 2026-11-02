@@ -17,6 +17,7 @@ function setup(caps: { tts?: boolean; stt?: boolean; recorder?: boolean } = {}, 
     <ExerciseHost
       exercise={ex}
       mode="exam"
+      lang="vi"
       vocabIndex={new Map()}
       capabilities={{ tts: caps.tts ?? true, stt: caps.stt ?? true, recorder: caps.recorder ?? true }}
       voiceRate={1}

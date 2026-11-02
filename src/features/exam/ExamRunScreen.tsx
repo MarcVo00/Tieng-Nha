@@ -4,6 +4,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useEntryState } from "@/app/useEntryState";
 import { useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
 import type { Boss, Capabilities, ExamQuestion, Look, VocabId, VocabItem } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import type { GradeResult } from "@/exercises/types";
@@ -152,6 +153,7 @@ function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled
 // Hierarchy: the fight stage (hero vs boss, water-drop HP) is the hero, the current exercise is the one action, lives sit in the header.
 function ExamRun({ run }: { run: RunState }) {
   const { content, exam, activity, clock, tts, stt, recorder, sound } = useServices();
+  const { language } = useLanguage(); // `content` is the active language's source
   const { settings } = useSettings();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
@@ -525,6 +527,7 @@ function ExamRun({ run }: { run: RunState }) {
               vocabIndex={load.vocabIndex}
               capabilities={capabilities}
               voiceRate={voiceRateOf(settings)}
+              lang={language.htmlLang}
               services={{ tts, stt, recorder }}
               onResult={onResult}
             />

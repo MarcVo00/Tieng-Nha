@@ -65,6 +65,26 @@ test("the feedback sheet of a speak exercise shows its pronunciation and the Tag
   expect(sheet.getByText("Salamat po.")).toHaveAttribute("lang", "tl");
 });
 
+test("a Tagalog lesson exercise speaks with the Tagalog language, its replay too", async () => {
+  const listen = lesson.exercises.find((e) => e.type === "listen_choose")!;
+  const vocabIndex = new Map(lesson.vocab.map((v) => [v.id, v]));
+  const tts = new FakeSpeechSynthesizer();
+  renderWithServices(
+    <ExerciseHost
+      exercise={listen}
+      mode="practice"
+      lang="tl"
+      vocabIndex={vocabIndex}
+      capabilities={{ tts: true, stt: false, recorder: false }}
+      voiceRate={1}
+      services={{ tts, stt: new FakeSpeechRecognizer(), recorder: new FakeVoiceRecorder() }}
+      onResult={() => {}}
+    />,
+  );
+  await waitFor(() => expect(tts.spoken).toHaveLength(1)); // auto-play
+  expect(tts.lastOptions?.language).toBe("tl");
+});
+
 test("a dialogue shows the pronunciation under each Tagalog line, with lang tl", async () => {
   expect(tagalogDialogueFixtures[0]).toBeDefined();
   renderWithServices(

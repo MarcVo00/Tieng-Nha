@@ -571,3 +571,13 @@ test("a Vietnamese preview with Tagalog active uses the Vietnamese voice and tel
   expect(fallback.spoken).toEqual(["bao nhiêu tiền"]);
   expect(fallback.lastOptions?.language).toBe("vi");
 });
+
+test("a Vietnamese exercise with Tagalog active (duel) plays the learner's chosen Vietnamese voice", async () => {
+  const { tts, fallback, audio, southKeys } = await setup({ language: "tl", voice: "south-f" });
+  const done = tts.speak("xin chào", { rate: 1, language: "vi" }); // no voice override: the chosen one
+  await vi.waitFor(() => expect(audio().playLog).toHaveLength(1));
+  expect(audio().playLog[0]?.src).toBe(`/audio/south-f/${southKeys[0]}.mp3`);
+  audio().end();
+  await done;
+  expect(fallback.spoken).toEqual([]);
+});

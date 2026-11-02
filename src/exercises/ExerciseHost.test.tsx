@@ -13,6 +13,7 @@ const ex = lessonFixture.exercises.find((e) => e.type === "listen_choose")!; // 
 const translate = lessonFixture.exercises.find((e) => e.type === "translate_choose")!;
 const tts = new FakeSpeechSynthesizer();
 const base = {
+  lang: "vi" as const,
   vocabIndex,
   capabilities: { tts: true, stt: true, recorder: true },
   voiceRate: 1,

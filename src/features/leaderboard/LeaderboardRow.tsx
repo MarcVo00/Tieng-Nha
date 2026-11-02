@@ -13,7 +13,7 @@ type LeaderboardRowProps = {
   /** Sticky copy shown when my row scrolled out of view: decorative, not focusable. */
   pinned?: boolean;
   rowRef?: (el: HTMLLIElement | null) => void;
-  /** Lesson count of the active language (the N of « x/N »); null while it loads. */
+  /** Lesson count of the active language (the N of « x/N »); null while it loads (or failed): the count is hidden. */
   lessonTotal: number | null;
 };
 
@@ -30,9 +30,14 @@ function Body({ row, rank, lessonTotal }: { row: Row; rank: number; lessonTotal:
         <span className="block truncate text-body-strong text-ink">{row.pseudo}</span>
         <span className="flex items-center gap-2 text-caption text-ink-muted">
           {row.isMe ? <span className="text-primary">{fr.leaderboard.you}</span> : null}
-          <span className="tabular" aria-label={fr.leaderboard.lessonsLabel(done, lessonTotal)}>
-            {fr.leaderboard.lessons(done, lessonTotal)}
-          </span>
+          {lessonTotal === null ? (
+            // Until the total is known: no count at all (a bare « n » would turn into « n/N »), same line height.
+            <span aria-hidden="true">{" "}</span>
+          ) : (
+            <span className="tabular" aria-label={fr.leaderboard.lessonsLabel(done, lessonTotal)}>
+              {fr.leaderboard.lessons(done, lessonTotal)}
+            </span>
+          )}
         </span>
       </span>
       {row.streak > 0 ? <StreakFlame days={row.streak} size="sm" /> : null}

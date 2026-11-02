@@ -300,9 +300,21 @@ describe("lesson counts follow the active language", () => {
       await screen.findByRole("list", { name: fr.leaderboard.podiumLabel });
       const link = (await screen.findAllByRole("link")).find((l) => l.textContent?.includes("Un") && l.getAttribute("href") === "/u/u1");
       expect(link).toBeDefined();
-      expect(link).toHaveTextContent(expected);
+      await waitFor(() => expect(link).toHaveTextContent(expected));
       cleanup();
     }
+  });
+
+  test("while the lesson total loads, the row shows no count rather than a bare « n »", async () => {
+    const services = countsServices()("vi");
+    vi.spyOn(services.content, "listLessons").mockReturnValue(new Promise(() => undefined)); // never resolves
+    setup("/leaderboard", services);
+    await screen.findByRole("list", { name: fr.leaderboard.podiumLabel });
+    const link = (await screen.findAllByRole("link")).find((l) => l.getAttribute("href") === "/u/u1");
+    expect(link).toBeDefined();
+    expect(link?.querySelector("[aria-label]")).toBeNull();
+    expect(link?.textContent).not.toMatch(/\d+\/\d+/);
+    expect(link?.textContent).not.toMatch(/Un\s*1/);
   });
 
   test("the public profile counts only the active language", async () => {

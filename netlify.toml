@@ -3,6 +3,8 @@
   publish = "dist"
 [build.environment]
   NODE_VERSION = "20"
+  # The birthday has passed: no birthday message on the welcome screen (overrides the Netlify UI variable).
+  VITE_WELCOME_MESSAGE = ""
 [context.deploy-preview.environment]
   VITE_USE_FAKES = "true"
   VITE_DEMO = "true"

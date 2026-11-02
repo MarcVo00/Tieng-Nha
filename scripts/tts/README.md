@@ -36,3 +36,13 @@ The full run synthesises ~380 texts x 4 voices; it is resumable (existing MP3s a
 Edit `src/content/<language>/{lessons,dialogues,exam.json}`, then re-run both commands above: only the new texts are generated, the manifest is rewritten from the files on disk.
 Commit `public/audio/**` together with the content change. Texts without a pack file are spoken by the device voice.
 The preview and device-test phrase (`Chào bạn!`) is listed in `extract_texts.mjs` (`EXTRA_TEXTS`, kept per language: `vi` and `tl`); add any new hard-coded spoken string there.
+
+## Tagalog voices (edge-tts)
+`tl-f` (`fil-PH-BlessicaNeural`) and `tl-m` (`fil-PH-AngeloNeural`) come from [edge-tts](https://github.com/rany2/edge-tts) (free Microsoft neural voices, needs the network). See `docs/adr/0013-languages.md`.
+```bash
+py -3 -m venv ../tts-tools/edge-venv && ../tts-tools/edge-venv/Scripts/python -m pip install edge-tts   # once, outside the repo; ffmpeg on the PATH
+node scripts/tts/extract_texts.mjs
+../tts-tools/edge-venv/Scripts/python -I scripts/tts/generate_audio_edge.py     # the `tl` list, both voices, resumable
+```
+Options: `--voices tl-f`, `--limit 3 --no-manifest --out <scratch>` (smoke test), `--delay 0.2` (seconds between requests; failures are retried 5 times with back-off).
+Files are re-encoded with ffmpeg to mono 24 kHz 32 kbps (same as the Vietnamese pack) and the script rewrites `manifest.json` with both the Vietnamese and the Tagalog voices. `generate_audio.py --manifest-only` does the same without any generation.

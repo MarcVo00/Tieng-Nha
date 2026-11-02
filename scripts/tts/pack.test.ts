@@ -46,4 +46,19 @@ describe.skipIf(!existsSync(manifestPath))("generated voice pack", () => {
       }
     }
   });
+
+  test("every Tagalog text has a key and a file for both tl-f and tl-m", async () => {
+    const { keys, voices } = manifest();
+    for (const id of ["tl-f", "tl-m"]) {
+      const listed = new Set(voices.find((v) => v.id === id)?.keys);
+      expect(listed.size, id).toBeGreaterThan(0);
+      for (const text of extractTexts().tl) {
+        const key = await speechKey(text);
+        expect(keys[text], text).toBe(key);
+        expect(listed.has(key), `${id}: ${text}`).toBe(true);
+        const file = `${audioDir}/${id}/${key}.mp3`;
+        expect(existsSync(file) && statSync(file).size > 0, file).toBe(true);
+      }
+    }
+  });
 });

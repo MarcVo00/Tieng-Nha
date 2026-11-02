@@ -54,3 +54,4 @@
 | [0010](adr/0010-motion-and-fluidity.md) | Fluidité et animations |
 | [0011](adr/0011-voice-packs.md) | Packs de voix pré-générés (Sud / Nord) |
 | [0012](adr/0012-sound-effects.md) | Effets sonores synthétisés |
+| [0013](adr/0013-languages.md) | Langues : registre, ids préfixés, voix tagalog (edge-tts) |

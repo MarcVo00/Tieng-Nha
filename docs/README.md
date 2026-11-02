@@ -22,6 +22,7 @@
 | [Spec Énergie et succès](superpowers/specs/2026-10-29-energy-and-badge-rewards-design.md) | tous | énergie toutes les 10 min, xu par succès (20 à 200), 11 nouveaux succès |
 | [Spec Aide quand on bloque](superpowers/specs/2026-10-30-stuck-help-design.md) | tous | mots qui résistent, entraînement sur ses erreurs, talisman (+2 cœurs, essai offert) |
 | [Spec Tagalog et langues](superpowers/specs/2026-11-02-tagalog-and-languages-design.md) | tous | registre des langues, choix de langue, tagalog de voyage (oral), Bakunawa, duels par langue |
+| [Plan Tagalog 2.0](superpowers/plans/2026-11-02-tagalog-v2.0.md) | orchestrateur + sous-agents | registre des langues, choix et changement de langue, contenu par langue, voix et 8 leçons de tagalog |
 | [Déploiement](deploy.md) | toi | runbook Netlify/Supabase, et version démo sur le deploy preview de la PR « Démo (ne pas fusionner) » |
 | [Plan arbre + boss](superpowers/plans/2026-10-14-tree-and-boss.md) | orchestrateur + sous-agents | étapes 1–2 de la Progression V2 : arbre de compétences, boss Thủy Tinh |
 | [Plan énergie](superpowers/plans/2026-10-14-energy.md) | orchestrateur + sous-agents | étape 3 de la Progression V2 : énergie ⚡ |

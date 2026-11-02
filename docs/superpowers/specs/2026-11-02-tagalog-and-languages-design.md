@@ -154,7 +154,9 @@ L'appli devient multi-langues. On choisit la langue à apprendre avant le parcou
   
   Marc ne donne pas de date de voyage (« ne t'inquiète pas de ça ») : ainsi, l'essentiel pour parler arrive en premier.
 - **Succès par langue.** Les succès liés au contenu ne comptent que la progression de leur langue :
-  - leçons, dialogues, sans faute, mots révisés, boss.
+  - leçons, dialogues, sans faute, boss.
+
+  *(précision du plan)* « Mots révisés » reste commun : le journal ne compte que les bonnes réponses d'une révision, sans dire de quels mots il s'agit, donc on ne peut pas les répartir par langue sans changer le format des événements.
   
   Les succès vietnamiens existants gardent leurs identifiants et ne comptent que le vietnamien. Personne ne perd un succès déjà obtenu, puisqu'un succès gagné l'est pour toujours. Les succès transversaux, série, jours actifs et XP, restent communs.
 - **Certificat tagalog.** Vaincre Bakunawa donne un certificat tagalog, avec le même dessin que le vietnamien et un texte à la langue.

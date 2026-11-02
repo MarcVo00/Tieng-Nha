@@ -1,6 +1,6 @@
 import type { ProgressRepository } from "@/ports";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
-import { VOICE_IDS, type AppEvent, type LeaderboardRow, type NewEvent, type Settings, type VocabProgress } from "@/domain/types";
+import { SETTINGS_VOICE_IDS, type AppEvent, type LeaderboardRow, type NewEvent, type Settings, type VocabProgress } from "@/domain/types";
 import { LANGUAGE_IDS, languageOfId, type LanguageId } from "@/domain/languages";
 import { THEME_KEY } from "@/domain/storageKeys";
 import type { TiengNhaDb } from "@/adapters/dexie/db";
@@ -42,7 +42,7 @@ export class DexieProgressRepository implements ProgressRepository {
     const row = await this.db.kv.get(SETTINGS_KEY);
     const merged: Settings = { ...DEFAULT_SETTINGS, ...((row?.value as Partial<Settings> | undefined) ?? {}) };
     // Rows saved before voice packs have no voice, rows saved before 1.7 no sound; unknown values fall back to the default too.
-    const voice = VOICE_IDS.includes(merged.voice) ? merged.voice : DEFAULT_SETTINGS.voice;
+    const voice = SETTINGS_VOICE_IDS.includes(merged.voice) ? merged.voice : DEFAULT_SETTINGS.voice;
     const sound = typeof merged.sound === "boolean" ? merged.sound : DEFAULT_SETTINGS.sound;
     // Rows saved before 2.0 have no language: not chosen yet.
     const language = LANGUAGE_IDS.includes(merged.language as LanguageId) ? merged.language : DEFAULT_SETTINGS.language;

@@ -1,3 +1,4 @@
+import type { Language } from "@/domain/languages";
 import { RecognitionError, type RecognitionErrorCode, type SpeechRecognizer } from "@/ports";
 
 type Alt = { transcript: string; confidence: number };
@@ -38,7 +39,7 @@ export class WebSpeechRecognizer implements SpeechRecognizer {
     return this.ctor() !== undefined;
   }
 
-  listen({ lang, timeoutMs, acceptEarly }: { lang: "vi-VN"; timeoutMs: number; acceptEarly?: (alternatives: string[]) => boolean }): Promise<string[]> {
+  listen({ lang, timeoutMs, acceptEarly }: { lang: Language["speechLang"]; timeoutMs: number; acceptEarly?: (alternatives: string[]) => boolean }): Promise<string[]> {
     const Ctor = this.ctor();
     if (!Ctor) return Promise.reject(new RecognitionError("unsupported"));
     this.abort();

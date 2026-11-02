@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { z } from "zod";
 import { useCallback, useEffect, useState } from "react";
-import type { Capabilities, EnergyState, ProgressSnapshot, Session, Settings, Wallet } from "@/domain/types";
+import { LANGUAGES } from "@/domain/languages";
+import type { Capabilities, EnergyState, ProgressSnapshot, Session, Settings, VoiceId, Wallet } from "@/domain/types";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { PROFILE_KEY } from "@/domain/storageKeys";
 import { useServices } from "@/app/ServicesProvider";
@@ -76,6 +77,7 @@ export function useRefreshProgress() {
 export function useDeviceTest() {
   const { tts, stt, detectCapabilities } = useServices();
   const { settings, updateSettings } = useSettings();
+  const language = LANGUAGES[settings.language ?? "vi"];
   const [result, setResult] = useState<Capabilities | null>(settings.capabilities);
   const [busy, setBusy] = useState<"voice" | "mic" | null>(null);
 
@@ -93,24 +95,24 @@ export function useDeviceTest() {
   const testVoice = useCallback(async (): Promise<void> => {
     setBusy("voice");
     try {
-      await tts.speak("Chào bạn!", { rate: 1 });
+      await tts.speak(language.id === "tl" ? "Kumusta!" : "Chào bạn!", { rate: 1 });
     } catch {
       // A failed test voice is reported by the detection below.
     }
     await refresh();
     setBusy(null);
-  }, [tts, refresh]);
+  }, [tts, refresh, language]);
 
   const testMic = useCallback(async (): Promise<void> => {
     setBusy("mic");
     try {
-      await stt.listen({ lang: "vi-VN", timeoutMs: 6000 });
+      await stt.listen({ lang: language.speechLang, timeoutMs: 6000 });
     } catch {
       // Denied, silent or unsupported: the detection below shows what works.
     }
     await refresh();
     setBusy(null);
-  }, [stt, refresh]);
+  }, [stt, refresh, language]);
 
   return { result, busy: busy !== null, listening: busy === "mic", testVoice, testMic, refresh };
 }
@@ -119,7 +121,10 @@ export function useDeviceTest() {
 export function useVoicePrefetch(): void {
   const { prefetchVoice } = useServices();
   const ready = useAppState((s) => s.ready);
-  const voice = useAppState((s) => s.settings.voice);
+  const chosen = useAppState((s) => s.settings.voice);
+  const languageId = useAppState((s) => s.settings.language ?? "vi");
+  // Tagalog has no voice to choose: its default pack follows the language.
+  const voice: VoiceId = languageId === "vi" ? chosen : (LANGUAGES[languageId].packVoices[0] as VoiceId);
   useEffect(() => {
     if (!ready || voice === "device") return;
     prefetchVoice(voice).catch(() => undefined);

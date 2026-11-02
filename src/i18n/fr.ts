@@ -1025,7 +1025,7 @@ export const fr = {
       saveError: "Ce réglage n'a pas pu être enregistré.",
       password: { open: "Changer mon mot de passe", title: "Changer mon mot de passe", updated: "Mot de passe mis à jour" },
       voicePack: {
-        label: "Voix",
+        label: "Voix vietnamienne",
         hint: "Les voix du Sud et du Nord se téléchargent en arrière-plan, pour marcher aussi sans réseau.",
         options: {
           "south-f": { prefix: "Sud · ", name: "Mỹ Duyên", suffix: " (femme)" },

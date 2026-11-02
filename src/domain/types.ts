@@ -92,12 +92,16 @@ export type VocabProgress = {
 
 export type Capabilities = { tts: boolean; stt: boolean; recorder: boolean };
 export type ThemePref = "system" | "light" | "dark";
-export const VOICE_IDS = ["south-f", "south-m", "north-f", "north-m", "device"] as const;
+/** Every voice pack the app ships: the Vietnamese ones (and `device`) are chosen in the settings, the Tagalog ones follow the language. */
+export const VOICE_IDS = ["south-f", "south-m", "north-f", "north-m", "device", "tl-f", "tl-m"] as const;
 export type VoiceId = (typeof VOICE_IDS)[number];
+/** The voices the learner chooses between (Vietnamese accents or the device voice). */
+export const SETTINGS_VOICE_IDS = ["south-f", "south-m", "north-f", "north-m", "device"] as const;
+export type SettingsVoiceId = (typeof SETTINGS_VOICE_IDS)[number];
 export type Settings = {
   theme: ThemePref;
   voiceRate: "normal" | "slow";
-  voice: VoiceId; // which accent/voice pack speaks; "device" = browser speechSynthesis
+  voice: SettingsVoiceId; // which Vietnamese accent/voice pack speaks; "device" = browser speechSynthesis
   capabilities: Capabilities | null; // null = device test not done yet
   onboardingDone: boolean;
   sound: boolean; // sound effects (lessons, fights, gacha); rows saved before 1.7 have none and read back as on

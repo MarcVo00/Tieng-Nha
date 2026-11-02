@@ -128,3 +128,32 @@ test("listening accepts the sentence as soon as it is said perfectly, and only t
   expect(acceptEarly?.(["cho tui một ly trà"])).toBe(false);
   expect(acceptEarly?.(["Cho tui một ly trà đá"])).toBe(true);
 });
+
+test("listening asks for the speech language of the active language", async () => {
+  const stt = new FakeSpeechRecognizer();
+  const listen = vi.spyOn(stt, "listen");
+  stt.queue = [["Salamat po"]];
+  renderWithServices(
+    <ExerciseHost
+      exercise={{ ...ex, id: "tl_sp1", vi: "Salamat po.", fr: "Merci." }}
+      mode="exam"
+      vocabIndex={new Map()}
+      capabilities={{ tts: true, stt: true, recorder: true }}
+      voiceRate={1}
+      services={{ tts: new FakeSpeechSynthesizer(), stt, recorder: new FakeVoiceRecorder() }}
+      onResult={vi.fn()}
+      onCapabilityLost={vi.fn()}
+      lang="tl"
+    />,
+  );
+  await userEvent.click(screen.getByRole("button", { name: /parler/i }));
+  expect(listen.mock.calls[0]?.[0]?.lang).toBe("fil-PH");
+});
+
+test("listening asks for vi-VN by default", async () => {
+  const { stt } = setup();
+  const listen = vi.spyOn(stt, "listen");
+  stt.queue = [["cho tui"]];
+  await userEvent.click(screen.getByRole("button", { name: /parler/i }));
+  expect(listen.mock.calls[0]?.[0]?.lang).toBe("vi-VN");
+});

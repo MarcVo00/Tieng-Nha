@@ -1,5 +1,6 @@
 import { AudioPackSynthesizer, createDetectCapabilities, type AudioLike, type GestureTarget } from "@/adapters/speech";
 import { FakeSpeechRecognizer, FakeSpeechSynthesizer, FakeVoiceRecorder } from "@/adapters/fakes";
+import { LANGUAGES, type LanguageId } from "@/domain/languages";
 import type { VoiceId } from "@/domain/types";
 import { speechKey } from "@/services/speechKey";
 
@@ -50,6 +51,7 @@ const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 type SetupOptions = {
   mapKeys?: boolean;
   voice?: VoiceId;
+  language?: LanguageId;
   manifest?: unknown;
   manifestStatus?: number;
   failingFiles?: boolean;
@@ -84,6 +86,7 @@ async function setup(over: SetupOptions = {}) {
   const elements: FakeAudio[] = [];
   const tts = new AudioPackSynthesizer(fallback, {
     getVoice: () => voiceRef.current,
+    getLanguage: () => LANGUAGES[over.language ?? "vi"],
     fetchFn,
     gestureTarget: over.gestureTarget ?? null,
     ...(over.now ? { now: over.now } : {}),
@@ -504,4 +507,54 @@ test("detectCapabilities reports tts through the audio pack even without device 
   fallback.available = false;
   const detect = createDetectCapabilities(tts, new FakeSpeechRecognizer(), new FakeVoiceRecorder());
   await expect(detect()).resolves.toEqual({ tts: true, stt: true, recorder: true });
+});
+
+describe("Tagalog", () => {
+  const tlManifest = async () => {
+    const key = await speechKey("Salamat po");
+    return { key, manifest: { version: 2, keys: { "Salamat po": key }, voices: [{ id: "tl-f", keys: [key] }, { id: "tl-m", keys: [] }, { id: "south-f", keys: [] }] } };
+  };
+
+  test("plays the default Tagalog pack voice whatever Vietnamese voice is chosen", async () => {
+    const { key, manifest } = await tlManifest();
+    const { tts, fallback, audio } = await setup({ language: "tl", manifest, voice: "north-m" });
+    const done = tts.speak("Salamat po");
+    await vi.waitFor(() => expect(audio().playLog).toHaveLength(1));
+    expect(audio().playLog[0]?.src).toBe(`/audio/tl-f/${key}.mp3`);
+    audio().end();
+    await done;
+    expect(fallback.spoken).toEqual([]);
+  });
+
+  test("a Tagalog text missing from the pack goes to the device fallback, never to a Vietnamese pack voice", async () => {
+    const { manifest } = await tlManifest();
+    const { tts, fallback, elements } = await setup({ language: "tl", manifest });
+    await tts.speak("Magandang umaga");
+    expect(fallback.spoken).toEqual(["Magandang umaga"]);
+    expect(elements.flatMap((e) => e.playLog)).toHaveLength(0);
+  });
+
+  test("with an empty Tagalog manifest everything is spoken by the device voice, and availability is the device's", async () => {
+    const empty = { version: 2, keys: {}, voices: [] };
+    const { tts, fallback } = await setup({ language: "tl", manifest: empty });
+    await tts.ready();
+    fallback.available = false;
+    expect(tts.isAvailable()).toBe(false);
+    fallback.available = true;
+    expect(tts.isAvailable()).toBe(true);
+    await tts.speak("Salamat po");
+    expect(fallback.spoken).toEqual(["Salamat po"]);
+  });
+
+  test("a Vietnamese pack voice is not used for Tagalog availability", async () => {
+    const { manifest } = await tlManifest();
+    const { tts, fallback } = await setup({ language: "tl", manifest, voice: "south-f" });
+    await tts.ready();
+    fallback.available = false;
+    expect(tts.isAvailable()).toBe(true); // tl-f has a file
+    const none = await setup({ language: "tl", manifest: { version: 2, keys: {}, voices: [{ id: "south-f", keys: ["abc"] }] }, voice: "south-f" });
+    await none.tts.ready();
+    none.fallback.available = false;
+    expect(none.tts.isAvailable()).toBe(false);
+  });
 });

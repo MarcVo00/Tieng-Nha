@@ -19,3 +19,11 @@ test("renders nothing for self-assessed and skipped results", () => {
   rerender(<SyllableDiffView exercise={ex} result={grade(ex, { kind: "skip" }, ctx)} />);
   expect(container).toBeEmptyDOMElement();
 });
+
+test("Tagalog shows a neutral diff: no tone mark, no tone underline", () => {
+  const tl = { id: "t", type: "speak" as const, vi: "Salamat po.", fr: "Merci.", vocabIds: [] };
+  const result = grade(tl, { kind: "speech", alternatives: ["salámat po"] }, ctx);
+  render(<SyllableDiffView exercise={tl} result={result} lang="tl" />);
+  expect(screen.queryByText(/\(ton\)/)).not.toBeInTheDocument();
+  expect(screen.getByText("salámat po")).toHaveAttribute("lang", "tl");
+});

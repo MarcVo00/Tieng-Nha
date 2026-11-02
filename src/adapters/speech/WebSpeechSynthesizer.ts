@@ -1,11 +1,17 @@
+import { LANGUAGES, type Language } from "@/domain/languages";
 import type { SpeakOptions, SpeechSynthesizer } from "@/ports";
 
 type UtteranceCtor = new (text: string) => SpeechSynthesisUtterance;
 export type SpeechWindow = { speechSynthesis?: SpeechSynthesis; SpeechSynthesisUtterance?: UtteranceCtor; Audio?: typeof Audio };
 
-export function pickVietnameseVoice(voices: readonly SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
-  const vi = voices.filter((v) => v.lang.toLowerCase().replace("_", "-").startsWith("vi"));
-  return vi.find((v) => /google/i.test(v.name)) ?? vi.find((v) => !v.localService) ?? vi[0] ?? null;
+/** Primary language subtags a device voice may carry for a speech language (Filipino is `fil`, older engines say `tl`). */
+const PRIMARY_SUBTAGS: Record<Language["speechLang"], readonly string[]> = { "vi-VN": ["vi"], "fil-PH": ["fil", "tl"] };
+
+/** The best device voice of the language; never a voice of another language. */
+export function pickVoiceFor(voices: readonly SpeechSynthesisVoice[], speechLang: Language["speechLang"]): SpeechSynthesisVoice | null {
+  const wanted = PRIMARY_SUBTAGS[speechLang];
+  const matching = voices.filter((v) => wanted.includes(v.lang.toLowerCase().replace("_", "-").split("-")[0] ?? ""));
+  return matching.find((v) => /google/i.test(v.name)) ?? matching.find((v) => !v.localService) ?? matching[0] ?? null;
 }
 
 const LOAD_TIMEOUT_MS = 8000; // cap before the clip's length is known (stalled network)
@@ -13,26 +19,32 @@ const END_MARGIN_MS = 2000; // slack after the expected end before a silent clip
 
 export class WebSpeechSynthesizer implements SpeechSynthesizer {
   private voice: SpeechSynthesisVoice | null = null;
-  private readyPromise: Promise<void> | null = null;
+  private voiceLang: Language["speechLang"] | null = null; // the language `voice` was picked for
+  private readonly readyPromises = new Map<Language["speechLang"], Promise<void>>();
   // iOS can garbage-collect an utterance mid-speech and never fire `end`; keeping a reference helps.
   private current: SpeechSynthesisUtterance | null = null;
 
-  constructor(private readonly win: SpeechWindow = window as unknown as SpeechWindow) {}
+  constructor(
+    private readonly getLanguage: () => Language = () => LANGUAGES.vi,
+    private readonly win: SpeechWindow = window as unknown as SpeechWindow,
+  ) {}
 
   /** Resolves once voices are loaded (Chrome loads them asynchronously) or after 1.5 s. */
   ready(): Promise<void> {
-    if (this.readyPromise) return this.readyPromise;
+    const speechLang = this.getLanguage().speechLang;
+    const existing = this.readyPromises.get(speechLang);
+    if (existing) return existing;
     const synth = this.win.speechSynthesis;
-    this.readyPromise = new Promise<void>((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       if (!synth) {
         resolve();
         return;
       }
       const pick = () => {
-        this.voice = pickVietnameseVoice(synth.getVoices());
+        this.refreshVoice();
       };
       pick();
-      if (this.voice) {
+      if (this.currentVoice()) {
         resolve();
         return;
       }
@@ -43,24 +55,32 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
       };
       const onChange = () => {
         pick();
-        if (this.voice) finish();
+        if (this.currentVoice()) finish();
       };
       const timer = setTimeout(finish, 1500);
       synth.addEventListener("voiceschanged", onChange);
     });
-    return this.readyPromise;
+    this.readyPromises.set(speechLang, promise);
+    return promise;
   }
 
   isAvailable(): boolean {
     this.refreshVoice();
-    return this.voice !== null;
+    return this.currentVoice() !== null;
   }
 
-  /** Voices may arrive after the 1.5 s cutoff: retry the lookup lazily. */
+  /** The picked voice, only if it belongs to the active language. */
+  private currentVoice(): SpeechSynthesisVoice | null {
+    return this.voiceLang === this.getLanguage().speechLang ? this.voice : null;
+  }
+
+  /** Voices may arrive after the 1.5 s cutoff, and the language may change: retry the lookup lazily. */
   private refreshVoice(): void {
-    if (this.voice) return;
+    const speechLang = this.getLanguage().speechLang;
+    if (this.voiceLang === speechLang && this.voice) return;
     const synth = this.win.speechSynthesis;
-    if (synth) this.voice = pickVietnameseVoice(synth.getVoices());
+    this.voice = synth ? pickVoiceFor(synth.getVoices(), speechLang) : null;
+    this.voiceLang = speechLang;
   }
 
   async speak(text: string, opts: SpeakOptions = {}): Promise<void> {
@@ -72,11 +92,12 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
     this.refreshVoice();
     const synth = this.win.speechSynthesis;
     const Utt = this.win.SpeechSynthesisUtterance;
-    if (!synth || !Utt || !this.voice) throw new Error("tts_unavailable");
+    const voice = this.currentVoice();
+    if (!synth || !Utt || !voice) throw new Error("tts_unavailable");
     synth.cancel();
     const u = new Utt(text);
-    u.lang = "vi-VN";
-    u.voice = this.voice;
+    u.lang = this.getLanguage().speechLang;
+    u.voice = voice;
     u.rate = opts.rate ?? 1;
     this.current = u;
     const rate = u.rate > 0 ? u.rate : 1;

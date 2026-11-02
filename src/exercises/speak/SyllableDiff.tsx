@@ -23,9 +23,10 @@ function isDetail(d: unknown): d is SpeakDetail {
   return typeof d === "object" && d !== null && Array.isArray((d as SpeakDetail).diff) && typeof (d as SpeakDetail).heard === "string";
 }
 
-function Syllable({ item }: { item: SyllableDiff & { expected: string } }) {
+function Syllable({ item, tones }: { item: SyllableDiff & { expected: string }; tones: boolean }) {
   if (item.status === "ok") return <span>{item.expected}</span>;
-  if (item.status === "tone") {
+  // Tones only exist in Vietnamese: any other language shows a near miss as a plain mismatch.
+  if (item.status === "tone" && tones) {
     return (
       <span className={`underline decoration-[3px] underline-offset-4 ${TONE_DECORATION[toneOfSyllable(item.expected)]}`}>
         {item.expected}
@@ -44,7 +45,7 @@ export const SyllableDiffView: FC<{ exercise: Speak; result: GradeResult; lang?:
     <div className="flex flex-col gap-2">
       <p lang={lang} className="text-heading flex flex-wrap gap-x-2">
         {shown.map((d, i) => (
-          <Syllable key={i} item={d} />
+          <Syllable key={i} item={d} tones={lang === "vi"} />
         ))}
       </p>
       {heard ? (

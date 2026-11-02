@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { VOICE_IDS, type Settings, type VoiceId } from "@/domain/types";
+import { SETTINGS_VOICE_IDS, type Settings, type SettingsVoiceId } from "@/domain/types";
 import { detectPlatform } from "@/domain/platform";
 import { useDeviceTest, useSettings } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
@@ -70,18 +70,18 @@ function Toggle({ id, label, hint, on, onChange }: ToggleProps) {
 
 const PREVIEW_TEXT = "Chào bạn!"; // also listed in scripts/tts/extract_texts.mjs so every voice pack has it
 
-function voiceLabel(id: VoiceId): string {
+function voiceLabel(id: SettingsVoiceId): string {
   const o = fr.profile.settings.voicePack.options[id];
   return `${o.prefix}${o.name}${o.suffix}`;
 }
 
 /** One radio per voice, each with its own preview button (previews never change the saved voice). */
-function VoicePicker({ value, onChange }: { value: VoiceId; onChange(v: VoiceId): void }) {
+function VoicePicker({ value, onChange }: { value: SettingsVoiceId; onChange(v: SettingsVoiceId): void }) {
   const { tts } = useServices();
   const toast = useToast();
   const t = fr.profile.settings.voicePack;
 
-  function preview(id: VoiceId): void {
+  function preview(id: SettingsVoiceId): void {
     // Straight from the click: iOS only starts audio inside a user gesture.
     tts.speak(PREVIEW_TEXT, { rate: 1, voice: id }).catch(() => toast.show({ title: t.previewError }));
   }
@@ -92,7 +92,7 @@ function VoicePicker({ value, onChange }: { value: VoiceId; onChange(v: VoiceId)
         {t.label}
       </p>
       <div role="radiogroup" aria-labelledby="voice-pack-label" className="flex flex-col gap-2">
-        {VOICE_IDS.map((id) => {
+        {SETTINGS_VOICE_IDS.map((id) => {
           const o = t.options[id];
           const selected = id === value;
           return (

@@ -1,6 +1,7 @@
 import {
   BadgesFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, ShopFileSchema, TreeFileSchema,
 } from "../src/content/schema";
+import { LANGUAGES, languageOfId, type LanguageId } from "../src/domain/languages";
 import { toneOfSyllable } from "../src/domain/tones";
 import type { Dialogue, Exercise, Lesson } from "../src/domain/types";
 
@@ -8,8 +9,15 @@ export type ContentBundle = { lessons: unknown[]; dialogues: unknown[]; exam: un
 
 const EXAM_MIN = { total: 60, listening: 20, translation: 16, tones: 12, speaking: 12 } as const;
 
-export function checkContent(input: ContentBundle, opts: { strict: boolean }): string[] {
+/**
+ * `strict`: the language's path is complete (counts, exam quotas, boss sheets: Vietnamese only).
+ * `language`: the folder's language. Turns on the integrity checks every language needs (dialogue references resolve,
+ * every lesson is in the tree, ids carry the folder's prefix, exercise types belong to the language); strict implies
+ * the first two.
+ */
+export function checkContent(input: ContentBundle, opts: { strict: boolean; language?: LanguageId }): string[] {
   const errors: string[] = [];
+  const integrity = opts.strict || opts.language !== undefined;
   const lessons: Lesson[] = [];
   const dialogues: Dialogue[] = [];
 
@@ -141,7 +149,31 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
 
   // Lesson → dialogue references
   const dialogueIds = new Set(dialogues.map((d) => d.id));
-  if (opts.strict) for (const l of lessons) if (!dialogueIds.has(l.dialogueId)) errors.push(`${l.id}: dialogue ${l.dialogueId} missing`);
+  if (integrity) for (const l of lessons) if (!dialogueIds.has(l.dialogueId)) errors.push(`${l.id}: dialogue ${l.dialogueId} missing`);
+
+  // Language of the folder: every id routes back to it (`languageOfId`), every exercise type is one it teaches
+  if (opts.language !== undefined) {
+    const language = opts.language;
+    const types = LANGUAGES[language].exerciseTypes;
+    const owned = (id: string, where: string) => {
+      if (languageOfId(id) !== language) errors.push(`${where}: id "${id}" does not belong to ${language} (prefix "${LANGUAGES[language].idPrefix}")`);
+    };
+    const ownExercise = (e: Exercise, where: string) => {
+      owned(e.id, where);
+      if (!types.includes(e.type)) errors.push(`${where}: exercise type ${e.type} is not taught in ${language}`);
+      if (e.type === "listen_choose") [e.vocabId, ...e.choices].forEach((id) => owned(id, where));
+      if (e.type === "speak") e.vocabIds.forEach((id) => owned(id, where));
+    };
+    for (const l of lessons) {
+      owned(l.id, l.id);
+      owned(l.dialogueId, `${l.id}.dialogueId`);
+      l.vocab.forEach((v) => owned(v.id, `${l.id}.vocab`));
+      l.exercises.forEach((e) => ownExercise(e, `${l.id}/${e.id}`));
+    }
+    for (const d of dialogues) owned(d.id, d.id);
+    if (exam.success) for (const q of exam.data.questions) ownExercise(q.exercise, `exam/${q.id}`);
+    if (tree?.success) for (const n of tree.data.nodes) if (n.kind === "lesson") owned(n.id, "tree");
+  }
 
   // Skill tree: unique ids, known prerequisites, no cycle, lesson nodes match lesson files
   if (tree?.success) {
@@ -167,7 +199,7 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean }): s
     for (const n of nodes) if (cyclic(n.id)) { errors.push(`tree: cycle through ${n.id}`); break; }
     const lessonIds = new Set(lessons.map((l) => l.id));
     for (const n of nodes) if (n.kind === "lesson" && !lessonIds.has(n.id)) errors.push(`tree: lesson ${n.id} has no lesson file`);
-    if (opts.strict) {
+    if (integrity) {
       const treeLessons = new Set(nodes.filter((n) => n.kind === "lesson").map((n) => n.id));
       for (const l of lessons) if (!treeLessons.has(l.id)) errors.push(`tree: lesson ${l.id} missing from the tree`);
     }

@@ -53,6 +53,37 @@ test("detects duplicate ids across lessons", () => {
   expect(checkContent(bad, { strict: false }).join("\n")).toMatch(/duplicate/i);
 });
 
+describe("integrity checks for a language folder (also when not strict)", () => {
+  test("a valid Vietnamese bundle passes", () => {
+    expect(checkContent(ok, { strict: false, language: "vi" })).toEqual([]);
+  });
+
+  test("a lesson whose dialogue is missing is flagged", () => {
+    const noDialogue = { ...ok, dialogues: [] };
+    expect(checkContent(noDialogue, { strict: false })).toEqual([]); // no language: legacy validity only
+    expect(checkContent(noDialogue, { strict: false, language: "tl" }).join("\n")).toMatch(/dialogue d\d+ missing/);
+  });
+
+  test("a lesson missing from the tree is flagged", () => {
+    const tree = { contentVersion: 1, nodes: [{ id: "boss_a", kind: "boss", requires: [], branch: "trunk" }] };
+    expect(checkContent({ ...ok, tree }, { strict: false, language: "vi" })).toContain(`tree: lesson ${lessonFixture.id} missing from the tree`);
+  });
+
+  test("ids must carry the folder's prefix, both ways", () => {
+    const inTl = checkContent(ok, { strict: false, language: "tl" }).join("\n");
+    expect(inTl).toMatch(new RegExp(`id "${lessonFixture.id}" does not belong to tl`));
+    const bad = structuredClone(ok);
+    bad.lessons[0]!.vocab[0]!.id = "tl_v_intruder";
+    expect(checkContent(bad, { strict: false, language: "vi" }).join("\n")).toMatch(/id "tl_v_intruder" does not belong to vi/);
+  });
+
+  test("an exercise type the language does not teach is flagged", () => {
+    const bad = structuredClone(ok);
+    bad.lessons[0]!.exercises[1] = { id: "x2", type: "tone_pick", syllable: "đá", answerTone: "sac" };
+    expect(checkContent(bad, { strict: false, language: "tl" }).join("\n")).toMatch(/tone_pick is not taught in tl/);
+  });
+});
+
 test("strict mode requires 10 lessons, 10 dialogues and exam quotas", () => {
   const errors = checkContent(ok, { strict: true }).join("\n");
   expect(errors).toMatch(/10 lessons/);

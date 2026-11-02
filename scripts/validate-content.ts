@@ -10,7 +10,9 @@ const readOr = (path: string, fallback: unknown) => (existsSync(path) ? json(pat
 const readOptional = (path: string) => (existsSync(path) ? json(path) : undefined);
 
 const strict = process.argv.includes("--strict") || process.env.CONTENT_STRICT === "1";
-// Vietnamese is the complete path (strict applies to it); Tagalog grows lesson by lesson, so it is only checked for validity.
+// Every language gets the integrity checks (references, tree, id prefixes, exercise types). Strict adds the
+// complete-path checks (lesson and dialogue counts, exam quotas, boss sheets), which only Vietnamese has in 2.0:
+// Tagalog has no exam or boss yet.
 const languages = [
   { id: "vi", strict },
   { id: "tl", strict: false },
@@ -29,7 +31,7 @@ for (const language of languages) {
       shop: readOptional(join(root, "shop.json")),
       tree: readOptional(join(dir, "tree.json")),
     },
-    { strict: language.strict },
+    { strict: language.strict, language: language.id },
   );
   errors.push(...found.map((e) => `[${language.id}] ${e}`));
 }

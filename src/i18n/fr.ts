@@ -539,7 +539,7 @@ export const fr = {
       prerequisites: "L'un de vous deux n'a pas encore débloqué les duels.",
       bad_questions: "Les questions du duel n'étaient pas valides. Réessaie.",
       not_common_lesson: "Pas assez de leçons en commun pour un duel.",
-      already_open: "Un duel est déjà en cours avec ce joueur.",
+      already_open: "Un duel est déjà en cours avec ce joueur dans cette langue.",
       daily_limit: "Tu as lancé 5 défis aujourd'hui. Reviens demain\u202f!",
       not_found: "Ce duel n'existe plus.",
       not_participant: "Ce duel ne te concerne pas.",
@@ -550,6 +550,7 @@ export const fr = {
     },
     hub: {
       lockedTitle: "Les duels t'attendent",
+      inLanguage: (language: string, caption: string) => `${language} · ${caption}`,
       empty: { title: "Aucun duel pour l'instant", body: "Défie quelqu'un du groupe\u202f: vous jouez chacun de votre côté, puis le combat est rejoué." },
       offline: { title: "Les duels ont besoin du réseau", body: "Reconnecte-toi pour voir tes duels. Un combat déjà joué part tout seul dès que le réseau revient." },
       error: { title: "Les duels n'ont pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },

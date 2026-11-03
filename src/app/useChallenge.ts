@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
 import { ContentNotFoundError, OfflineError } from "@/domain/errors";
 import type { Lesson } from "@/domain/types";
 import { commonLessons, duelPrerequisites, pickDuelQuestions } from "@/services/duel";
@@ -12,12 +13,13 @@ export type ChallengeTarget = { userId: string; pseudo: string; lessonsDone: rea
 
 /**
  * Challenge flow shared by the public profile and the duels hub: prerequisites, question picking from the
- * lessons both players finished, creation, then the run screen. `blockedBy` is the calm reason a duel is
+ * lessons both players finished in the active language, creation, then the run screen. `blockedBy` is the calm reason a duel is
  * impossible right now (null when it is possible or not known yet); `message` is the outcome of the last attempt.
  */
 export function useChallenge() {
-  const { contents, duels, leaderboard } = useServices();
-  const content = contents.vi; // duels are Vietnamese-only in 2.0, whatever the active language
+  const { content, duels, leaderboard } = useServices(); // `content`: the active language, the duel's
+  const { language } = useLanguage();
+  const lang = language.id;
   const navigate = useNavigate();
   const snapshot = useAppState((s) => s.snapshot);
   const stt = useAppState((s) => s.settings.capabilities?.stt ?? false);
@@ -33,17 +35,17 @@ export function useChallenge() {
     };
   }, []);
 
-  const unlocked = snapshot === null ? null : duelPrerequisites(snapshot.lessonsDone, snapshot.dialoguesDone);
+  const unlocked = snapshot === null ? null : duelPrerequisites(snapshot.lessonsDone, snapshot.dialoguesDone, lang);
 
   const blockedBy = useCallback(
     (target: ChallengeTarget): string | null => {
       if (snapshot === null) return null;
-      if (!duelPrerequisites(snapshot.lessonsDone, snapshot.dialoguesDone)) return fr.duels.locked;
-      if (!duelPrerequisites(target.lessonsDone, target.dialoguesDone)) return fr.duels.opponentLocked(target.pseudo);
-      if (commonLessons(snapshot.lessonsDone, target.lessonsDone).length === 0) return fr.duels.noCommon;
+      if (!duelPrerequisites(snapshot.lessonsDone, snapshot.dialoguesDone, lang)) return fr.duels.locked;
+      if (!duelPrerequisites(target.lessonsDone, target.dialoguesDone, lang)) return fr.duels.opponentLocked(target.pseudo);
+      if (commonLessons(snapshot.lessonsDone, target.lessonsDone, lang).length === 0) return fr.duels.noCommon;
       return null;
     },
-    [snapshot],
+    [snapshot, lang],
   );
 
   const start = useCallback(
@@ -69,7 +71,7 @@ export function useChallenge() {
 
         const mine = snapshot?.lessonsDone ?? [];
         const lessons = (
-          await Promise.all(commonLessons(mine, target.lessonsDone).map((id) => content.getLesson(id).catch((e: unknown) => {
+          await Promise.all(commonLessons(mine, target.lessonsDone, lang).map((id) => content.getLesson(id).catch((e: unknown) => {
             if (e instanceof ContentNotFoundError) return null; // a lesson removed from the content is just skipped
             throw e;
           })))
@@ -77,7 +79,7 @@ export function useChallenge() {
         const questions = pickDuelQuestions(lessons, Math.random);
         if (!questions) return fail(fr.duels.noCommon);
 
-        const res = await duels.create(target.userId, questions, Math.floor(Math.random() * 0x7fffffff));
+        const res = await duels.create(target.userId, questions, Math.floor(Math.random() * 0x7fffffff), lang);
         if (res.ok) {
           navigate(`/duel/${res.duelId}/run`);
           return;
@@ -90,7 +92,7 @@ export function useChallenge() {
         if (mounted.current) setBusy(false);
       }
     },
-    [blockedBy, content, duels, leaderboard, navigate, snapshot, stt],
+    [blockedBy, content, duels, leaderboard, navigate, snapshot, stt, lang],
   );
 
   return { busy, message, unlocked, blockedBy, start };

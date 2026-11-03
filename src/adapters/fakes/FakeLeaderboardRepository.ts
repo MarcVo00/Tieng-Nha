@@ -14,7 +14,8 @@ const BOTS: Array<Omit<LeaderboardRow, "isMe">> = [
 
 /** Lessons/dialogues each fake member has done (consistent with `lessonsDone` above); duels use them as prerequisites. */
 const MEMBER_PROGRESS: Record<string, { lessonsDone: string[]; dialoguesDone: string[] }> = {
-  bot_ba_ngoai: { lessonsDone: ["l01", "l02", "l03"], dialoguesDone: ["d01", "d02", "d03"] },
+  // Bà Ngoại also started Tagalog: the demo can show a Tagalog duel.
+  bot_ba_ngoai: { lessonsDone: ["l01", "l02", "l03", "tl_l01", "tl_l02"], dialoguesDone: ["d01", "d02", "d03", "tl_d01"] },
   bot_chu_tu: { lessonsDone: ["l01", "l02"], dialoguesDone: ["d01", "d02"] },
   bot_be_na: { lessonsDone: ["l01"], dialoguesDone: ["d01"] },
   bot_anh_hai: { lessonsDone: ["l01"], dialoguesDone: ["d01"] },

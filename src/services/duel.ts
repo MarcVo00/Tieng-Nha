@@ -1,5 +1,5 @@
 import type { DuelQuestionRef, DuelQuestions, Lesson, Round1Answer, Round2Answer } from "@/domain/types";
-import { languageOfId } from "@/domain/languages";
+import { LANGUAGES, languageOfId, type LanguageId } from "@/domain/languages";
 import { shuffle } from "@/services/random";
 
 type Rng = () => number;
@@ -84,13 +84,20 @@ export function pickDuelQuestions(common: readonly Lesson[], rng: Rng): DuelQues
   return { round1, round2 };
 }
 
-/** Both players need the first lesson and the first dialogue to duel. */
-export function duelPrerequisites(lessonsDone: readonly string[], dialoguesDone: readonly string[]): boolean {
-  return lessonsDone.includes("l01") && dialoguesDone.includes("d01");
+/** Both players need the first lesson and the first dialogue of the duel's language. */
+export function duelPrerequisites(lessonsDone: readonly string[], dialoguesDone: readonly string[], language: LanguageId = "vi"): boolean {
+  const prefix = LANGUAGES[language].idPrefix;
+  return lessonsDone.includes(`${prefix}l01`) && dialoguesDone.includes(`${prefix}d01`);
 }
 
-/** Vietnamese lessons done by both players, in the order of `a` (duels are Vietnamese-only in 2.0). */
-export function commonLessons(a: readonly string[], b: readonly string[]): string[] {
+/** Lessons of `language` done by both players, in the order of `a`. */
+export function commonLessons(a: readonly string[], b: readonly string[], language: LanguageId = "vi"): string[] {
   const other = new Set(b);
-  return a.filter((id, i) => languageOfId(id) === "vi" && other.has(id) && a.indexOf(id) === i);
+  return a.filter((id, i) => languageOfId(id) === language && other.has(id) && a.indexOf(id) === i);
+}
+
+/** A duel's language, read from its questions (they all come from one language; the duels before 2.2 are Vietnamese). */
+export function duelLanguage(questions: DuelQuestions): LanguageId {
+  const first = questions.round1[0] ?? questions.round2[0];
+  return first ? languageOfId(first.lessonId) : "vi";
 }

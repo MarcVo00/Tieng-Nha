@@ -1,5 +1,5 @@
 import type { Lesson, Round1Answer } from "@/domain/types";
-import { commonLessons, DUEL, duelDamage, duelOutcome, duelPrerequisites, duelTime, pickDuelQuestions, round1Blow, round2Blow, toDuelMs } from "@/services/duel";
+import { commonLessons, DUEL, duelDamage, duelLanguage, duelOutcome, duelPrerequisites, duelTime, pickDuelQuestions, round1Blow, round2Blow, toDuelMs } from "@/services/duel";
 import { createRng } from "@/services/random";
 import { LOCAL_ONLY_EVENT_TYPES } from "@/services/energy";
 
@@ -105,6 +105,20 @@ describe("prerequisites and common lessons", () => {
   test("intersection", () => {
     expect(commonLessons(["l01", "l02", "l03"], ["l03", "l01", "l09"])).toEqual(["l01", "l03"]);
     expect(commonLessons(["l01"], [])).toEqual([]);
+  });
+  test("per language: the first lesson and dialogue of that language, its common lessons only", () => {
+    expect(duelPrerequisites(["l01", "tl_l01"], ["d01"], "tl")).toBe(false);
+    expect(duelPrerequisites(["tl_l01"], ["tl_d01"], "tl")).toBe(true);
+    expect(duelPrerequisites(["tl_l01"], ["tl_d01"])).toBe(false);
+    const mine = ["l01", "tl_l01", "tl_l02", "l02"];
+    const theirs = ["tl_l02", "l01", "tl_l01"];
+    expect(commonLessons(mine, theirs, "tl")).toEqual(["tl_l01", "tl_l02"]);
+    expect(commonLessons(mine, theirs)).toEqual(["l01"]);
+  });
+  test("a duel's language comes from its questions", () => {
+    expect(duelLanguage({ round1: [{ lessonId: "tl_l02", exerciseId: "x" }], round2: [] })).toBe("tl");
+    expect(duelLanguage({ round1: [{ lessonId: "l02", exerciseId: "x" }], round2: [] })).toBe("vi");
+    expect(duelLanguage({ round1: [], round2: [] })).toBe("vi");
   });
 });
 

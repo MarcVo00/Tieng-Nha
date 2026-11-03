@@ -76,3 +76,21 @@ test("locked duels: the profile explains what is missing", async ({ page }) => {
   await expect(page.getByText(fr.duels.locked)).toBeVisible();
   await expect(page.getByRole("button", { name: fr.duels.challenge })).toHaveCount(0);
 });
+
+test("a Tagalog duel: the challenge from the Tagalog side uses Tagalog lessons, and the hub says so", async ({ page }) => {
+  await onboard(page, { language: "tl" });
+  await seedLessonsCompleted(page, ["tl_l01", "tl_l02"]);
+  await seedDialoguesCompleted(page, ["tl_d01"]);
+  await page.goto(`/u/${OPPONENT.id}`);
+
+  await page.getByRole("button", { name: fr.duels.challenge }).click();
+  await expect(page).toHaveURL(/\/duel\/[^/]+\/run$/);
+  await expect(page.locator("[data-exercise-id]").first()).toHaveAttribute("data-exercise-id", /^tl_l0[12]_e/);
+  await playRun(page);
+
+  await expect(page).toHaveURL(/\/duel\/[^/]+$/);
+  await page.getByRole("button", { name: fr.duels.result.skip }).click();
+  await page.getByRole("button", { name: fr.duels.result.back }).click();
+  await expect(page).toHaveURL(/\/duels$/);
+  await expect(page.getByText(new RegExp(`^${fr.duels.hub.inLanguage("Tagalog", "")}`)).first()).toBeVisible();
+});

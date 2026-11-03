@@ -2,7 +2,8 @@ import { OfflineError } from "@/domain/errors";
 import type { AppEvent, Duel, DuelQuestions, DuelRun, Round1Answer, Round2Answer } from "@/domain/types";
 import type { DuelError, DuelGateway } from "@/ports";
 import { fakeMembers, type FakeMember } from "@/adapters/fakes/FakeLeaderboardRepository";
-import { commonLessons, DUEL, duelDamage, duelOutcome, duelPrerequisites, duelTime } from "@/services/duel";
+import { commonLessons, DUEL, duelDamage, duelLanguage, duelOutcome, duelPrerequisites, duelTime } from "@/services/duel";
+import type { LanguageId } from "@/domain/languages";
 import { addDaysIso, parisDay } from "@/services/time";
 
 const ME = "me";
@@ -88,7 +89,7 @@ export class FakeDuelGateway implements DuelGateway {
     }
   }
 
-  async create(opponent: string, questions: DuelQuestions, seed: number): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }> {
+  async create(opponent: string, questions: DuelQuestions, seed: number, language: LanguageId = "vi"): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }> {
     if (!this.online) throw new OfflineError();
     const refuse = (error: DuelError) => ({ ok: false as const, error });
     if (opponent === ME) return refuse("self");
@@ -101,7 +102,7 @@ export class FakeDuelGateway implements DuelGateway {
       lessons: events.filter((e) => e.type === "lesson_completed").map((e) => e.refId),
       dialogues: events.filter((e) => e.type === "dialogue_completed").map((e) => e.refId),
     };
-    if (!duelPrerequisites(mine.lessons, mine.dialogues) || !duelPrerequisites(member.lessonsDone, member.dialoguesDone)) {
+    if (!duelPrerequisites(mine.lessons, mine.dialogues, language) || !duelPrerequisites(member.lessonsDone, member.dialoguesDone, language)) {
       return refuse("prerequisites");
     }
 
@@ -109,9 +110,9 @@ export class FakeDuelGateway implements DuelGateway {
     if (round1.length < DUEL.minRound1 || round1.length > DUEL.round1 || round2.length < DUEL.minRound2 || round2.length > DUEL.round2) {
       return refuse("bad_questions");
     }
-    const common = new Set(commonLessons(mine.lessons, member.lessonsDone));
+    const common = new Set(commonLessons(mine.lessons, member.lessonsDone, language));
     if (![...round1, ...round2].every((q) => common.has(q.lessonId))) return refuse("not_common_lesson");
-    if (this.duels.some((d) => d.status === "open" && this.other(d) === opponent)) return refuse("already_open");
+    if (this.duels.some((d) => d.status === "open" && this.other(d) === opponent && duelLanguage(d.questions) === language)) return refuse("already_open");
     const now = this.clock();
     if (this.duels.filter((d) => d.challenger === ME && parisDay(d.createdAt) === parisDay(now)).length >= MAX_PER_DAY) return refuse("daily_limit");
 

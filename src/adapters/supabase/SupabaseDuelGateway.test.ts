@@ -10,25 +10,25 @@ const offline = () => vi.fn().mockResolvedValue({ data: null, error: { message: 
 describe("create", () => {
   test("sends the RPC arguments and maps ok", async () => {
     const rpc = ok({ ok: true, duelId: "d1" });
-    await expect(gateway(rpc).create("u2", questions, 42)).resolves.toEqual({ ok: true, duelId: "d1" });
-    expect(rpc).toHaveBeenCalledWith("create_duel", { p_opponent: "u2", p_questions: questions, p_seed: 42 });
+    await expect(gateway(rpc).create("u2", questions, 42, "tl")).resolves.toEqual({ ok: true, duelId: "d1" });
+    expect(rpc).toHaveBeenCalledWith("create_duel", { p_opponent: "u2", p_questions: questions, p_seed: 42, p_language: "tl" });
   });
 
   test("maps a business refusal to its code", async () => {
-    await expect(gateway(ok({ ok: false, error: "already_open" })).create("u2", questions, 1)).resolves.toEqual({
+    await expect(gateway(ok({ ok: false, error: "already_open" })).create("u2", questions, 1, "vi")).resolves.toEqual({
       ok: false,
       error: "already_open",
     });
   });
 
   test("an unknown error code or a malformed payload is not a refusal", async () => {
-    await expect(gateway(ok({ ok: false, error: "nope" })).create("u2", questions, 1)).rejects.toThrow("invalid_duel_response");
-    await expect(gateway(ok(null)).create("u2", questions, 1)).rejects.toThrow("invalid_duel_response");
-    await expect(gateway(ok({ ok: true })).create("u2", questions, 1)).rejects.toThrow("invalid_duel_response");
+    await expect(gateway(ok({ ok: false, error: "nope" })).create("u2", questions, 1, "vi")).rejects.toThrow("invalid_duel_response");
+    await expect(gateway(ok(null)).create("u2", questions, 1, "vi")).rejects.toThrow("invalid_duel_response");
+    await expect(gateway(ok({ ok: true })).create("u2", questions, 1, "vi")).rejects.toThrow("invalid_duel_response");
   });
 
   test("a network failure throws OfflineError", async () => {
-    await expect(gateway(offline()).create("u2", questions, 1)).rejects.toBeInstanceOf(OfflineError);
+    await expect(gateway(offline()).create("u2", questions, 1, "vi")).rejects.toBeInstanceOf(OfflineError);
   });
 });
 

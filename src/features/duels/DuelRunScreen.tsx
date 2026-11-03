@@ -6,6 +6,8 @@ import { useHeroLook } from "@/app/useHeroLook";
 import { useServices } from "@/app/ServicesProvider";
 import { OfflineError } from "@/domain/errors";
 import type { Capabilities, Exercise, VocabId, VocabItem } from "@/domain/types";
+import { LANGUAGES, type LanguageId } from "@/domain/languages";
+import { duelLanguage } from "@/services/duel";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import type { GradeResult } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
@@ -38,7 +40,7 @@ type Load =
   | { status: "error" }
   | { status: "notFound" }
   | { status: "noMic" }
-  | { status: "ready"; exercises: (Exercise | null)[]; vocabIndex: ReadonlyMap<VocabId, VocabItem>; seed: number };
+  | { status: "ready"; exercises: (Exercise | null)[]; vocabIndex: ReadonlyMap<VocabId, VocabItem>; seed: number; language: LanguageId };
 
 type Phase = { kind: "running" } | { kind: "sending" } | { kind: "offline" } | { kind: "failed" } | { kind: "rejected" };
 
@@ -55,7 +57,6 @@ const VERDICT_STYLE: Record<Verdict, string> = {
 export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
   const { id = "" } = useParams();
   const { contents, duels, tts, stt, recorder, sound } = useServices();
-  const content = contents.vi; // duels are Vietnamese-only in 2.0, whatever the active language
   const { settings, updateSettings } = useSettings();
   const heroLook = useHeroLook();
   const navigate = useNavigate();
@@ -134,7 +135,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
     const pending = readPending(id);
     if (pending) {
       pendingRun.current = pending;
-      setLoad({ status: "ready", exercises: [], vocabIndex: new Map(), seed: 0 });
+      setLoad({ status: "ready", exercises: [], vocabIndex: new Map(), seed: 0, language: "vi" }); // only sends: nothing is shown
       void send(pending);
       return;
     }
@@ -158,6 +159,9 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
       if (first === "notFound") return setLoad({ status: "notFound" });
       if (first === "gone") return navigate(`/duel/${id}`, { replace: true });
       const lessonIds = [...new Set([...first.questions.round1, ...first.questions.round2].map((q) => q.lessonId))];
+      // The duel's own language, whatever the active one: its content, its voice, its recognition.
+      const language = duelLanguage(first.questions);
+      const content = contents[language];
       const [lessons, vocabIndex] = await Promise.all([
         Promise.all(lessonIds.map((l) => content.getLesson(l).catch(() => null))),
         content.getVocabIndex(),
@@ -172,14 +176,14 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
       saveRun(id, first);
       setRec(first);
       setIntroDone(first.round2.length > 0);
-      setLoad({ status: "ready", exercises, vocabIndex, seed: first.seed });
+      setLoad({ status: "ready", exercises, vocabIndex, seed: first.seed, language });
     })().catch(() => {
       if (!cancelled) setLoad({ status: "error" });
     });
     return () => {
       cancelled = true;
     };
-  }, [content, duels, id, navigate, send, loadAttempt]);
+  }, [contents, duels, id, navigate, send, loadAttempt]);
 
   const afterAnswer = useCallback(
     (next: RunRecord, round: 1 | 2) => {
@@ -435,7 +439,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
                 vocabIndex={load.vocabIndex}
                 capabilities={capabilities}
                 voiceRate={voiceRateOf(settings)}
-                lang="vi" // Vietnamese-only content: spoken and heard in Vietnamese even while Tagalog is active
+                lang={LANGUAGES[load.language].htmlLang} // the duel's language: spoken and heard in it whatever the active one
                 services={{ tts, stt, recorder }}
                 onResult={onResult}
                 onCapabilityLost={onCapabilityLost}

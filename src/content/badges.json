@@ -23,6 +23,15 @@
     { "id": "xp_1500", "title": "Érudit·e", "description": "Gagne 1 500 XP.", "icon": "🏯", "rule": { "kind": "xp_total", "gte": 1500 }, "coins": 100 },
     { "id": "xp_3000", "title": "Lettré·e", "description": "Gagne 3 000 XP.", "icon": "🎋", "rule": { "kind": "xp_total", "gte": 3000 }, "coins": 200 },
     { "id": "days_10", "title": "Fidèle au poste", "description": "Apprends pendant 10 jours différents.", "icon": "🌾", "rule": { "kind": "active_days", "gte": 10 }, "coins": 60 },
-    { "id": "days_30", "title": "Pilier de la maison", "description": "Apprends pendant 30 jours différents.", "icon": "🏡", "rule": { "kind": "active_days", "gte": 30 }, "coins": 150 }
+    { "id": "days_30", "title": "Pilier de la maison", "description": "Apprends pendant 30 jours différents.", "icon": "🏡", "rule": { "kind": "active_days", "gte": 30 }, "coins": 150 },
+    { "id": "tl_first_lesson", "title": "Premiers pas aux Philippines", "description": "Termine ta première leçon de tagalog.", "icon": "🌴", "rule": { "kind": "lessons_done", "gte": 1 }, "coins": 20 },
+    { "id": "tl_four_lessons", "title": "À mi-chemin", "description": "Termine 4 leçons de tagalog.", "icon": "🚕", "rule": { "kind": "lessons_done", "gte": 4 }, "coins": 40 },
+    { "id": "tl_all_lessons", "title": "Prêt·e à partir", "description": "Termine les 8 leçons de tagalog.", "icon": "🧳", "rule": { "kind": "lessons_done", "gte": 8 }, "coins": 100 },
+    { "id": "tl_perfect_lesson", "title": "Sans faute, en tagalog", "description": "Termine une leçon de tagalog sans aucune erreur.", "icon": "🌺", "rule": { "kind": "perfect_lesson" }, "coins": 20 },
+    { "id": "tl_perfect_all", "title": "Perle des Philippines", "description": "Réussis les 8 leçons de tagalog sans aucune erreur.", "icon": "🦪", "rule": { "kind": "perfect_lessons", "gte": 8 }, "coins": 120 },
+    { "id": "tl_first_dialogue", "title": "Première conversation en tagalog", "description": "Termine ton premier dialogue de tagalog.", "icon": "🗨️", "rule": { "kind": "dialogues_done", "gte": 1 }, "coins": 20 },
+    { "id": "tl_all_dialogues", "title": "Ça papote", "description": "Termine les 8 dialogues de tagalog.", "icon": "🥥", "rule": { "kind": "dialogues_done", "gte": 8 }, "coins": 100 },
+    { "id": "tl_exam_passed", "title": "Vainqueur de Bakunawa", "description": "Bats Bakunawa, le boss final du tagalog.", "icon": "🌕", "rule": { "kind": "exam_score", "gte": 70 }, "coins": 100 },
+    { "id": "tl_exam_excellent", "title": "La lune est sauvée", "description": "Bats Bakunawa en gardant au moins 4 vies.", "icon": "✨", "rule": { "kind": "exam_score", "gte": 90 }, "coins": 150 }
   ]
 }

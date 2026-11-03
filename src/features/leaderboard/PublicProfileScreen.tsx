@@ -9,6 +9,7 @@ import type { BadgeDef, Boss, PublicProfile } from "@/domain/types";
 import { LANGUAGE_IDS, LANGUAGES, languageOfId, type LanguageId } from "@/domain/languages";
 import { livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS, examBestIn } from "@/services/exam";
+import { shownBadges } from "@/services/badges";
 import { fr } from "@/i18n/fr";
 import { Avatar, fxSpill, BadgeShelf, SectionTitle, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
 
@@ -198,7 +199,7 @@ export function PublicProfileScreen() {
 
       <section className="mt-8" aria-labelledby="pp-badges">
         <SectionTitle id="pp-badges" overline={fr.ui.overline.badges}>{fr.publicProfile.badgesTitle}</SectionTitle>
-        <BadgeShelf badges={badges} unlocked={unlocked} none={fr.publicProfile.noBadges} />
+        <BadgeShelf badges={shownBadges(badges, profile)} unlocked={unlocked} none={fr.publicProfile.noBadges} />
       </section>
 
       {startedLanguages(profile).map((id, _, shown) => {

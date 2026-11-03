@@ -13,6 +13,7 @@ import type { BadgeDef, Boss } from "@/domain/types";
 import { lookOf } from "@/services/look";
 import { bossMention, livesFromScore } from "@/services/bossFight";
 import { EXAM_PASS, examBestIn } from "@/services/exam";
+import { shownBadges } from "@/services/badges";
 import { fr } from "@/i18n/fr";
 import {
   Avatar, fxSpill, BadgeMedal, BadgeShelf, Button, Card, Certificate, ConfirmDialog, DropNumber, Icon, SectionTitle, Sheet, StreakFlame, downloadCertificate, tap, useToast,
@@ -197,7 +198,7 @@ export function MeScreen() {
       : null;
 
   const unlockedIds = new Set(snapshot?.badges ?? []);
-  const sortedBadges = badges ? [...badges].sort((a, b) => Number(unlockedIds.has(b.id)) - Number(unlockedIds.has(a.id))) : [];
+  const sortedBadges = badges ? shownBadges(badges, { lessonsDone: snapshot?.lessonsDone ?? [], badges: snapshot?.badges ?? [] }, language.id).sort((a, b) => Number(unlockedIds.has(b.id)) - Number(unlockedIds.has(a.id))) : [];
 
   async function leave(kind: "signout" | "delete", skipUnsyncedCheck = false): Promise<void> {
     if (leaving.current) return;

@@ -82,13 +82,14 @@ test("event sink throws OfflineError on a batch network error", async () => {
 
 test("exam gateway maps exam_limit", async () => {
   const db = { rpc: vi.fn().mockResolvedValue({ data: null, error: { message: "exam_limit" } }) };
-  await expect(new SupabaseExamGateway(db as never).startAttempt()).rejects.toBeInstanceOf(ExamLimitError);
+  await expect(new SupabaseExamGateway(db as never).startAttempt("vi")).rejects.toBeInstanceOf(ExamLimitError);
 });
 
 test("exam gateway maps the start_exam_attempt payload and submitAttempt is a no-op", async () => {
   const db = { rpc: vi.fn().mockResolvedValue({ data: { attempt_id: "a1", remaining_today: 2 }, error: null }) };
   const gw: ExamGateway = new SupabaseExamGateway(db as never);
-  await expect(gw.startAttempt()).resolves.toEqual({ attemptId: "a1", remainingToday: 2 });
+  await expect(gw.startAttempt("tl")).resolves.toEqual({ attemptId: "a1", remainingToday: 2 });
+  expect(db.rpc).toHaveBeenCalledWith("start_exam_attempt", { p_language: "tl" });
   await expect(gw.submitAttempt("a1", 80)).resolves.toBeUndefined();
   expect(db.rpc).toHaveBeenCalledTimes(1);
 });

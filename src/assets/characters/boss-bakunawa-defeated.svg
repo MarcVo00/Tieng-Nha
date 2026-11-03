@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>Boss — Bakunawa salue après le combat (Đông Hồ simplifié)</title>
+  <!-- Version « vaincu » : un salut, pas une humiliation. Il baisse la tête, les yeux fermés, la gueule close ;
+       la lune, recrachée, remonte au-dessus de lui. -->
+  <defs>
+    <pattern id="hatch-bakunawa-defeated" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="72" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#2B4E6E" stroke-width="3" stroke-linecap="round" opacity="0.4">
+    <path d="M12 112 Q22 106 32 112 Q42 118 52 112"/>
+    <path d="M150 116 Q160 110 170 116 Q180 122 190 116"/>
+  </g>
+
+  <g id="layer-weapon" stroke="#1F1A17" stroke-width="3">
+    <!-- la lune libérée -->
+    <circle cx="162" cy="30" r="14" fill="#D9A93A"/>
+  </g>
+
+  <g id="layer-body" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 170 Q36 124 58 168" stroke="#1F1A17" stroke-width="26"/>
+    <path d="M16 170 Q36 124 58 168" stroke="#4E7A4A" stroke-width="20"/>
+    <path d="M140 170 Q152 150 172 146" stroke="#1F1A17" stroke-width="24"/>
+    <path d="M140 170 Q152 150 172 146" stroke="#4E7A4A" stroke-width="18"/>
+    <path d="M98 174 Q86 136 110 120 Q128 108 120 90" stroke="#1F1A17" stroke-width="30"/>
+    <path d="M98 174 Q86 136 110 120 Q128 108 120 90" stroke="#4E7A4A" stroke-width="24"/>
+    <g fill="#B23A2A" stroke="#1F1A17" stroke-width="3">
+      <path d="M80 148 L68 140 L84 134 Z"/>
+      <path d="M86 128 L76 114 L94 116 Z"/>
+      <path d="M100 110 L94 94 L108 100 Z"/>
+      <path d="M170 136 L188 132 L182 152 Z"/>
+    </g>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" transform="translate(2 10) rotate(24 116 82)">
+    <path d="M112 62 L96 50 L112 50 L106 34 L122 42 Z" fill="#B23A2A"/>
+    <!-- gueule close -->
+    <path d="M112 82 Q100 50 124 38 Q146 30 160 44 L180 52 Q186 62 174 70 Q140 90 112 82 Z" fill="#4E7A4A"/>
+    <path d="M150 67 L176 62" fill="none" stroke-width="2"/>
+    <!-- yeux fermés en arcs, sourcil calme, joue vermillon -->
+    <path d="M128 47 Q135 45 142 48" fill="none" stroke-width="2.5"/>
+    <path d="M130 55 Q136 60 142 55" fill="none" stroke-width="2.5"/>
+    <circle cx="170" cy="53" r="1.6" fill="#1F1A17" stroke="none"/>
+    <circle cx="128" cy="68" r="3" fill="#B23A2A" stroke="none"/>
+  </g>
+
+  <g id="layer-water" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M6 188 L6 168 Q20 158 34 168 Q48 178 62 168 Q76 158 90 168 Q104 178 118 168 Q132 158 146 168 Q160 178 174 168 Q186 160 194 168 L194 188 Z" fill="#F4E4C4"/>
+    <path d="M6 188 L6 168 Q20 158 34 168 Q48 178 62 168 Q76 158 90 168 Q104 178 118 168 Q132 158 146 168 Q160 178 174 168 Q186 160 194 168 L194 188 Z" fill="url(#hatch-bakunawa-defeated)" stroke="none"/>
+  </g>
+</svg>

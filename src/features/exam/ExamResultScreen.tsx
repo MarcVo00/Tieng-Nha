@@ -5,6 +5,7 @@ import { useEntryState } from "@/app/useEntryState";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
+import { LANGUAGES, languageOfId } from "@/domain/languages";
 import { useHeroLook } from "@/app/useHeroLook";
 import {
   BadgeMedal,
@@ -32,6 +33,7 @@ import {
 
 function Corrections({ state }: { state: ResultState }) {
   const { tts } = useServices();
+  const language = languageOfId(state.boss.id); // the boss's language, whatever the active one is now
   const { settings } = useSettings();
   const [open, setOpen] = useState(false);
   const canSpeak = (settings.capabilities?.tts ?? tts.isAvailable()) === true;
@@ -68,13 +70,13 @@ function Corrections({ state }: { state: ResultState }) {
                   ) : null}
                   <p className="text-body text-ink">
                     <span className="text-caption text-ink-muted">{fr.exam.result.expected}{"\u202f: "}</span>
-                    <span lang="vi">{r.expected}</span>
+                    <span lang={LANGUAGES[language].htmlLang}>{r.expected}</span>
                   </p>
                 </div>
                 {canSpeak && r.expected ? (
                   <SpeakerButton
                     onSpeak={() => {
-                      tts.speak(r.expected, { rate: voiceRateOf(settings) }).catch(() => undefined);
+                      tts.speak(r.expected, { rate: voiceRateOf(settings), language }).catch(() => undefined);
                     }}
                   />
                 ) : null}
@@ -169,7 +171,7 @@ function ResultContent({ state }: { state: ResultState }) {
   }, [won, reduced]);
   const pseudo = profile?.pseudo ?? "";
   const mention = state.mention === "presque" ? null : state.mention;
-  const certificate = won && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking } : null;
+  const certificate = won && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking, language: languageOfId(boss.id) } : null;
   // Only a victory is staged; a defeat shows everything at once (« Réessayer » must be there right away).
   const enter = (step: 1 | 2 | 3) =>
     !won

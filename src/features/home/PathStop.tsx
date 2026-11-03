@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
+import { LANGUAGES, languageOfId } from "@/domain/languages";
 import { EXAM_PASS } from "@/services/exam";
 import { Icon, tap, useToast, duration, spring } from "@/ui";
 import { bossArtUrl } from "@/features/home/bossArt";
@@ -83,14 +84,14 @@ function visualOf(node: PathNode): Visual {
     icon: art ? <img src={art} alt="" className="h-full w-full object-contain p-1" /> : <Icon name="trophy" size={28} className="text-gold" />,
     badge: node.locked ? <Icon name="lock" size={14} /> : null,
     title: (
-      <span lang="vi" className={`block text-body-strong ${node.locked ? "text-ink-muted" : "text-ink"}`}>
+      <span lang={LANGUAGES[languageOfId(node.boss.id)].htmlLang} className={`block text-body-strong ${node.locked ? "text-ink-muted" : "text-ink"}`}>
         {node.boss.name}
       </span>
     ),
-    sub: <span className="text-caption text-ink-muted">{node.locked ? fr.home.exam.lockedHint : node.best !== null && node.best >= EXAM_PASS ? fr.home.exam.won : fr.home.exam.kicker}</span>,
+    sub: <span className="text-caption text-ink-muted">{node.locked ? fr.home.exam.lockedHint(node.lessons) : node.best !== null && node.best >= EXAM_PASS ? fr.home.exam.won : fr.home.exam.kicker}</span>,
     chip: node.next,
     to: node.locked ? null : "/exam",
-    lockedToast: fr.home.exam.lockedToast,
+    lockedToast: fr.home.exam.lockedToast(node.boss.name),
     label: fr.home.exam.aria(node.boss.name, node.locked),
   };
 }

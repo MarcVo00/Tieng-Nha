@@ -6,11 +6,11 @@ import { useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useLanguage } from "@/app/useLanguage";
 import type { Boss, Capabilities, ExamQuestion, Look, VocabId, VocabItem } from "@/domain/types";
+import type { Language } from "@/domain/languages";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import type { GradeResult } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import { answer, bossMention, buildDeck, fightScore, outOfQuestions, startFight, type Fight } from "@/services/bossFight";
-import { FINAL_BOSS_ID } from "@/services/tree";
 import { seedFromString } from "@/services/random";
 import { useHeroLook } from "@/app/useHeroLook";
 import { useBlowCue } from "@/app/useBlowCue";
@@ -63,6 +63,8 @@ type Fx = { id: number; kind: "ink" | "ko" | "dmg" | "wave"; life: number };
 
 type StageProps = {
   boss: Boss;
+  /** The boss's language: the win stamp is written in it. */
+  language: Language;
   defeated: boolean;
   look: Look;
   heroFace: Expression;
@@ -78,10 +80,10 @@ type StageProps = {
 };
 
 /**
- * The fight strip (audit §C.2): the player's hero on the left facing Thủy Tinh on the right, each on a paper mat, a
+ * The fight strip (audit §C.2): the player's hero on the left facing the boss on the right, each on a paper mat, a
  * calm wave motif behind. FX are mounted for their beat and unmounted by the caller (≤ 30 nodes).
  */
-function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled, fx, hero, bossCtl, stage, reduced, live }: StageProps) {
+function FightStage({ boss, language, defeated, look, heroFace, bossFace, bossPose, veiled, fx, hero, bossCtl, stage, reduced, live }: StageProps) {
   return (
     <div role="group" aria-label={fr.exam.run.stage(boss.name)} className="relative mx-5 h-28 max-[359px]:h-24">
       {/* Backdrop clipped to the strip; the fighters and their FX may spill over its edge. */}
@@ -106,8 +108,8 @@ function FightStage({ boss, defeated, look, heroFace, bossFace, bossPose, veiled
         {fx.map((f) =>
           f.kind === "ko" ? (
             <span key={f.id} aria-hidden="true" className="pointer-events-none absolute left-[10.25rem] top-1 z-30 -translate-x-1/2">
-              <FightSeal big lang="vi" life={f.life} reduced={reduced}>
-                {fr.exam.run.win}
+              <FightSeal big lang={language.htmlLang} life={f.life} reduced={reduced}>
+                {fr.exam.run.win[language.id]}
               </FightSeal>
             </span>
           ) : null,
@@ -306,7 +308,12 @@ function ExamRun({ run }: { run: RunState }) {
   useEffect(() => {
     let cancelled = false;
     setLoad({ status: "loading" });
-    Promise.all([content.getExamPool(), content.getVocabIndex(), content.getBoss(FINAL_BOSS_ID)]).then(
+    const bossId = language.finalBossId;
+    if (bossId === null) {
+      setLoad({ status: "error" }); // a language without a boss has no route here
+      return;
+    }
+    Promise.all([content.getExamPool(), content.getVocabIndex(), content.getBoss(bossId)]).then(
       ([pool, vocabIndex, boss]) => {
         if (cancelled) return;
         try {
@@ -327,7 +334,7 @@ function ExamRun({ run }: { run: RunState }) {
     return () => {
       cancelled = true;
     };
-  }, [content, run.attemptId, loadAttempt]);
+  }, [content, language.finalBossId, run.attemptId, loadAttempt]);
 
   const finish = useCallback(
     async (f: Fight, boss: Boss, deck: readonly ExamQuestion[]) => {
@@ -346,6 +353,7 @@ function ExamRun({ run }: { run: RunState }) {
           score,
           noSpeaking,
           boss: { bossId: boss.id, won, livesLeft: f.lives, bossHpLeft: f.bossHp },
+          language: language.id,
         });
         await refreshProgress().catch(() => undefined);
         if (!mounted.current) return;
@@ -381,7 +389,7 @@ function ExamRun({ run }: { run: RunState }) {
         if (mounted.current) setSaveError(true);
       }
     },
-    [exam, activity, refreshProgress, navigate, clock, run.attemptId, run.remainingToday],
+    [exam, activity, refreshProgress, navigate, clock, run.attemptId, run.remainingToday, language.id],
   );
 
   const onResult = useCallback(
@@ -465,6 +473,7 @@ function ExamRun({ run }: { run: RunState }) {
 
       <FightStage
         boss={boss}
+        language={language}
         defeated={fight.status === "won"}
         look={look}
         heroFace={heroFace}
@@ -479,7 +488,7 @@ function ExamRun({ run }: { run: RunState }) {
         live={fight.status === "fighting" || ending}
       />
       <div className="flex items-center justify-between gap-3 px-5 pt-2">
-        <p lang="vi" className="whitespace-nowrap text-body-strong text-ink">
+        <p lang={language.htmlLang} className="whitespace-nowrap text-body-strong text-ink">
           {boss.name}
         </p>
         <WaterDropHp value={hp} max={boss.hp} label={fr.exam.run.bossHp(boss.name, hp, boss.hp)} reduced={beat.reduced} />

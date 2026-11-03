@@ -60,3 +60,18 @@ test("a wallet streak state keeps the streak alive across missed days", () => {
   expect(computeProgress(events, "2026-10-14T12:00:00.000Z", { streak: 2, lastActiveDay: "2026-10-12", freezes: 1 }).streak).toBe(2);
   expect(computeProgress(events, "2026-10-14T12:00:00.000Z", { streak: 2, lastActiveDay: "2026-10-12", freezes: 0 }).streak).toBe(0);
 });
+
+test("each language keeps its own boss score: a Tagalog fight (tl_exam) never moves the Vietnamese examBest", () => {
+  const s = computeProgress(
+    [
+      ev({ type: "exam_finished", refId: "tl_exam", xp: 85, createdAt: "2026-10-10T08:00:00.000Z", payload: { score: 85 } }),
+      ev({ type: "exam_finished", refId: "tl_exam", xp: 0, createdAt: "2026-10-10T08:30:00.000Z", payload: { score: 78 } }),
+    ],
+    NOW,
+  );
+  expect(s.examBest).toBeNull();
+  expect(s.examBests).toEqual({ tl: 85 });
+  const both = computeProgress([...[ev({ type: "exam_finished", refId: "exam", xp: 72, createdAt: "2026-10-10T09:00:00.000Z", payload: { score: 72 } })]], NOW);
+  expect(both.examBest).toBe(72);
+  expect(both.examBests).toEqual({ vi: 72 });
+});

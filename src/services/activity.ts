@@ -8,6 +8,8 @@ import { ENERGY, energyAt } from "@/services/energy";
 import { equippable, nextDailyBonus, purchasable, walletAt } from "@/services/wallet";
 import { parisDay } from "@/services/time";
 import { struggleAt, type Struggle } from "@/services/struggle";
+import { examBestIn } from "@/services/exam";
+import { examRefId, type LanguageId } from "@/domain/languages";
 
 export type ActivityResult = { xpGained: number; newBadges: BadgeDef[]; snapshot: ProgressSnapshot; firstTime: boolean; energyGained?: number; coinsGained: number };
 export type ActivityService = {
@@ -29,7 +31,8 @@ export type ActivityService = {
   completeLesson(i: { lessonId: LessonId; mistakes: number; durationMs: number; vocabIds: readonly VocabId[] }): Promise<ActivityResult>;
   completeDialogue(i: { dialogueId: DialogueId; durationMs: number }): Promise<ActivityResult>;
   completeReview(i: { correctCount: number; total: number }): Promise<ActivityResult>;
-  finishExam(i: { attemptId: string; score: number; noSpeaking: boolean; boss?: BossOutcome }): Promise<ActivityResult>;
+  /** `language`: the boss's language (its `ref_id` and its own best score); Vietnamese when omitted. */
+  finishExam(i: { attemptId: string; score: number; noSpeaking: boolean; boss?: BossOutcome; language?: LanguageId }): Promise<ActivityResult>;
   /**
    * Mirrors settled duels into the local journal: one `duel_settled` per rewarded duel not yet in it (ADR 0004).
    * Returns the Kim bài added to the local wallet.
@@ -221,9 +224,9 @@ export function createActivityService(deps: {
       await progress.appendEvent({ type: "demo_grant", refId: "demo", xp: 0, payload: { coins, kimBai } }, clock()); // local only: never enqueued
       return wallet();
     },
-    async finishExam({ attemptId, score, noSpeaking, boss }) {
-      const best = (await snapshot()).examBest;
-      return commit(ev("exam_finished", "exam", examXpDelta(score, best), { score, attemptId, noSpeaking, ...(boss ?? {}) }), best === null);
+    async finishExam({ attemptId, score, noSpeaking, boss, language = "vi" }) {
+      const best = examBestIn(await snapshot(), language);
+      return commit(ev("exam_finished", examRefId(language), examXpDelta(score, best), { score, attemptId, noSpeaking, ...(boss ?? {}) }), best === null);
     },
   };
 }

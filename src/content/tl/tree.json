@@ -8,6 +8,7 @@
     { "id": "tl_l05", "kind": "lesson", "requires": ["tl_l04"], "branch": "trunk" },
     { "id": "tl_l06", "kind": "lesson", "requires": ["tl_l05"], "branch": "trunk" },
     { "id": "tl_l07", "kind": "lesson", "requires": ["tl_l06"], "branch": "trunk" },
-    { "id": "tl_l08", "kind": "lesson", "requires": ["tl_l07"], "branch": "trunk" }
+    { "id": "tl_l08", "kind": "lesson", "requires": ["tl_l07"], "branch": "trunk" },
+    { "id": "tl_boss_bakunawa", "kind": "boss", "requires": ["tl_l08"], "branch": "trunk" }
   ]
 }

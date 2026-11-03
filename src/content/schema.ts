@@ -112,7 +112,7 @@ export const DialogueSchema = z
 
 export const ExamSectionSchema = z.enum(["listening", "translation", "tones", "speaking"]);
 export const ExamQuestionSchema = z
-  .object({ id: z.string().regex(/^exam_q\d{3}$/), section: ExamSectionSchema, exercise: ExerciseSchema })
+  .object({ id: z.string().regex(/^(tl_)?exam_q\d{3}$/), section: ExamSectionSchema, exercise: ExerciseSchema })
   .strict();
 export const ExamPoolSchema = z.object({ contentVersion: z.number().int().min(1), questions: z.array(ExamQuestionSchema) }).strict();
 
@@ -123,7 +123,7 @@ export const TreeFileSchema = z.object({ contentVersion: z.number().int().min(1)
 
 export const BossSchema = z
   .object({
-    id: z.string().regex(/^boss_[a-z0-9_]+$/),
+    id: z.string().regex(/^(tl_)?boss_[a-z0-9_]+$/),
     name: ViTextSchema,
     title: z.string().min(1),
     legend: z.string().min(1),

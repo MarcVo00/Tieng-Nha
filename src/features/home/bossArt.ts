@@ -1,6 +1,7 @@
 import thuyTinh from "@/assets/characters/boss-thuy-tinh.svg";
+import bakunawa from "@/assets/characters/boss-bakunawa.svg";
 
-const ART: Record<string, string> = { boss_thuy_tinh: thuyTinh };
+const ART: Record<string, string> = { boss_thuy_tinh: thuyTinh, tl_boss_bakunawa: bakunawa };
 
 /** Bundled illustration of a boss sheet (`illustration` key), or null when none is drawn yet. */
 export function bossArtUrl(illustration: string): string | null {

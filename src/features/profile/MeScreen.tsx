@@ -6,12 +6,13 @@ import { THEME_KEY } from "@/domain/storageKeys";
 import { OfflineError } from "@/domain/errors";
 import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
+import { languageOfId } from "@/domain/languages";
 import { useUnseenNews } from "@/app/useNews";
 import type { BadgeDef, Boss } from "@/domain/types";
 import { lookOf } from "@/services/look";
-import { FINAL_BOSS_ID } from "@/services/tree";
 import { bossMention, livesFromScore } from "@/services/bossFight";
-import { EXAM_PASS } from "@/services/exam";
+import { EXAM_PASS, examBestIn } from "@/services/exam";
 import { fr } from "@/i18n/fr";
 import {
   Avatar, fxSpill, BadgeMedal, BadgeShelf, Button, Card, Certificate, ConfirmDialog, DropNumber, Icon, SectionTitle, Sheet, StreakFlame, downloadCertificate, tap, useToast,
@@ -102,6 +103,8 @@ function BadgeSheet({ badge, unlocked, onClose }: { badge: BadgeDef | null; unlo
 
 export function MeScreen() {
   const { auth, progress, content, sync, outbox } = useServices();
+  const { language } = useLanguage(); // the boss, its stat and its certificate are the active language's
+  const bossId = language.finalBossId;
   const navigate = useNavigate();
   const unseenNews = useUnseenNews();
   const toast = useToast();
@@ -125,7 +128,7 @@ export function MeScreen() {
   const [pending, setPending] = useState(false);
   const leaving = useRef(false);
 
-  const examBest = snapshot?.examBest ?? null;
+  const examBest = snapshot ? examBestIn(snapshot, language.id) : null;
   const passed = examBest !== null && examBest >= EXAM_PASS;
 
   useEffect(() => {
@@ -141,14 +144,18 @@ export function MeScreen() {
 
   useEffect(() => {
     let cancelled = false;
+    if (bossId === null) {
+      setBossFailed(true);
+      return;
+    }
     content
-      .getBoss(FINAL_BOSS_ID)
+      .getBoss(bossId)
       .then((b) => !cancelled && setBoss(b))
       .catch(() => !cancelled && setBossFailed(true)); // The stat falls back to a plain label.
     return () => {
       cancelled = true;
     };
-  }, [content]);
+  }, [content, bossId]);
 
   useEffect(() => {
     if (!passed) return;
@@ -159,7 +166,7 @@ export function MeScreen() {
         // The best attempt; on equal scores the earliest one (listEvents is ordered by date).
         let best: { score: number; dateIso: string; noSpeaking: boolean } | null = null;
         for (const e of events) {
-          if (e.type !== "exam_finished") continue;
+          if (e.type !== "exam_finished" || languageOfId(e.refId) !== language.id) continue;
           const score = typeof e.payload.score === "number" ? e.payload.score : -1;
           if (best === null || score > best.score) best = { score, dateIso: e.createdAt, noSpeaking: e.payload.noSpeaking === true };
         }
@@ -169,7 +176,7 @@ export function MeScreen() {
     return () => {
       cancelled = true;
     };
-  }, [passed, progress]);
+  }, [passed, progress, language.id]);
 
   const lives = passed && boss && examBest !== null ? livesFromScore(examBest, boss.playerLives) : null;
   // Won is decided by the score alone; the boss sheet only adds the name and the lives. Nothing is claimed while it loads.
@@ -186,7 +193,7 @@ export function MeScreen() {
   const mention = examBest === null ? "presque" : bossMention(examBest);
   const certificate: CertificateProps | null =
     passed && examBest !== null && mention !== "presque" && profile && bestDate
-      ? { pseudo: profile.pseudo, score: examBest, mention, dateIso: bestDate.dateIso, noSpeaking: bestDate.noSpeaking }
+      ? { pseudo: profile.pseudo, score: examBest, mention, dateIso: bestDate.dateIso, noSpeaking: bestDate.noSpeaking, language: language.id }
       : null;
 
   const unlockedIds = new Set(snapshot?.badges ?? []);

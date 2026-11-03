@@ -1,15 +1,19 @@
 import type { ProgressSnapshot, Tree } from "@/domain/types";
-import { EXAM_PASS } from "@/services/exam";
+import { EXAM_PASS, examBestIn } from "@/services/exam";
+import { LANGUAGES, type LanguageId } from "@/domain/languages";
 
-/** The boss that closes the trunk; its fight uses the exam pool and its result is `examBest`. */
+/** The Vietnamese boss that closes the trunk; its fight uses the exam pool and its result is `examBest`. */
 export const FINAL_BOSS_ID = "boss_thuy_tinh";
 
 export type NodeState = "locked" | "available" | "done";
 export type TreeProgress = { lessonsDone: readonly string[]; bossesWon: readonly string[] };
 
-export function treeProgress(snapshot: Pick<ProgressSnapshot, "lessonsDone" | "examBest">): TreeProgress {
-  const won = snapshot.examBest !== null && snapshot.examBest >= EXAM_PASS;
-  return { lessonsDone: snapshot.lessonsDone, bossesWon: won ? [FINAL_BOSS_ID] : [] };
+/** Progress on a language's tree: its lessons done, and its final boss once won. */
+export function treeProgress(snapshot: Pick<ProgressSnapshot, "lessonsDone" | "examBest" | "examBests">, language: LanguageId = "vi"): TreeProgress {
+  const best = examBestIn(snapshot, language);
+  const boss = LANGUAGES[language].finalBossId;
+  const won = boss !== null && best !== null && best >= EXAM_PASS;
+  return { lessonsDone: snapshot.lessonsDone, bossesWon: won ? [boss] : [] };
 }
 
 /** Generic unlock rule (spec §2.2): a node is available once every node it requires is done. */

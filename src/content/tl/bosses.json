@@ -1,1 +1,15 @@
-{ "contentVersion": 1, "bosses": [] }
+{
+  "contentVersion": 1,
+  "bosses": [
+    {
+      "id": "tl_boss_bakunawa",
+      "name": "Bakunawa",
+      "title": "Le serpent qui avale la lune",
+      "legend": "Bakunawa, le serpent des mers, sort des flots pour avaler la lune. Les villageois le chassaient en faisant du bruit. Fais-lui recracher la lune avec ton tagalog !",
+      "illustration": "tl_boss_bakunawa",
+      "hp": 15,
+      "playerLives": 5,
+      "pool": "exam"
+    }
+  ]
+}

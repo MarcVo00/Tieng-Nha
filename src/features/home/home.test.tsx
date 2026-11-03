@@ -7,6 +7,7 @@ import { useAppState } from "@/app/appState";
 import { createFakeServices } from "@/adapters/fakes";
 import { ToastViewport } from "@/ui";
 import { HomeScreen } from "@/features/home";
+import { fr } from "@/i18n/fr";
 import "@/test/routerTestEnv";
 import { BONUS_SHOWN_KEY } from "@/domain/storageKeys";
 import { parisDay } from "@/services/time";
@@ -158,23 +159,26 @@ describe("with Tagalog active", () => {
     useAppState.setState({ settings: { ...DEFAULT_SETTINGS } });
   });
 
-  test("the path shows the Tagalog lessons, no boss stop and no Vietnamese title", async () => {
+  test("the path shows the Tagalog lessons and ends on Bakunawa, locked, with no Vietnamese title", async () => {
     renderHome();
     const stop = await screen.findByRole("link", { name: /Salamat at kumusta.*disponible/ });
     expect(stop).toHaveAttribute("href", "/lesson/tl_l01");
     expect(screen.getByText("Kain tayo")).toBeInTheDocument();
-    expect(screen.queryByText("Boss final")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Bakunawa, boss final, verrouillé" })).toBeInTheDocument();
+    expect(screen.getByText(fr.home.exam.lockedHint(2))).toBeInTheDocument();
+    expect(screen.getByText("Bakunawa")).toHaveAttribute("lang", "tl");
     expect(screen.queryByRole("button", { name: /Thủy Tinh/ })).not.toBeInTheDocument();
     expect(screen.queryByText("Au café")).not.toBeInTheDocument();
   });
 
-  test("finishing every lesson does not conjure an exam stop", async () => {
+  test("finishing every Tagalog lesson opens Bakunawa; a Vietnamese win does not count for him", async () => {
     const services = createFakeServices();
+    await services.activity.finishExam({ attemptId: "v", score: 92, noSpeaking: false });
     await services.activity.completeLesson({ lessonId: "tl_l01", mistakes: 0, durationMs: 1000, vocabIds: [] });
     await services.activity.completeLesson({ lessonId: "tl_l02", mistakes: 0, durationMs: 1000, vocabIds: [] });
     renderHome(services);
-    await screen.findByRole("link", { name: /Salamat at kumusta.*terminée/ });
-    expect(screen.queryByText("Boss final")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /boss final/i })).not.toBeInTheDocument();
+    const boss = await screen.findByRole("link", { name: "Bakunawa, boss final" });
+    expect(boss).toHaveAttribute("href", "/exam");
+    expect(screen.queryByText(fr.home.exam.won)).not.toBeInTheDocument();
   });
 });

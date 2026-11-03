@@ -75,8 +75,10 @@ describe("one content source per language", () => {
     expect(tlKeys.every((k) => k.startsWith("tl_"))).toBe(true);
   });
   test("tree, exam and bosses are per language", async () => {
-    expect((await tl.getTree()).nodes.map((n) => n.id)).toEqual(["tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05", "tl_l06", "tl_l07", "tl_l08"]);
-    expect(await tl.getExamPool()).toEqual([]);
+    expect((await tl.getTree()).nodes.map((n) => n.id)).toEqual(["tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05", "tl_l06", "tl_l07", "tl_l08", "tl_boss_bakunawa"]);
+    const pool = await tl.getExamPool();
+    expect(pool.length).toBeGreaterThanOrEqual(19); // 15 hp + 5 lives - 1
+    expect(pool.every((q) => q.id.startsWith("tl_exam_q") && q.exercise.id.startsWith("tl_exam_e"))).toBe(true);
     expect((await vi.getTree()).nodes.some((n) => n.id === "boss_thuy_tinh")).toBe(true);
   });
   test("badges, shop and changelog are shared", async () => {
@@ -87,5 +89,7 @@ describe("one content source per language", () => {
   test("the Vietnamese boss is unknown to the Tagalog source", async () => {
     await expect(vi.getBoss("boss_thuy_tinh")).resolves.toMatchObject({ id: "boss_thuy_tinh" });
     await expect(tl.getBoss("boss_thuy_tinh")).rejects.toBeInstanceOf(ContentNotFoundError);
+    await expect(tl.getBoss("tl_boss_bakunawa")).resolves.toMatchObject({ name: "Bakunawa", hp: 15, playerLives: 5 });
+    await expect(vi.getBoss("tl_boss_bakunawa")).rejects.toBeInstanceOf(ContentNotFoundError);
   });
 });

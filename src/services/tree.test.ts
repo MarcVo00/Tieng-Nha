@@ -28,3 +28,18 @@ test("the final boss counts as done once beaten (best score at least 70)", () =>
 test("an unknown node is locked", () => {
   expect(nodeState(tree, "nope", treeProgress({ lessonsDone: [], examBest: null }))).toBe("locked");
 });
+
+test("each language's tree counts its own boss: Bakunawa is won by the Tagalog score, never the Vietnamese one", () => {
+  const tlTree = {
+    contentVersion: 1,
+    nodes: [
+      { id: "tl_l01", kind: "lesson" as const, requires: [], branch: "trunk" },
+      { id: "tl_boss_bakunawa", kind: "boss" as const, requires: ["tl_l01"], branch: "trunk" },
+    ],
+  };
+  const vietnameseOnly = treeProgress({ lessonsDone: ["tl_l01"], examBest: 92, examBests: { vi: 92 } }, "tl");
+  expect(nodeState(tlTree, "tl_boss_bakunawa", vietnameseOnly)).toBe("available");
+  const won = treeProgress({ lessonsDone: ["tl_l01"], examBest: null, examBests: { tl: 78 } }, "tl");
+  expect(nodeState(tlTree, "tl_boss_bakunawa", won)).toBe("done");
+  expect(treeProgress({ lessonsDone: [], examBest: null, examBests: { tl: 78 } }, "vi").bossesWon).toEqual([]);
+});

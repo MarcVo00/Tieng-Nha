@@ -74,7 +74,7 @@ describe("intro", () => {
   test("is locked until the tree unlocks the boss and shows the progress", async () => {
     useAppState.setState({ snapshot: snapshotWith(0) });
     renderExam({ entry: "/exam" });
-    expect(await screen.findByRole("heading", { name: fr.exam.intro.locked.title })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: fr.exam.intro.locked.title("Thủy Tinh") })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1, name: "Thủy Tinh" })).toBeInTheDocument();
     expect(screen.getByText(fr.exam.intro.locked.progress(0, 1))).toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
@@ -132,7 +132,7 @@ describe("intro", () => {
 
   test("shows the daily limit message after three attempts", async () => {
     const services = createFakeServices();
-    for (let i = 0; i < 3; i++) await services.exam.startAttempt();
+    for (let i = 0; i < 3; i++) await services.exam.startAttempt("vi");
     renderExam({ services, entry: "/exam" });
     await userEvent.click(await screen.findByRole("button", { name: fr.exam.intro.start }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Tu as utilisé tes 3 essais aujourd'hui. Reviens demain !");
@@ -361,7 +361,7 @@ describe("run", () => {
     await answerQuestion(first, true);
     expect(await screen.findByRole("img", { name: "Thủy Tinh, le dieu des eaux — vaincu" })).toBeInTheDocument();
     // Respect: the win is stamped over the strip, not on the boss; the last ink splashes beside him, not on his face.
-    const seal = await screen.findByText(fr.exam.run.win);
+    const seal = await screen.findByText(fr.exam.run.win.vi);
     expect(seal).toHaveAttribute("lang", "vi");
     const bossBox = document.querySelector("[data-fighter='boss']")?.closest("[role='img']")?.parentElement?.querySelector("[data-fx-layer='boss']");
     expect(bossBox).not.toBeNull();
@@ -433,7 +433,7 @@ describe("run", () => {
       await fight(deck, 99, recognizer);
       await waitFor(() => expect(finishExam).toHaveBeenCalledTimes(1), { timeout: 8000 });
       expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
-      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 100, noSpeaking: false, boss: { bossId: "boss_thuy_tinh", won: true, livesLeft: 5, bossHpLeft: 0 } });
+      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 100, noSpeaking: false, boss: { bossId: "boss_thuy_tinh", won: true, livesLeft: 5, bossHpLeft: 0 }, language: "vi" });
       expect(submit).toHaveBeenCalledWith(ATTEMPT.attemptId, 100);
     },
     TEST_TIMEOUT,
@@ -447,7 +447,7 @@ describe("run", () => {
       await fight(deck, 3, recognizer); // 3 hits, then wrong until 0 lives
       await waitFor(() => expect(finishExam).toHaveBeenCalledTimes(1), { timeout: 8000 });
       expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
-      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 12, noSpeaking: true, boss: { bossId: "boss_thuy_tinh", won: false, livesLeft: 0, bossHpLeft: 12 } });
+      expect(finishExam).toHaveBeenCalledWith({ attemptId: ATTEMPT.attemptId, score: 12, noSpeaking: true, boss: { bossId: "boss_thuy_tinh", won: false, livesLeft: 0, bossHpLeft: 12 }, language: "vi" });
     },
     TEST_TIMEOUT,
   );
@@ -733,3 +733,45 @@ function mockCanvas() {
   Object.defineProperty(URL, "revokeObjectURL", { value: vi.fn(), configurable: true });
   return { ctxCalls };
 }
+
+describe("Tagalog boss", () => {
+  beforeEach(() => {
+    useAppState.setState({
+      settings: { ...withCapabilities(true), language: "tl" },
+      snapshot: { ...snapshotWith(0, 92), lessonsDone: ["tl_l01", "tl_l02"], examBests: { vi: 92 } },
+    });
+  });
+
+  test("the intro presents Bakunawa; a Vietnamese win does not count; starting asks for a Tagalog attempt", async () => {
+    const services = createFakeServices();
+    const start = vi.spyOn(services.exam, "startAttempt");
+    renderExam({ services, entry: "/exam" });
+    const name = await screen.findByRole("heading", { level: 1, name: "Bakunawa" });
+    expect(name).toHaveAttribute("lang", "tl");
+    expect(screen.getByRole("img", { name: "Bakunawa, le serpent qui avale la lune" })).toBeInTheDocument();
+    expect(screen.queryByText(/vaincu ✓/)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: fr.exam.intro.start }));
+    await waitFor(() => expect(start).toHaveBeenCalledWith("tl"));
+  });
+
+  test("a Tagalog victory gives the Tagalog certificate", async () => {
+    const state: ResultState = {
+      score: 92,
+      mention: bossMention(92),
+      results: [],
+      questions: [],
+      noSpeaking: false,
+      xpGained: 92,
+      coinsGained: 50,
+      newBadges: [],
+      remainingToday: 2,
+      dateIso: "2026-11-03T10:00:00.000Z",
+      boss: { id: "tl_boss_bakunawa", name: "Bakunawa", title: "Le serpent qui avale la lune", illustration: "tl_boss_bakunawa", hp: 15, playerLives: 5, won: true, livesLeft: 4, bossHpLeft: 0 },
+    };
+    renderExam({ entry: { pathname: "/exam/result", state } });
+    expect(await screen.findByRole("heading", { name: fr.exam.result.won("Bakunawa") })).toBeInTheDocument();
+    const certificate = screen.getAllByRole("img", { name: fr.exam.certificate.aria("Linh", 92) })[0] as HTMLElement;
+    expect(within(certificate).getByText(fr.exam.certificate.heading.tl)).toHaveAttribute("lang", "tl");
+    expect(within(certificate).getByText(fr.exam.certificate.achievement.tl)).toBeInTheDocument();
+  });
+});

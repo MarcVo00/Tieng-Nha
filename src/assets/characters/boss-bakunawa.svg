@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
+  <title>Boss — Bakunawa, le serpent qui avale la lune (Đông Hồ simplifié)</title>
+  <!-- Gabarit boss : 200×200. Signature lục (vert) pour le serpent, motif d'élément = la bande de vagues (seule zone
+       hachurée), attribut lisible de loin = la lune or entre ses mâchoires. Il regarde à droite (miroir au combat). -->
+  <defs>
+    <pattern id="hatch-bakunawa" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="72" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#2B4E6E" stroke-width="3" stroke-linecap="round" opacity="0.55">
+    <!-- la mer de nuit d'où il sort -->
+    <path d="M12 108 Q22 98 32 108 Q42 118 52 108"/>
+    <path d="M22 76 Q30 68 38 76"/>
+    <path d="M150 112 Q160 102 170 112 Q180 122 190 112"/>
+  </g>
+
+  <g id="layer-body" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- corps-tube : contour noir de 3 px = trait noir 30 sous un trait vert 24 -->
+    <path d="M16 170 Q36 116 58 168" stroke="#1F1A17" stroke-width="26"/>
+    <path d="M16 170 Q36 116 58 168" stroke="#4E7A4A" stroke-width="20"/>
+    <path d="M140 170 Q150 142 172 134" stroke="#1F1A17" stroke-width="24"/>
+    <path d="M140 170 Q150 142 172 134" stroke="#4E7A4A" stroke-width="18"/>
+    <path d="M98 174 Q86 132 110 114 Q128 100 118 80" stroke="#1F1A17" stroke-width="30"/>
+    <path d="M98 174 Q86 132 110 114 Q128 100 118 80" stroke="#4E7A4A" stroke-width="24"/>
+    <!-- crête dorsale et nageoire de queue vermillon -->
+    <g fill="#B23A2A" stroke="#1F1A17" stroke-width="3">
+      <path d="M80 146 L68 138 L84 132 Z"/>
+      <path d="M86 124 L76 110 L94 112 Z"/>
+      <path d="M100 104 L94 88 L108 94 Z"/>
+      <path d="M170 124 L188 120 L182 140 Z"/>
+    </g>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- crête de la tête -->
+    <path d="M112 62 L96 50 L112 50 L106 34 L122 42 Z" fill="#B23A2A"/>
+    <!-- tête, gueule ouverte sur la lune -->
+    <path d="M112 82 Q100 50 124 38 Q146 30 160 44 L180 50 Q184 57 176 59 L146 64 L172 74 Q178 81 169 84 Q138 92 112 82 Z" fill="#4E7A4A"/>
+    <!-- sourcil froncé, œil rond : il est en colère ; joue vermillon -->
+    <path d="M127 45 L142 50" fill="none"/>
+    <circle cx="136" cy="55" r="3.2" fill="#1F1A17" stroke="none"/>
+    <circle cx="170" cy="51" r="1.6" fill="#1F1A17" stroke="none"/>
+    <circle cx="128" cy="68" r="3" fill="#B23A2A" stroke="none"/>
+  </g>
+
+  <g id="layer-weapon" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round">
+    <!-- la lune, qu'il est en train d'avaler -->
+    <circle cx="176" cy="67" r="12" fill="#D9A93A"/>
+  </g>
+
+  <g id="layer-water" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- bande de vagues devant lui : la seule zone à motif -->
+    <path d="M6 188 L6 168 Q20 158 34 168 Q48 178 62 168 Q76 158 90 168 Q104 178 118 168 Q132 158 146 168 Q160 178 174 168 Q186 160 194 168 L194 188 Z" fill="#F4E4C4"/>
+    <path d="M6 188 L6 168 Q20 158 34 168 Q48 178 62 168 Q76 158 90 168 Q104 178 118 168 Q132 158 146 168 Q160 178 174 168 Q186 160 194 168 L194 188 Z" fill="url(#hatch-bakunawa)" stroke="none"/>
+  </g>
+</svg>

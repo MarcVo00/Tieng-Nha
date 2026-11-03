@@ -54,13 +54,15 @@ const VERDICT_STYLE: Record<Verdict, string> = {
  */
 export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
   const { id = "" } = useParams();
-  const { content, duels, tts, stt, recorder, sound } = useServices();
+  const { contents, duels, tts, stt, recorder, sound } = useServices();
+  const content = contents.vi; // duels are Vietnamese-only in 2.0, whatever the active language
   const { settings, updateSettings } = useSettings();
   const heroLook = useHeroLook();
   const navigate = useNavigate();
 
   const hasStt = useRef(settings.capabilities?.stt ?? false); // fixed for the run
   // The recorder would let the learner grade themselves: duels are recognition-only.
+  // `tts.isAvailable()` probes the active language; acceptable, as every language's pack has files (pack test).
   const capabilities: Capabilities = { tts: settings.capabilities?.tts ?? tts.isAvailable(), stt: true, recorder: false };
 
   const [load, setLoad] = useState<Load>({ status: "loading" });
@@ -433,6 +435,7 @@ export function DuelRunScreen({ now = Date.now }: { now?: () => number }) {
                 vocabIndex={load.vocabIndex}
                 capabilities={capabilities}
                 voiceRate={voiceRateOf(settings)}
+                lang="vi" // Vietnamese-only content: spoken and heard in Vietnamese even while Tagalog is active
                 services={{ tts, stt, recorder }}
                 onResult={onResult}
                 onCapabilityLost={onCapabilityLost}

@@ -1,0 +1,108 @@
+{
+  "id": "tl_d07",
+  "contentVersion": 1,
+  "title": "En tricycle",
+  "scene": "Devant ton hôtel, un chauffeur de tricycle t'interpelle",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Tricycle po? Saan po tayo?",
+      "fr": "Un tricycle ? On va où ?",
+      "next": "t2",
+      "pron": "tray·si·KEL PO sa·AN PO TA·yo"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Sa palengke po. Magkano po?",
+          "fr": "Au marché. C'est combien ?",
+          "next": "t3",
+          "pron": "SA pa·LENG·ke PO mag·KA·no PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Magkano po hanggang palengke?",
+          "fr": "Combien jusqu'au marché ?",
+          "next": "t3",
+          "pron": "mag·KA·no PO hang·GANG pa·LENG·ke"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Singkuwenta po.",
+      "fr": "Cinquante pesos.",
+      "next": "t4",
+      "pron": "sing·ku·WEN·ta PO"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Ang mahal! Bente po?",
+          "fr": "C'est cher ! Vingt ?",
+          "next": "t5",
+          "pron": "ANG ma·HAL BEN·te PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Opo, salamat po.",
+          "fr": "D'accord, merci.",
+          "next": "t6",
+          "pron": "O·po sa·LA·mat PO"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Hindi po pwede. Kuwarenta na lang po.",
+      "fr": "Impossible. Quarante, alors.",
+      "next": "t7",
+      "pron": "hin·DI PO PWE·de ku·wa·REN·ta NA LANG PO"
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Sige po.",
+      "fr": "D'accord, montez.",
+      "next": "t7",
+      "pron": "SI·ge PO"
+    },
+    {
+      "id": "t7",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Para po! Bayad po.",
+          "fr": "(Arrivé au marché) Arrêtez-vous ici ! Voilà l'argent.",
+          "next": "t8",
+          "pron": "PA·ra PO BA·yad PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Dito na lang po. Bayad po.",
+          "fr": "(Arrivé au marché) Ici, ça ira. Voilà l'argent.",
+          "next": "t8",
+          "pron": "DI·to NA LANG PO BA·yad PO"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "speaker": "npc",
+      "vi": "Salamat po! Ingat po!",
+      "fr": "Merci ! Prenez soin de vous !",
+      "next": null,
+      "pron": "sa·LA·mat PO I·ngat PO"
+    }
+  ]
+}

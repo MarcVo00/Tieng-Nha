@@ -19,7 +19,9 @@ test("sign out, then sign back in with e-mail and password", async ({ page }) =>
   await page.getByLabel(fr.onboarding.signIn.passwordLabel, { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: fr.onboarding.signIn.submit }).click();
 
-  // A returning user skips the device and install steps and lands on the home path directly.
+  // A returning user skips the device and install steps; the language choice is local, so the picker comes back once.
+  await page.waitForURL("**/languages");
+  await page.getByRole("button", { name: /Vietnamien/ }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("navigation", { name: fr.ui.nav.label })).toBeVisible();
 });

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
 import type { VocabItem } from "@/domain/types";
 import { SLOW_VOICE_RATE } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
-import { Button, Card, duration, EXIT_RATIO, ease, ReportButton, SpeakerButton, spring } from "@/ui";
+import { Button, Card, duration, EXIT_RATIO, ease, Pron, ReportButton, SpeakerButton, spring } from "@/ui";
 
 export const SWIPE_THRESHOLD = 80; // px
 
@@ -24,7 +25,7 @@ const cardVariants = {
   exit: (dir: number) => ({ x: dir * 140, opacity: 0, transition: { duration: duration.fast * EXIT_RATIO, ease: ease.in } }),
 };
 
-function WordCard({ item, top, dir, onSwipe }: { item: VocabItem; top: boolean; dir: number; onSwipe: (dir: number) => void }) {
+function WordCard({ item, lang, top, dir, onSwipe }: { item: VocabItem; lang: "vi" | "tl"; top: boolean; dir: number; onSwipe: (dir: number) => void }) {
   return (
     <motion.div
       custom={dir}
@@ -43,9 +44,10 @@ function WordCard({ item, top, dir, onSwipe }: { item: VocabItem; top: boolean; 
       style={{ zIndex: top ? 2 : 1, transformOrigin: "50% 100%" }}
     >
       <Card raised className="flex h-full min-h-72 flex-col justify-center gap-3 p-6">
-        <p lang="vi" className="break-words text-display text-ink">
+        <p lang={lang} className="break-words text-display text-ink">
           {item.vi}
         </p>
+        <Pron text={item.pron} />
         <p className="text-body text-ink-muted">{item.fr}</p>
         {item.note ? <p className="mt-2 rounded-sm bg-surface-2 p-3 text-caption text-info">{item.note}</p> : null}
       </Card>
@@ -55,6 +57,7 @@ function WordCard({ item, top, dir, onSwipe }: { item: VocabItem; top: boolean; 
 
 export function VocabDeck({ vocab, voiceRate, ttsEnabled, onReport, onStart }: VocabDeckProps) {
   const { tts } = useServices();
+  const { language } = useLanguage();
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
   const item = vocab[index];
@@ -90,7 +93,7 @@ export function VocabDeck({ vocab, voiceRate, ttsEnabled, onReport, onStart }: V
       <div className="grid">
         <AnimatePresence custom={dir} initial={false}>
           {shown.map((v) => (
-            <WordCard key={v.id} item={v} top={v.id === item.id} dir={dir} onSwipe={go} />
+            <WordCard key={v.id} item={v} lang={language.htmlLang} top={v.id === item.id} dir={dir} onSwipe={go} />
           ))}
         </AnimatePresence>
       </div>

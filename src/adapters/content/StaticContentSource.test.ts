@@ -32,7 +32,7 @@ test("exam pool and badges", async () => {
   expect((await src.getBadges()).length).toBe(24);
 });
 test("createStaticContentSource lists real lessons in order and loads the real exam pool", async () => {
-  const real = createStaticContentSource();
+  const real = createStaticContentSource("vi");
   const lessons = await real.listLessons();
   expect(lessons.length).toBeGreaterThan(0);
   expect(lessons.map((l) => l.order)).toEqual(lessons.map((_, i) => i + 1));
@@ -49,5 +49,43 @@ test("createStaticContentSource lists real lessons in order and loads the real e
 });
 
 test("the real shop catalogue matches the fakes fixture", async () => {
-  expect(await createStaticContentSource().getShop()).toEqual(shopFixture);
+  expect(await createStaticContentSource("vi").getShop()).toEqual(shopFixture);
+});
+
+describe("one content source per language", () => {
+  const vi = createStaticContentSource("vi");
+  const tl = createStaticContentSource("tl");
+
+  test("vi lists the ten Vietnamese lessons in order", async () => {
+    expect((await vi.listLessons()).map((l) => l.id)).toEqual(["l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10"]);
+  });
+  test("tl lists only tl_ lessons and dialogues", async () => {
+    const ids = (await tl.listLessons()).map((l) => l.id);
+    expect(ids.length).toBeGreaterThan(0);
+    expect(ids.every((id) => id.startsWith("tl_"))).toBe(true);
+    expect((await tl.getDialogue("tl_d01")).id).toBe("tl_d01");
+    await expect(vi.getDialogue("tl_d01")).rejects.toBeInstanceOf(ContentNotFoundError);
+  });
+  test("each vocab index holds only its own language", async () => {
+    const viKeys = [...(await vi.getVocabIndex()).keys()];
+    const tlKeys = [...(await tl.getVocabIndex()).keys()];
+    expect(viKeys.length).toBeGreaterThan(0);
+    expect(tlKeys.length).toBeGreaterThan(0);
+    expect(viKeys.some((k) => k.startsWith("tl_"))).toBe(false);
+    expect(tlKeys.every((k) => k.startsWith("tl_"))).toBe(true);
+  });
+  test("tree, exam and bosses are per language", async () => {
+    expect((await tl.getTree()).nodes.map((n) => n.id)).toEqual(["tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05", "tl_l06", "tl_l07", "tl_l08"]);
+    expect(await tl.getExamPool()).toEqual([]);
+    expect((await vi.getTree()).nodes.some((n) => n.id === "boss_thuy_tinh")).toBe(true);
+  });
+  test("badges, shop and changelog are shared", async () => {
+    expect(await tl.getBadges()).toEqual(await vi.getBadges());
+    expect(await tl.getShop()).toEqual(await vi.getShop());
+    expect(await tl.getChangelog()).toEqual(await vi.getChangelog());
+  });
+  test("the Vietnamese boss is unknown to the Tagalog source", async () => {
+    await expect(vi.getBoss("boss_thuy_tinh")).resolves.toMatchObject({ id: "boss_thuy_tinh" });
+    await expect(tl.getBoss("boss_thuy_tinh")).rejects.toBeInstanceOf(ContentNotFoundError);
+  });
 });

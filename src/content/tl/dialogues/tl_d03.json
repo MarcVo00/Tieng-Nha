@@ -1,0 +1,80 @@
+{
+  "id": "tl_d03",
+  "contentVersion": 1,
+  "title": "Acheter des mangues",
+  "scene": "Un étal de fruits au marché de Quiapo, à Manille",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Magandang hapon! Mangga po, singkuwenta pesos.",
+      "fr": "Bon après-midi ! Des mangues, cinquante pesos pièce.",
+      "next": "t2",
+      "pron": "ma·gan·DANG HA·pon mang·GA PO sing·ku·WEN·ta PE·sos"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Isa po.",
+          "fr": "Une, s'il vous plaît.",
+          "next": "t3",
+          "pron": "i·SA PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Dalawa po.",
+          "fr": "Deux, s'il vous plaît.",
+          "next": "t4",
+          "pron": "da·la·WA PO"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Isa, singkuwenta pesos po.",
+      "fr": "Une, cinquante pesos.",
+      "next": "t5",
+      "pron": "i·SA sing·ku·WEN·ta PE·sos PO"
+    },
+    {
+      "id": "t4",
+      "speaker": "npc",
+      "vi": "Dalawa, sandaan pesos po.",
+      "fr": "Deux, cent pesos.",
+      "next": "t5",
+      "pron": "da·la·WA san·da·AN PE·sos PO"
+    },
+    {
+      "id": "t5",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Opo, salamat po.",
+          "fr": "Oui, merci.",
+          "next": "t6",
+          "pron": "O·po sa·LA·mat PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Opo. Maraming salamat po!",
+          "fr": "Oui. Merci beaucoup !",
+          "next": "t6",
+          "pron": "O·po ma·RA·ming sa·LA·mat PO"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Salamat po! Ingat!",
+      "fr": "Merci ! Prenez soin de vous !",
+      "next": null,
+      "pron": "sa·LA·mat PO I·ngat"
+    }
+  ]
+}

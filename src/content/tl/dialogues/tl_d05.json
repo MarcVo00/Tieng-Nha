@@ -1,0 +1,108 @@
+{
+  "id": "tl_d05",
+  "contentVersion": 1,
+  "title": "Payer un souvenir",
+  "scene": "Un stand de souvenirs au marché : la vendeuse t'annonce le prix",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Magandang umaga po! Dosyentos po ito.",
+      "fr": "Bonjour ! C'est deux cents pesos.",
+      "next": "t2",
+      "pron": "ma·gan·DANG u·MA·ga PO dos·YEN·tos PO i·TO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Ang mahal! May discount po ba?",
+          "fr": "C'est cher ! Vous avez une réduction ?",
+          "next": "t3",
+          "pron": "ANG ma·HAL MAY DIS·kawnt PO BA"
+        },
+        {
+          "id": "o2",
+          "vi": "Pwede po bang card?",
+          "fr": "Je peux payer par carte ?",
+          "next": "t4",
+          "pron": "PWE·de PO BANG KARD"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Opo. Siyento singkuwenta po.",
+      "fr": "Oui. Cent cinquante pesos.",
+      "next": "t5",
+      "pron": "O·po si·YEN·to sing·ku·WEN·ta PO"
+    },
+    {
+      "id": "t4",
+      "speaker": "npc",
+      "vi": "Pasensya na po, cash lang.",
+      "fr": "Désolée, seulement en espèces.",
+      "next": "t5",
+      "pron": "pa·SEN·sya NA PO KASH LANG"
+    },
+    {
+      "id": "t5",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Opo. Bayad po.",
+          "fr": "D'accord. Voilà.",
+          "next": "t6",
+          "pron": "O·po BA·yad PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Salamat po. Bayad po.",
+          "fr": "Merci. Voilà.",
+          "next": "t6",
+          "pron": "sa·LA·mat PO BA·yad PO"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Salamat po! Ito po ang sukli.",
+      "fr": "Merci ! Voici votre monnaie.",
+      "next": "t7",
+      "pron": "sa·LA·mat PO i·TO PO ANG suk·LI"
+    },
+    {
+      "id": "t7",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Salamat po!",
+          "fr": "Merci !",
+          "next": "t8",
+          "pron": "sa·LA·mat PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Maraming salamat po! Paalam!",
+          "fr": "Merci beaucoup ! Au revoir !",
+          "next": "t8",
+          "pron": "ma·RA·ming sa·LA·mat PO pa·A·lam"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "speaker": "npc",
+      "vi": "Ingat po!",
+      "fr": "Prenez soin de vous !",
+      "next": null,
+      "pron": "I·ngat PO"
+    }
+  ]
+}

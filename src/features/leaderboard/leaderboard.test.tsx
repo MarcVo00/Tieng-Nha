@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { ServicesProvider } from "@/app/ServicesProvider";
@@ -8,6 +8,11 @@ import { createFakeServices, FakeLeaderboardRepository } from "@/adapters/fakes"
 import type { LeaderboardRow } from "@/domain/types";
 import { LeaderboardScreen, PublicProfileScreen } from "@/features/leaderboard";
 import { fr } from "@/i18n/fr";
+import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
+import { InMemoryContentSource } from "@/adapters/fakes/InMemoryContentSource";
+import { lessonFixture } from "@/adapters/fakes/seed/lesson";
+import { treeFixture } from "@/adapters/fakes/seed/tree";
+import { shopFixture } from "@/adapters/fakes/seed/shop";
 
 const NOW = "2026-10-10T10:00:00.000Z";
 const clock = () => NOW;
@@ -176,13 +181,13 @@ test("a profile shows its lesson count and boss victory", async () => {
     list: (period) => base.leaderboard.list(period),
     getPublicProfile: async () => ({
       userId: "x", pseudo: "Xuân", avatarEmoji: "🐯", xpTotal: 200, xpWeek: 50, streak: 3,
-      lessonsDone: ["l01", "l02"], dialoguesDone: [], badges: ["first_lesson"], examBest: 92, frame: null, fx: null, look: {},
+      lessonsDone: ["l01", "l05"], dialoguesDone: [], badges: ["first_lesson"], examBest: 92, frame: null, fx: null, look: {},
     }),
   };
   setup("/u/x", createFakeServices({ clock, content: base.content, leaderboard }));
   expect(await screen.findByRole("heading", { level: 1, name: "Xuân" })).toBeInTheDocument();
   expect(await screen.findByText(fr.publicProfile.bossWon("Thủy Tinh", 4, 5))).toBeInTheDocument();
-  expect(screen.getByText(fr.publicProfile.lessonsSummary(2))).toBeInTheDocument();
+  expect(screen.getByText(fr.publicProfile.lessonsSummary(1, 1))).toBeInTheDocument();
   expect(screen.queryAllByText(fr.ui.badge.locked, { exact: false })).toHaveLength(0);
   await userEvent.click(screen.getByRole("button", { expanded: false, name: /à découvrir/ }));
   expect(screen.getAllByText(fr.ui.badge.locked, { exact: false }).length).toBeGreaterThan(0);
@@ -262,4 +267,62 @@ test("members wear their hero, not an emoji", async () => {
   expect(podium.querySelectorAll("[data-look]").length).toBeGreaterThan(0);
   expect(podium).not.toHaveTextContent("🐢");
   expect(screen.getByRole("list", { name: fr.leaderboard.listLabel })).not.toHaveTextContent("🐯");
+});
+
+describe("lesson counts follow the active language", () => {
+  const lessonOf = (id: string) => ({ ...lessonFixture, id });
+  const countsServices = () => {
+    const base = createFakeServices({ clock });
+    const vi = new InMemoryContentSource(Array.from({ length: 10 }, (_, i) => lessonOf(`l${String(i + 1).padStart(2, "0")}`)), [], [], [], treeFixture, [], shopFixture);
+    const tl = new InMemoryContentSource(Array.from({ length: 8 }, (_, i) => lessonOf(`tl_l${String(i + 1).padStart(2, "0")}`)), [], [], [], treeFixture, [], shopFixture);
+    const leaderboard: Services["leaderboard"] = {
+      list: async () => [
+        row("u2", "Deux", 40),
+        row("u3", "Trois", 30),
+        row("u4", "Quatre", 20),
+        { ...row("u1", "Un", 5), lessonsDone: 3, lessonIds: ["l01", "tl_l01", "tl_l02"] },
+      ],
+      getPublicProfile: async () => ({
+        userId: "u1", pseudo: "Un", avatarEmoji: "🐯", xpTotal: 30, xpWeek: 30, streak: 0,
+        lessonsDone: ["l01", "tl_l01", "tl_l02"], dialoguesDone: [], badges: [], examBest: null, frame: null, fx: null, look: {},
+      }),
+    };
+    return (language: "vi" | "tl") => {
+      useAppState.setState({ settings: { ...DEFAULT_SETTINGS, language } });
+      return createFakeServices({ clock, progress: base.progress, leaderboard, contents: { vi, tl }, content: language === "vi" ? vi : tl });
+    };
+  };
+
+  test("the leaderboard row shows 1/10 in Vietnamese and 2/8 in Tagalog", async () => {
+    const make = countsServices();
+    for (const [language, expected] of [["vi", "1/10"], ["tl", "2/8"]] as const) {
+      setup("/leaderboard", make(language));
+      await screen.findByRole("list", { name: fr.leaderboard.podiumLabel });
+      const link = (await screen.findAllByRole("link")).find((l) => l.textContent?.includes("Un") && l.getAttribute("href") === "/u/u1");
+      expect(link).toBeDefined();
+      await waitFor(() => expect(link).toHaveTextContent(expected));
+      cleanup();
+    }
+  });
+
+  test("while the lesson total loads, the row shows no count rather than a bare « n »", async () => {
+    const services = countsServices()("vi");
+    vi.spyOn(services.content, "listLessons").mockReturnValue(new Promise(() => undefined)); // never resolves
+    setup("/leaderboard", services);
+    await screen.findByRole("list", { name: fr.leaderboard.podiumLabel });
+    const link = (await screen.findAllByRole("link")).find((l) => l.getAttribute("href") === "/u/u1");
+    expect(link).toBeDefined();
+    expect(link?.querySelector("[aria-label]")).toBeNull();
+    expect(link?.textContent).not.toMatch(/\d+\/\d+/);
+    expect(link?.textContent).not.toMatch(/Un\s*1/);
+  });
+
+  test("the public profile counts only the active language", async () => {
+    const make = countsServices();
+    setup("/u/u1", make("tl"));
+    expect(await screen.findByText(fr.publicProfile.lessonsSummary(2, 8))).toBeInTheDocument();
+    cleanup();
+    setup("/u/u1", make("vi"));
+    expect(await screen.findByText(fr.publicProfile.lessonsSummary(1, 10))).toBeInTheDocument();
+  });
 });

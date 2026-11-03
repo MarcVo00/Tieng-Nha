@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import type { VocabId, VocabItem } from "@/domain/types";
+import { useLanguage } from "@/app/useLanguage";
 import { fr } from "@/i18n/fr";
 import { Card, Icon, tap } from "@/ui";
 
@@ -11,6 +12,7 @@ export function StuckWords({ ids, vocabIndex, onSpeak, canSpeak }: {
   onSpeak: (vi: string) => void;
   canSpeak: boolean;
 }) {
+  const { language } = useLanguage();
   const words = ids.flatMap((id) => {
     const w = vocabIndex.get(id);
     return w ? [w] : [];
@@ -23,7 +25,7 @@ export function StuckWords({ ids, vocabIndex, onSpeak, canSpeak }: {
         {words.map((w) => (
           <li key={w.id} className="flex items-center gap-3 px-4 py-2">
             <span className="min-w-0 flex-1">
-              <span lang="vi" className="block break-words text-body-strong leading-relaxed text-ink">{w.vi}</span>
+              <span lang={language.htmlLang} className="block break-words text-body-strong leading-relaxed text-ink">{w.vi}</span>
               <span className="block text-caption text-ink-muted">{w.fr}</span>
             </span>
             {canSpeak ? (

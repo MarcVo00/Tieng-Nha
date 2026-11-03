@@ -14,7 +14,7 @@ import { ToastViewport } from "@/ui";
 import "@/test/routerTestEnv";
 
 function build(demo: boolean) {
-  const content = createStaticContentSource();
+  const content = createStaticContentSource("vi");
   const base = createFakeServices({ content });
   const services: Services = {
     ...base,

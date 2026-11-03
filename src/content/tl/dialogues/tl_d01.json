@@ -1,0 +1,108 @@
+{
+  "id": "tl_d01",
+  "contentVersion": 1,
+  "title": "Bonjour à l'hôtel",
+  "scene": "La réception d'un petit hôtel à Manille, un matin",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Magandang umaga po!",
+      "fr": "Bonjour !",
+      "next": "t2",
+      "pron": "ma·gan·DANG u·MA·ga PO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Magandang umaga po!",
+          "fr": "Bonjour !",
+          "next": "t3",
+          "pron": "ma·gan·DANG u·MA·ga PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Magandang umaga! Kumusta po kayo?",
+          "fr": "Bonjour ! Comment allez-vous ?",
+          "next": "t4",
+          "pron": "ma·gan·DANG u·MA·ga ku·mus·TA PO ka·YO"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Kumusta po kayo?",
+      "fr": "Comment allez-vous ?",
+      "next": "t5",
+      "pron": "ku·mus·TA PO ka·YO"
+    },
+    {
+      "id": "t4",
+      "speaker": "npc",
+      "vi": "Mabuti naman po, salamat! Kumusta po kayo?",
+      "fr": "Bien, merci ! Et vous, comment allez-vous ?",
+      "next": "t5",
+      "pron": "ma·BU·ti na·MAN PO sa·LA·mat ku·mus·TA PO ka·YO"
+    },
+    {
+      "id": "t5",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Mabuti naman, salamat po.",
+          "fr": "Ça va bien, merci.",
+          "next": "t6",
+          "pron": "ma·BU·ti na·MAN sa·LA·mat PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Mabuti po. Maraming salamat!",
+          "fr": "Bien. Merci beaucoup !",
+          "next": "t6",
+          "pron": "ma·BU·ti PO ma·RA·ming sa·LA·mat"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Walang anuman po. Ingat po!",
+      "fr": "De rien. Prenez soin de vous !",
+      "next": "t7",
+      "pron": "wa·LANG a·nu·MAN PO I·ngat PO"
+    },
+    {
+      "id": "t7",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Salamat po. Paalam!",
+          "fr": "Merci. Au revoir !",
+          "next": "t8",
+          "pron": "sa·LA·mat PO pa·A·lam"
+        },
+        {
+          "id": "o2",
+          "vi": "Salamat po! Ingat!",
+          "fr": "Merci ! Prenez soin de vous !",
+          "next": "t8",
+          "pron": "sa·LA·mat PO I·ngat"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "speaker": "npc",
+      "vi": "Paalam po!",
+      "fr": "Au revoir !",
+      "next": null,
+      "pron": "pa·A·lam PO"
+    }
+  ]
+}

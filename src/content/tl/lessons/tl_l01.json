@@ -1,0 +1,273 @@
+{
+  "id": "tl_l01",
+  "contentVersion": 1,
+  "title": "Salutations et politesse",
+  "description": "Dis bonjour à toute heure, remercie et prends congé. Et surtout, apprends « po » : le petit mot qui rend tout poli.",
+  "tagline": "Saluer poliment",
+  "emoji": "👋",
+  "dialogueId": "tl_d01",
+  "vocab": [
+    {
+      "id": "tl_v_kumusta",
+      "vi": "kumusta",
+      "fr": "comment ça va ? / salut",
+      "dialect": "manila",
+      "pron": "ku·mus·TA",
+      "note": "Le salut de tous les jours, de l'espagnol « cómo está ». « Kumusta ka? » à un ami, « Kumusta po kayo? » à un inconnu ou à un aîné."
+    },
+    {
+      "id": "tl_v_mabuti",
+      "vi": "mabuti",
+      "fr": "bien",
+      "dialect": "manila",
+      "pron": "ma·BU·ti"
+    },
+    {
+      "id": "tl_v_mabuti_naman",
+      "vi": "mabuti naman",
+      "fr": "ça va bien",
+      "dialect": "manila",
+      "pron": "ma·BU·ti na·MAN",
+      "note": "La réponse habituelle à « Kumusta? ». « Naman » adoucit la phrase."
+    },
+    {
+      "id": "tl_v_ka",
+      "vi": "ka",
+      "fr": "tu",
+      "dialect": "manila",
+      "pron": "KA",
+      "note": "À un ami ou à quelqu'un de ton âge : « Kumusta ka? »."
+    },
+    {
+      "id": "tl_v_kayo",
+      "vi": "kayo",
+      "fr": "vous (poli)",
+      "dialect": "manila",
+      "pron": "ka·YO",
+      "note": "Avec « po », pour un aîné, un vendeur ou un chauffeur : « Kumusta po kayo? »."
+    },
+    {
+      "id": "tl_v_po",
+      "vi": "po",
+      "fr": "marque de respect",
+      "dialect": "manila",
+      "pron": "PO",
+      "note": "Le mot le plus utile du voyage. On le glisse dans la phrase pour parler poliment à un inconnu, un vendeur, un chauffeur ou un aîné : « Salamat po. » Dans le doute, mets « po »."
+    },
+    {
+      "id": "tl_v_opo",
+      "vi": "opo",
+      "fr": "oui (poli)",
+      "dialect": "manila",
+      "pron": "O·po",
+      "note": "Le oui respectueux, à dire à un inconnu ou à un aîné."
+    },
+    {
+      "id": "tl_v_oo",
+      "vi": "oo",
+      "fr": "oui",
+      "dialect": "manila",
+      "pron": "O·o",
+      "note": "Entre amis. À un inconnu, dis plutôt « opo »."
+    },
+    {
+      "id": "tl_v_hindi",
+      "vi": "hindi",
+      "fr": "non",
+      "dialect": "manila",
+      "pron": "hin·DI",
+      "note": "Poliment : « Hindi po »."
+    },
+    {
+      "id": "tl_v_salamat",
+      "vi": "salamat",
+      "fr": "merci",
+      "dialect": "manila",
+      "pron": "sa·LA·mat",
+      "note": "Poliment : « Salamat po »."
+    },
+    {
+      "id": "tl_v_maraming_salamat",
+      "vi": "maraming salamat",
+      "fr": "merci beaucoup",
+      "dialect": "manila",
+      "pron": "ma·RA·ming sa·LA·mat"
+    },
+    {
+      "id": "tl_v_walang_anuman",
+      "vi": "walang anuman",
+      "fr": "de rien",
+      "dialect": "manila",
+      "pron": "wa·LANG a·nu·MAN"
+    },
+    {
+      "id": "tl_v_magandang_umaga",
+      "vi": "magandang umaga",
+      "fr": "bonjour (le matin)",
+      "dialect": "manila",
+      "pron": "ma·gan·DANG u·MA·ga",
+      "note": "Mot à mot « beau matin ». Avec « po » pour un inconnu : « Magandang umaga po! »."
+    },
+    {
+      "id": "tl_v_magandang_hapon",
+      "vi": "magandang hapon",
+      "fr": "bon après-midi",
+      "dialect": "manila",
+      "pron": "ma·gan·DANG HA·pon",
+      "note": "L'après-midi, pour saluer en arrivant."
+    },
+    {
+      "id": "tl_v_magandang_gabi",
+      "vi": "magandang gabi",
+      "fr": "bonsoir",
+      "dialect": "manila",
+      "pron": "ma·gan·DANG ga·BI",
+      "note": "Le soir, pour saluer en arrivant."
+    },
+    {
+      "id": "tl_v_paalam",
+      "vi": "paalam",
+      "fr": "au revoir",
+      "dialect": "manila",
+      "pron": "pa·A·lam",
+      "note": "Un peu solennel. Au quotidien, on se quitte plutôt avec « Ingat! » ou même « Bye! » en anglais."
+    },
+    {
+      "id": "tl_v_ingat",
+      "vi": "ingat",
+      "fr": "prends soin de toi (en se quittant)",
+      "dialect": "manila",
+      "pron": "I·ngat",
+      "note": "Le vrai au revoir de tous les jours : « Ingat! », ou « Ingat po! » pour un aîné."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l01_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_salamat",
+      "choices": [
+        "tl_v_salamat",
+        "tl_v_paalam",
+        "tl_v_opo",
+        "tl_v_ingat"
+      ]
+    },
+    {
+      "id": "tl_l01_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_magandang_umaga",
+      "choices": [
+        "tl_v_magandang_umaga",
+        "tl_v_magandang_hapon",
+        "tl_v_magandang_gabi",
+        "tl_v_kumusta"
+      ]
+    },
+    {
+      "id": "tl_l01_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_opo",
+      "choices": [
+        "tl_v_opo",
+        "tl_v_oo",
+        "tl_v_po",
+        "tl_v_hindi"
+      ]
+    },
+    {
+      "id": "tl_l01_e04",
+      "type": "translate_choose",
+      "promptFr": "Merci beaucoup !",
+      "answerVi": "Maraming salamat!",
+      "distractorsVi": [
+        "Walang anuman!",
+        "Magandang umaga!",
+        "Ingat!"
+      ]
+    },
+    {
+      "id": "tl_l01_e05",
+      "type": "translate_choose",
+      "promptFr": "Bonsoir ! (poliment)",
+      "answerVi": "Magandang gabi po!",
+      "distractorsVi": [
+        "Magandang umaga po!",
+        "Magandang hapon po!",
+        "Maraming salamat po!"
+      ]
+    },
+    {
+      "id": "tl_l01_e06",
+      "type": "translate_choose",
+      "promptFr": "Comment allez-vous ?",
+      "answerVi": "Kumusta po kayo?",
+      "distractorsVi": [
+        "Kumusta ka?",
+        "Mabuti naman.",
+        "Walang anuman."
+      ]
+    },
+    {
+      "id": "tl_l01_e07",
+      "type": "word_order",
+      "fr": "Ça va bien, merci.",
+      "tokensVi": [
+        "Mabuti",
+        "naman",
+        "salamat"
+      ],
+      "extraTokens": [
+        "hindi"
+      ]
+    },
+    {
+      "id": "tl_l01_e08",
+      "type": "word_order",
+      "fr": "Merci beaucoup ! (poliment)",
+      "tokensVi": [
+        "Maraming",
+        "salamat",
+        "po"
+      ],
+      "extraTokens": [
+        "opo"
+      ]
+    },
+    {
+      "id": "tl_l01_e09",
+      "type": "speak",
+      "vi": "Magandang umaga po!",
+      "fr": "Bonjour ! (le matin, poliment)",
+      "vocabIds": [
+        "tl_v_magandang_umaga",
+        "tl_v_po"
+      ],
+      "pron": "ma·gan·DANG u·MA·ga PO"
+    },
+    {
+      "id": "tl_l01_e10",
+      "type": "speak",
+      "vi": "Kumusta po kayo?",
+      "fr": "Comment allez-vous ?",
+      "vocabIds": [
+        "tl_v_kumusta",
+        "tl_v_po",
+        "tl_v_kayo"
+      ],
+      "pron": "ku·mus·TA PO ka·YO"
+    },
+    {
+      "id": "tl_l01_e11",
+      "type": "speak",
+      "vi": "Salamat po. Ingat!",
+      "fr": "Merci. Prenez soin de vous !",
+      "vocabIds": [
+        "tl_v_salamat",
+        "tl_v_po",
+        "tl_v_ingat"
+      ],
+      "pron": "sa·LA·mat PO I·ngat"
+    }
+  ]
+}

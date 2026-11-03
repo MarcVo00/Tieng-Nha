@@ -16,7 +16,7 @@ import {
 } from "./helpers";
 
 type LessonFile = { vocab: { id: string; fr: string }[]; exercises: { id: string; type: string; vocabId?: string }[] };
-const lesson: LessonFile = JSON.parse(readFileSync(join(process.cwd(), "src/content/lessons/l01.json"), "utf8"));
+const lesson: LessonFile = JSON.parse(readFileSync(join(process.cwd(), "src/content/vi/lessons/l01.json"), "utf8"));
 
 /** Picks the right French meaning on the first listening exercise (the lesson starts with those), without verifying. */
 async function chooseRightAnswer(page: Page): Promise<void> {

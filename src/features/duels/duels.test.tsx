@@ -1,7 +1,7 @@
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { createFakeServices, FakeSoundPlayer, type FakeSpeechRecognizer } from "@/adapters/fakes";
+import { createFakeServices, FakeSoundPlayer, FakeSpeechSynthesizer, type FakeSpeechRecognizer } from "@/adapters/fakes";
 import { useAppState } from "@/app/appState";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import type { Services } from "@/app/services";
@@ -83,6 +83,18 @@ describe("duel run", () => {
     await answer(E03.right, 1500);
     expect(await screen.findByText("2/2", undefined, { timeout: 3000 })).toBeInTheDocument();
     expect(sound.played.filter((p) => p.cue === "arena.start")).toHaveLength(1);
+  });
+
+  test("with Tagalog active, the duel's Vietnamese words are spoken in Vietnamese", async () => {
+    useAppState.setState({ settings: { ...withStt(true), language: "tl" } });
+    const services = createFakeServices();
+    const tts = services.tts;
+    if (!(tts instanceof FakeSpeechSynthesizer)) throw new Error("expected the fake synthesizer");
+    renderRun(services);
+    expect(await screen.findByText(fr.duels.run.round1)).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole("button", { name: fr.exercises.translateChoose.listen(E03.right) }));
+    await waitFor(() => expect(tts.spoken).toContain(E03.right));
+    expect(tts.lastOptions?.language).toBe("vi");
   });
 
   test(

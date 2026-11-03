@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { readCachedSession } from "@/domain/sessionCache";
@@ -29,6 +29,15 @@ export function Root() {
   const ready = useAppState((s) => s.ready);
   const signedIn = useAppState((s) => s.session !== null);
   useVoicePrefetch();
+
+  // The header and the tab bar outlive a language switch: reload the due count (and the rest) for the new language.
+  const language = useAppState((s) => s.settings.language);
+  const lastLanguage = useRef(language);
+  useEffect(() => {
+    if (lastLanguage.current === language) return;
+    lastLanguage.current = language;
+    if (ready) void refreshProgress().catch(() => undefined);
+  }, [language, ready, refreshProgress]);
 
   useEffect(() => {
     let cancelled = false;

@@ -10,7 +10,7 @@ type WordOrder = Extract<Exercise, { type: "word_order" }>;
 type Tile = { key: string; text: string };
 
 // Hero: the French sentence + the answer line being built. Secondary: the tile bank. One action: Vérifier.
-export const Component: FC<ExerciseProps<WordOrder>> = ({ exercise, disabled, onAnswer, seed }) => {
+export const Component: FC<ExerciseProps<WordOrder>> = ({ exercise, disabled, onAnswer, seed, lang = "vi" }) => {
   // Keys are index-based: tokens can repeat, so text is not a usable identity.
   const bank = useMemo(() => {
     const tiles: Tile[] = [...exercise.tokensVi, ...(exercise.extraTokens ?? [])].map((text, i) => ({ key: `tile-${i}`, text }));
@@ -37,7 +37,7 @@ export const Component: FC<ExerciseProps<WordOrder>> = ({ exercise, disabled, on
       type="button"
       layout
       layoutId={tile.key}
-      lang="vi"
+      lang={lang}
       disabled={disabled}
       onClick={onClick}
       whileTap={tap}

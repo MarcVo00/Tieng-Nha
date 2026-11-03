@@ -8,8 +8,9 @@ import { Bubble, MiniSpeaker, TypingIndicator } from "@/features/conversation/Bu
 import { useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useResumeAtZero } from "@/app/useCountdown";
+import { useLanguage } from "@/app/useLanguage";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
-import { BadgeMedal, rewardProp, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
+import { BadgeMedal, rewardProp, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, Pron, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
 
 const BADGE_STAGGER_MS = 280;
@@ -23,7 +24,7 @@ const NOTICE_TEXT: Record<Exclude<DialogueNotice, null>, string> = {
 
 // Hero: the conversation itself. Secondary: the scene card. One action at a time:
 // answer (voice or tap) while it is your turn, then "Retour à l'accueil" at the end.
-function SceneCard({ dialogue }: { dialogue: Dialogue }) {
+function SceneCard({ dialogue, lang }: { dialogue: Dialogue; lang: "vi" | "tl" }) {
   return (
     <Card className="relative mx-5 overflow-hidden px-4 py-3">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-primary">
@@ -31,7 +32,7 @@ function SceneCard({ dialogue }: { dialogue: Dialogue }) {
       </div>
       <div className="relative">
         <h1 className="text-heading text-ink">{dialogue.title}</h1>
-        <p lang="vi" className="text-caption text-ink-muted">
+        <p lang={lang} className="text-caption text-ink-muted">
           {dialogue.scene}
         </p>
       </div>
@@ -107,6 +108,7 @@ export function DialogueScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { reporter } = useServices();
+  const { language } = useLanguage();
   const dueCount = useAppState((s) => s.dueCount);
   const reduced = useReducedMotion();
   const d = useDialogue(id);
@@ -170,7 +172,7 @@ export function DialogueScreen() {
     <div className="flex min-h-dvh flex-col">
       <FocusHeader progress={d.phase === "done" ? 1 : d.progress} onClose={() => (d.phase === "done" ? goHome() : setQuitting(true))}
         closeLabel={fr.conversation.quit.aria} />
-      <SceneCard dialogue={d.dialogue} />
+      <SceneCard dialogue={d.dialogue} lang={language.htmlLang} />
 
       <ol role="log" aria-label={fr.conversation.log} aria-live="polite" className="flex flex-1 flex-col gap-3 px-5 pb-6 pt-5">
         {d.lines.map((line) => (
@@ -179,6 +181,8 @@ export function DialogueScreen() {
             speaker={line.speaker}
             vi={line.vi}
             fr={line.fr}
+            lang={language.htmlLang}
+            {...(line.pron ? { pron: line.pron } : {})}
             onReplay={() => d.replay(line.vi)}
             replayDisabled={busy || !d.capabilities.tts}
             {...(line.speaker === "npc" ? { onReport: () => setReportRef(`${dialogueId}_${line.turnId}`) } : {})}
@@ -254,9 +258,10 @@ export function DialogueScreen() {
                     transition={spring.snappy}
                     className="flex min-h-14 flex-1 flex-col items-start gap-0.5 px-4 py-3 text-left disabled:opacity-60"
                   >
-                    <span lang="vi" className="break-words text-body-strong text-ink">
+                    <span lang={language.htmlLang} className="break-words text-body-strong text-ink">
                       {o.vi}
                     </span>
+                    <Pron text={o.pron} />
                     <span className="text-caption text-ink-muted">{o.fr}</span>
                   </motion.button>
                   <div className="pr-2">

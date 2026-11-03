@@ -4,7 +4,7 @@ import { fr } from "@/i18n/fr";
 import { Icon } from "@/ui/icons";
 import { duration, spring, tap } from "@/ui/motion";
 
-export type ChoiceOption = { id: string; label: string; lang?: "vi" | "fr"; sub?: string };
+export type ChoiceOption = { id: string; label: string; lang?: "vi" | "tl" | "fr"; sub?: string };
 
 type ChoiceGridProps = {
   options: ChoiceOption[];

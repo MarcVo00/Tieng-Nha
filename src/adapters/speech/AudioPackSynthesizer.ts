@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LANGUAGES, type Language } from "@/domain/languages";
 import type { VoiceId } from "@/domain/types";
 import type { SpeakOptions, SpeechSynthesizer } from "@/ports";
 import { normalizeSpeechText, speechKey } from "@/services/speechKey";
@@ -39,7 +40,9 @@ export type GestureTarget = {
 export type FallbackSynthesizer = SpeechSynthesizer & { ready?(): Promise<void> };
 
 export type AudioPackOptions = {
+  /** The Vietnamese voice the learner chose; other languages ignore it and use their own default pack voice. */
   getVoice: () => VoiceId;
+  getLanguage: () => Language;
   manifestUrl?: string;
   baseUrl?: string; // folder holding <voiceId>/<key>.mp3
   fetchFn?: typeof fetch;
@@ -84,7 +87,8 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
   private playing: Playing | null = null;
   private generation = 0;
   private readonly prefetches = new Map<string, { job: Promise<PrefetchResult>; abort: AbortController }>();
-  private readonly getVoice: () => VoiceId;
+  private readonly chosenVoice: () => VoiceId;
+  private readonly getLanguage: () => Language;
   private readonly manifestUrl: string;
   private readonly baseUrl: string;
   private readonly fetchFn: typeof fetch;
@@ -96,7 +100,8 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
   private unlocking = false;
 
   constructor(private readonly fallback: FallbackSynthesizer, opts: AudioPackOptions) {
-    this.getVoice = opts.getVoice;
+    this.chosenVoice = opts.getVoice;
+    this.getLanguage = opts.getLanguage;
     this.baseUrl = (opts.baseUrl ?? "/audio").replace(/\/$/, "");
     this.manifestUrl = opts.manifestUrl ?? `${this.baseUrl}/manifest.json`;
     this.fetchFn = opts.fetchFn ?? ((input, init) => fetch(input, init));
@@ -106,6 +111,11 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
     void this.loadManifest(); // preload at startup so speak() can start playback synchronously
     const target = opts.gestureTarget === undefined ? (typeof window === "undefined" ? null : window) : opts.gestureTarget;
     if (target) this.installUnlock(target);
+  }
+
+  /** Vietnamese: the learner's choice. Any other language: the first pack voice of that language. */
+  private getVoice(language: Language = this.getLanguage()): VoiceId {
+    return language.id === "vi" ? this.chosenVoice() : ((language.packVoices[0] ?? "device") as VoiceId);
   }
 
   /** Resolves once the manifest (cached after the first load) and the fallback voices are known. */
@@ -125,7 +135,7 @@ export class AudioPackSynthesizer implements SpeechSynthesizer {
     this.stopAudio();
     this.fallback.cancel();
     if (opts.audioUrl) return this.fallback.speak(text, opts);
-    const voice = opts.voice ?? this.getVoice();
+    const voice = opts.voice ?? this.getVoice(opts.language ? LANGUAGES[opts.language] : undefined);
     if (voice !== "device") {
       // Fast path: manifest already loaded and text known -> play() starts synchronously inside the user gesture (iOS).
       // Nothing may be awaited before this.play() on that path.

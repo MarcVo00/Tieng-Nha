@@ -1,3 +1,4 @@
+import { LANGUAGES, languageOfId } from "@/domain/languages";
 import type { Env } from "@/domain/config";
 import type { VoiceId } from "@/domain/types";
 import type { DemoTools, Services } from "@/app/services";
@@ -53,12 +54,14 @@ export function createServices(env: Env): Services {
   const db = new TiengNhaDb();
   const progress = new DexieProgressRepository(db);
   const outbox = new DexieOutbox(db);
-  const content = createStaticContentSource();
+  const contents = { vi: createStaticContentSource("vi"), tl: createStaticContentSource("tl") } as const;
+  const content = contents.vi;
 
   // Speech
+  const getLanguage = () => LANGUAGES[useAppState.getState().settings.language ?? "vi"];
   const voice = env.VITE_FAKE_SPEECH
     ? new FakeSpeechSynthesizer()
-    : new AudioPackSynthesizer(new WebSpeechSynthesizer(), { getVoice: () => useAppState.getState().settings.voice });
+    : new AudioPackSynthesizer(new WebSpeechSynthesizer(getLanguage), { getVoice: () => useAppState.getState().settings.voice, getLanguage });
   const stt = env.VITE_FAKE_SPEECH ? new FakeSpeechRecognizer() : new WebSpeechRecognizer();
   const recorder = env.VITE_FAKE_SPEECH ? new FakeVoiceRecorder() : new MediaRecorderVoiceRecorder();
   const detectCapabilities =
@@ -109,7 +112,7 @@ export function createServices(env: Env): Services {
       : undefined;
 
   return {
-    env, flags, clock, content, progress, outbox, ...remote, tts, sound, stt, recorder, detectCapabilities, prefetchVoice,
-    conversation: new ScriptedConversationEngine(content), activity, sync, ...(demo ? { demo } : {}),
+    env, flags, clock, content, contents, progress, outbox, ...remote, tts, sound, stt, recorder, detectCapabilities, prefetchVoice,
+    conversation: new ScriptedConversationEngine({ getDialogue: (id) => contents[languageOfId(id)].getDialogue(id) }), activity, sync, ...(demo ? { demo } : {}),
   };
 }

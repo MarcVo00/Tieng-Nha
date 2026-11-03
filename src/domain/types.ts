@@ -5,6 +5,8 @@ import type {
   ExamQuestionSchema, BadgeRuleSchema, BadgeDefSchema, TreeNodeSchema, TreeFileSchema, BossSchema, ShopItemSchema, RaritySchema, ChangelogEntrySchema,
 } from "@/content/schema";
 
+import type { LanguageId } from "@/domain/languages";
+
 export type { Tone } from "@/domain/tones";
 export type VocabId = string;
 export type LessonId = string;
@@ -90,15 +92,20 @@ export type VocabProgress = {
 
 export type Capabilities = { tts: boolean; stt: boolean; recorder: boolean };
 export type ThemePref = "system" | "light" | "dark";
-export const VOICE_IDS = ["south-f", "south-m", "north-f", "north-m", "device"] as const;
+/** Every voice pack the app ships: the Vietnamese ones (and `device`) are chosen in the settings, the Tagalog ones follow the language. */
+export const VOICE_IDS = ["south-f", "south-m", "north-f", "north-m", "device", "tl-f", "tl-m"] as const;
 export type VoiceId = (typeof VOICE_IDS)[number];
+/** The voices the learner chooses between (Vietnamese accents or the device voice). */
+export const SETTINGS_VOICE_IDS = ["south-f", "south-m", "north-f", "north-m", "device"] as const;
+export type SettingsVoiceId = (typeof SETTINGS_VOICE_IDS)[number];
 export type Settings = {
   theme: ThemePref;
   voiceRate: "normal" | "slow";
-  voice: VoiceId; // which accent/voice pack speaks; "device" = browser speechSynthesis
+  voice: SettingsVoiceId; // which Vietnamese accent/voice pack speaks; "device" = browser speechSynthesis
   capabilities: Capabilities | null; // null = device test not done yet
   onboardingDone: boolean;
   sound: boolean; // sound effects (lessons, fights, gacha); rows saved before 1.7 have none and read back as on
+  language: LanguageId | null; // the language being learned; null = not chosen yet (rows saved before 2.0 have none)
 };
 
 export type Session = { userId: string; email: string };
@@ -110,6 +117,8 @@ export type LeaderboardRow = {
   xp: number; // xp_week or xp_total depending on period
   streak: number;
   lessonsDone: number;
+  /** Ids of the lessons done, of every language; absent on rows cached before 2.0. */
+  lessonIds?: LessonId[];
   frame: string | null; // equipped frame item id
   look: Look; // equipped hero (character, hat, outfit, accessory, aura)
   isMe: boolean;

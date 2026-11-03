@@ -1,6 +1,7 @@
 import type { ContentSource } from "@/ports";
 import type { BadgeDef, Boss, ChangelogEntry, Dialogue, ExamQuestion, Lesson, LessonSummary, ShopItem, Tree, VocabItem } from "@/domain/types";
 import { BadgesFileSchema, ChangelogFileSchema, BossesFileSchema, DialogueSchema, ExamPoolSchema, LessonSchema, ShopFileSchema, TreeFileSchema } from "@/content/schema";
+import type { LanguageId } from "@/domain/languages";
 import { ContentNotFoundError } from "@/domain/errors";
 
 export type ContentLoaders = {
@@ -90,25 +91,29 @@ export class StaticContentSource implements ContentSource {
   }
 }
 
-export function createStaticContentSource(): StaticContentSource {
-  const lessons = import.meta.glob("/src/content/lessons/*.json", { import: "default" });
-  const dialogues = import.meta.glob("/src/content/dialogues/*.json", { import: "default" });
-  const exam = import.meta.glob("/src/content/exam.json", { import: "default" });
-  const badges = import.meta.glob("/src/content/badges.json", { import: "default", eager: true });
-  const tree = import.meta.glob("/src/content/tree.json", { import: "default", eager: true });
-  const bosses = import.meta.glob("/src/content/bosses.json", { import: "default", eager: true });
-  const shop = import.meta.glob("/src/content/shop.json", { import: "default", eager: true });
-  const changelog = import.meta.glob("/src/content/changelog.json", { import: "default", eager: true });
+// Globbed once for every language; each source keeps the files under its own folder.
+const lessonGlob = import.meta.glob("/src/content/*/lessons/*.json", { import: "default" });
+const dialogueGlob = import.meta.glob("/src/content/*/dialogues/*.json", { import: "default" });
+const examGlob = import.meta.glob("/src/content/*/exam.json", { import: "default" });
+const treeGlob = import.meta.glob("/src/content/*/tree.json", { import: "default", eager: true });
+const bossesGlob = import.meta.glob("/src/content/*/bosses.json", { import: "default", eager: true });
+const badges = import.meta.glob("/src/content/badges.json", { import: "default", eager: true });
+const shop = import.meta.glob("/src/content/shop.json", { import: "default", eager: true });
+const changelog = import.meta.glob("/src/content/changelog.json", { import: "default", eager: true });
+
+const inFolder = <T>(glob: Record<string, T>, folder: string): Record<string, T> =>
+  Object.fromEntries(Object.entries(glob).filter(([path]) => path.startsWith(folder)));
+
+export function createStaticContentSource(language: LanguageId): StaticContentSource {
+  const dir = `/src/content/${language}/`;
+  const exam = examGlob[`${dir}exam.json`];
   return new StaticContentSource({
-    lessons,
-    dialogues,
-    exam: async () => {
-      const load = exam["/src/content/exam.json"];
-      return load ? load() : { contentVersion: 1, questions: [] };
-    },
+    lessons: inFolder(lessonGlob, `${dir}lessons/`),
+    dialogues: inFolder(dialogueGlob, `${dir}dialogues/`),
+    exam: async () => (exam ? exam() : { contentVersion: 1, questions: [] }),
     badges: async () => badges["/src/content/badges.json"],
-    tree: async () => tree["/src/content/tree.json"],
-    bosses: async () => bosses["/src/content/bosses.json"],
+    tree: async () => treeGlob[`${dir}tree.json`],
+    bosses: async () => bossesGlob[`${dir}bosses.json`],
     shop: async () => shop["/src/content/shop.json"],
     changelog: async () => changelog["/src/content/changelog.json"],
   });

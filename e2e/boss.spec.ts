@@ -41,15 +41,15 @@ async function seedNoVoiceSettings(page: Page): Promise<void> {
 type Json = Record<string, unknown>;
 const readJson = (rel: string): Json => JSON.parse(readFileSync(resolve(process.cwd(), rel), "utf8")) as Json;
 const FRENCH_OF_VIETNAMESE = new Map<string, string>();
-for (const f of readdirSync(resolve(process.cwd(), "src/content/lessons"))) {
-  for (const v of readJson("src/content/lessons/" + f)["vocab"] as { vi: string; fr: string }[]) FRENCH_OF_VIETNAMESE.set(v.vi, v.fr);
+for (const f of readdirSync(resolve(process.cwd(), "src/content/vi/lessons"))) {
+  for (const v of readJson("src/content/vi/lessons/" + f)["vocab"] as { vi: string; fr: string }[]) FRENCH_OF_VIETNAMESE.set(v.vi, v.fr);
 }
 const TRANSLATION = new Map<string, string>();
 const WORD_ORDER = new Map<string, string[]>();
 const TONE = new Map<string, string>();
 const TONE_MARKS = new RegExp(String.fromCharCode(91, 0x300, 0x301, 0x303, 0x309, 0x323, 93), "g");
 const withoutToneMark = (syllable: string): string => syllable.normalize("NFD").replace(TONE_MARKS, "").normalize("NFC");
-for (const q of readJson("src/content/exam.json")["questions"] as { exercise: Json }[]) {
+for (const q of readJson("src/content/vi/exam.json")["questions"] as { exercise: Json }[]) {
   const e = q.exercise;
   if (e["type"] === "translate_choose") TRANSLATION.set(e["promptFr"] as string, e["answerVi"] as string);
   if (e["type"] === "word_order") WORD_ORDER.set(e["fr"] as string, e["tokensVi"] as string[]);

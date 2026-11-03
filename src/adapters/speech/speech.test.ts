@@ -1,13 +1,14 @@
-import { createDetectCapabilities, MediaRecorderVoiceRecorder, pickVietnameseVoice, WebSpeechRecognizer, WebSpeechSynthesizer } from "@/adapters/speech";
+import { createDetectCapabilities, MediaRecorderVoiceRecorder, pickVoiceFor, WebSpeechRecognizer, WebSpeechSynthesizer } from "@/adapters/speech";
+import { LANGUAGES } from "@/domain/languages";
 import { RecognitionError } from "@/ports";
 
 const voice = (name: string, lang: string, localService = true) =>
   ({ name, lang, localService, default: false, voiceURI: name }) as SpeechSynthesisVoice;
 
 test("picks a vi-VN voice, preferring Google/network voices on Chrome", () => {
-  expect(pickVietnameseVoice([voice("Thomas", "fr-FR"), voice("Linh", "vi-VN"), voice("Google Tiếng Việt", "vi-VN", false)])?.name).toBe("Google Tiếng Việt");
-  expect(pickVietnameseVoice([voice("Linh", "vi_VN")])?.name).toBe("Linh"); // Android uses underscore
-  expect(pickVietnameseVoice([voice("Thomas", "fr-FR")])).toBeNull();
+  expect(pickVoiceFor([voice("Thomas", "fr-FR"), voice("Linh", "vi-VN"), voice("Google Tiếng Việt", "vi-VN", false)], "vi-VN")?.name).toBe("Google Tiếng Việt");
+  expect(pickVoiceFor([voice("Linh", "vi_VN")], "vi-VN")?.name).toBe("Linh"); // Android uses underscore
+  expect(pickVoiceFor([voice("Thomas", "fr-FR")], "vi-VN")).toBeNull();
 });
 
 function fakeSynthWindow(getVoices: () => SpeechSynthesisVoice[], listeners: Array<() => void>) {
@@ -35,7 +36,7 @@ test("synthesizer waits for voiceschanged (max 1.5 s) then reports availability"
   try {
     let voices: SpeechSynthesisVoice[] = [];
     const listeners: Array<() => void> = [];
-    const tts = new WebSpeechSynthesizer(fakeSynthWindow(() => voices, listeners) as never);
+    const tts = new WebSpeechSynthesizer(undefined, fakeSynthWindow(() => voices, listeners) as never);
     const ready = tts.ready();
     voices = [voice("Linh", "vi-VN")];
     listeners.forEach((l) => l());
@@ -50,7 +51,7 @@ test("synthesizer waits for voiceschanged (max 1.5 s) then reports availability"
 test("synthesizer gives up after 1.5 s without a Vietnamese voice", async () => {
   vi.useFakeTimers();
   try {
-    const tts = new WebSpeechSynthesizer(fakeSynthWindow(() => [], []) as never);
+    const tts = new WebSpeechSynthesizer(undefined, fakeSynthWindow(() => [], []) as never);
     const ready = tts.ready();
     await vi.advanceTimersByTimeAsync(1500);
     await ready;
@@ -63,7 +64,7 @@ test("synthesizer gives up after 1.5 s without a Vietnamese voice", async () => 
 test("speak uses the Vietnamese voice and resolves on end", async () => {
   const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
   win.speechSynthesis.speak.mockImplementation((u: { onend: (() => void) | null }) => u.onend?.());
-  const tts = new WebSpeechSynthesizer(win as never);
+  const tts = new WebSpeechSynthesizer(undefined, win as never);
   await tts.speak("xin chào", { rate: 0.7 });
   expect(win.speechSynthesis.speak).toHaveBeenCalledTimes(1);
   expect(win.speechSynthesis.speak.mock.calls[0]?.[0]).toMatchObject({ text: "xin chào", lang: "vi-VN", rate: 0.7 });
@@ -73,7 +74,7 @@ test("speak gives up after a safety timeout when the utterance is dropped", asyn
   vi.useFakeTimers();
   try {
     const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []); // speak() never fires end
-    const tts = new WebSpeechSynthesizer(win as never);
+    const tts = new WebSpeechSynthesizer(undefined, win as never);
     let settled = false;
     const p = tts.speak("xin chào", { rate: 1 }).then(() => {
       settled = true;
@@ -96,12 +97,12 @@ test("the safety timeout scales with text length and slow rate, and is cleared o
   try {
     const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
     win.speechSynthesis.speak.mockImplementation((u: { onend: (() => void) | null }) => u.onend?.());
-    await new WebSpeechSynthesizer(win as never).speak("xin chào");
+    await new WebSpeechSynthesizer(undefined, win as never).speak("xin chào");
     expect(vi.getTimerCount()).toBe(0);
     const slow = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
     const text = "a".repeat(40);
     let settled = false;
-    void new WebSpeechSynthesizer(slow as never).speak(text, { rate: 0.5 }).then(() => {
+    void new WebSpeechSynthesizer(undefined, slow as never).speak(text, { rate: 0.5 }).then(() => {
       settled = true;
     });
     await vi.advanceTimersByTimeAsync(40 * 150 / 0.5 + 1999);
@@ -117,7 +118,7 @@ test("a stale safety timer never cancels a newer utterance", async () => {
   vi.useFakeTimers();
   try {
     const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
-    const tts = new WebSpeechSynthesizer(win as never);
+    const tts = new WebSpeechSynthesizer(undefined, win as never);
     void tts.speak("a");
     await vi.advanceTimersByTimeAsync(1000);
     void tts.speak("b");
@@ -216,7 +217,7 @@ test("recorder is unavailable without getUserMedia", () => {
 });
 
 test("detectCapabilities combines the three adapters", async () => {
-  const tts = new WebSpeechSynthesizer(fakeSynthWindow(() => [voice("Linh", "vi-VN")], []) as never);
+  const tts = new WebSpeechSynthesizer(undefined, fakeSynthWindow(() => [voice("Linh", "vi-VN")], []) as never);
   const detect = createDetectCapabilities(
     tts,
     { isAvailable: () => true, listen: async () => [], abort() {} },
@@ -229,7 +230,7 @@ test("synthesizer picks up voices that arrive after the cutoff", async () => {
   vi.useFakeTimers();
   try {
     let voices: SpeechSynthesisVoice[] = [];
-    const tts = new WebSpeechSynthesizer(fakeSynthWindow(() => voices, []) as never);
+    const tts = new WebSpeechSynthesizer(undefined, fakeSynthWindow(() => voices, []) as never);
     const ready = tts.ready();
     await vi.advanceTimersByTimeAsync(1500);
     await ready;
@@ -366,7 +367,7 @@ describe("WebSpeechSynthesizer audioUrl clips", () => {
       FakeClip.last = this;
     }
   }
-  const make = () => new WebSpeechSynthesizer({ Audio: FakeClip } as never);
+  const make = () => new WebSpeechSynthesizer(undefined, { Audio: FakeClip } as never);
 
   afterEach(() => vi.useRealTimers());
 
@@ -401,4 +402,67 @@ describe("WebSpeechSynthesizer audioUrl clips", () => {
     FakeClip.last.onerror?.();
     await expect(done).rejects.toThrow("audio_failed");
   });
+});
+
+test("pickVoiceFor finds a Filipino voice (fil or tl) and never a Vietnamese one", () => {
+  expect(pickVoiceFor([voice("Linh", "vi-VN"), voice("Blessica", "fil-PH")], "fil-PH")?.name).toBe("Blessica");
+  expect(pickVoiceFor([voice("Old", "tl_PH")], "fil-PH")?.name).toBe("Old");
+  expect(pickVoiceFor([voice("Linh", "vi-VN"), voice("Thomas", "fr-FR")], "fil-PH")).toBeNull();
+  expect(pickVoiceFor([voice("Blessica", "fil-PH")], "vi-VN")).toBeNull();
+});
+
+describe("synthesizer with Tagalog active", () => {
+  const tagalog = LANGUAGES.tl;
+
+  test("speaks with the Filipino voice and a fil-PH utterance", async () => {
+    const win = fakeSynthWindow(() => [voice("Linh", "vi-VN"), voice("Blessica", "fil-PH")], []);
+    win.speechSynthesis.speak.mockImplementation((u: { onend: (() => void) | null }) => u.onend?.());
+    const tts = new WebSpeechSynthesizer(() => tagalog, win as never);
+    await tts.speak("Salamat po");
+    expect(win.speechSynthesis.speak.mock.calls[0]?.[0]).toMatchObject({ text: "Salamat po", lang: "fil-PH", voice: { name: "Blessica" } });
+  });
+
+  test("with only a Vietnamese voice it is unavailable and rejects tts_unavailable", async () => {
+    vi.useFakeTimers();
+    try {
+      const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
+      const tts = new WebSpeechSynthesizer(() => tagalog, win as never);
+      const done = tts.speak("Salamat po").catch((e: unknown) => e);
+      await vi.advanceTimersByTimeAsync(1500);
+      expect(await done).toMatchObject({ message: "tts_unavailable" });
+      expect(tts.isAvailable()).toBe(false);
+      expect(win.speechSynthesis.speak).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test("follows the language when it changes", async () => {
+    let language = LANGUAGES.vi;
+    const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []);
+    win.speechSynthesis.speak.mockImplementation((u: { onend: (() => void) | null }) => u.onend?.());
+    const tts = new WebSpeechSynthesizer(() => language, win as never);
+    expect(tts.isAvailable()).toBe(true);
+    language = tagalog;
+    expect(tts.isAvailable()).toBe(false);
+    language = LANGUAGES.vi;
+    await tts.speak("xin chào");
+    expect(win.speechSynthesis.speak.mock.calls[0]?.[0]).toMatchObject({ lang: "vi-VN" });
+  });
+});
+
+test("a call naming Vietnamese speaks it with the Vietnamese voice even when Tagalog is active", async () => {
+  const win = fakeSynthWindow(() => [voice("Linh", "vi-VN")], []); // no Filipino voice on the device
+  win.speechSynthesis.speak.mockImplementation((u: { onend: (() => void) | null }) => u.onend?.());
+  const tts = new WebSpeechSynthesizer(() => LANGUAGES.tl, win as never);
+  await tts.speak("Chào bạn!", { language: "vi" });
+  expect(win.speechSynthesis.speak.mock.calls[0]?.[0]).toMatchObject({ text: "Chào bạn!", lang: "vi-VN", voice: { name: "Linh" } });
+  await expect(tts.speak("Salamat po")).rejects.toThrow("tts_unavailable"); // Tagalog is still never read by it
+});
+
+test("a Filipino device voice never reads a Vietnamese preview", async () => {
+  const win = fakeSynthWindow(() => [voice("Blessica", "fil-PH")], []);
+  const tts = new WebSpeechSynthesizer(() => LANGUAGES.tl, win as never);
+  await expect(tts.speak("Chào bạn!", { language: "vi" })).rejects.toThrow("tts_unavailable");
+  expect(win.speechSynthesis.speak).not.toHaveBeenCalled();
 });

@@ -1,0 +1,263 @@
+{
+  "id": "tl_l02",
+  "contentVersion": 1,
+  "title": "Se présenter, survivre",
+  "description": "Dis qui tu es et d'où tu viens, puis les phrases de survie : je ne comprends pas, répète, plus lentement, tu parles anglais ?",
+  "tagline": "Les phrases de survie",
+  "emoji": "🙋",
+  "dialogueId": "tl_d02",
+  "vocab": [
+    {
+      "id": "tl_v_ako",
+      "vi": "ako",
+      "fr": "je, moi",
+      "dialect": "manila",
+      "pron": "a·KO"
+    },
+    {
+      "id": "tl_v_ako_si",
+      "vi": "ako si",
+      "fr": "je suis… (+ prénom)",
+      "dialect": "manila",
+      "pron": "a·KO SI",
+      "note": "« Ako si Marc. » : « Je suis Marc. » On met « si » devant un prénom."
+    },
+    {
+      "id": "tl_v_pangalan",
+      "vi": "pangalan",
+      "fr": "nom, prénom",
+      "dialect": "manila",
+      "pron": "pa·NGA·lan",
+      "note": "On te demandera : « Ano ang pangalan mo? » (Comment tu t'appelles ?)."
+    },
+    {
+      "id": "tl_v_ikaw",
+      "vi": "ikaw",
+      "fr": "toi",
+      "dialect": "manila",
+      "pron": "i·KAW",
+      "note": "Pour renvoyer la question : « Ikaw? » (Et toi ?)."
+    },
+    {
+      "id": "tl_v_pranses",
+      "vi": "Pranses",
+      "fr": "français(e)",
+      "dialect": "manila",
+      "pron": "pran·SES",
+      "note": "« Pranses ako. » : « Je suis français(e). »"
+    },
+    {
+      "id": "tl_v_taga_france_ako",
+      "vi": "taga-France ako",
+      "fr": "je viens de France",
+      "dialect": "manila",
+      "pron": "ta·GA-FRANS a·KO",
+      "note": "« Taga- » veut dire « originaire de ». Le nom du pays se dit souvent en anglais : c'est du taglish, et c'est tout à fait normal."
+    },
+    {
+      "id": "tl_v_hindi_ko_alam",
+      "vi": "hindi ko alam",
+      "fr": "je ne sais pas",
+      "dialect": "manila",
+      "pron": "hin·DI KO a·LAM"
+    },
+    {
+      "id": "tl_v_pakiulit_po",
+      "vi": "pakiulit po",
+      "fr": "répétez, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "pa·ki·u·LIT PO",
+      "note": "« Paki- » veut dire « s'il te plaît, fais… ». Avec « po », la demande est polie."
+    },
+    {
+      "id": "tl_v_dahan_dahan_po",
+      "vi": "dahan-dahan po",
+      "fr": "plus lentement, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "DA·han DA·han PO",
+      "note": "Mot à mot « doucement »."
+    },
+    {
+      "id": "tl_v_ano_po",
+      "vi": "ano po?",
+      "fr": "pardon ? quoi ?",
+      "dialect": "manila",
+      "pron": "a·NO PO",
+      "note": "Pour faire répéter poliment."
+    },
+    {
+      "id": "tl_v_marunong",
+      "vi": "marunong",
+      "fr": "savoir (faire, parler)",
+      "dialect": "manila",
+      "pron": "ma·RU·nong"
+    },
+    {
+      "id": "tl_v_mag_ingles",
+      "vi": "mag-Ingles",
+      "fr": "parler anglais",
+      "dialect": "manila",
+      "pron": "mag·ing·GLES",
+      "note": "Presque tout le monde comprend l'anglais aux Philippines : c'est ta roue de secours."
+    },
+    {
+      "id": "tl_v_tagalog",
+      "vi": "Tagalog",
+      "fr": "le tagalog",
+      "dialect": "manila",
+      "pron": "ta·GA·log",
+      "note": "La langue de Manille, base du filipino, la langue nationale."
+    },
+    {
+      "id": "tl_v_hindi_ko_maintindihan",
+      "vi": "hindi ko maintindihan",
+      "fr": "je ne comprends pas",
+      "dialect": "manila",
+      "pron": "hin·DI KO ma·in·tin·di·HAN"
+    },
+    {
+      "id": "tl_v_hindi_ko_gets",
+      "vi": "hindi ko gets",
+      "fr": "je ne pige pas (familier)",
+      "dialect": "manila",
+      "pron": "hin·DI KO GETS",
+      "note": "Du taglish très courant : « gets » vient de l'anglais « get it »."
+    },
+    {
+      "id": "tl_v_konti_lang",
+      "vi": "konti lang",
+      "fr": "juste un peu",
+      "dialect": "manila",
+      "pron": "KON·ti LANG",
+      "note": "La réponse modeste quand on te demande si tu parles tagalog."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l02_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_hindi_ko_alam",
+      "choices": [
+        "tl_v_hindi_ko_alam",
+        "tl_v_pakiulit_po",
+        "tl_v_dahan_dahan_po",
+        "tl_v_konti_lang"
+      ]
+    },
+    {
+      "id": "tl_l02_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_pakiulit_po",
+      "choices": [
+        "tl_v_pakiulit_po",
+        "tl_v_dahan_dahan_po",
+        "tl_v_ano_po",
+        "tl_v_hindi_ko_gets"
+      ]
+    },
+    {
+      "id": "tl_l02_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_pranses",
+      "choices": [
+        "tl_v_pranses",
+        "tl_v_tagalog",
+        "tl_v_mag_ingles",
+        "tl_v_pangalan"
+      ]
+    },
+    {
+      "id": "tl_l02_e04",
+      "type": "translate_choose",
+      "promptFr": "Je suis Marc.",
+      "answerVi": "Ako si Marc.",
+      "distractorsVi": [
+        "Ikaw si Marc?",
+        "Pranses ako.",
+        "Taga-France ako."
+      ]
+    },
+    {
+      "id": "tl_l02_e05",
+      "type": "translate_choose",
+      "promptFr": "Je ne sais pas.",
+      "answerVi": "Hindi ko alam.",
+      "distractorsVi": [
+        "Hindi ko gets.",
+        "Konti lang.",
+        "Hindi po."
+      ]
+    },
+    {
+      "id": "tl_l02_e06",
+      "type": "translate_choose",
+      "promptFr": "Plus lentement, s'il vous plaît.",
+      "answerVi": "Dahan-dahan po.",
+      "distractorsVi": [
+        "Pakiulit po.",
+        "Ano po?",
+        "Salamat po."
+      ]
+    },
+    {
+      "id": "tl_l02_e07",
+      "type": "word_order",
+      "fr": "Tu parles anglais ?",
+      "tokensVi": [
+        "Marunong",
+        "ka",
+        "bang",
+        "mag-Ingles"
+      ],
+      "extraTokens": [
+        "ako"
+      ]
+    },
+    {
+      "id": "tl_l02_e08",
+      "type": "word_order",
+      "fr": "Je suis Marc, je viens de France.",
+      "tokensVi": [
+        "Ako",
+        "si",
+        "Marc",
+        "taga-France",
+        "ako"
+      ],
+      "extraTokens": [
+        "ikaw"
+      ]
+    },
+    {
+      "id": "tl_l02_e09",
+      "type": "speak",
+      "vi": "Pakiulit po.",
+      "fr": "Répétez, s'il vous plaît.",
+      "vocabIds": [
+        "tl_v_pakiulit_po"
+      ],
+      "pron": "pa·ki·u·LIT PO"
+    },
+    {
+      "id": "tl_l02_e10",
+      "type": "speak",
+      "vi": "Hindi ko maintindihan.",
+      "fr": "Je ne comprends pas.",
+      "vocabIds": [
+        "tl_v_hindi_ko_maintindihan"
+      ],
+      "pron": "hin·DI KO ma·in·tin·di·HAN"
+    },
+    {
+      "id": "tl_l02_e11",
+      "type": "speak",
+      "vi": "Marunong ka bang mag-Ingles?",
+      "fr": "Tu parles anglais ?",
+      "vocabIds": [
+        "tl_v_marunong",
+        "tl_v_mag_ingles"
+      ],
+      "pron": "ma·RU·nong KA BANG mag·ing·GLES"
+    }
+  ]
+}

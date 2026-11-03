@@ -1,0 +1,264 @@
+{
+  "id": "tl_l08",
+  "contentVersion": 1,
+  "title": "Une journée de voyageur",
+  "description": "Toute une journée sur place : aborder quelqu'un, s'excuser, avoir faim, trouver un endroit ouvert. Tout ce que tu as appris, mélangé.",
+  "tagline": "Une journée sur place",
+  "emoji": "🌴",
+  "dialogueId": "tl_d08",
+  "vocab": [
+    {
+      "id": "tl_v_excuse_me_po",
+      "vi": "excuse me po",
+      "fr": "excusez-moi (pour aborder quelqu'un)",
+      "dialect": "manila",
+      "pron": "eks·KYUS MI PO",
+      "note": "Du taglish : on aborde quelqu'un en anglais, avec « po » pour la politesse."
+    },
+    {
+      "id": "tl_v_pasensya_na",
+      "vi": "pasensya na",
+      "fr": "désolé(e)",
+      "dialect": "manila",
+      "pron": "pa·SEN·sya NA",
+      "note": "Pour s'excuser : « Pasensya na po. »"
+    },
+    {
+      "id": "tl_v_okay_lang",
+      "vi": "okay lang",
+      "fr": "pas de souci, ça va",
+      "dialect": "manila",
+      "pron": "o·KEY LANG",
+      "note": "La réponse à « Pasensya na » : « Okay lang! »"
+    },
+    {
+      "id": "tl_v_sige",
+      "vi": "sige",
+      "fr": "d'accord ; vas-y",
+      "dialect": "manila",
+      "pron": "SI·ge",
+      "note": "Le mot à tout faire : d'accord, vas-y, à plus. « Sige, salamat! »"
+    },
+    {
+      "id": "tl_v_tara",
+      "vi": "tara",
+      "fr": "on y va !",
+      "dialect": "manila",
+      "pron": "ta·RA",
+      "note": "« Tara na! » : allez, on y va !"
+    },
+    {
+      "id": "tl_v_gutom",
+      "vi": "gutom",
+      "fr": "affamé(e)",
+      "dialect": "manila",
+      "pron": "gu·TOM",
+      "note": "« Gutom na ako. » : j'ai faim."
+    },
+    {
+      "id": "tl_v_busog",
+      "vi": "busog",
+      "fr": "rassasié(e)",
+      "dialect": "manila",
+      "pron": "bu·SOG",
+      "note": "« Busog na ako. » : je n'ai plus faim. Pour refuser gentiment une autre assiette."
+    },
+    {
+      "id": "tl_v_teka_lang",
+      "vi": "teka lang",
+      "fr": "attends un peu",
+      "dialect": "manila",
+      "pron": "TE·ka LANG",
+      "note": "« Teka lang po » : un instant, s'il vous plaît."
+    },
+    {
+      "id": "tl_v_mainit",
+      "vi": "mainit",
+      "fr": "chaud",
+      "dialect": "manila",
+      "pron": "ma·I·nit"
+    },
+    {
+      "id": "tl_v_ang_init",
+      "vi": "ang init!",
+      "fr": "qu'il fait chaud !",
+      "dialect": "manila",
+      "pron": "ANG I·nit",
+      "note": "Comme « ang mahal! » : « ang » + mot = « que c'est… ! »."
+    },
+    {
+      "id": "tl_v_sarado",
+      "vi": "sarado",
+      "fr": "fermé",
+      "dialect": "manila",
+      "pron": "sa·RA·do"
+    },
+    {
+      "id": "tl_v_bukas",
+      "vi": "bukas",
+      "fr": "ouvert",
+      "dialect": "manila",
+      "pron": "bu·KAS",
+      "note": "« Bukas po ba? » : c'est ouvert ? Attention, dit avec l'accent sur la première syllabe, « bukas » veut dire « demain »."
+    },
+    {
+      "id": "tl_v_meron",
+      "vi": "meron",
+      "fr": "il y en a, avoir",
+      "dialect": "manila",
+      "pron": "ME·ron",
+      "note": "« Meron po ba? » : vous en avez ? Réponse : « Meron! » ou « Wala po. »"
+    },
+    {
+      "id": "tl_v_kain_tayo",
+      "vi": "kain tayo!",
+      "fr": "on mange !",
+      "dialect": "manila",
+      "pron": "KA·in TA·yo",
+      "note": "Les Philippins t'inviteront souvent à manger avec eux : c'est une marque d'accueil."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l08_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_sige",
+      "choices": [
+        "tl_v_sige",
+        "tl_v_tara",
+        "tl_v_teka_lang",
+        "tl_v_okay_lang"
+      ]
+    },
+    {
+      "id": "tl_l08_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_busog",
+      "choices": [
+        "tl_v_busog",
+        "tl_v_gutom",
+        "tl_v_mainit",
+        "tl_v_sarado"
+      ]
+    },
+    {
+      "id": "tl_l08_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_bukas",
+      "choices": [
+        "tl_v_bukas",
+        "tl_v_sarado",
+        "tl_v_meron",
+        "tl_v_wala"
+      ]
+    },
+    {
+      "id": "tl_l08_e04",
+      "type": "translate_choose",
+      "promptFr": "J'ai faim ! On mange ?",
+      "answerVi": "Gutom na ako. Kain tayo!",
+      "distractorsVi": [
+        "Busog na ako. Salamat!",
+        "Ang init! Tara na!",
+        "Teka lang po."
+      ]
+    },
+    {
+      "id": "tl_l08_e05",
+      "type": "translate_choose",
+      "promptFr": "Excusez-moi, où sont les toilettes ?",
+      "answerVi": "Excuse me po, nasaan po ang CR?",
+      "distractorsVi": [
+        "Excuse me po, nasaan po ang hotel?",
+        "Excuse me po, magkano po ito?",
+        "Excuse me po, bukas po ba?"
+      ]
+    },
+    {
+      "id": "tl_l08_e06",
+      "type": "translate_choose",
+      "promptFr": "C'est ouvert ?",
+      "answerVi": "Bukas po ba?",
+      "distractorsVi": [
+        "Sarado po ba?",
+        "Malayo po ba?",
+        "Meron po ba?"
+      ]
+    },
+    {
+      "id": "tl_l08_e07",
+      "type": "word_order",
+      "fr": "Désolé, je ne comprends pas.",
+      "tokensVi": [
+        "Pasensya",
+        "na",
+        "po",
+        "hindi",
+        "ko",
+        "maintindihan"
+      ],
+      "extraTokens": [
+        "alam"
+      ]
+    },
+    {
+      "id": "tl_l08_e08",
+      "type": "word_order",
+      "fr": "Il fait chaud ! De l'eau, s'il vous plaît.",
+      "tokensVi": [
+        "Ang",
+        "init",
+        "pahingi",
+        "po",
+        "ng",
+        "tubig"
+      ],
+      "extraTokens": [
+        "kape"
+      ]
+    },
+    {
+      "id": "tl_l08_e09",
+      "type": "speak",
+      "vi": "Excuse me po, magkano po ito?",
+      "fr": "Excusez-moi, combien ça coûte ?",
+      "vocabIds": [
+        "tl_v_excuse_me_po",
+        "tl_v_magkano"
+      ],
+      "pron": "eks·KYUS MI PO mag·KA·no PO i·TO"
+    },
+    {
+      "id": "tl_l08_e10",
+      "type": "speak",
+      "vi": "Busog na ako. Salamat po!",
+      "fr": "Je n'ai plus faim. Merci !",
+      "vocabIds": [
+        "tl_v_busog"
+      ],
+      "pron": "bu·SOG NA a·KO sa·LA·mat PO"
+    },
+    {
+      "id": "tl_l08_e11",
+      "type": "speak",
+      "vi": "Teka lang po. Pakiulit po.",
+      "fr": "Un instant. Répétez, s'il vous plaît.",
+      "vocabIds": [
+        "tl_v_teka_lang",
+        "tl_v_pakiulit_po"
+      ],
+      "pron": "TE·ka LANG PO pa·ki·u·LIT PO"
+    },
+    {
+      "id": "tl_l08_e12",
+      "type": "speak",
+      "vi": "Okay lang. Sige, salamat!",
+      "fr": "Pas de souci. D'accord, merci !",
+      "vocabIds": [
+        "tl_v_okay_lang",
+        "tl_v_sige"
+      ],
+      "pron": "o·KEY LANG SI·ge sa·LA·mat"
+    }
+  ]
+}

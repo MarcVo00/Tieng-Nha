@@ -136,3 +136,7 @@ describe("per-answer blows (shared by duelDamage and the replay)", () => {
     expect(sum).toBe(15 + 10 + 15);
   });
 });
+
+test("commonLessons keeps only Vietnamese lessons", () => {
+  expect(commonLessons(["l01", "tl_l01"], ["l01", "tl_l01"])).toEqual(["l01"]);
+});

@@ -18,8 +18,12 @@ export type GradeResult = {
   detail?: unknown; // plugin-specific (e.g. syllable diff for speak)
 };
 
+/** Language of the target-language text (the `lang` attribute); Vietnamese when a host does not say. */
+export type TargetLang = "vi" | "tl";
+
 export type ExerciseProps<E extends Exercise> = {
   exercise: E;
+  lang?: TargetLang;
   disabled: boolean; // true after the answer was submitted
   onAnswer: (answer: unknown) => void;
   services: ExerciseServices;
@@ -36,5 +40,5 @@ export type ExercisePlugin<E extends Exercise = Exercise> = {
   Component: FC<ExerciseProps<E>>;
   grade(exercise: E, answer: unknown, ctx: GradeContext): GradeResult;
   /** Optional extra content rendered inside the feedback sheet (e.g. syllable diff for speak). */
-  Feedback?: FC<{ exercise: E; result: GradeResult }>;
+  Feedback?: FC<{ exercise: E; result: GradeResult; lang?: TargetLang }>;
 };

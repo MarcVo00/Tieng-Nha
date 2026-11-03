@@ -62,6 +62,7 @@ export const fr = {
     close: "Fermer",
     overline: { badges: "Huy hiệu", wardrobe: "Tủ đồ", rewards: "Quà", settings: "Cài đặt", account: "Tài khoản", shop: "Cửa hàng", arena: "Đấu trường", duels: "Thách đấu" },
     button: { loading: "Chargement en cours" },
+    pron: { label: (text: string) => `Prononciation\u202f: ${text}` },
     feedback: {
       sheetLabel: "Résultat de ta réponse",
       correct: "Đúng rồi!",
@@ -352,6 +353,15 @@ export const fr = {
       won: "Vaincu ✓",
       aria: (name: string, locked: boolean) => `${name}, boss final${locked ? ", verrouillé" : ""}`,
     },
+  },
+  // --- languages: the picker after onboarding and the switcher at the top of the home ---
+  languages: {
+    title: "Quelle langue veux-tu apprendre\u202f?",
+    intro: "Tu pourras en changer à tout moment depuis l'accueil.",
+    current: (name: string) => `Langue\u202f: ${name}`,
+    switch: "Changer de langue",
+    switchHint: "Tes leçons terminées t'attendent dans chaque langue.",
+    saveError: "Ton choix n'a pas pu être enregistré. Réessaie.",
   },
   // --- report ---
   report: {
@@ -762,8 +772,8 @@ export const fr = {
     listLabel: "Classement complet",
     medals: { 1: "🥇", 2: "🥈", 3: "🥉" },
     rankLabel: (n: number) => `Rang ${n}`,
-    lessons: (n: number) => `${n}/10`,
-    lessonsLabel: (n: number) => `${n} leçons sur 10`,
+    lessons: (n: number, total: number | null) => (total === null ? `${n}` : `${n}/${total}`),
+    lessonsLabel: (n: number, total: number | null) => (total === null ? `${n} leçons` : `${n} leçons sur ${total}`),
     you: "Toi",
     xp: (n: number) => `${n} XP`,
     offline: (rel: string) => `Hors ligne · mis à jour ${rel}`,
@@ -781,7 +791,7 @@ export const fr = {
     streakLabel: "Série en cours",
     lessonsTitle: "Leçons terminées",
     lessonDot: (n: number, done: boolean) => `Leçon ${n}\u202f: ${done ? "terminée" : "pas encore terminée"}`,
-    lessonsSummary: (n: number) => `${n} sur 10`,
+    lessonsSummary: (n: number, total: number) => `${n} sur ${total}`,
     badgesTitle: "Badges",
     noBadges: "Pas encore de badge.",
     examTitle: "Boss final",
@@ -1015,7 +1025,7 @@ export const fr = {
       saveError: "Ce réglage n'a pas pu être enregistré.",
       password: { open: "Changer mon mot de passe", title: "Changer mon mot de passe", updated: "Mot de passe mis à jour" },
       voicePack: {
-        label: "Voix",
+        label: "Voix vietnamienne",
         hint: "Les voix du Sud et du Nord se téléchargent en arrière-plan, pour marcher aussi sans réseau.",
         options: {
           "south-f": { prefix: "Sud · ", name: "Mỹ Duyên", suffix: " (femme)" },

@@ -1,0 +1,253 @@
+{
+  "id": "tl_l04",
+  "contentVersion": 1,
+  "title": "Commander à manger",
+  "description": "Commande dans une cantine de quartier : le plat, le riz, de l'eau, encore un, et dis que c'est délicieux.",
+  "tagline": "Commander à manger",
+  "emoji": "🍚",
+  "dialogueId": "tl_d04",
+  "vocab": [
+    {
+      "id": "tl_v_gusto_ko",
+      "vi": "gusto ko",
+      "fr": "je voudrais, j'aime",
+      "dialect": "manila",
+      "pron": "gus·TO KO",
+      "note": "« Gusto ko po ng adobo. » Le petit mot « ng », prononcé « nang », relie à ce que tu veux."
+    },
+    {
+      "id": "tl_v_isa_pa_po",
+      "vi": "isa pa po",
+      "fr": "encore un, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "i·SA PA PO"
+    },
+    {
+      "id": "tl_v_pahingi",
+      "vi": "pahingi",
+      "fr": "donnez-moi… (s'il vous plaît)",
+      "dialect": "manila",
+      "pron": "pa·hi·NGI",
+      "note": "« Pahingi po ng tubig. » Pour demander de l'eau, du riz ou une serviette. Avec « po », c'est poli."
+    },
+    {
+      "id": "tl_v_tubig",
+      "vi": "tubig",
+      "fr": "eau",
+      "dialect": "manila",
+      "pron": "TU·big"
+    },
+    {
+      "id": "tl_v_kanin",
+      "vi": "kanin",
+      "fr": "riz (cuit)",
+      "dialect": "manila",
+      "pron": "KA·nin",
+      "note": "Le riz accompagne presque chaque repas, même le petit-déjeuner."
+    },
+    {
+      "id": "tl_v_manok",
+      "vi": "manok",
+      "fr": "poulet",
+      "dialect": "manila",
+      "pron": "ma·NOK"
+    },
+    {
+      "id": "tl_v_baboy",
+      "vi": "baboy",
+      "fr": "porc",
+      "dialect": "manila",
+      "pron": "BA·boy"
+    },
+    {
+      "id": "tl_v_isda",
+      "vi": "isda",
+      "fr": "poisson",
+      "dialect": "manila",
+      "pron": "is·DA"
+    },
+    {
+      "id": "tl_v_adobo",
+      "vi": "adobo",
+      "fr": "adobo",
+      "dialect": "manila",
+      "pron": "a·DO·bo",
+      "note": "Le plat le plus connu : viande mijotée au vinaigre, à la sauce soja et à l'ail."
+    },
+    {
+      "id": "tl_v_kape",
+      "vi": "kape",
+      "fr": "café",
+      "dialect": "manila",
+      "pron": "ka·PE"
+    },
+    {
+      "id": "tl_v_yelo",
+      "vi": "yelo",
+      "fr": "glace, glaçons",
+      "dialect": "manila",
+      "pron": "YE·lo"
+    },
+    {
+      "id": "tl_v_walang_yelo",
+      "vi": "walang yelo",
+      "fr": "sans glaçons",
+      "dialect": "manila",
+      "pron": "wa·LANG YE·lo",
+      "note": "Pour une boisson sans glaçons : « Walang yelo po »."
+    },
+    {
+      "id": "tl_v_masarap",
+      "vi": "masarap",
+      "fr": "délicieux",
+      "dialect": "manila",
+      "pron": "ma·sa·RAP",
+      "note": "« Masarap! » : c'est bon ! Le plus beau compliment au cuisinier."
+    },
+    {
+      "id": "tl_v_maanghang",
+      "vi": "maanghang",
+      "fr": "épicé, piquant",
+      "dialect": "manila",
+      "pron": "ma·ang·HANG",
+      "note": "Pour vérifier : « Maanghang po ba? » (C'est épicé ?)."
+    },
+    {
+      "id": "tl_v_ito",
+      "vi": "ito",
+      "fr": "ceci, ça",
+      "dialect": "manila",
+      "pron": "i·TO",
+      "note": "Pour montrer un plat du doigt : « Ito po. »"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l04_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_manok",
+      "choices": [
+        "tl_v_manok",
+        "tl_v_baboy",
+        "tl_v_isda",
+        "tl_v_kanin"
+      ]
+    },
+    {
+      "id": "tl_l04_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_tubig",
+      "choices": [
+        "tl_v_tubig",
+        "tl_v_kape",
+        "tl_v_yelo",
+        "tl_v_kanin"
+      ]
+    },
+    {
+      "id": "tl_l04_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_masarap",
+      "choices": [
+        "tl_v_masarap",
+        "tl_v_maanghang",
+        "tl_v_walang_yelo",
+        "tl_v_isa_pa_po"
+      ]
+    },
+    {
+      "id": "tl_l04_e04",
+      "type": "translate_choose",
+      "promptFr": "De l'eau, s'il vous plaît.",
+      "answerVi": "Pahingi po ng tubig.",
+      "distractorsVi": [
+        "Pahingi po ng kanin.",
+        "Pahingi po ng kape.",
+        "Pahingi po ng yelo."
+      ]
+    },
+    {
+      "id": "tl_l04_e05",
+      "type": "translate_choose",
+      "promptFr": "Je voudrais du poulet.",
+      "answerVi": "Gusto ko po ng manok.",
+      "distractorsVi": [
+        "Gusto ko po ng baboy.",
+        "Gusto ko po ng isda.",
+        "Gusto ko po ng kanin."
+      ]
+    },
+    {
+      "id": "tl_l04_e06",
+      "type": "translate_choose",
+      "promptFr": "C'est épicé ?",
+      "answerVi": "Maanghang po ba?",
+      "distractorsVi": [
+        "Masarap po ba?",
+        "Walang yelo po.",
+        "Isa pa po."
+      ]
+    },
+    {
+      "id": "tl_l04_e07",
+      "type": "word_order",
+      "fr": "De l'eau, sans glaçons, s'il vous plaît.",
+      "tokensVi": [
+        "Tubig",
+        "po",
+        "walang",
+        "yelo"
+      ],
+      "extraTokens": [
+        "masarap"
+      ]
+    },
+    {
+      "id": "tl_l04_e08",
+      "type": "word_order",
+      "fr": "Je voudrais ça, s'il vous plaît.",
+      "tokensVi": [
+        "Gusto",
+        "ko",
+        "po",
+        "ito"
+      ],
+      "extraTokens": [
+        "ng"
+      ]
+    },
+    {
+      "id": "tl_l04_e09",
+      "type": "speak",
+      "vi": "Pahingi po ng tubig.",
+      "fr": "De l'eau, s'il vous plaît.",
+      "vocabIds": [
+        "tl_v_pahingi",
+        "tl_v_tubig"
+      ],
+      "pron": "pa·hi·NGI PO NANG TU·big"
+    },
+    {
+      "id": "tl_l04_e10",
+      "type": "speak",
+      "vi": "Gusto ko po ng adobo.",
+      "fr": "Je voudrais de l'adobo.",
+      "vocabIds": [
+        "tl_v_gusto_ko",
+        "tl_v_adobo"
+      ],
+      "pron": "gus·TO KO PO NANG a·DO·bo"
+    },
+    {
+      "id": "tl_l04_e11",
+      "type": "speak",
+      "vi": "Isa pa po. Masarap!",
+      "fr": "Encore un, s'il vous plaît. C'est délicieux !",
+      "vocabIds": [
+        "tl_v_isa_pa_po",
+        "tl_v_masarap"
+      ],
+      "pron": "i·SA PA PO ma·sa·RAP"
+    }
+  ]
+}

@@ -1,0 +1,281 @@
+{
+  "id": "tl_l03",
+  "contentVersion": 1,
+  "title": "Les nombres et les prix",
+  "description": "Compte de un à dix en tagalog, puis comprends les prix comme on les dit vraiment : en espagnol, et souvent en anglais.",
+  "tagline": "Compter en pesos",
+  "emoji": "🔢",
+  "dialogueId": "tl_d03",
+  "vocab": [
+    {
+      "id": "tl_v_isa",
+      "vi": "isa",
+      "fr": "un",
+      "dialect": "manila",
+      "pron": "i·SA",
+      "note": "Les nombres tagalog servent pour compter les choses : « Isa po » (un, s'il vous plaît)."
+    },
+    {
+      "id": "tl_v_dalawa",
+      "vi": "dalawa",
+      "fr": "deux",
+      "dialect": "manila",
+      "pron": "da·la·WA"
+    },
+    {
+      "id": "tl_v_tatlo",
+      "vi": "tatlo",
+      "fr": "trois",
+      "dialect": "manila",
+      "pron": "tat·LO"
+    },
+    {
+      "id": "tl_v_apat",
+      "vi": "apat",
+      "fr": "quatre",
+      "dialect": "manila",
+      "pron": "A·pat"
+    },
+    {
+      "id": "tl_v_lima",
+      "vi": "lima",
+      "fr": "cinq",
+      "dialect": "manila",
+      "pron": "li·MA"
+    },
+    {
+      "id": "tl_v_anim",
+      "vi": "anim",
+      "fr": "six",
+      "dialect": "manila",
+      "pron": "A·nim"
+    },
+    {
+      "id": "tl_v_pito",
+      "vi": "pito",
+      "fr": "sept",
+      "dialect": "manila",
+      "pron": "pi·TO"
+    },
+    {
+      "id": "tl_v_walo",
+      "vi": "walo",
+      "fr": "huit",
+      "dialect": "manila",
+      "pron": "wa·LO"
+    },
+    {
+      "id": "tl_v_siyam",
+      "vi": "siyam",
+      "fr": "neuf",
+      "dialect": "manila",
+      "pron": "si·YAM"
+    },
+    {
+      "id": "tl_v_sampu",
+      "vi": "sampu",
+      "fr": "dix",
+      "dialect": "manila",
+      "pron": "sam·PU"
+    },
+    {
+      "id": "tl_v_bente",
+      "vi": "bente",
+      "fr": "vingt",
+      "dialect": "manila",
+      "pron": "BEN·te",
+      "note": "Les prix se disent souvent avec les nombres espagnols : « bente » vient de « veinte »."
+    },
+    {
+      "id": "tl_v_singkuwenta",
+      "vi": "singkuwenta",
+      "fr": "cinquante",
+      "dialect": "manila",
+      "pron": "sing·ku·WEN·ta",
+      "note": "De l'espagnol « cincuenta ». On l'écrit aussi « singkwenta »."
+    },
+    {
+      "id": "tl_v_sandaan",
+      "vi": "sandaan",
+      "fr": "cent",
+      "dialect": "manila",
+      "pron": "san·da·AN"
+    },
+    {
+      "id": "tl_v_dosyentos",
+      "vi": "dosyentos",
+      "fr": "deux cents",
+      "dialect": "manila",
+      "pron": "dos·YEN·tos",
+      "note": "De l'espagnol « doscientos ». On l'écrit aussi « dos siyentos »."
+    },
+    {
+      "id": "tl_v_piso",
+      "vi": "piso",
+      "fr": "peso",
+      "dialect": "manila",
+      "pron": "PI·so",
+      "note": "La monnaie des Philippines. Pour un prix, on entend surtout « pesos », à l'espagnole."
+    },
+    {
+      "id": "tl_v_pesos",
+      "vi": "pesos",
+      "fr": "pesos (dans un prix)",
+      "dialect": "manila",
+      "pron": "PE·sos",
+      "note": "« Singkuwenta pesos » : cinquante pesos. Beaucoup de vendeurs disent aussi le prix en anglais : « fifty pesos »."
+    },
+    {
+      "id": "tl_v_fifty_pesos",
+      "vi": "fifty pesos",
+      "fr": "cinquante pesos",
+      "dialect": "manila",
+      "pron": "FIF·ti PE·sos",
+      "note": "Le même prix, dit en anglais : beaucoup de vendeurs annoncent leurs prix ainsi."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l03_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_isa",
+      "choices": [
+        "tl_v_isa",
+        "tl_v_lima",
+        "tl_v_walo",
+        "tl_v_sampu"
+      ]
+    },
+    {
+      "id": "tl_l03_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_tatlo",
+      "choices": [
+        "tl_v_tatlo",
+        "tl_v_dalawa",
+        "tl_v_pito",
+        "tl_v_siyam"
+      ]
+    },
+    {
+      "id": "tl_l03_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_singkuwenta",
+      "choices": [
+        "tl_v_singkuwenta",
+        "tl_v_bente",
+        "tl_v_sandaan",
+        "tl_v_dosyentos"
+      ]
+    },
+    {
+      "id": "tl_l03_e12",
+      "type": "listen_choose",
+      "vocabId": "tl_v_fifty_pesos",
+      "choices": [
+        "tl_v_fifty_pesos",
+        "tl_v_bente",
+        "tl_v_sandaan",
+        "tl_v_dosyentos"
+      ]
+    },
+    {
+      "id": "tl_l03_e04",
+      "type": "translate_choose",
+      "promptFr": "Deux, s'il vous plaît.",
+      "answerVi": "Dalawa po.",
+      "distractorsVi": [
+        "Tatlo po.",
+        "Isa po.",
+        "Apat po."
+      ]
+    },
+    {
+      "id": "tl_l03_e05",
+      "type": "translate_choose",
+      "promptFr": "Cinquante pesos.",
+      "answerVi": "Singkuwenta pesos.",
+      "distractorsVi": [
+        "Bente pesos.",
+        "Sandaan pesos.",
+        "Dosyentos pesos."
+      ]
+    },
+    {
+      "id": "tl_l03_e06",
+      "type": "translate_choose",
+      "promptFr": "Neuf.",
+      "answerVi": "Siyam.",
+      "distractorsVi": [
+        "Pito.",
+        "Walo.",
+        "Anim."
+      ]
+    },
+    {
+      "id": "tl_l03_e07",
+      "type": "word_order",
+      "fr": "Deux cents pesos, s'il vous plaît.",
+      "tokensVi": [
+        "Dosyentos",
+        "pesos",
+        "po"
+      ],
+      "extraTokens": [
+        "bente"
+      ]
+    },
+    {
+      "id": "tl_l03_e08",
+      "type": "word_order",
+      "fr": "Un, deux, trois.",
+      "tokensVi": [
+        "Isa",
+        "dalawa",
+        "tatlo"
+      ],
+      "extraTokens": [
+        "apat"
+      ]
+    },
+    {
+      "id": "tl_l03_e09",
+      "type": "speak",
+      "vi": "Isa, dalawa, tatlo, apat, lima.",
+      "fr": "Un, deux, trois, quatre, cinq.",
+      "vocabIds": [
+        "tl_v_isa",
+        "tl_v_dalawa",
+        "tl_v_tatlo",
+        "tl_v_apat",
+        "tl_v_lima"
+      ],
+      "pron": "i·SA da·la·WA tat·LO A·pat li·MA"
+    },
+    {
+      "id": "tl_l03_e10",
+      "type": "speak",
+      "vi": "Anim, pito, walo, siyam, sampu.",
+      "fr": "Six, sept, huit, neuf, dix.",
+      "vocabIds": [
+        "tl_v_anim",
+        "tl_v_pito",
+        "tl_v_walo",
+        "tl_v_siyam",
+        "tl_v_sampu"
+      ],
+      "pron": "A·nim pi·TO wa·LO si·YAM sam·PU"
+    },
+    {
+      "id": "tl_l03_e11",
+      "type": "speak",
+      "vi": "Singkuwenta pesos po.",
+      "fr": "Cinquante pesos.",
+      "vocabIds": [
+        "tl_v_singkuwenta",
+        "tl_v_pesos"
+      ],
+      "pron": "sing·ku·WEN·ta PE·sos PO"
+    }
+  ]
+}

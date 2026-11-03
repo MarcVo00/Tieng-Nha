@@ -16,7 +16,8 @@ export type ChallengeTarget = { userId: string; pseudo: string; lessonsDone: rea
  * impossible right now (null when it is possible or not known yet); `message` is the outcome of the last attempt.
  */
 export function useChallenge() {
-  const { content, duels, leaderboard } = useServices();
+  const { contents, duels, leaderboard } = useServices();
+  const content = contents.vi; // duels are Vietnamese-only in 2.0, whatever the active language
   const navigate = useNavigate();
   const snapshot = useAppState((s) => s.snapshot);
   const stt = useAppState((s) => s.settings.capabilities?.stt ?? false);

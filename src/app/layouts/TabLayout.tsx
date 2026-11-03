@@ -1,4 +1,6 @@
 import { AnimatePresence } from "motion/react";
+import { Fragment } from "react";
+import { useLanguage } from "@/app/useLanguage";
 import { Link, useLocation, useOutlet } from "react-router-dom";
 import { useAppState } from "@/app/appState";
 import { EnergyIndicator } from "@/app/EnergyIndicator";
@@ -14,6 +16,7 @@ import { Avatar, PageTransition, StreakFlame, TabBar, XpCounter } from "@/ui";
 export function TabLayout() {
   const { pathname } = useLocation();
   const outlet = useOutlet();
+  const { language } = useLanguage();
   const profile = useAppState((s) => s.profile);
   const snapshot = useAppState((s) => s.snapshot);
   const equipped = useAppState((s) => s.wallet?.equipped);
@@ -47,7 +50,7 @@ export function TabLayout() {
       <main>
         <AnimatePresence mode="wait">
         <PageTransition key={pathname} variant="tab">
-          <PendingDuelsContext.Provider value={pendingDuels}>{outlet}</PendingDuelsContext.Provider>
+          <PendingDuelsContext.Provider value={pendingDuels}><Fragment key={language.id}>{outlet}</Fragment></PendingDuelsContext.Provider>
         </PageTransition>
       </AnimatePresence>
       </main>

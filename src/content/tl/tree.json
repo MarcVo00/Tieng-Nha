@@ -1,0 +1,13 @@
+{
+  "contentVersion": 1,
+  "nodes": [
+    { "id": "tl_l01", "kind": "lesson", "requires": [], "branch": "trunk" },
+    { "id": "tl_l02", "kind": "lesson", "requires": ["tl_l01"], "branch": "trunk" },
+    { "id": "tl_l03", "kind": "lesson", "requires": ["tl_l02"], "branch": "trunk" },
+    { "id": "tl_l04", "kind": "lesson", "requires": ["tl_l03"], "branch": "trunk" },
+    { "id": "tl_l05", "kind": "lesson", "requires": ["tl_l04"], "branch": "trunk" },
+    { "id": "tl_l06", "kind": "lesson", "requires": ["tl_l05"], "branch": "trunk" },
+    { "id": "tl_l07", "kind": "lesson", "requires": ["tl_l06"], "branch": "trunk" },
+    { "id": "tl_l08", "kind": "lesson", "requires": ["tl_l07"], "branch": "trunk" }
+  ]
+}

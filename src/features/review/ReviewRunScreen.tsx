@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
 import type { Capabilities } from "@/domain/types";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import { fr } from "@/i18n/fr";
@@ -77,6 +78,7 @@ function DonePanel({ result, finishing, onFinish }: { result: ReviewDone; finish
 export function ReviewRunScreen() {
   const navigate = useNavigate();
   const { tts, stt, recorder } = useServices();
+  const { language } = useLanguage();
   const { settings, updateSettings } = useSettings();
   const run = useReviewRun();
   const [quitting, setQuitting] = useState(false);
@@ -135,6 +137,7 @@ export function ReviewRunScreen() {
             vocabIndex={phase.vocabIndex}
             capabilities={capabilities}
             voiceRate={voiceRateOf(settings)}
+            lang={language.htmlLang}
             services={{ tts, stt, recorder }}
             onResult={run.submit}
             onGraded={run.graded}

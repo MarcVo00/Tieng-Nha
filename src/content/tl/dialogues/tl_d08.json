@@ -1,0 +1,108 @@
+{
+  "id": "tl_d08",
+  "contentVersion": 1,
+  "title": "Déjeuner et addition",
+  "scene": "Midi passé, une carinderia au coin de la rue : le serveur t'accueille",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Magandang hapon po! Ano po ang gusto ninyo?",
+      "fr": "Bon après-midi ! Qu'est-ce que vous voulez ?",
+      "next": "t2",
+      "pron": "ma·gan·DANG HA·pon PO a·NO PO ANG gus·TO nin·YO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Gutom na ako! Meron po bang adobo?",
+          "fr": "J'ai faim ! Vous avez de l'adobo ?",
+          "next": "t3",
+          "pron": "gu·TOM NA a·KO ME·ron PO BANG a·DO·bo"
+        },
+        {
+          "id": "o2",
+          "vi": "Ano po ito? Masarap po ba?",
+          "fr": "C'est quoi, ça ? C'est bon ?",
+          "next": "t4",
+          "pron": "a·NO PO i·TO ma·sa·RAP PO BA"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Pasensya na po, wala na.",
+      "fr": "Désolé, il n'y en a plus.",
+      "next": "t5",
+      "pron": "pa·SEN·sya NA PO wa·LA NA"
+    },
+    {
+      "id": "t4",
+      "speaker": "npc",
+      "vi": "Manok po. Masarap po ito, hindi maanghang.",
+      "fr": "Du poulet. C'est délicieux, et pas épicé.",
+      "next": "t5",
+      "pron": "ma·NOK PO ma·sa·RAP PO i·TO hin·DI ma·ang·HANG"
+    },
+    {
+      "id": "t5",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Okay lang. Gusto ko po ng manok.",
+          "fr": "Pas de souci. Je voudrais du poulet.",
+          "next": "t6",
+          "pron": "o·KEY LANG gus·TO KO PO NANG ma·NOK"
+        },
+        {
+          "id": "o2",
+          "vi": "Sige po, ito po. Pahingi po ng tubig.",
+          "fr": "D'accord, ça. Et de l'eau, s'il vous plaît.",
+          "next": "t6",
+          "pron": "SI·ge PO i·TO PO pa·hi·NGI PO NANG TU·big"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "speaker": "npc",
+      "vi": "Masarap po ba?",
+      "fr": "(Un peu plus tard) C'était bon ?",
+      "next": "t7",
+      "pron": "ma·sa·RAP PO BA"
+    },
+    {
+      "id": "t7",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Masarap! Busog na ako. Magkano po?",
+          "fr": "Délicieux ! Je n'ai plus faim. C'est combien ?",
+          "next": "t8",
+          "pron": "ma·sa·RAP bu·SOG NA a·KO mag·KA·no PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Opo, salamat po! Magkano po?",
+          "fr": "Oui, merci ! C'est combien ?",
+          "next": "t8",
+          "pron": "O·po sa·LA·mat PO mag·KA·no PO"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "speaker": "npc",
+      "vi": "Dosyentos po. Salamat po, ingat!",
+      "fr": "Deux cents pesos. Merci, prenez soin de vous !",
+      "next": null,
+      "pron": "dos·YEN·tos PO sa·LA·mat PO I·ngat"
+    }
+  ]
+}

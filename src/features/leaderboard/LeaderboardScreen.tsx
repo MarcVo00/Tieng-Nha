@@ -49,12 +49,13 @@ function SkeletonRows() {
 }
 
 export function LeaderboardScreen() {
-  const { leaderboard, progress, clock } = useServices();
+  const { leaderboard, progress, clock, content } = useServices();
   const reduced = useReducedMotion();
   const pendingDuels = usePendingDuels().length;
   const [period, setPeriod] = useState<Period>("week");
   const [view, setView] = useState<View | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [lessonTotal, setLessonTotal] = useState<number | null>(null);
   const [myEl, setMyEl] = useState<HTMLLIElement | null>(null);
   const [myVisible, setMyVisible] = useState(true);
 
@@ -83,6 +84,18 @@ export function LeaderboardScreen() {
       cancelled = true;
     };
   }, [leaderboard, progress, clock, period, attempt]);
+
+  // The N of « x/N »: the lessons of the active language.
+  useEffect(() => {
+    let cancelled = false;
+    content.listLessons().then(
+      (list) => !cancelled && setLessonTotal(list.length),
+      () => !cancelled && setLessonTotal(null),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [content]);
 
   const current = view && view.period === period ? view : null;
   const refreshing = current === null || (current.status === "ready" && current.refreshing);
@@ -195,7 +208,7 @@ export function LeaderboardScreen() {
             {current.rows.length > 3 ? (
               <motion.ul aria-label={fr.leaderboard.listLabel} className="list-none" variants={LIST} initial="hidden" animate="show">
                 {current.rows.slice(3).map((row, i) => (
-                  <LeaderboardRow key={row.userId} row={row} rank={i + 4} variants={ITEM} {...(row.isMe ? { rowRef: setMyEl } : {})} />
+                  <LeaderboardRow key={row.userId} row={row} rank={i + 4} lessonTotal={lessonTotal} variants={ITEM} {...(row.isMe ? { rowRef: setMyEl } : {})} />
                 ))}
               </motion.ul>
             ) : null}
@@ -214,7 +227,7 @@ export function LeaderboardScreen() {
             className="pointer-events-none fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 pb-2"
           >
             <div className="mx-auto max-w-md px-5">
-              <LeaderboardRow row={myRow} rank={myIndex + 1} pinned />
+              <LeaderboardRow row={myRow} rank={myIndex + 1} lessonTotal={lessonTotal} pinned />
             </div>
           </motion.div>
         ) : null}

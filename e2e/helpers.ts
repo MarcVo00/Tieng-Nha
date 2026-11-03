@@ -1,15 +1,19 @@
 import { expect, type Page } from "@playwright/test";
 import { fr } from "@/i18n/fr";
 
+/** Picker tile of each language, found by its French name (e2e only sees fr.ts, not the language registry). */
+const LANGUAGE_TILE = { vi: /Vietnamien/, tl: /Tagalog/ } as const;
+
 export const PSEUDO = "Marc";
 export const EMAIL = "test@example.com";
 export const PASSWORD = "secret-pass-1";
 
 /**
- * Welcome -> invite + email -> OTP -> new password -> pseudo + avatar -> device check -> install, ending on the home path.
+ * Welcome -> invite + email -> OTP -> new password -> pseudo + avatar -> device check -> install -> language picker,
+ * ending on the home path of `language` (Vietnamese by default).
  * The daily-bonus sheet opens by itself on the first home visit of the day; it is marked as already shown unless `dailyBonus`.
  */
-export async function onboard(page: Page, opts: { dailyBonus?: boolean } = {}): Promise<void> {
+export async function onboard(page: Page, opts: { dailyBonus?: boolean; language?: keyof typeof LANGUAGE_TILE } = {}): Promise<void> {
   if (!opts.dailyBonus) {
     await page.addInitScript(() => {
       const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
@@ -42,6 +46,8 @@ export async function onboard(page: Page, opts: { dailyBonus?: boolean } = {}): 
   const finish = page.getByRole("button", { name: fr.onboarding.install.finish });
   await later.or(finish).first().click();
 
+  await page.waitForURL("**/languages");
+  await page.getByRole("button", { name: LANGUAGE_TILE[opts.language ?? "vi"] }).click();
   await expect(page).toHaveURL(/\/$/);
 }
 

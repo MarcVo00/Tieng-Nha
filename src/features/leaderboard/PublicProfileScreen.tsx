@@ -14,14 +14,11 @@ import { Avatar, fxSpill, BadgeShelf, SectionTitle, Button, Card, EmptyState, Ic
 
 // Hero: avatar + pseudo, with the XP number beside it. The ten lesson dots are the quiet story of progress.
 
-const LESSON_COUNT = 10;
-const lessonId = (n: number) => `l${String(n).padStart(2, "0")}`;
-
 type State =
   | { status: "loading" }
   | { status: "redirect" }
   | { status: "offline" | "not-found" | "error" }
-  | { status: "ready"; profile: PublicProfile; badges: BadgeDef[] };
+  | { status: "ready"; profile: PublicProfile; badges: BadgeDef[]; lessonIds: string[] };
 
 function BackLink() {
   return (
@@ -76,8 +73,8 @@ export function PublicProfileScreen() {
         return;
       }
       try {
-        const [profile, badges] = await Promise.all([leaderboard.getPublicProfile(userId), content.getBadges()]);
-        if (!cancelled) setState({ status: "ready", profile, badges });
+        const [profile, badges, lessons] = await Promise.all([leaderboard.getPublicProfile(userId), content.getBadges(), content.listLessons()]);
+        if (!cancelled) setState({ status: "ready", profile, badges, lessonIds: lessons.map((l) => l.id) });
       } catch (error) {
         if (cancelled) return;
         setState({ status: error instanceof OfflineError ? "offline" : error instanceof ContentNotFoundError ? "not-found" : "error" });
@@ -119,10 +116,11 @@ export function PublicProfileScreen() {
     );
   }
 
-  const { profile, badges } = state;
+  const { profile, badges, lessonIds } = state;
   const blocked = challenge.blockedBy(profile);
+  // Only the lessons of the active language: their ids are the dots, and their number is the N of « x/N ».
   const done = new Set(profile.lessonsDone);
-  const doneCount = Array.from({ length: LESSON_COUNT }, (_, i) => done.has(lessonId(i + 1))).filter(Boolean).length;
+  const doneCount = lessonIds.filter((id) => done.has(id)).length;
   const unlocked = new Set(profile.badges);
 
   return (
@@ -168,13 +166,13 @@ export function PublicProfileScreen() {
       <section className="mt-8" aria-labelledby="pp-lessons">
         <div className="flex items-baseline justify-between">
           <h2 id="pp-lessons" className="text-heading text-ink">{fr.publicProfile.lessonsTitle}</h2>
-          <span className="tabular text-caption text-ink-muted">{fr.publicProfile.lessonsSummary(doneCount)}</span>
+          <span className="tabular text-caption text-ink-muted">{fr.publicProfile.lessonsSummary(doneCount, lessonIds.length)}</span>
         </div>
         <ol className="mt-3 flex list-none gap-2">
-          {Array.from({ length: LESSON_COUNT }, (_, i) => {
-            const isDone = done.has(lessonId(i + 1));
+          {lessonIds.map((id, i) => {
+            const isDone = done.has(id);
             return (
-              <li key={lessonId(i + 1)} className={`h-6 flex-1 rounded-full ${isDone ? "bg-success" : "bg-surface-2"}`}>
+              <li key={id} className={`h-6 flex-1 rounded-full ${isDone ? "bg-success" : "bg-surface-2"}`}>
                 <span className="sr-only">{fr.publicProfile.lessonDot(i + 1, isDone)}</span>
               </li>
             );

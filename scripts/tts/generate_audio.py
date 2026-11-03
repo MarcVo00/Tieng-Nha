@@ -3,7 +3,7 @@
     python scripts/tts/generate_audio.py --onnx-dir <path to onnx_update> [--voices south-f,south-m,north-f,north-m]
                                          [--out public/audio] [--limit N]
 
-Reads scripts/tts/texts.json (run extract_texts.mjs first), writes public/audio/<voiceId>/<key>.mp3
+Reads the "vi" list of scripts/tts/texts.json (run extract_texts.mjs first), writes public/audio/<voiceId>/<key>.mp3
 (mono, 24 kHz, 32 kbps) and public/audio/manifest.json. Existing files are skipped, so re-running after a
 content change only generates the new texts. See scripts/tts/README.md.
 """
@@ -24,6 +24,11 @@ VOICES = {
     "north-f": {"accent": "north", "gender": "female", "label": "Đoan Trang", "preset": "Đoan Trang"},
     "north-m": {"accent": "north", "gender": "male", "label": "Phạm Tuyên", "preset": "Phạm Tuyên"},
 }
+# Tagalog voices (edge-tts, see generate_audio_edge.py); listed here so the manifest covers every voice.
+TL_VOICES = {
+    "tl-f": {"accent": "fil-PH", "gender": "female", "label": "Blessica", "edge": "fil-PH-BlessicaNeural"},
+    "tl-m": {"accent": "fil-PH", "gender": "male", "label": "Angelo", "edge": "fil-PH-AngeloNeural"},
+}
 MODEL_REPO = "pnnbao-ump/VieNeu-TTS-v3-Turbo"
 HERE = pathlib.Path(__file__).resolve().parent
 
@@ -36,6 +41,12 @@ def normalize_speech_text(text: str) -> str:
 def speech_key(text: str) -> str:
     """First 16 hex chars of SHA-256 over the UTF-8 bytes of the normalised text (= MP3 file name)."""
     return hashlib.sha256(normalize_speech_text(text).encode("utf-8")).hexdigest()[:16]
+
+
+def load_texts(path: pathlib.Path, language: str) -> list[str]:
+    """Texts of one language from texts.json, shaped { "vi": [...], "tl": [...] } (this generator only voices Vietnamese)."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return list(data[language])
 
 
 def deref_hf_cache() -> int:
@@ -74,16 +85,24 @@ def convert_to_mp3(wav: pathlib.Path, mp3: pathlib.Path) -> None:
         tmp.unlink(missing_ok=True)
 
 
-def write_manifest(out: pathlib.Path, texts: list[str]) -> None:
+def write_manifest(out: pathlib.Path, texts: list[str], tl_texts: list[str] | None = None) -> None:
+    """Vietnamese voices list the keys of `texts`, Tagalog voices (tl-*) the keys of `tl_texts`; both text maps are merged."""
+    tl_texts = tl_texts or []
     keys = [speech_key(t) for t in texts]
+    tl_keys = [speech_key(t) for t in tl_texts]
     voices = []
     for voice_id, meta in VOICES.items():
         present = [k for k in keys if (out / voice_id / f"{k}.mp3").is_file()]
         if present:
             voices.append({"id": voice_id, "accent": meta["accent"], "gender": meta["gender"], "label": meta["label"], "keys": present})
+    for voice_id, meta in TL_VOICES.items():
+        present = [k for k in tl_keys if (out / voice_id / f"{k}.mp3").is_file()]
+        if present:
+            voices.append({"id": voice_id, "accent": meta["accent"], "gender": meta["gender"], "label": meta["label"], "keys": present})
     out.mkdir(parents=True, exist_ok=True)
     # "keys" maps each normalised text to its key, so the app can start playback without hashing (iOS user gesture).
-    manifest = {"version": 2, "keys": dict(zip(texts, keys)), "voices": voices}
+    all_keys = {**dict(zip(texts, keys)), **{t: k for t, k in zip(tl_texts, tl_keys) if t not in texts}}
+    manifest = {"version": 2, "keys": all_keys, "voices": voices}
     (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
@@ -102,11 +121,12 @@ def main() -> int:
 
     if args.deref_hf_cache:
         print("dereferenced", deref_hf_cache(), "cache files")
-    texts = json.loads(pathlib.Path(args.texts).read_text(encoding="utf-8"))
+    texts = load_texts(pathlib.Path(args.texts), "vi")
     texts = sorted({normalize_speech_text(t) for t in texts if normalize_speech_text(t)})
+    tl_texts = sorted({normalize_speech_text(t) for t in load_texts(pathlib.Path(args.texts), "tl") if normalize_speech_text(t)})
     out = pathlib.Path(args.out)
     if args.manifest_only:
-        write_manifest(out, texts)
+        write_manifest(out, texts, tl_texts)
         print("manifest written:", out / "manifest.json")
         return 0
 
@@ -150,7 +170,7 @@ def main() -> int:
                     print(f"[{voice_id}] FAILED {text!r}: {error}", file=sys.stderr, flush=True)
             print(f"[{voice_id}] created {created}, skipped {skipped}")
 
-    write_manifest(out, texts)
+    write_manifest(out, texts, tl_texts)
     print("manifest written:", out / "manifest.json")
     return 1 if failures else 0
 

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppState, useRefreshProgress, useSettings } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
+import { languageOfId } from "@/domain/languages";
 import { fr } from "@/i18n/fr";
 import type { VocabId, VocabItem } from "@/domain/types";
 import type { GradeResult } from "@/exercises/types";
@@ -32,6 +34,7 @@ export type ReviewPhase =
 export function useReviewRun() {
   const { content, progress, activity, clock, sound } = useServices();
   const { settings } = useSettings();
+  const { language } = useLanguage();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
   const toast = useToast();
@@ -64,10 +67,10 @@ export function useReviewRun() {
     try {
       const now = clock();
       const [due, snapshot] = await Promise.all([
-        progress.listDueVocab(now, 20),
+        progress.listDueVocab(now, 20, language.id),
         useAppState.getState().snapshot ?? activity.getSnapshot(),
       ]);
-      const lessons = await Promise.all(snapshot.lessonsDone.map((id) => content.getLesson(id)));
+      const lessons = await Promise.all(snapshot.lessonsDone.filter((id) => languageOfId(id) === language.id).map((id) => content.getLesson(id)));
       const pool = lessons.flatMap((l) => l.vocab);
       const exercises = buildReviewSession(due, pool, createRng(seedFromString(now)), { hasStt: hasStt.current });
       if (!mounted.current) return;
@@ -82,7 +85,7 @@ export function useReviewRun() {
     } catch {
       if (mounted.current) setPhase({ name: "error" });
     }
-  }, [clock, progress, activity, content]);
+  }, [clock, progress, activity, content, language.id]);
 
   useEffect(() => {
     if (started.current) return;

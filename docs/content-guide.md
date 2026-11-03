@@ -2,6 +2,11 @@
 
 > Le contenu est généré **sans relecture humaine**. Ce guide sert à minimiser le risque d'erreur. En cas de doute sur un mot ou une tournure : **choisir plus simple et plus fréquent**, ou ne pas l'utiliser.
 
+## 0. Où vivent les fichiers
+- Un dossier par langue : `src/content/vi/` (vietnamien, ids inchangés `l01`…) et `src/content/tl/` (tagalog, ids préfixés `tl_` : `tl_l01`, `tl_d01`, `tl_v_*`). Chacun contient `lessons/`, `dialogues/`, `exam.json`, `tree.json`, `bosses.json`.
+- Les catalogues partagés restent à la racine de `src/content/` : `badges.json`, `shop.json`, `changelog.json`.
+- Les textes parlés sont extraits par langue dans `scripts/tts/texts.json` (`{ "vi": [...], "tl": [...] }`).
+
 ## 1. Règles absolues
 1. **Unicode NFC** pour tout texte vietnamien (`str.normalize("NFC")`). `validate-content` rejette le NFD.
 2. **Vocabulaire du Sud** (Sài Gòn) quand il diffère du Nord (tableau §3). Ajouter une `note` FR quand la différence est notable.
@@ -145,3 +150,39 @@ Règles dialogue : 4–8 tours ; alternance PNJ/utilisateur ; commence par le PN
 - [ ] Chaque `answerTone` correspond au signe de `syllable`.
 - [ ] Les distracteurs sont plausibles mais **sans ambiguïté** (une seule bonne réponse possible).
 - [ ] Après toute modification du contenu : régénérer les voix (`node scripts/tts/extract_texts.mjs` puis `generate_audio.py`, voir `scripts/tts/README.md`) ; sans cela le nouveau texte est lu par la voix de l'appareil.
+
+## 9. Tagalog (`src/content/tl/`)
+
+Les §1 à §8 valent pour le tagalog, sauf ce qui touche aux tons et au Sud du Vietnam. Le but est le même que pour Marc au Vietnam : **parler** en voyage aux Philippines (saluer, commander, payer, demander son chemin, prendre un taxi).
+
+### 9.1 Règles propres au tagalog
+1. **Identifiants préfixés** : `tl_l01`, `tl_d01`, `tl_v_salamat`, exercices `tl_l01_e01`. Champ `dialect: "manila"`. Le texte tagalog va dans les champs `vi` / `answerVi` / `tokensVi` (noms hérités du schéma).
+2. **Le tagalog qu'on entend vraiment** (anti-objectif de la spec : pas de tagalog de manuel) :
+   - le **taglish** est normal : `discount`, `card`, `cash`, `excuse me po`, `okay lang`, `hindi ko gets`, `taga-France ako` ;
+   - les **prix** se disent en espagnol (`bente`, `singkuwenta`, `dosyentos`, `siyento singkuwenta`) ou en anglais ; le tagalog sert à compter les choses (`isa`, `dalawa`…) ;
+   - **`po`** partout où l'on parle à un inconnu, un vendeur, un chauffeur ou un aîné, et **`opo`** pour le oui poli. L'apprenant dit `po` à tout inconnu qui ne le tutoie pas (un `ka` ou un `mo` en face autorise à s'en passer).
+3. **Accent tonique sourcé** : l'accent ne s'écrit pas en tagalog. Chaque mot enseigné a une ligne dans `docs/content/tagalog-sources.md` (mot → transcription → prononciation de la source → URL, en priorité l'API du Wiktionnaire anglais). **Un mot sans source n'est pas enseigné**, ni dans le vocabulaire, ni dans un exercice, ni dans une réplique de dialogue.
+4. **`pron` obligatoire** sur chaque vocabulaire, chaque exercice `speak` et chaque réplique de dialogue (PNJ et options). Format : syllabes séparées par `·`, syllabe accentuée en capitales, mots séparés par une espace (`sa·LA·mat PO`, `ma·gan·DANG u·MA·ga`). La transcription d'une phrase est la suite des transcriptions de ses mots ; `ng` s'écrit `NANG`, un mot d'une syllabe est en capitales, un mot anglais est réécrit avec les lettres du tagalog (`DIS·kawnt`). Un mot redoublé s'écrit en deux mots (`DA·han DA·han`) : le schéma exige une syllabe en capitales entre deux espaces.
+5. **Exercices** : seulement `listen_choose`, `translate_choose`, `word_order`, `speak` (pas de `tone_pick` : le registre `src/domain/languages.ts` en décide). Par leçon : ≥ 2 `listen_choose`, ≥ 2 `translate_choose`, ≥ 1 `word_order`, ≥ 2 `speak`.
+6. **Mots-outils autorisés partout** (au lieu du §4) : `po`, `ang`, `ng`, `sa`, `na`, `ba`, `bang`, `ko`, `ka`, `mo`, `si`, `lang`, `pa`, `may`, `ako`. Ils ont tout de même leur ligne de source.
+7. **Notes en français** : elles expliquent l'usage (à qui on dit `po`, que le taglish est normal, comment on paie dans le jeepney). Mêmes règles typographiques que l'interface : espace fine insécable (U+202F) avant `? ! : ;` et à l'intérieur de « ». Les guillemets entourent le tagalog cité.
+
+### 9.2 Curriculum
+| Leçon | Thème | Vocabulaire | Dialogue |
+|---|---|---|---|
+| tl_l01 | Salutations et politesse | kumusta, mabuti (naman), ka, kayo, po, opo, oo, hindi, salamat, maraming salamat, walang anuman, magandang umaga / hapon / gabi, paalam, ingat | tl_d01 — Bonjour à l'hôtel |
+| tl_l02 | Se présenter, survivre | ako, ako si, pangalan, ikaw, Pranses, taga-France ako, hindi ko alam, pakiulit po, dahan-dahan po, ano po?, marunong, mag-Ingles, Tagalog, hindi ko maintindihan, hindi ko gets, konti lang | tl_d02 — Faire connaissance |
+| tl_l03 | Les nombres et les prix | isa … sampu, bente, singkuwenta, sandaan, dosyentos, piso, pesos | tl_d03 — Acheter des mangues |
+| tl_l04 | Commander à manger | gusto ko, isa pa po, pahingi, tubig, kanin, manok, baboy, isda, adobo, kape, yelo, walang yelo, masarap, maanghang, ito | tl_d04 — À la cantine |
+| tl_l05 | Payer | magkano, bayad, sukli, barya, mahal, ang mahal!, mura, may, discount, pwede, card, cash, wala | tl_d05 — Payer un souvenir |
+| tl_l06 | Demander son chemin | nasaan, saan, kaliwa, kanan, diretso, malapit, malayo, dito, doon, CR, palengke, hotel, mall, tapos | tl_d06 — Trouver les toilettes |
+| tl_l07 | Prendre un taxi | sa, airport, para po!, dito na lang po, sa tabi lang po, hanggang, metro, pakibuksan po ang metro, jeepney, tricycle, Grab, taxi | tl_d07 — En tricycle |
+| tl_l08 | Une journée de voyageur | excuse me po, pasensya na, okay lang, sige, tara, gutom, busog, teka lang, mainit, ang init!, sarado, bukas, meron, kain tayo! | tl_d08 — Déjeuner et addition |
+
+`tl_l08` révise les leçons 1 à 7 dans des situations mélangées ; comme tout vocabulaire a un identifiant unique, elle apporte aussi ses propres mots de « journée de voyage ».
+
+### 9.3 Auto-vérification tagalog
+- [ ] Chaque mot de chaque texte tagalog a sa ligne dans `docs/content/tagalog-sources.md`, et le `pron` correspond à l'accent de la source.
+- [ ] `po` / `opo` dans chaque phrase adressée à un inconnu.
+- [ ] Les options utilisateur et les exercices n'utilisent que le vocabulaire de la leçon, des leçons précédentes et les mots-outils §9.1.
+- [ ] `npx tsx scripts/validate-content.ts --strict` et `node scripts/tts/extract_texts.mjs` (chaque texte tagalog listé sous `tl`).

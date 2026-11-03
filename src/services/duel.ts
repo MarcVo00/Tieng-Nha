@@ -1,4 +1,5 @@
 import type { DuelQuestionRef, DuelQuestions, Lesson, Round1Answer, Round2Answer } from "@/domain/types";
+import { languageOfId } from "@/domain/languages";
 import { shuffle } from "@/services/random";
 
 type Rng = () => number;
@@ -88,8 +89,8 @@ export function duelPrerequisites(lessonsDone: readonly string[], dialoguesDone:
   return lessonsDone.includes("l01") && dialoguesDone.includes("d01");
 }
 
-/** Lessons done by both players, in the order of `a`. */
+/** Vietnamese lessons done by both players, in the order of `a` (duels are Vietnamese-only in 2.0). */
 export function commonLessons(a: readonly string[], b: readonly string[]): string[] {
   const other = new Set(b);
-  return a.filter((id, i) => other.has(id) && a.indexOf(id) === i);
+  return a.filter((id, i) => languageOfId(id) === "vi" && other.has(id) && a.indexOf(id) === i);
 }

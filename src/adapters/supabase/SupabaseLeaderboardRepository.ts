@@ -4,6 +4,7 @@ import { ContentNotFoundError } from "@/domain/errors";
 import { lookOf } from "@/services/look";
 import type { ItemSlot, LeaderboardRow, Look, PublicProfile } from "@/domain/types";
 import type { LeaderboardRepository } from "@/ports";
+import { LANGUAGE_IDS, type LanguageId } from "@/domain/languages";
 
 /** Equipped profile effect id from the `equipped` jsonb; any unexpected shape reads as none. */
 function profileFx(equipped: unknown): string | null {
@@ -16,6 +17,19 @@ function profileFx(equipped: unknown): string | null {
 function lookFrom(equipped: unknown): Look {
   if (typeof equipped !== "object" || equipped === null || Array.isArray(equipped)) return {};
   return lookOf(equipped as Partial<Record<ItemSlot, string>>);
+}
+
+/** Best boss score per language: `exam_best` is Vietnamese, `exam_bests` the others (`{"tl": 85}`); bad values are dropped. */
+function examBestsFrom(examBest: number | null, examBests: unknown): Partial<Record<LanguageId, number>> {
+  const out: Partial<Record<LanguageId, number>> = {};
+  if (typeof examBests === "object" && examBests !== null && !Array.isArray(examBests)) {
+    for (const id of LANGUAGE_IDS) {
+      const v = (examBests as Record<string, unknown>)[id];
+      if (typeof v === "number" && Number.isFinite(v)) out[id] = v;
+    }
+  }
+  if (examBest !== null) out.vi = examBest;
+  return out;
 }
 
 export class SupabaseLeaderboardRepository implements LeaderboardRepository {
@@ -65,6 +79,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
       dialoguesDone: data.dialogues_done ?? [],
       badges: data.badges ?? [],
       examBest: data.exam_best,
+      examBests: examBestsFrom(data.exam_best, data.exam_bests),
       frame: data.equipped_frame ?? null,
       fx: profileFx(data.equipped),
       look: lookFrom(data.equipped),

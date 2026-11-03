@@ -241,18 +241,21 @@ export type Database = {
       exam_attempts: {
         Row: {
           id: string
+          language: string
           score: number | null
           started_at: string
           user_id: string
         }
         Insert: {
           id?: string
+          language?: string
           score?: number | null
           started_at?: string
           user_id: string
         }
         Update: {
           id?: string
+          language?: string
           score?: number | null
           started_at?: string
           user_id?: string
@@ -368,6 +371,7 @@ export type Database = {
           dialogues_done: string[]
           equipped: Json
           exam_best: number | null
+          exam_bests: Json
           group_id: string
           gacha_pity: Json
           inventory: string[]
@@ -390,6 +394,7 @@ export type Database = {
           dialogues_done?: string[]
           equipped?: Json
           exam_best?: number | null
+          exam_bests?: Json
           group_id: string
           gacha_pity?: Json
           inventory?: string[]
@@ -412,6 +417,7 @@ export type Database = {
           dialogues_done?: string[]
           equipped?: Json
           exam_best?: number | null
+          exam_bests?: Json
           group_id?: string
           gacha_pity?: Json
           inventory?: string[]
@@ -456,6 +462,7 @@ export type Database = {
           equipped: Json | null
           equipped_frame: string | null
           exam_best: number | null
+          exam_bests: Json | null
           group_id: string | null
           lessons_done: string[] | null
           lessons_done_count: number | null
@@ -535,7 +542,7 @@ export type Database = {
         Returns: string
       }
       start_exam_attempt: {
-        Args: Record<PropertyKey, never>
+        Args: { p_language?: string }
         Returns: Json
       }
       submit_duel_run: {

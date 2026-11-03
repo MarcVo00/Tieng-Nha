@@ -5,6 +5,7 @@ import { mapError } from "@/adapters/supabase/errors";
 import { IsoSchema } from "@/adapters/supabase/iso";
 import type { Duel, DuelQuestions, Round1Answer, Round2Answer } from "@/domain/types";
 import { NotAuthenticatedError } from "@/domain/errors";
+import type { LanguageId } from "@/domain/languages";
 import { DUEL_ERRORS, type DuelError, type DuelGateway } from "@/ports";
 
 const RunSchema = z.object({
@@ -48,8 +49,8 @@ function refusal(error: string | undefined): { ok: false; error: DuelError } {
 export class SupabaseDuelGateway implements DuelGateway {
   constructor(private readonly db: Db) {}
 
-  async create(opponent: string, questions: DuelQuestions, seed: number): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }> {
-    const { data, error } = await this.db.rpc("create_duel", { p_opponent: opponent, p_questions: questions as unknown as Json, p_seed: seed });
+  async create(opponent: string, questions: DuelQuestions, seed: number, language: LanguageId): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }> {
+    const { data, error } = await this.db.rpc("create_duel", { p_opponent: opponent, p_questions: questions as unknown as Json, p_seed: seed, p_language: language });
     if (error) throw mapError(error);
     const r = result(data);
     if (!r.ok) return refusal(r.error);

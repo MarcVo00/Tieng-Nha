@@ -1,4 +1,5 @@
 import type { Duel, DuelQuestions, Round1Answer, Round2Answer } from "@/domain/types";
+import type { LanguageId } from "@/domain/languages";
 
 /** Business refusals of the duel RPCs (never thrown: returned as `{ ok: false, error }`). */
 export type DuelError =
@@ -22,7 +23,8 @@ export const DUEL_ERRORS: readonly DuelError[] = [
 
 /** Asynchronous duels. A network failure throws `OfflineError`. */
 export interface DuelGateway {
-  create(opponent: string, questions: DuelQuestions, seed: number): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }>;
+  /** One open duel per pair and per language; the questions come from lessons of `language`. */
+  create(opponent: string, questions: DuelQuestions, seed: number, language: LanguageId): Promise<{ ok: true; duelId: string } | { ok: false; error: DuelError }>;
   submitRun(duelId: string, round1: Round1Answer[], round2: Round2Answer[]): Promise<{ ok: true } | { ok: false; error: DuelError }>;
   /** My duels, newest first; `theirRun` is only present once the duel is settled. */
   list(): Promise<Duel[]>;

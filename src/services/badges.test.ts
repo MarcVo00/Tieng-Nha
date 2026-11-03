@@ -1,4 +1,4 @@
-import { evaluateBadges } from "@/services/badges";
+import { evaluateBadges, shownBadges } from "@/services/badges";
 import { BadgesFileSchema } from "@/content/schema";
 import badgesFile from "@/content/badges.json";
 import type { ProgressSnapshot } from "@/domain/types";
@@ -33,7 +33,7 @@ test("xp_total and active_days unlock from the snapshot", () => {
 
 test("every badge pays between 20 and 200 xu, harder ones more", () => {
   const coins = Object.fromEntries(defs.map((d) => [d.id, d.coins]));
-  expect(defs).toHaveLength(24);
+  expect(defs).toHaveLength(33);
   expect(defs.every((d) => d.coins >= 20 && d.coins <= 200)).toBe(true);
   expect([coins["first_lesson"], coins["five_lessons"], coins["ten_lessons"]]).toEqual([20, 40, 100]);
   expect([coins["streak_3"], coins["streak_7"], coins["streak_14"], coins["streak_30"]]).toEqual([30, 60, 100, 200]);
@@ -56,4 +56,34 @@ test("Tagalog perfect lessons and dialogues do not unlock the Vietnamese badges"
   expect(evaluateBadges({ ...empty, perfectLessons: perfect }, [five, one])).toEqual([]);
   expect(evaluateBadges({ ...empty, dialoguesDone: ["tl_d01"] }, [dlg])).toEqual([]);
   expect(evaluateBadges({ ...empty, perfectLessons: [...perfect, "l01"] }, [one])).toEqual(["perfect_1"]);
+});
+
+test("the Tagalog badges count only Tagalog progress, and the Vietnamese ones only Vietnamese", () => {
+  const tl = ["tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05", "tl_l06", "tl_l07", "tl_l08"];
+  const tlDialogues = tl.map((id) => id.replace("_l", "_d"));
+  const ids = evaluateBadges({ ...empty, lessonsDone: tl, perfectLessons: tl, dialoguesDone: tlDialogues, examBests: { tl: 92 } }, defs);
+  expect(ids.sort()).toEqual(
+    ["tl_all_dialogues", "tl_all_lessons", "tl_exam_excellent", "tl_exam_passed", "tl_first_dialogue", "tl_first_lesson", "tl_four_lessons", "tl_perfect_all", "tl_perfect_lesson"],
+  );
+  const vietnamese = evaluateBadges({ ...empty, lessonsDone: ["l01", "l02", "l03", "l04"], dialoguesDone: ["d01"], examBest: 92, examBests: { vi: 92 } }, defs);
+  expect(vietnamese.filter((id) => id.startsWith("tl_"))).toEqual([]);
+  expect(vietnamese).toEqual(expect.arrayContaining(["first_lesson", "exam_passed", "exam_excellent"]));
+});
+
+test("Tagalog badges pay between 20 and 200 xu and grant no item", () => {
+  const tlDefs = defs.filter((d) => d.id.startsWith("tl_"));
+  expect(tlDefs).toHaveLength(9);
+  for (const d of tlDefs) {
+    expect(d.coins).toBeGreaterThanOrEqual(20);
+    expect(d.coins).toBeLessThanOrEqual(200);
+    expect(d.reward).toBeUndefined();
+  }
+});
+
+test("a profile shows another language's badges only once that language is started", () => {
+  const count = (p: { lessonsDone: string[]; badges: string[] }, active?: "vi" | "tl") => shownBadges(defs, p, active).length;
+  expect(count({ lessonsDone: ["l01"], badges: [] })).toBe(24);
+  expect(count({ lessonsDone: ["l01"], badges: [] }, "tl")).toBe(33);
+  expect(count({ lessonsDone: ["tl_l01"], badges: [] })).toBe(33);
+  expect(count({ lessonsDone: [], badges: ["tl_first_lesson"] })).toBe(25);
 });

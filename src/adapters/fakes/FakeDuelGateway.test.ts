@@ -55,6 +55,16 @@ describe("create refusals", () => {
     expect(await gw.create(BOT, q(), 3)).toMatchObject({ ok: true });
   });
 
+  test("one open duel per pair and per language: a Tagalog duel beside a Vietnamese one", async () => {
+    const TL_READY = [...READY, ev("lesson_completed", "tl_l01"), ev("lesson_completed", "tl_l02"), ev("dialogue_completed", "tl_d01")];
+    const { gw } = setup(TL_READY);
+    await create(gw);
+    expect(await gw.create(BOT, q(4, 1, "tl_l01"), 2, "tl")).toMatchObject({ ok: true });
+    expect(await gw.create(BOT, q(4, 1, "tl_l02"), 3, "tl")).toEqual({ ok: false, error: "already_open" });
+    expect(await gw.create(BOT, q(4, 1, "l01"), 4, "tl")).toEqual({ ok: false, error: "not_common_lesson" });
+    expect(await setup().gw.create(BOT, q(4, 1, "tl_l01"), 5, "tl")).toEqual({ ok: false, error: "prerequisites" });
+  });
+
   test("max 5 duels created per Paris day, back to normal the next day", async () => {
     const members = Array.from({ length: 6 }, (_, i) => ({ userId: `m${i}`, pseudo: `M${i}`, avatarEmoji: "x", lessonsDone: ["l01"], dialoguesDone: ["d01"] }));
     let now = T0;

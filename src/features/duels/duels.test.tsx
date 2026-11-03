@@ -97,6 +97,27 @@ describe("duel run", () => {
     expect(tts.lastOptions?.language).toBe("vi");
   });
 
+  test("a Tagalog duel speaks Tagalog and marks its words lang=tl, even with Vietnamese active", async () => {
+    const tl: DuelQuestions = {
+      round1: [
+        { lessonId: "tl_l01", exerciseId: "tl_l01_e04" },
+        { lessonId: "tl_l01", exerciseId: "tl_l01_e05" },
+      ],
+      round2: [{ lessonId: "tl_l01", exerciseId: "tl_l01_e07" }],
+    };
+    saveRun(ID, newRecord(tl, 7));
+    const services = createFakeServices();
+    const tts = services.tts;
+    if (!(tts instanceof FakeSpeechSynthesizer)) throw new Error("expected the fake synthesizer");
+    renderRun(services);
+    expect(await screen.findByText(fr.duels.run.round1)).toBeInTheDocument();
+    const choice = await option("Salamat po.");
+    expect(choice.querySelector("[lang]") ?? choice.closest("[lang]")).toHaveAttribute("lang", "tl");
+    await userEvent.click(await screen.findByRole("button", { name: fr.exercises.translateChoose.listen("Salamat po.") }));
+    await waitFor(() => expect(tts.spoken).toContain("Salamat po."));
+    expect(tts.lastOptions?.language).toBe("tl");
+  });
+
   test(
     "plays round 1, the round-2 intro and round 2 with the time measured from display, then sends and opens the result",
     async () => {

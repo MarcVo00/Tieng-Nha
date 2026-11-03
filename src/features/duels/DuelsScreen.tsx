@@ -8,6 +8,8 @@ import { usePendingDuels } from "@/app/usePendingDuels";
 import { OfflineError } from "@/domain/errors";
 import type { Duel, LeaderboardRow, Look } from "@/domain/types";
 import { fr } from "@/i18n/fr";
+import { LANGUAGES } from "@/domain/languages";
+import { duelLanguage } from "@/services/duel";
 import { Avatar, Button, Card, duration, EmptyState, ease, Icon, SectionTitle, SegmentedNav, Skeleton, tap } from "@/ui";
 import { readPending, readRun, unsentDuelIds } from "@/features/duels/duelRunState";
 import { hoursLeft, otherId, outcomeOf, splitDuels } from "@/features/duels/duelsView";
@@ -32,6 +34,12 @@ function Section({ id, title, children }: { id: string; title: string; children:
   );
 }
 
+/** A duel in another language than Vietnamese says so (« Tagalog · … »): the hub lists every language's duels. */
+const withLanguage = (caption: string, duel: Duel): string => {
+  const language = duelLanguage(duel.questions);
+  return language === "vi" ? caption : fr.duels.hub.inLanguage(LANGUAGES[language].nameFr, caption);
+};
+
 function DuelRow({ duel, to, title, caption, trailing, look }: { duel: Duel; to: string; title: string; caption: string; trailing?: ReactNode; look?: Look | undefined }) {
   return (
     <motion.li whileTap={tap}>
@@ -40,7 +48,7 @@ function DuelRow({ duel, to, title, caption, trailing, look }: { duel: Duel; to:
           <Avatar emoji={duel.opponentAvatar} size="md" look={look ?? DEFAULT_LOOK} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-body-strong text-ink">{title}</span>
-            <span className="block truncate text-caption text-ink-muted">{caption}</span>
+            <span className="block truncate text-caption text-ink-muted">{withLanguage(caption, duel)}</span>
           </span>
           {trailing}
           <Icon name="chevron-right" size={20} className="shrink-0 text-ink-muted" />

@@ -10,9 +10,8 @@ const readOr = (path: string, fallback: unknown) => (existsSync(path) ? json(pat
 const readOptional = (path: string) => (existsSync(path) ? json(path) : undefined);
 
 const strict = process.argv.includes("--strict") || process.env.CONTENT_STRICT === "1";
-// Every language gets the integrity checks (references, tree, id prefixes, exercise types). Strict adds the
-// complete-path checks (lesson and dialogue counts, exam quotas, boss sheets), which only Vietnamese has in 2.0:
-// Tagalog has no exam or boss yet.
+// Every language gets the integrity checks (references, tree, id prefixes, exercise types, boss sheets and pool size).
+// Strict adds the Vietnamese course's own counts (10 lessons, 10 dialogues, exam quotas per section, tones included).
 const languages = [
   { id: "vi", strict },
   { id: "tl", strict: false },

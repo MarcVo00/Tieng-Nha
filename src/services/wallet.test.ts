@@ -402,3 +402,12 @@ describe("daily bonus (mirrors supabase/tests/08_daily_bonus_test.sql)", () => {
     expect(nextDailyBonus(walletOf([1, 2, 3, 4, 5, 6].map((d) => bonus(d))), "2026-10-07")).toEqual({ day: 7, coins: 50 });
   });
 });
+
+describe("boss wins per language (mirrors supabase/tests/10_language_exams_test.sql)", () => {
+  const tlExam = (score: number, hour: number) => ev("exam_finished", { score }, "tl_exam", 10, hour);
+  test("a first Tagalog win pays 50, a later one 20, and a first Vietnamese win still pays 50", () => {
+    expect(coinsOf([tlExam(85, 8)])).toBe(COINS.firstBossWin);
+    expect(coinsOf([tlExam(85, 8), tlExam(78, 9)])).toBe(COINS.firstBossWin + COINS.bossWin);
+    expect(coinsOf([tlExam(85, 8), tlExam(78, 9), exam(92, 10)])).toBe(2 * COINS.firstBossWin + COINS.bossWin);
+  });
+});

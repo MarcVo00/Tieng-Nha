@@ -16,8 +16,8 @@ test("every registry entry carries its own id and a prefix matching languageOfId
   }
 });
 
-test("Tagalog has no final boss, two voices and four exercise types; Vietnamese keeps its boss", () => {
-  expect(LANGUAGES.tl).toMatchObject({ finalBossId: null, packVoices: ["tl-f", "tl-m"], speechLang: "fil-PH", htmlLang: "tl", idPrefix: "tl_" });
+test("Tagalog has its own final boss, two voices and four exercise types; Vietnamese keeps its boss", () => {
+  expect(LANGUAGES.tl).toMatchObject({ finalBossId: "tl_boss_bakunawa", packVoices: ["tl-f", "tl-m"], speechLang: "fil-PH", htmlLang: "tl", idPrefix: "tl_" });
   expect(LANGUAGES.tl.exerciseTypes).toEqual(["listen_choose", "translate_choose", "word_order", "speak"]);
   expect(LANGUAGES.vi).toMatchObject({ finalBossId: "boss_thuy_tinh", speechLang: "vi-VN", idPrefix: "" });
   expect(LANGUAGES.vi.exerciseTypes).toHaveLength(5);

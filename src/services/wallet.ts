@@ -2,6 +2,7 @@ import type { AppEvent, BadgeDef, ItemSlot, ShopItem, Wallet } from "@/domain/ty
 import { gachaRefund, isGachaItem } from "@/services/gacha";
 import { STREAK_EVENT_TYPES } from "@/services/progress";
 import { daysBetween, parisDay } from "@/services/time";
+import { languageOfId, type LanguageId } from "@/domain/languages";
 
 export const COINS = { lesson: 10, perfectBonus: 5, dialogue: 5, review: 3, badge: 10, firstBossWin: 50, bossWin: 20, bossPass: 70 } as const;
 
@@ -109,7 +110,8 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
   const unlocked = new Set<string>();
   const settledDuels = new Set<string>();
   const pulls = new Set<string>();
-  let best: number | null = null;
+  // best boss score per language, like the server (exam_best for Vietnamese, exam_bests for the others)
+  const best: Partial<Record<LanguageId, number>> = {};
 
   for (const e of sorted) {
     if (e.type === "item_purchased") {
@@ -170,9 +172,12 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
       }
       unlocked.add(e.refId);
     } else {
-      w.coins += coinsForEvent(e, best);
+      w.coins += coinsForEvent(e, e.type === "exam_finished" ? (best[languageOfId(e.refId)] ?? null) : null);
     }
-    if (e.type === "exam_finished") best = Math.max(best ?? 0, normalisedScore(e.payload["score"]));
+    if (e.type === "exam_finished") {
+      const language = languageOfId(e.refId);
+      best[language] = Math.max(best[language] ?? 0, normalisedScore(e.payload["score"]));
+    }
     if (STREAK_EVENT_TYPES.includes(e.type)) {
       // Same as the server: consecutive day +1; g missed days <= stock consume g and +1; else restart at 1.
       const day = parisDay(e.createdAt);

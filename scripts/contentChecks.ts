@@ -205,17 +205,18 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean; lang
     }
   }
 
-  // Boss sheets: each is a boss node of the tree; strict mode also needs a sheet per node and enough exam questions
+  // Boss sheets: each is a boss node of the tree; strict mode and every language folder also need a sheet per node
+  // and enough exam questions
   if (tree?.success) {
     const bossNodes = new Set(tree.data.nodes.filter((n) => n.kind === "boss").map((n) => n.id));
     const sheetList = bosses?.success ? bosses.data.bosses : [];
     for (const b of sheetList) if (!bossNodes.has(b.id)) errors.push(`bosses: ${b.id} is not a boss node of the tree`);
-    if (opts.strict) {
+    if (integrity) {
       const sheets = new Set(sheetList.map((b) => b.id));
       for (const id of bossNodes) if (!sheets.has(id)) errors.push(`tree: boss node ${id} has no boss sheet`);
     }
   }
-  if (opts.strict && bosses?.success && exam.success) {
+  if (integrity && bosses?.success && exam.success) {
     for (const b of bosses.data.bosses) {
       const need = b.hp + b.playerLives - 1;
       if (need > exam.data.questions.length) errors.push(`bosses: ${b.id} needs ${need} questions, the exam pool has ${exam.data.questions.length}`);

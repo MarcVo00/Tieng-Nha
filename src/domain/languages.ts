@@ -45,10 +45,13 @@ export const LANGUAGES: Readonly<Record<LanguageId, Language>> = {
     speechLang: "fil-PH",
     idPrefix: "tl_",
     exerciseTypes: ["listen_choose", "translate_choose", "word_order", "speak"],
-    finalBossId: null,
+    finalBossId: "tl_boss_bakunawa",
     packVoices: ["tl-f", "tl-m"],
   },
 };
 
 /** The language a content id (lesson, dialogue, vocab…) belongs to: `tl_` ids are Tagalog, the rest Vietnamese. */
 export const languageOfId = (id: string): LanguageId => (id.startsWith("tl_") ? "tl" : "vi");
+
+/** `ref_id` of a language's `exam_finished` events: `exam` (Vietnamese, as before 2.1) or `tl_exam`. */
+export const examRefId = (language: LanguageId): string => `${LANGUAGES[language].idPrefix}exam`;

@@ -64,6 +64,17 @@ test("finishExam records the boss outcome in the event payload", async () => {
   expect(ev?.payload).toEqual({ score: 92, attemptId: "a1", noSpeaking: false, bossId: "boss_thuy_tinh", won: true, livesLeft: 4, bossHpLeft: 0 });
 });
 
+test("finishExam in Tagalog writes tl_exam and scores against the Tagalog best only", async () => {
+  const { svc, progress } = setup();
+  expect((await svc.finishExam({ attemptId: "v", score: 90, noSpeaking: false })).xpGained).toBe(90);
+  const tl = await svc.finishExam({ attemptId: "t", score: 80, noSpeaking: false, language: "tl" });
+  expect(tl.xpGained).toBe(80); // a first Tagalog fight: the Vietnamese 90 does not count
+  expect(tl.snapshot.examBests).toEqual({ vi: 90, tl: 80 });
+  expect(tl.snapshot.examBest).toBe(90);
+  const refs = (await progress.listEvents()).filter((e) => e.type === "exam_finished").map((e) => e.refId);
+  expect(refs).toEqual(["exam", "tl_exam"]);
+});
+
 test("startSession spends energy in the local journal only, and refuses when there is not enough", async () => {
   const s = createFakeServices({ clock: () => "2026-10-14T08:00:00.000Z" });
   expect(await s.activity.getEnergy()).toEqual({ current: 5, max: 5, nextAt: null });

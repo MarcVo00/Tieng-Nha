@@ -19,7 +19,7 @@ function snapshot(lessonsDone: string[]): ProgressSnapshot {
   return { xpTotal: 0, xpWeek: 0, xpToday: 0, streak: 0, lessonsDone, perfectLessons: [], dialoguesDone: [], vocabReviewed: 0, examBest: null, badges: [], activeDays: [] };
 }
 
-const boss = { name: "Thủy Tinh", illustration: "boss_thuy_tinh" };
+const boss = { id: "boss_thuy_tinh", name: "Thủy Tinh", illustration: "boss_thuy_tinh" };
 
 const stop = (nodes: PathNode[], id: string) => {
   const node = nodes.find((n) => n.kind === "lesson" && n.key === id);

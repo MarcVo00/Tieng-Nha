@@ -56,15 +56,36 @@ export const tagalogDialogueFixtures: Dialogue[] = [
   dialogue(2, "À table", "Gutom ka na ba?", "As-tu déjà faim ?", "Oo, gutom na ako.", "Oui, j'ai faim."),
 ];
 
-export const tagalogExamFixture: ExamQuestion[] = [];
+const SECTION = { listen_choose: "listening", translate_choose: "translation", word_order: "translation", speak: "speaking", tone_pick: "tones" } as const;
 
-/** Two lessons in a row, no boss: the Tagalog path has none. */
+/** The lessons' exercises, cycled to 20 questions (a 15 + 5 boss needs 19), renumbered like src/content/tl/exam.json. */
+export const tagalogExamFixture: ExamQuestion[] = Array.from({ length: 20 }, (_, i) => {
+  const all = tagalogLessonFixtures.flatMap((l) => l.exercises);
+  const exercise = all[i % all.length] ?? all[0];
+  if (!exercise) throw new Error("no Tagalog exercise");
+  const n = String(i + 1).padStart(3, "0");
+  return { id: `tl_exam_q${n}`, section: SECTION[exercise.type], exercise: { ...exercise, id: `tl_exam_e${n}` } };
+});
+
+/** Two lessons in a row, then Bakunawa. */
 export const tagalogTreeFixture: Tree = {
   contentVersion: 1,
   nodes: [
     { id: "tl_l01", kind: "lesson", requires: [], branch: "trunk" },
     { id: "tl_l02", kind: "lesson", requires: ["tl_l01"], branch: "trunk" },
+    { id: "tl_boss_bakunawa", kind: "boss", requires: ["tl_l02"], branch: "trunk" },
   ],
 };
 
-export const tagalogBossFixtures: Boss[] = [];
+export const tagalogBossFixtures: Boss[] = [
+  {
+    id: "tl_boss_bakunawa",
+    name: "Bakunawa",
+    title: "Le serpent qui avale la lune",
+    legend: "Bakunawa sort des flots pour avaler la lune (fixture).",
+    illustration: "tl_boss_bakunawa",
+    hp: 15,
+    playerLives: 5,
+    pool: "exam",
+  },
+];

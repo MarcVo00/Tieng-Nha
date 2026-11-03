@@ -348,8 +348,8 @@ export const fr = {
     dialogue: { kicker: "Dialogue", aria: (title: string) => `Dialogue\u202f: ${title}`, done: "Fait" },
     exam: {
       kicker: "Boss final",
-      lockedToast: "Termine d'abord les leçons pour affronter Thủy Tinh",
-      lockedHint: "Après les 10 leçons",
+      lockedToast: (name: string) => `Termine d'abord les leçons pour affronter ${name}`,
+      lockedHint: (lessons: number) => `Après les ${lessons} leçons`,
       won: "Vaincu ✓",
       aria: (name: string, locked: boolean) => `${name}, boss final${locked ? ", verrouillé" : ""}`,
     },
@@ -692,7 +692,7 @@ export const fr = {
       },
       won: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
       locked: {
-        title: "Thủy Tinh t'attend au bout du parcours",
+        title: (name: string) => `${name} t'attend au bout du parcours`,
         body: "Termine les leçons pour l'affronter.",
         progress: (n: number, total: number) => `${n} / ${total} leçons terminées`,
       },
@@ -707,8 +707,8 @@ export const fr = {
       bossHp: (name: string, hp: number, max: number) => `PV de ${name}\u202f: ${hp} sur ${max}`,
       stage: (name: string) => `Combat contre ${name}`,
       hero: "Ton h\u00e9ros",
-      /** The player's win, stamped on the strip (Vietnamese, as on a Đông Hồ print): never a mark on the bowing boss. */
-      win: "Thắng!",
+      /** The player's win, stamped on the strip in the boss's language (as on a Đông Hồ print): never a mark on the bowing boss. */
+      win: { vi: "Thắng!", tl: "Panalo!" },
       skip: "Passer",
       hit: (hpLeft: number) => `Touché\u202f! Il lui reste ${hpLeft} PV`,
       miss: (livesLeft: number) => `Aïe\u202f! Il te reste ${livesLeft} vie${livesLeft > 1 ? "s" : ""}`,
@@ -750,10 +750,11 @@ export const fr = {
       home: "Retour à l'accueil",
     },
     certificate: {
-      vi: "Chứng nhận",
+      /** Heading in the certificate's language. */
+      heading: { vi: "Chứng nhận", tl: "Sertipiko" },
       title: "Certificat de réussite",
       awardedTo: "décerné à",
-      achievement: "a réussi le test final de vietnamien du Sud",
+      achievement: { vi: "a réussi le test final de vietnamien du Sud", tl: "a réussi le test final de tagalog" },
       score: (n: number) => `${n} / 100`,
       noSpeaking: "Sans épreuve orale",
       seal: "Tiếng Nhà",
@@ -795,6 +796,7 @@ export const fr = {
     badgesTitle: "Badges",
     noBadges: "Pas encore de badge.",
     examTitle: "Boss final",
+    examTitleIn: (language: string) => `Boss final · ${language}`,
     bossWon: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
     bossWonNoLives: "Boss final vaincu ✓",
     examNone: "Pas encore vaincu",

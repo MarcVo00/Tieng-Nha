@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { fr } from "@/i18n/fr";
-import { firstLessonLink, onboard } from "./helpers";
+import { firstLessonLink, onboard, seedLessonsCompleted } from "./helpers";
 
 test("choose Tagalog after onboarding, read the pronunciation, hear a tl-f voice file, then switch back to Vietnamese", async ({
   page,
@@ -44,4 +44,15 @@ test("choose Tagalog after onboarding, read the pronunciation, hear a tl-f voice
   await page.getByRole("button", { name: /Vietnamien/ }).click();
   await expect(page.getByRole("button", { name: fr.languages.current("Vietnamien") })).toBeVisible();
   await expect(firstLessonLink(page)).toContainText("Les 6 tons");
+});
+
+test("after the eight Tagalog lessons, Bakunawa ends the path and can be challenged", async ({ page }) => {
+  await onboard(page, { language: "tl" });
+  await seedLessonsCompleted(page, Array.from({ length: 8 }, (_, i) => `tl_l0${i + 1}`));
+  await page.goto("/");
+  await page.getByRole("link", { name: fr.home.exam.aria("Bakunawa", false) }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Bakunawa" })).toBeVisible();
+  await page.getByRole("button", { name: fr.exam.intro.start }).click();
+  await expect(page.getByRole("progressbar", { name: fr.exam.run.bossHp("Bakunawa", 15, 15) })).toBeVisible();
+  await expect(page.getByRole("img", { name: fr.ui.hearts(5, 5) })).toBeVisible();
 });

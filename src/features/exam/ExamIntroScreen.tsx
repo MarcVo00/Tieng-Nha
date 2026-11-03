@@ -3,11 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useEntryState } from "@/app/useEntryState";
 import { useServices } from "@/app/ServicesProvider";
+import { useLanguage } from "@/app/useLanguage";
 import type { Boss, Tree } from "@/domain/types";
 import { ENERGY } from "@/services/energy";
 import { livesFromScore } from "@/services/bossFight";
-import { EXAM_PASS } from "@/services/exam";
-import { FINAL_BOSS_ID, nodeState, treeProgress } from "@/services/tree";
+import { EXAM_PASS, examBestIn } from "@/services/exam";
+import { nodeState, treeProgress } from "@/services/tree";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
 import { Button, Card, EmptyState, Hearts, Icon, Motif, ProgressBar, Skeleton, WaterDropHp } from "@/ui";
@@ -102,6 +103,8 @@ function Rules({ hp, lives }: { hp: number; lives: number }) {
 // Hero: the boss portrait (or the lock while the skill tree keeps it locked). One action: Commencer.
 export function ExamIntroScreen() {
   const { exam, content, activity } = useServices();
+  const { language } = useLanguage();
+  const bossId = language.finalBossId;
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
   const interrupted = isInterruptedState(useEntryState());
@@ -137,7 +140,11 @@ export function ExamIntroScreen() {
   useEffect(() => {
     let cancelled = false;
     setTreeFailed(false);
-    Promise.all([content.getTree(), content.getBoss(FINAL_BOSS_ID)]).then(
+    if (bossId === null) {
+      setTreeFailed(true); // a language without a boss has no route here
+      return;
+    }
+    Promise.all([content.getTree(), content.getBoss(bossId)]).then(
       ([t, b]) => {
         if (cancelled) return;
         setTree(t);
@@ -150,7 +157,7 @@ export function ExamIntroScreen() {
     return () => {
       cancelled = true;
     };
-  }, [content, attempt]);
+  }, [content, bossId, attempt]);
 
   if (treeFailed) {
     return (
@@ -170,12 +177,13 @@ export function ExamIntroScreen() {
       </div>
     );
   }
-  const progress = treeProgress(snapshot);
-  const unlocked = nodeState(tree, FINAL_BOSS_ID, progress) !== "locked";
+  const progress = treeProgress(snapshot, language.id);
+  const unlocked = nodeState(tree, boss.id, progress) !== "locked";
   const trunkLessons = tree.nodes.filter((n) => n.kind === "lesson");
   const done = trunkLessons.filter((n) => progress.lessonsDone.includes(n.id)).length;
   const total = trunkLessons.length;
-  const bestLives = snapshot.examBest !== null && snapshot.examBest >= EXAM_PASS ? livesFromScore(snapshot.examBest, boss.playerLives) : null;
+  const best = examBestIn(snapshot, language.id);
+  const bestLives = best !== null && best >= EXAM_PASS ? livesFromScore(best, boss.playerLives) : null;
 
   const canFight = !spendRefused && (energy === null || energy.current >= ENERGY.cost.boss);
 
@@ -184,8 +192,8 @@ export function ExamIntroScreen() {
     setStarting(true);
     setError(null);
     try {
-      const { attemptId, remainingToday } = await exam.startAttempt();
-      const spent = await activity.startSession("boss", FINAL_BOSS_ID);
+      const { attemptId, remainingToday } = await exam.startAttempt(language.id);
+      const spent = await activity.startSession("boss", boss.id);
       // Accepted trade-off: if this spend fails (or throws) after startAttempt succeeded, the daily attempt is used.
       if (!spent.ok) {
         // Lost a race with another tab: the energy is gone, the attempt stays unused.
@@ -216,13 +224,13 @@ export function ExamIntroScreen() {
         {unlocked ? (
           <>
             <BossPortrait boss={boss} size={176} />
-            <h1 lang="vi" className="text-title text-ink">
+            <h1 lang={language.htmlLang} className="text-title text-ink">
               {boss.name}
             </h1>
             <p className="text-body-strong text-ink-muted">{boss.title}</p>
           </>
         ) : (
-          <h1 lang="vi" className="text-title text-ink">
+          <h1 lang={language.htmlLang} className="text-title text-ink">
             {boss.name}
           </h1>
         )}
@@ -276,7 +284,7 @@ export function ExamIntroScreen() {
         <Card className="relative flex flex-col gap-3 p-5">
           <div className="flex items-center gap-3 text-ink-muted">
             <Icon name="lock" size={28} />
-            <h2 className="text-heading text-ink">{fr.exam.intro.locked.title}</h2>
+            <h2 className="text-heading text-ink">{fr.exam.intro.locked.title(boss.name)}</h2>
           </div>
           <p className="text-body text-ink-muted">{fr.exam.intro.locked.body}</p>
           <ProgressBar value={done / Math.max(1, total)} label={fr.exam.intro.locked.progress(done, total)} />

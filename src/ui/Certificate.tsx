@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
 import { fr } from "@/i18n/fr";
+import { LANGUAGES } from "@/domain/languages";
 import { CERTIFICATE_SIZE, formatCertificateDate, type CertificateData } from "@/ui/drawCertificate";
 import { Motif } from "@/ui/Motif";
 
@@ -18,7 +19,7 @@ const { w: W, h: H } = CERTIFICATE_SIZE;
 const CORNER_POS = ["left-[3.7%] top-[5.2%]", "right-[3.7%] top-[5.2%]", "bottom-[5.2%] left-[3.7%]", "bottom-[5.2%] right-[3.7%]"] as const;
 
 // Hero: the pseudo, large, on cream. Same composition as drawCertificate (shared 1754 x 1240 space).
-function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking }: CertificateProps) {
+function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking, language = "vi" }: CertificateProps) {
   const pseudoSize = Math.min(112, Math.floor(1300 / Math.max(1, pseudo.length * 0.62)));
   return (
     <div
@@ -36,8 +37,8 @@ function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking }: Certif
       <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full font-sans" aria-hidden="true" focusable="false">
         <rect x={36} y={36} width={W - 72} height={H - 72} fill="none" strokeWidth={8} className="stroke-gold" />
         <rect x={60} y={60} width={W - 120} height={H - 120} fill="none" strokeWidth={3} className="stroke-gold" />
-        <text x={W / 2} y={250} textAnchor="middle" fontSize={96} fontWeight={800} className="fill-primary" lang="vi">
-          {fr.exam.certificate.vi}
+        <text x={W / 2} y={250} textAnchor="middle" fontSize={96} fontWeight={800} className="fill-primary" lang={LANGUAGES[language].htmlLang}>
+          {fr.exam.certificate.heading[language]}
         </text>
         <text x={W / 2} y={325} textAnchor="middle" fontSize={40} fontWeight={600} className="fill-ink-muted">
           {fr.exam.certificate.title}
@@ -49,7 +50,7 @@ function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking }: Certif
           {pseudo}
         </text>
         <text x={W / 2} y={660} textAnchor="middle" fontSize={40} className="fill-ink">
-          {fr.exam.certificate.achievement}
+          {fr.exam.certificate.achievement[language]}
         </text>
         <text x={W / 2} y={830} textAnchor="middle" fontSize={96} fontWeight={800} className="fill-gold-ink">
           {fr.exam.certificate.score(score)}

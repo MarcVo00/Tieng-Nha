@@ -127,6 +127,7 @@ export type Database = {
           expires_at: string
           group_id: string
           id: string
+          language: string
           opponent: string
           questions: Json
           seed: number
@@ -140,6 +141,7 @@ export type Database = {
           expires_at: string
           group_id: string
           id?: string
+          language?: string
           opponent: string
           questions: Json
           seed: number
@@ -153,6 +155,7 @@ export type Database = {
           expires_at?: string
           group_id?: string
           id?: string
+          language?: string
           opponent?: string
           questions?: Json
           seed?: number
@@ -493,6 +496,7 @@ export type Database = {
     Functions: {
       create_duel: {
         Args: {
+          p_language?: string
           p_opponent: string
           p_questions: Json
           p_seed: number

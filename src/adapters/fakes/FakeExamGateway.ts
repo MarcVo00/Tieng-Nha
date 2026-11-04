@@ -7,13 +7,13 @@ const MAX_PER_DAY = 3;
 export class FakeExamGateway implements ExamGateway {
   online = true;
   submitted: Array<{ attemptId: string; score: number }> = [];
-  private attemptsByDay = new Map<string, number>(); // key: day and language
+  private attemptsByDay = new Map<string, number>(); // key: day, language and boss
 
   constructor(private readonly clock: () => string = () => new Date().toISOString()) {}
 
-  async startAttempt(language: LanguageId = "vi"): Promise<{ attemptId: string; remainingToday: number }> {
+  async startAttempt(language: LanguageId = "vi", bossId = ""): Promise<{ attemptId: string; remainingToday: number }> {
     if (!this.online) throw new OfflineError();
-    const day = `${this.clock().slice(0, 10)} ${language}`;
+    const day = `${this.clock().slice(0, 10)} ${language} ${bossId}`;
     const used = this.attemptsByDay.get(day) ?? 0;
     if (used >= MAX_PER_DAY) throw new ExamLimitError();
     this.attemptsByDay.set(day, used + 1);

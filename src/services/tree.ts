@@ -1,5 +1,5 @@
 import type { ProgressSnapshot, Tree } from "@/domain/types";
-import { EXAM_PASS, examBestIn } from "@/services/exam";
+import { bossWon } from "@/services/exam";
 import { LANGUAGES, type LanguageId } from "@/domain/languages";
 
 /** The Vietnamese boss that closes the trunk; its fight uses the exam pool and its result is `examBest`. */
@@ -8,12 +8,30 @@ export const FINAL_BOSS_ID = "boss_thuy_tinh";
 export type NodeState = "locked" | "available" | "done";
 export type TreeProgress = { lessonsDone: readonly string[]; bossesWon: readonly string[] };
 
-/** Progress on a language's tree: its lessons done, and its final boss once won. */
-export function treeProgress(snapshot: Pick<ProgressSnapshot, "lessonsDone" | "examBest" | "examBests">, language: LanguageId = "vi"): TreeProgress {
-  const best = examBestIn(snapshot, language);
-  const boss = LANGUAGES[language].finalBossId;
-  const won = boss !== null && best !== null && best >= EXAM_PASS;
-  return { lessonsDone: snapshot.lessonsDone, bossesWon: won ? [boss] : [] };
+/** Progress on a language's tree: its lessons done, and its bosses won. */
+export function treeProgress(snapshot: Pick<ProgressSnapshot, "lessonsDone" | "examBest" | "examBests" | "bossBests">, language: LanguageId = "vi"): TreeProgress {
+  return { lessonsDone: snapshot.lessonsDone, bossesWon: LANGUAGES[language].bossIds.filter((id) => bossWon(snapshot, id)) };
+}
+
+/** The boss nodes of a tree, in path order: the nth closes level n. */
+export const treeBosses = (tree: Tree): string[] => tree.nodes.filter((n) => n.kind === "boss").map((n) => n.id);
+
+/** The lessons of level `level`: those between the boss before it and its own boss. */
+export function levelLessons(tree: Tree, level: number): string[] {
+  let current = 1;
+  const ids: string[] = [];
+  for (const n of tree.nodes) {
+    if (n.kind === "boss") current += 1;
+    else if (current === level) ids.push(n.id);
+  }
+  return ids;
+}
+
+/** The boss a lesson waits for: an unbeaten boss among its prerequisites, or null. */
+export function blockingBoss(tree: Tree, lessonId: string, p: TreeProgress): string | null {
+  const node = tree.nodes.find((n) => n.id === lessonId);
+  const boss = node?.requires.find((r) => tree.nodes.some((n) => n.id === r && n.kind === "boss") && !p.bossesWon.includes(r));
+  return boss ?? null;
 }
 
 /** Generic unlock rule (spec §2.2): a node is available once every node it requires is done. */

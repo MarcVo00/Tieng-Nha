@@ -243,6 +243,7 @@ export type Database = {
       }
       exam_attempts: {
         Row: {
+          boss_id: string | null
           id: string
           language: string
           score: number | null
@@ -546,7 +547,7 @@ export type Database = {
         Returns: string
       }
       start_exam_attempt: {
-        Args: { p_language?: string }
+        Args: { p_boss?: string; p_language?: string }
         Returns: Json
       }
       submit_duel_run: {

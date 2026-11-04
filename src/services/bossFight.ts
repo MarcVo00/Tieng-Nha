@@ -12,11 +12,11 @@ export type Fight = { bossHp: number; lives: number; answers: { questionId: stri
 /** Enough questions for the longest possible fight: every hit plus every life but the last. */
 export const maxQuestions = (boss: Boss): number => boss.hp + boss.playerLives - 1;
 
-/** One question at a time, no repeats, rotating through the sections (speaking only with speech recognition). */
+/** One question at a time from the boss's level, no repeats, rotating through the sections (speaking only with speech recognition). */
 export function buildDeck(pool: readonly ExamQuestion[], boss: Boss, seed: number, hasStt: boolean): ExamQuestion[] {
   const rng = createRng(seed);
   const sections = ROTATION.filter((s) => hasStt || s !== "speaking");
-  const queues = new Map(sections.map((s) => [s, shuffle(pool.filter((q) => q.section === s && !q.exercise.deprecated), rng)]));
+  const queues = new Map(sections.map((s) => [s, shuffle(pool.filter((q) => q.section === s && !q.exercise.deprecated && (q.level ?? 1) === (boss.level ?? 1)), rng)]));
   const deck: ExamQuestion[] = [];
   const need = maxQuestions(boss);
   for (let i = 0; deck.length < need; i++) {

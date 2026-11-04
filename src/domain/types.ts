@@ -136,8 +136,10 @@ export type PublicProfile = {
   badges: string[];
   /** Best Vietnamese boss score. */
   examBest: number | null;
-  /** Best boss score per language, Vietnamese included (read it with `examBestIn`). */
+  /** Best score on the level 1 boss per language, Vietnamese included (read it with `examBestIn`). */
   examBests?: Partial<Record<LanguageId, number>>;
+  /** Best score per boss above level 1, by boss id (read it with `bossBestIn`). */
+  bossBests?: Record<string, number>;
   /** Equipped avatar frame item id (`frame_*`), or null. */
   frame: string | null;
   /** Equipped profile effect item id (`fx_*`), or null. */
@@ -168,8 +170,10 @@ export type ProgressSnapshot = {
   vocabReviewed: number;
   /** Best Vietnamese boss score (certificate, badges, as before 2.1). */
   examBest: number | null;
-  /** Best boss score per language, Vietnamese included; missing in older fixtures (read it with `examBestIn`). */
+  /** Best score on the level 1 boss per language, Vietnamese included; missing in older fixtures (read it with `examBestIn`). */
   examBests?: Partial<Record<LanguageId, number>>;
+  /** Best score per boss above level 1, by boss id (read it with `bossBestIn`). */
+  bossBests?: Record<string, number>;
   badges: string[];
   activeDays: string[]; // YYYY-MM-DD, Europe/Paris, sorted asc
 };

@@ -411,3 +411,9 @@ describe("boss wins per language (mirrors supabase/tests/10_language_exams_test.
     expect(coinsOf([tlExam(85, 8), tlExam(78, 9), exam(92, 10)])).toBe(2 * COINS.firstBossWin + COINS.bossWin);
   });
 });
+
+test("each boss pays its own first win (mirrors supabase/tests/12_levels_test.sql)", () => {
+  const boss = (id: string, score: number, hour: number) => ev("exam_finished", { score }, id, 10, hour);
+  expect(coinsOf([exam(85, 8), boss("boss_son_tinh", 85, 9)])).toBe(2 * COINS.firstBossWin);
+  expect(coinsOf([exam(85, 8), boss("boss_son_tinh", 85, 9), boss("boss_son_tinh", 92, 10)])).toBe(2 * COINS.firstBossWin + COINS.bossWin);
+});

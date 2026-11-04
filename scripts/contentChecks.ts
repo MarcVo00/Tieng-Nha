@@ -219,13 +219,16 @@ export function checkContent(input: ContentBundle, opts: { strict: boolean; lang
   if (integrity && bosses?.success && exam.success) {
     for (const b of bosses.data.bosses) {
       const need = b.hp + b.playerLives - 1;
-      if (need > exam.data.questions.length) errors.push(`bosses: ${b.id} needs ${need} questions, the exam pool has ${exam.data.questions.length}`);
+      // Without speech recognition the deck has no speaking question: the rest of the level must be enough.
+      const own = exam.data.questions.filter((q) => (q.level ?? 1) === (b.level ?? 1));
+      if (need > own.length) errors.push(`bosses: ${b.id} needs ${need} questions, the exam pool has ${own.length}`);
+      else if (need > own.filter((q) => q.section !== "speaking").length) errors.push(`bosses: ${b.id} needs ${need} questions without speech recognition`);
     }
   }
 
   if (opts.strict) {
-    if (lessons.length !== 10) errors.push(`expected 10 lessons, found ${lessons.length}`);
-    if (dialogues.length !== 10) errors.push(`expected 10 dialogues, found ${dialogues.length}`);
+    if (lessons.length < 10) errors.push(`expected at least 10 lessons, found ${lessons.length}`);
+    if (dialogues.length < 10) errors.push(`expected at least 10 dialogues, found ${dialogues.length}`);
     if (exam.success) {
       const qs = exam.data.questions;
       if (qs.length < EXAM_MIN.total) errors.push(`exam: expected >= ${EXAM_MIN.total} questions, found ${qs.length}`);

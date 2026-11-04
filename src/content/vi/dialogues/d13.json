@@ -1,0 +1,90 @@
+{
+  "id": "d13",
+  "contentVersion": 1,
+  "title": "Le week-end",
+  "scene": "Une amie t'appelle pour sortir ce week-end",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Cuối tuần bạn rảnh không?",
+      "fr": "Tu es libre ce week-end ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Mình rảnh.",
+          "fr": "Je suis libre.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Rảnh chứ!",
+          "fr": "Bien sûr !",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Mình đi xem phim nha?",
+      "fr": "On va voir un film ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Mình thích xem phim!",
+          "fr": "J'aime les films !",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Hay quá!",
+          "fr": "Super !",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Vậy hẹn gặp bạn chủ nhật nha!",
+      "fr": "Alors à dimanche !",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Hẹn gặp lại nha!",
+          "fr": "À bientôt !",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Chào bạn nha!",
+          "fr": "Salut !",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Chào bạn!",
+      "fr": "Salut !",
+      "next": null
+    }
+  ]
+}

@@ -10,6 +10,17 @@
       "hp": 15,
       "playerLives": 5,
       "pool": "exam"
+    },
+    {
+      "id": "boss_son_tinh",
+      "name": "Sơn Tinh",
+      "title": "Le génie des montagnes",
+      "legend": "Sơn Tinh a battu Thủy Tinh et épousé Mỵ Nương. Chaque année, il élève ses montagnes contre les eaux. Il ne cède le passage qu'à ceux qui savent parler de leur vie de tous les jours.",
+      "illustration": "boss_son_tinh",
+      "hp": 15,
+      "playerLives": 5,
+      "pool": "exam",
+      "level": 2
     }
   ]
 }

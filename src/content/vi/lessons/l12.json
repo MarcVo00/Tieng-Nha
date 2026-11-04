@@ -1,0 +1,212 @@
+{
+  "id": "l12",
+  "contentVersion": 1,
+  "title": "Se sentir mal",
+  "description": "Dire où tu as mal, parler au médecin et trouver une pharmacie.",
+  "tagline": "Chez le médecin",
+  "emoji": "🤒",
+  "dialogueId": "d12",
+  "vocab": [
+    {
+      "id": "v_met",
+      "vi": "mệt",
+      "fr": "fatigué·e",
+      "dialect": "south"
+    },
+    {
+      "id": "v_dau",
+      "vi": "đau",
+      "fr": "avoir mal",
+      "dialect": "south"
+    },
+    {
+      "id": "v_dau_tete",
+      "vi": "đầu",
+      "fr": "tête",
+      "dialect": "south"
+    },
+    {
+      "id": "v_bung",
+      "vi": "bụng",
+      "fr": "ventre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_bac_si",
+      "vi": "bác sĩ",
+      "fr": "médecin",
+      "dialect": "south"
+    },
+    {
+      "id": "v_thuoc",
+      "vi": "thuốc",
+      "fr": "médicament",
+      "dialect": "south"
+    },
+    {
+      "id": "v_sot",
+      "vi": "sốt",
+      "fr": "fièvre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ho",
+      "vi": "ho",
+      "fr": "toux, tousser",
+      "dialect": "south"
+    },
+    {
+      "id": "v_benh_vien",
+      "vi": "bệnh viện",
+      "fr": "hôpital",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nha_thuoc",
+      "vi": "nhà thuốc",
+      "fr": "pharmacie",
+      "dialect": "south"
+    },
+    {
+      "id": "v_dau_dau",
+      "vi": "đau đầu",
+      "fr": "mal de tête",
+      "dialect": "south"
+    },
+    {
+      "id": "v_dau_bung",
+      "vi": "đau bụng",
+      "fr": "mal de ventre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_bi",
+      "vi": "bị",
+      "fr": "subir, avoir (un mal)",
+      "dialect": "south",
+      "note": "S'emploie pour ce qu'on subit : « bị sốt », avoir de la fièvre."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l12_e01",
+      "type": "listen_choose",
+      "vocabId": "v_met",
+      "choices": [
+        "v_met",
+        "v_dau_tete",
+        "v_bac_si",
+        "v_sot"
+      ]
+    },
+    {
+      "id": "l12_e02",
+      "type": "listen_choose",
+      "vocabId": "v_bac_si",
+      "choices": [
+        "v_bac_si",
+        "v_sot",
+        "v_benh_vien",
+        "v_dau_dau"
+      ]
+    },
+    {
+      "id": "l12_e03",
+      "type": "listen_choose",
+      "vocabId": "v_thuoc",
+      "choices": [
+        "v_thuoc",
+        "v_ho",
+        "v_nha_thuoc",
+        "v_dau_bung"
+      ]
+    },
+    {
+      "id": "l12_e04",
+      "type": "tone_pick",
+      "syllable": "đầu",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l12_e05",
+      "type": "tone_pick",
+      "syllable": "mệt",
+      "answerTone": "nang"
+    },
+    {
+      "id": "l12_e06",
+      "type": "translate_choose",
+      "promptFr": "J'ai très mal à la tête !",
+      "answerVi": "Đau đầu quá!",
+      "distractorsVi": [
+        "Đau bụng quá!",
+        "Mệt quá!",
+        "Đói quá!"
+      ]
+    },
+    {
+      "id": "l12_e07",
+      "type": "translate_choose",
+      "promptFr": "Où est la pharmacie ?",
+      "answerVi": "Nhà thuốc ở đâu?",
+      "distractorsVi": [
+        "Bệnh viện ở đâu?",
+        "Bác sĩ ở đâu?",
+        "Chợ ở đâu?"
+      ]
+    },
+    {
+      "id": "l12_e08",
+      "type": "word_order",
+      "fr": "J'ai de la fièvre.",
+      "tokensVi": [
+        "Mình",
+        "bị",
+        "sốt"
+      ],
+      "extraTokens": [
+        "ho"
+      ]
+    },
+    {
+      "id": "l12_e09",
+      "type": "word_order",
+      "fr": "Je suis très fatigué·e !",
+      "tokensVi": [
+        "Mệt",
+        "quá"
+      ],
+      "extraTokens": [
+        "no"
+      ]
+    },
+    {
+      "id": "l12_e10",
+      "type": "speak",
+      "vi": "Nhà thuốc ở đâu?",
+      "fr": "Où est la pharmacie ?",
+      "vocabIds": [
+        "v_nha_thuoc"
+      ]
+    },
+    {
+      "id": "l12_e11",
+      "type": "speak",
+      "vi": "Mình bị ho.",
+      "fr": "Je tousse.",
+      "vocabIds": [
+        "v_bi",
+        "v_ho"
+      ]
+    },
+    {
+      "id": "l12_e12",
+      "type": "speak",
+      "vi": "Đau bụng quá!",
+      "fr": "J'ai très mal au ventre !",
+      "vocabIds": [
+        "v_dau_bung"
+      ]
+    }
+  ]
+}

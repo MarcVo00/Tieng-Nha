@@ -1,0 +1,206 @@
+{
+  "id": "l15",
+  "contentVersion": 1,
+  "title": "Au téléphone",
+  "description": "Appeler, se donner rendez-vous, prévenir qu'on est en retard.",
+  "tagline": "Appeler",
+  "emoji": "📱",
+  "dialogueId": "d15",
+  "vocab": [
+    {
+      "id": "v_dien_thoai",
+      "vi": "điện thoại",
+      "fr": "téléphone",
+      "dialect": "south"
+    },
+    {
+      "id": "v_goi",
+      "vi": "gọi",
+      "fr": "appeler",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nhan_tin",
+      "vi": "nhắn tin",
+      "fr": "envoyer un message",
+      "dialect": "south"
+    },
+    {
+      "id": "v_so_dien_thoai",
+      "vi": "số điện thoại",
+      "fr": "numéro de téléphone",
+      "dialect": "south"
+    },
+    {
+      "id": "v_a_lo",
+      "vi": "a lô",
+      "fr": "allô",
+      "dialect": "south"
+    },
+    {
+      "id": "v_hen",
+      "vi": "hẹn",
+      "fr": "rendez-vous, donner rendez-vous",
+      "dialect": "south"
+    },
+    {
+      "id": "v_tre",
+      "vi": "trễ",
+      "fr": "en retard",
+      "dialect": "south",
+      "note": "Mot du Sud (le Nord dit « muộn »)."
+    },
+    {
+      "id": "v_som",
+      "vi": "sớm",
+      "fr": "tôt",
+      "dialect": "south"
+    },
+    {
+      "id": "v_cho_doi",
+      "vi": "chờ",
+      "fr": "attendre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_cho_chut",
+      "vi": "chờ chút",
+      "fr": "attends un peu",
+      "dialect": "south"
+    },
+    {
+      "id": "v_lat_nua",
+      "vi": "lát nữa",
+      "fr": "tout à l'heure",
+      "dialect": "south"
+    },
+    {
+      "id": "v_dia_chi",
+      "vi": "địa chỉ",
+      "fr": "adresse",
+      "dialect": "south"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l15_e01",
+      "type": "listen_choose",
+      "vocabId": "v_goi",
+      "choices": [
+        "v_goi",
+        "v_so_dien_thoai",
+        "v_hen",
+        "v_som"
+      ]
+    },
+    {
+      "id": "l15_e02",
+      "type": "listen_choose",
+      "vocabId": "v_tre",
+      "choices": [
+        "v_tre",
+        "v_cho_doi",
+        "v_lat_nua",
+        "v_dien_thoai"
+      ]
+    },
+    {
+      "id": "l15_e03",
+      "type": "listen_choose",
+      "vocabId": "v_dia_chi",
+      "choices": [
+        "v_dia_chi",
+        "v_goi",
+        "v_so_dien_thoai",
+        "v_hen"
+      ]
+    },
+    {
+      "id": "l15_e04",
+      "type": "tone_pick",
+      "syllable": "gọi",
+      "answerTone": "nang"
+    },
+    {
+      "id": "l15_e05",
+      "type": "tone_pick",
+      "syllable": "trễ",
+      "answerTone": "nga"
+    },
+    {
+      "id": "l15_e06",
+      "type": "translate_choose",
+      "promptFr": "Attends-moi un peu.",
+      "answerVi": "Chờ mình chút nha.",
+      "distractorsVi": [
+        "Mình gọi lại nha.",
+        "Lát nữa gặp nha!",
+        "Xin lỗi, mình trễ."
+      ]
+    },
+    {
+      "id": "l15_e07",
+      "type": "translate_choose",
+      "promptFr": "Désolé·e, je suis en retard.",
+      "answerVi": "Xin lỗi, mình trễ.",
+      "distractorsVi": [
+        "Không sao.",
+        "Chờ mình chút nha.",
+        "Mình tới sớm."
+      ]
+    },
+    {
+      "id": "l15_e08",
+      "type": "word_order",
+      "fr": "À tout à l'heure !",
+      "tokensVi": [
+        "Lát nữa",
+        "gặp",
+        "nha"
+      ],
+      "extraTokens": [
+        "trễ"
+      ]
+    },
+    {
+      "id": "l15_e09",
+      "type": "word_order",
+      "fr": "Donne-moi ton numéro.",
+      "tokensVi": [
+        "Cho",
+        "mình",
+        "số điện thoại"
+      ],
+      "extraTokens": [
+        "địa chỉ"
+      ]
+    },
+    {
+      "id": "l15_e10",
+      "type": "speak",
+      "vi": "A lô, bạn ở đâu?",
+      "fr": "Allô, tu es où ?",
+      "vocabIds": [
+        "v_a_lo"
+      ]
+    },
+    {
+      "id": "l15_e11",
+      "type": "speak",
+      "vi": "Mình gọi lại nha.",
+      "fr": "Je te rappelle.",
+      "vocabIds": [
+        "v_goi"
+      ]
+    },
+    {
+      "id": "l15_e12",
+      "type": "speak",
+      "vi": "Mình nhắn tin cho bạn.",
+      "fr": "Je t'envoie un message.",
+      "vocabIds": [
+        "v_nhan_tin"
+      ]
+    }
+  ]
+}

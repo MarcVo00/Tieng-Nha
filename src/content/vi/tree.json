@@ -11,6 +11,14 @@
     { "id": "l08", "kind": "lesson", "requires": ["l07"], "branch": "trunk" },
     { "id": "l09", "kind": "lesson", "requires": ["l08"], "branch": "trunk" },
     { "id": "l10", "kind": "lesson", "requires": ["l09"], "branch": "trunk" },
-    { "id": "boss_thuy_tinh", "kind": "boss", "requires": ["l10"], "branch": "trunk" }
-  ]
+    { "id": "boss_thuy_tinh", "kind": "boss", "requires": ["l10"], "branch": "trunk" },
+    { "id": "l11", "kind": "lesson", "requires": ["boss_thuy_tinh"], "branch": "trunk" },
+    { "id": "l12", "kind": "lesson", "requires": ["l11"], "branch": "trunk" },
+    { "id": "l13", "kind": "lesson", "requires": ["l12"], "branch": "trunk" },
+    { "id": "l14", "kind": "lesson", "requires": ["l13"], "branch": "trunk" },
+    { "id": "l15", "kind": "lesson", "requires": ["l14"], "branch": "trunk" },
+    { "id": "l16", "kind": "lesson", "requires": ["l15"], "branch": "trunk" },
+    { "id": "boss_son_tinh", "kind": "boss", "requires": ["l16"], "branch": "trunk" }
+  ],
+  "levels": [{ "level": 2, "title": "La vie de tous les jours" }]
 }

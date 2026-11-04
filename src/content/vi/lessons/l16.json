@@ -1,0 +1,211 @@
+{
+  "id": "l16",
+  "contentVersion": 1,
+  "title": "Repas de famille",
+  "description": "Le repas chez des proches : inviter à commencer, complimenter, refuser poliment.",
+  "tagline": "À table",
+  "emoji": "🍲",
+  "dialogueId": "d16",
+  "vocab": [
+    {
+      "id": "v_moi",
+      "vi": "mời",
+      "fr": "inviter",
+      "dialect": "south",
+      "note": "Avant de manger, on invite les aînés : « Con mời cô chú ăn cơm. » C'est la politesse de table."
+    },
+    {
+      "id": "v_canh",
+      "vi": "canh",
+      "fr": "soupe (du repas)",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ca",
+      "vi": "cá",
+      "fr": "poisson",
+      "dialect": "south"
+    },
+    {
+      "id": "v_thit",
+      "vi": "thịt",
+      "fr": "viande",
+      "dialect": "south"
+    },
+    {
+      "id": "v_rau",
+      "vi": "rau",
+      "fr": "légumes",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ga",
+      "vi": "gà",
+      "fr": "poulet",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nau",
+      "vi": "nấu",
+      "fr": "cuisiner",
+      "dialect": "south"
+    },
+    {
+      "id": "v_lam",
+      "vi": "lắm",
+      "fr": "très",
+      "dialect": "south",
+      "note": "Se place après le mot : « ngon lắm », très bon."
+    },
+    {
+      "id": "v_ngon_lam",
+      "vi": "ngon lắm",
+      "fr": "très bon",
+      "dialect": "south"
+    },
+    {
+      "id": "v_them",
+      "vi": "thêm",
+      "fr": "encore, en plus",
+      "dialect": "south"
+    },
+    {
+      "id": "v_no_roi",
+      "vi": "no rồi",
+      "fr": "je n'ai plus faim",
+      "dialect": "south"
+    },
+    {
+      "id": "v_an_com",
+      "vi": "ăn cơm",
+      "fr": "manger, prendre le repas",
+      "dialect": "south"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l16_e01",
+      "type": "listen_choose",
+      "vocabId": "v_ca",
+      "choices": [
+        "v_ca",
+        "v_rau",
+        "v_nau",
+        "v_ngon_lam"
+      ]
+    },
+    {
+      "id": "l16_e02",
+      "type": "listen_choose",
+      "vocabId": "v_rau",
+      "choices": [
+        "v_rau",
+        "v_nau",
+        "v_ngon_lam",
+        "v_no_roi"
+      ]
+    },
+    {
+      "id": "l16_e03",
+      "type": "listen_choose",
+      "vocabId": "v_canh",
+      "choices": [
+        "v_canh",
+        "v_thit",
+        "v_ga",
+        "v_lam"
+      ]
+    },
+    {
+      "id": "l16_e04",
+      "type": "tone_pick",
+      "syllable": "cá",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l16_e05",
+      "type": "tone_pick",
+      "syllable": "thịt",
+      "answerTone": "nang"
+    },
+    {
+      "id": "l16_e06",
+      "type": "translate_choose",
+      "promptFr": "Vous cuisinez très bien !",
+      "answerVi": "Cô nấu ngon lắm!",
+      "distractorsVi": [
+        "Con no rồi.",
+        "Cảm ơn cô.",
+        "Ăn thêm đi con!"
+      ]
+    },
+    {
+      "id": "l16_e07",
+      "type": "translate_choose",
+      "promptFr": "Je n'ai plus faim.",
+      "answerVi": "Con no rồi.",
+      "distractorsVi": [
+        "Con đói quá.",
+        "Ngon lắm!",
+        "Cho con thêm cơm."
+      ]
+    },
+    {
+      "id": "l16_e08",
+      "type": "word_order",
+      "fr": "Encore un peu de riz, s'il te plaît.",
+      "tokensVi": [
+        "Cho",
+        "con",
+        "thêm",
+        "cơm"
+      ],
+      "extraTokens": [
+        "thịt"
+      ]
+    },
+    {
+      "id": "l16_e09",
+      "type": "word_order",
+      "fr": "Je ne mange pas de viande.",
+      "tokensVi": [
+        "Con",
+        "không",
+        "ăn",
+        "thịt"
+      ],
+      "extraTokens": [
+        "cá"
+      ]
+    },
+    {
+      "id": "l16_e10",
+      "type": "speak",
+      "vi": "Con mời cô chú ăn cơm.",
+      "fr": "Je vous invite à manger.",
+      "vocabIds": [
+        "v_moi",
+        "v_an_com"
+      ]
+    },
+    {
+      "id": "l16_e11",
+      "type": "speak",
+      "vi": "Cô nấu ngon lắm!",
+      "fr": "Vous cuisinez très bien !",
+      "vocabIds": [
+        "v_nau",
+        "v_ngon_lam"
+      ]
+    },
+    {
+      "id": "l16_e12",
+      "type": "speak",
+      "vi": "Con no rồi.",
+      "fr": "Je n'ai plus faim.",
+      "vocabIds": [
+        "v_no_roi"
+      ]
+    }
+  ]
+}

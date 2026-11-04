@@ -1024,6 +1024,1100 @@
           "v_sai_gon"
         ]
       }
+    },
+    {
+      "id": "exam_q073",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e073",
+        "type": "listen_choose",
+        "vocabId": "v_nha",
+        "choices": [
+          "v_nha",
+          "v_cua",
+          "v_ban_table",
+          "v_may_lanh"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q074",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e074",
+        "type": "listen_choose",
+        "vocabId": "v_giuong",
+        "choices": [
+          "v_giuong",
+          "v_ghe",
+          "v_quat",
+          "v_sach"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q075",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e075",
+        "type": "listen_choose",
+        "vocabId": "v_quat",
+        "choices": [
+          "v_quat",
+          "v_sach",
+          "v_mo",
+          "v_nha"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q076",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e076",
+        "type": "tone_pick",
+        "syllable": "cửa",
+        "answerTone": "hoi"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q077",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e077",
+        "type": "tone_pick",
+        "syllable": "bàn",
+        "answerTone": "huyen"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q078",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e078",
+        "type": "translate_choose",
+        "promptFr": "Où est ta maison ?",
+        "answerVi": "Nhà bạn ở đâu?",
+        "distractorsVi": [
+          "Nhà bạn có mấy người?",
+          "Phòng bạn ở đâu?",
+          "Chợ ở đâu?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q079",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e079",
+        "type": "translate_choose",
+        "promptFr": "Allume la clim, d'accord ?",
+        "answerVi": "Mở máy lạnh nha.",
+        "distractorsVi": [
+          "Mở cửa nha.",
+          "Cho một ly nước.",
+          "Đi thẳng nha."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q080",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e080",
+        "type": "word_order",
+        "fr": "Cette pièce est très propre !",
+        "tokensVi": [
+          "Phòng",
+          "này",
+          "sạch",
+          "quá"
+        ],
+        "extraTokens": [
+          "dơ"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q081",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e081",
+        "type": "word_order",
+        "fr": "Où sont les toilettes ?",
+        "tokensVi": [
+          "Nhà vệ sinh",
+          "ở đâu"
+        ],
+        "extraTokens": [
+          "phòng"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q082",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e082",
+        "type": "speak",
+        "vi": "Nhà vệ sinh ở đâu?",
+        "fr": "Où sont les toilettes ?",
+        "vocabIds": [
+          "v_nha_ve_sinh"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q083",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e083",
+        "type": "speak",
+        "vi": "Mở máy lạnh nha.",
+        "fr": "Allume la clim, d'accord ?",
+        "vocabIds": [
+          "v_mo",
+          "v_may_lanh"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q084",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e084",
+        "type": "speak",
+        "vi": "Phòng này sạch quá!",
+        "fr": "Cette pièce est très propre !",
+        "vocabIds": [
+          "v_phong",
+          "v_nay",
+          "v_sach"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q085",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e085",
+        "type": "listen_choose",
+        "vocabId": "v_met",
+        "choices": [
+          "v_met",
+          "v_dau_tete",
+          "v_bac_si",
+          "v_sot"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q086",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e086",
+        "type": "listen_choose",
+        "vocabId": "v_bac_si",
+        "choices": [
+          "v_bac_si",
+          "v_sot",
+          "v_benh_vien",
+          "v_dau_dau"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q087",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e087",
+        "type": "listen_choose",
+        "vocabId": "v_thuoc",
+        "choices": [
+          "v_thuoc",
+          "v_ho",
+          "v_nha_thuoc",
+          "v_dau_bung"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q088",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e088",
+        "type": "tone_pick",
+        "syllable": "đầu",
+        "answerTone": "huyen"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q089",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e089",
+        "type": "tone_pick",
+        "syllable": "mệt",
+        "answerTone": "nang"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q090",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e090",
+        "type": "translate_choose",
+        "promptFr": "J'ai très mal à la tête !",
+        "answerVi": "Đau đầu quá!",
+        "distractorsVi": [
+          "Đau bụng quá!",
+          "Mệt quá!",
+          "Đói quá!"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q091",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e091",
+        "type": "translate_choose",
+        "promptFr": "Où est la pharmacie ?",
+        "answerVi": "Nhà thuốc ở đâu?",
+        "distractorsVi": [
+          "Bệnh viện ở đâu?",
+          "Bác sĩ ở đâu?",
+          "Chợ ở đâu?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q092",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e092",
+        "type": "word_order",
+        "fr": "J'ai de la fièvre.",
+        "tokensVi": [
+          "Mình",
+          "bị",
+          "sốt"
+        ],
+        "extraTokens": [
+          "ho"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q093",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e093",
+        "type": "word_order",
+        "fr": "Je suis très fatigué·e !",
+        "tokensVi": [
+          "Mệt",
+          "quá"
+        ],
+        "extraTokens": [
+          "no"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q094",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e094",
+        "type": "speak",
+        "vi": "Nhà thuốc ở đâu?",
+        "fr": "Où est la pharmacie ?",
+        "vocabIds": [
+          "v_nha_thuoc"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q095",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e095",
+        "type": "speak",
+        "vi": "Mình bị ho.",
+        "fr": "Je tousse.",
+        "vocabIds": [
+          "v_bi",
+          "v_ho"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q096",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e096",
+        "type": "speak",
+        "vi": "Đau bụng quá!",
+        "fr": "J'ai très mal au ventre !",
+        "vocabIds": [
+          "v_dau_bung"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q097",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e097",
+        "type": "listen_choose",
+        "vocabId": "v_thich",
+        "choices": [
+          "v_thich",
+          "v_xem_phim",
+          "v_doc_sach",
+          "v_da_banh"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q098",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e098",
+        "type": "listen_choose",
+        "vocabId": "v_bien",
+        "choices": [
+          "v_bien",
+          "v_cuoi_tuan",
+          "v_thich",
+          "v_xem_phim"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q099",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e099",
+        "type": "listen_choose",
+        "vocabId": "v_ranh",
+        "choices": [
+          "v_ranh",
+          "v_khong_thich",
+          "v_nghe_nhac",
+          "v_di_choi"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q100",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e100",
+        "type": "tone_pick",
+        "syllable": "thích",
+        "answerTone": "sac"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q101",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e101",
+        "type": "tone_pick",
+        "syllable": "biển",
+        "answerTone": "hoi"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q102",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e102",
+        "type": "translate_choose",
+        "promptFr": "J'aime regarder des films.",
+        "answerVi": "Mình thích xem phim.",
+        "distractorsVi": [
+          "Mình thích nghe nhạc.",
+          "Mình thích đọc sách.",
+          "Mình không thích xem phim."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q103",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e103",
+        "type": "translate_choose",
+        "promptFr": "Tu es libre ce week-end ?",
+        "answerVi": "Cuối tuần bạn rảnh không?",
+        "distractorsVi": [
+          "Hôm nay bạn rảnh không?",
+          "Bạn thích gì?",
+          "Cuối tuần bạn đi đâu?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q104",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e104",
+        "type": "word_order",
+        "fr": "Je n'aime pas le foot.",
+        "tokensVi": [
+          "Mình",
+          "không thích",
+          "đá banh"
+        ],
+        "extraTokens": [
+          "thích"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q105",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e105",
+        "type": "word_order",
+        "fr": "J'aime aller à la mer.",
+        "tokensVi": [
+          "Mình",
+          "thích",
+          "đi biển"
+        ],
+        "extraTokens": [
+          "chụp hình"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q106",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e106",
+        "type": "speak",
+        "vi": "Bạn thích gì?",
+        "fr": "Qu'est-ce que tu aimes ?",
+        "vocabIds": [
+          "v_thich"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q107",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e107",
+        "type": "speak",
+        "vi": "Cuối tuần bạn rảnh không?",
+        "fr": "Tu es libre ce week-end ?",
+        "vocabIds": [
+          "v_cuoi_tuan",
+          "v_ranh"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q108",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e108",
+        "type": "speak",
+        "vi": "Mình đi chơi nha?",
+        "fr": "On sort ?",
+        "vocabIds": [
+          "v_di_choi"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q109",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e109",
+        "type": "listen_choose",
+        "vocabId": "v_ao",
+        "choices": [
+          "v_ao",
+          "v_giay",
+          "v_dep",
+          "v_chat"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q110",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e110",
+        "type": "listen_choose",
+        "vocabId": "v_giay",
+        "choices": [
+          "v_giay",
+          "v_dep",
+          "v_chat",
+          "v_do_mau"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q111",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e111",
+        "type": "listen_choose",
+        "vocabId": "v_trang",
+        "choices": [
+          "v_trang",
+          "v_lon",
+          "v_cai",
+          "v_ao"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q112",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e112",
+        "type": "tone_pick",
+        "syllable": "đỏ",
+        "answerTone": "hoi"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q113",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e113",
+        "type": "tone_pick",
+        "syllable": "quần",
+        "answerTone": "huyen"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q114",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e114",
+        "type": "translate_choose",
+        "promptFr": "Ce haut est très beau !",
+        "answerVi": "Áo này đẹp quá!",
+        "distractorsVi": [
+          "Áo này chật quá!",
+          "Áo này rộng quá!",
+          "Áo này mắc quá!"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q115",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e115",
+        "type": "translate_choose",
+        "promptFr": "Il y en a en rouge ?",
+        "answerVi": "Có màu đỏ không?",
+        "distractorsVi": [
+          "Có màu trắng không?",
+          "Có áo không?",
+          "Có giày không?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q116",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e116",
+        "type": "word_order",
+        "fr": "Ce haut est trop serré.",
+        "tokensVi": [
+          "Áo",
+          "này",
+          "chật",
+          "quá"
+        ],
+        "extraTokens": [
+          "rộng"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q117",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e117",
+        "type": "word_order",
+        "fr": "Il y en a un plus grand ?",
+        "tokensVi": [
+          "Có",
+          "cái",
+          "lớn",
+          "hơn",
+          "không"
+        ],
+        "extraTokens": [
+          "nhỏ"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q118",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e118",
+        "type": "speak",
+        "vi": "Cho em thử áo này.",
+        "fr": "Je peux essayer ce haut ?",
+        "vocabIds": [
+          "v_thu",
+          "v_ao",
+          "v_nay"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q119",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e119",
+        "type": "speak",
+        "vi": "Có màu đỏ không?",
+        "fr": "Il y en a en rouge ?",
+        "vocabIds": [
+          "v_mau",
+          "v_do_mau"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q120",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e120",
+        "type": "speak",
+        "vi": "Áo này đẹp quá!",
+        "fr": "Ce haut est très beau !",
+        "vocabIds": [
+          "v_dep"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q121",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e121",
+        "type": "listen_choose",
+        "vocabId": "v_goi",
+        "choices": [
+          "v_goi",
+          "v_so_dien_thoai",
+          "v_hen",
+          "v_som"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q122",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e122",
+        "type": "listen_choose",
+        "vocabId": "v_tre",
+        "choices": [
+          "v_tre",
+          "v_cho_doi",
+          "v_lat_nua",
+          "v_dien_thoai"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q123",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e123",
+        "type": "listen_choose",
+        "vocabId": "v_dia_chi",
+        "choices": [
+          "v_dia_chi",
+          "v_goi",
+          "v_so_dien_thoai",
+          "v_hen"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q124",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e124",
+        "type": "tone_pick",
+        "syllable": "gọi",
+        "answerTone": "nang"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q125",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e125",
+        "type": "tone_pick",
+        "syllable": "trễ",
+        "answerTone": "nga"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q126",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e126",
+        "type": "translate_choose",
+        "promptFr": "Attends-moi un peu.",
+        "answerVi": "Chờ mình chút nha.",
+        "distractorsVi": [
+          "Mình gọi lại nha.",
+          "Lát nữa gặp nha!",
+          "Xin lỗi, mình trễ."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q127",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e127",
+        "type": "translate_choose",
+        "promptFr": "Désolé·e, je suis en retard.",
+        "answerVi": "Xin lỗi, mình trễ.",
+        "distractorsVi": [
+          "Không sao.",
+          "Chờ mình chút nha.",
+          "Mình tới sớm."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q128",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e128",
+        "type": "word_order",
+        "fr": "À tout à l'heure !",
+        "tokensVi": [
+          "Lát nữa",
+          "gặp",
+          "nha"
+        ],
+        "extraTokens": [
+          "trễ"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q129",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e129",
+        "type": "word_order",
+        "fr": "Donne-moi ton numéro.",
+        "tokensVi": [
+          "Cho",
+          "mình",
+          "số điện thoại"
+        ],
+        "extraTokens": [
+          "địa chỉ"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q130",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e130",
+        "type": "speak",
+        "vi": "A lô, bạn ở đâu?",
+        "fr": "Allô, tu es où ?",
+        "vocabIds": [
+          "v_a_lo"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q131",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e131",
+        "type": "speak",
+        "vi": "Mình gọi lại nha.",
+        "fr": "Je te rappelle.",
+        "vocabIds": [
+          "v_goi"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q132",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e132",
+        "type": "speak",
+        "vi": "Mình nhắn tin cho bạn.",
+        "fr": "Je t'envoie un message.",
+        "vocabIds": [
+          "v_nhan_tin"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q133",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e133",
+        "type": "listen_choose",
+        "vocabId": "v_ca",
+        "choices": [
+          "v_ca",
+          "v_rau",
+          "v_nau",
+          "v_ngon_lam"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q134",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e134",
+        "type": "listen_choose",
+        "vocabId": "v_rau",
+        "choices": [
+          "v_rau",
+          "v_nau",
+          "v_ngon_lam",
+          "v_no_roi"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q135",
+      "section": "listening",
+      "exercise": {
+        "id": "exam_e135",
+        "type": "listen_choose",
+        "vocabId": "v_canh",
+        "choices": [
+          "v_canh",
+          "v_thit",
+          "v_ga",
+          "v_lam"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q136",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e136",
+        "type": "tone_pick",
+        "syllable": "cá",
+        "answerTone": "sac"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q137",
+      "section": "tones",
+      "exercise": {
+        "id": "exam_e137",
+        "type": "tone_pick",
+        "syllable": "thịt",
+        "answerTone": "nang"
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q138",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e138",
+        "type": "translate_choose",
+        "promptFr": "Vous cuisinez très bien !",
+        "answerVi": "Cô nấu ngon lắm!",
+        "distractorsVi": [
+          "Con no rồi.",
+          "Cảm ơn cô.",
+          "Ăn thêm đi con!"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q139",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e139",
+        "type": "translate_choose",
+        "promptFr": "Je n'ai plus faim.",
+        "answerVi": "Con no rồi.",
+        "distractorsVi": [
+          "Con đói quá.",
+          "Ngon lắm!",
+          "Cho con thêm cơm."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q140",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e140",
+        "type": "word_order",
+        "fr": "Encore un peu de riz, s'il te plaît.",
+        "tokensVi": [
+          "Cho",
+          "con",
+          "thêm",
+          "cơm"
+        ],
+        "extraTokens": [
+          "thịt"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q141",
+      "section": "translation",
+      "exercise": {
+        "id": "exam_e141",
+        "type": "word_order",
+        "fr": "Je ne mange pas de viande.",
+        "tokensVi": [
+          "Con",
+          "không",
+          "ăn",
+          "thịt"
+        ],
+        "extraTokens": [
+          "cá"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q142",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e142",
+        "type": "speak",
+        "vi": "Con mời cô chú ăn cơm.",
+        "fr": "Je vous invite à manger.",
+        "vocabIds": [
+          "v_moi",
+          "v_an_com"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q143",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e143",
+        "type": "speak",
+        "vi": "Cô nấu ngon lắm!",
+        "fr": "Vous cuisinez très bien !",
+        "vocabIds": [
+          "v_nau",
+          "v_ngon_lam"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "exam_q144",
+      "section": "speaking",
+      "exercise": {
+        "id": "exam_e144",
+        "type": "speak",
+        "vi": "Con no rồi.",
+        "fr": "Je n'ai plus faim.",
+        "vocabIds": [
+          "v_no_roi"
+        ]
+      },
+      "level": 2
     }
   ]
 }

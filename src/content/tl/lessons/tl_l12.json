@@ -1,0 +1,231 @@
+{
+  "id": "tl_l12",
+  "contentVersion": 1,
+  "title": "Bus et bateau",
+  "description": "Achète ton billet, demande l'heure du départ, et vérifie que tu vas au bon endroit.",
+  "tagline": "Partir plus loin",
+  "emoji": "⛴️",
+  "dialogueId": "tl_d12",
+  "vocab": [
+    {
+      "id": "tl_v_bus",
+      "vi": "bus",
+      "fr": "bus",
+      "dialect": "manila",
+      "pron": "BAS"
+    },
+    {
+      "id": "tl_v_bangka",
+      "vi": "bangka",
+      "fr": "barque",
+      "dialect": "manila",
+      "pron": "bang·KA"
+    },
+    {
+      "id": "tl_v_barko",
+      "vi": "barko",
+      "fr": "bateau, ferry",
+      "dialect": "manila",
+      "pron": "bar·KO"
+    },
+    {
+      "id": "tl_v_tiket",
+      "vi": "tiket",
+      "fr": "billet",
+      "dialect": "manila",
+      "pron": "TI·ket"
+    },
+    {
+      "id": "tl_v_biyahe",
+      "vi": "biyahe",
+      "fr": "voyage, trajet",
+      "dialect": "manila",
+      "pron": "bi·YA·he",
+      "note": "« Ingat sa biyahe! » : bon voyage, mot à mot « prends soin de toi pendant le trajet »."
+    },
+    {
+      "id": "tl_v_istasyon",
+      "vi": "istasyon",
+      "fr": "gare, station",
+      "dialect": "manila",
+      "pron": "is·tas·YON"
+    },
+    {
+      "id": "tl_v_papunta",
+      "vi": "papunta",
+      "fr": "en direction de",
+      "dialect": "manila",
+      "pron": "pa·pun·TA"
+    },
+    {
+      "id": "tl_v_sakay",
+      "vi": "sakay",
+      "fr": "monter (à bord)",
+      "dialect": "manila",
+      "pron": "sa·KAY"
+    },
+    {
+      "id": "tl_v_isang_tiket_po",
+      "vi": "isang tiket po",
+      "fr": "un billet, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "i·SANG TI·ket PO"
+    },
+    {
+      "id": "tl_v_dalawang_tiket_po",
+      "vi": "dalawang tiket po",
+      "fr": "deux billets, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "da·la·WANG TI·ket PO"
+    },
+    {
+      "id": "tl_v_anong_oras_bus",
+      "vi": "anong oras po ang bus?",
+      "fr": "à quelle heure est le bus ?",
+      "dialect": "manila",
+      "pron": "a·NONG O·ras PO ANG BAS"
+    },
+    {
+      "id": "tl_v_sakay_na",
+      "vi": "sakay na!",
+      "fr": "montez !",
+      "dialect": "manila",
+      "pron": "sa·KAY NA"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l12_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_bus",
+      "choices": [
+        "tl_v_bus",
+        "tl_v_barko",
+        "tl_v_biyahe",
+        "tl_v_papunta"
+      ]
+    },
+    {
+      "id": "tl_l12_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_bangka",
+      "choices": [
+        "tl_v_bangka",
+        "tl_v_tiket",
+        "tl_v_istasyon",
+        "tl_v_sakay"
+      ]
+    },
+    {
+      "id": "tl_l12_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_tiket",
+      "choices": [
+        "tl_v_tiket",
+        "tl_v_istasyon",
+        "tl_v_sakay",
+        "tl_v_dalawang_tiket_po"
+      ]
+    },
+    {
+      "id": "tl_l12_e04",
+      "type": "translate_choose",
+      "promptFr": "Un billet, s'il vous plaît.",
+      "answerVi": "Isang tiket po.",
+      "distractorsVi": [
+        "Dalawang tiket po.",
+        "Isang bus po.",
+        "Isang kape po."
+      ]
+    },
+    {
+      "id": "tl_l12_e05",
+      "type": "translate_choose",
+      "promptFr": "À quelle heure est le bus ?",
+      "answerVi": "Anong oras po ang bus?",
+      "distractorsVi": [
+        "Anong oras po ang barko?",
+        "Nasaan po ang bus?",
+        "Magkano po ang bus?"
+      ]
+    },
+    {
+      "id": "tl_l12_e06",
+      "type": "translate_choose",
+      "promptFr": "Ça va à Manille ?",
+      "answerVi": "Papunta po ba ito sa Maynila?",
+      "distractorsVi": [
+        "Papunta po ba ito sa airport?",
+        "Nasaan po ang Maynila?",
+        "Malayo po ba ang Maynila?"
+      ]
+    },
+    {
+      "id": "tl_l12_e07",
+      "type": "word_order",
+      "fr": "Deux billets, s'il vous plaît.",
+      "tokensVi": [
+        "Dalawang",
+        "tiket",
+        "po"
+      ],
+      "extraTokens": [
+        "isang"
+      ]
+    },
+    {
+      "id": "tl_l12_e08",
+      "type": "word_order",
+      "fr": "Où est la gare ?",
+      "tokensVi": [
+        "Nasaan",
+        "po",
+        "ang",
+        "istasyon"
+      ],
+      "extraTokens": [
+        "bangka"
+      ]
+    },
+    {
+      "id": "tl_l12_e09",
+      "type": "speak",
+      "vi": "Isang tiket po.",
+      "fr": "Un billet, s'il vous plaît.",
+      "vocabIds": [
+        "tl_v_isang_tiket_po"
+      ],
+      "pron": "i·SANG TI·ket PO"
+    },
+    {
+      "id": "tl_l12_e10",
+      "type": "speak",
+      "vi": "Anong oras po ang barko?",
+      "fr": "À quelle heure est le bateau ?",
+      "vocabIds": [
+        "tl_v_barko"
+      ],
+      "pron": "a·NONG O·ras PO ANG bar·KO"
+    },
+    {
+      "id": "tl_l12_e11",
+      "type": "speak",
+      "vi": "Papunta po ba ito sa airport?",
+      "fr": "Ça va à l'aéroport ?",
+      "vocabIds": [
+        "tl_v_papunta"
+      ],
+      "pron": "pa·pun·TA PO BA i·TO SA ER·port"
+    },
+    {
+      "id": "tl_l12_e12",
+      "type": "speak",
+      "vi": "Ingat sa biyahe!",
+      "fr": "Bon voyage !",
+      "vocabIds": [
+        "tl_v_biyahe"
+      ],
+      "pron": "I·ngat SA bi·YA·he"
+    }
+  ]
+}

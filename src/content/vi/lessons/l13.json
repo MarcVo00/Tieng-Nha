@@ -1,0 +1,208 @@
+{
+  "id": "l13",
+  "contentVersion": 1,
+  "title": "Ce que j'aime",
+  "description": "Parle de tes goûts et de ton week-end, et propose une sortie.",
+  "tagline": "Tes goûts",
+  "emoji": "🎬",
+  "dialogueId": "d13",
+  "vocab": [
+    {
+      "id": "v_thich",
+      "vi": "thích",
+      "fr": "aimer",
+      "dialect": "south"
+    },
+    {
+      "id": "v_khong_thich",
+      "vi": "không thích",
+      "fr": "ne pas aimer",
+      "dialect": "south"
+    },
+    {
+      "id": "v_xem_phim",
+      "vi": "xem phim",
+      "fr": "regarder un film",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nghe_nhac",
+      "vi": "nghe nhạc",
+      "fr": "écouter de la musique",
+      "dialect": "south"
+    },
+    {
+      "id": "v_doc_sach",
+      "vi": "đọc sách",
+      "fr": "lire un livre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_di_choi",
+      "vi": "đi chơi",
+      "fr": "sortir, se promener",
+      "dialect": "south"
+    },
+    {
+      "id": "v_da_banh",
+      "vi": "đá banh",
+      "fr": "jouer au foot",
+      "dialect": "south",
+      "note": "Mot du Sud (le Nord dit « đá bóng »)."
+    },
+    {
+      "id": "v_chup_hinh",
+      "vi": "chụp hình",
+      "fr": "prendre une photo",
+      "dialect": "south",
+      "note": "Mot du Sud (le Nord dit « chụp ảnh »)."
+    },
+    {
+      "id": "v_bien",
+      "vi": "biển",
+      "fr": "mer",
+      "dialect": "south"
+    },
+    {
+      "id": "v_di_bien",
+      "vi": "đi biển",
+      "fr": "aller à la mer",
+      "dialect": "south"
+    },
+    {
+      "id": "v_cuoi_tuan",
+      "vi": "cuối tuần",
+      "fr": "week-end",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ranh",
+      "vi": "rảnh",
+      "fr": "libre, disponible",
+      "dialect": "south"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l13_e01",
+      "type": "listen_choose",
+      "vocabId": "v_thich",
+      "choices": [
+        "v_thich",
+        "v_xem_phim",
+        "v_doc_sach",
+        "v_da_banh"
+      ]
+    },
+    {
+      "id": "l13_e02",
+      "type": "listen_choose",
+      "vocabId": "v_bien",
+      "choices": [
+        "v_bien",
+        "v_cuoi_tuan",
+        "v_thich",
+        "v_xem_phim"
+      ]
+    },
+    {
+      "id": "l13_e03",
+      "type": "listen_choose",
+      "vocabId": "v_ranh",
+      "choices": [
+        "v_ranh",
+        "v_khong_thich",
+        "v_nghe_nhac",
+        "v_di_choi"
+      ]
+    },
+    {
+      "id": "l13_e04",
+      "type": "tone_pick",
+      "syllable": "thích",
+      "answerTone": "sac"
+    },
+    {
+      "id": "l13_e05",
+      "type": "tone_pick",
+      "syllable": "biển",
+      "answerTone": "hoi"
+    },
+    {
+      "id": "l13_e06",
+      "type": "translate_choose",
+      "promptFr": "J'aime regarder des films.",
+      "answerVi": "Mình thích xem phim.",
+      "distractorsVi": [
+        "Mình thích nghe nhạc.",
+        "Mình thích đọc sách.",
+        "Mình không thích xem phim."
+      ]
+    },
+    {
+      "id": "l13_e07",
+      "type": "translate_choose",
+      "promptFr": "Tu es libre ce week-end ?",
+      "answerVi": "Cuối tuần bạn rảnh không?",
+      "distractorsVi": [
+        "Hôm nay bạn rảnh không?",
+        "Bạn thích gì?",
+        "Cuối tuần bạn đi đâu?"
+      ]
+    },
+    {
+      "id": "l13_e08",
+      "type": "word_order",
+      "fr": "Je n'aime pas le foot.",
+      "tokensVi": [
+        "Mình",
+        "không thích",
+        "đá banh"
+      ],
+      "extraTokens": [
+        "thích"
+      ]
+    },
+    {
+      "id": "l13_e09",
+      "type": "word_order",
+      "fr": "J'aime aller à la mer.",
+      "tokensVi": [
+        "Mình",
+        "thích",
+        "đi biển"
+      ],
+      "extraTokens": [
+        "chụp hình"
+      ]
+    },
+    {
+      "id": "l13_e10",
+      "type": "speak",
+      "vi": "Bạn thích gì?",
+      "fr": "Qu'est-ce que tu aimes ?",
+      "vocabIds": [
+        "v_thich"
+      ]
+    },
+    {
+      "id": "l13_e11",
+      "type": "speak",
+      "vi": "Cuối tuần bạn rảnh không?",
+      "fr": "Tu es libre ce week-end ?",
+      "vocabIds": [
+        "v_cuoi_tuan",
+        "v_ranh"
+      ]
+    },
+    {
+      "id": "l13_e12",
+      "type": "speak",
+      "vi": "Mình đi chơi nha?",
+      "fr": "On sort ?",
+      "vocabIds": [
+        "v_di_choi"
+      ]
+    }
+  ]
+}

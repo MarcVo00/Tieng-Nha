@@ -1,0 +1,100 @@
+{
+  "id": "tl_d12",
+  "contentVersion": 1,
+  "title": "Au guichet",
+  "scene": "Le guichet d'une gare routière : tu pars en voyage",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Saan po kayo papunta?",
+      "fr": "Vous allez où ?",
+      "next": "t2",
+      "pron": "sa·AN PO ka·YO pa·pun·TA"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Papunta po ako sa Maynila.",
+          "fr": "Je vais à Manille.",
+          "next": "t3",
+          "pron": "pa·pun·TA PO a·KO SA may·NI·la"
+        },
+        {
+          "id": "o2",
+          "vi": "Sa airport po.",
+          "fr": "À l'aéroport.",
+          "next": "t3",
+          "pron": "SA ER·port PO"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Isang tiket po ba?",
+      "fr": "Un billet ?",
+      "next": "t4",
+      "pron": "i·SANG TI·ket PO BA"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Opo, isang tiket po.",
+          "fr": "Oui, un billet.",
+          "next": "t5",
+          "pron": "O·po i·SANG TI·ket PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Dalawang tiket po.",
+          "fr": "Deux billets.",
+          "next": "t5",
+          "pron": "da·la·WANG TI·ket PO"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Sandaan pesos po.",
+      "fr": "Cent pesos.",
+      "next": "t6",
+      "pron": "san·da·AN PE·sos PO"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Bayad po. Anong oras po ang bus?",
+          "fr": "Voilà. À quelle heure est le bus ?",
+          "next": "t7",
+          "pron": "BA·yad PO a·NONG O·ras PO ANG BAS"
+        },
+        {
+          "id": "o2",
+          "vi": "Anong oras po ang bus?",
+          "fr": "À quelle heure est le bus ?",
+          "next": "t7",
+          "pron": "a·NONG O·ras PO ANG BAS"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Mamaya po. Ingat sa biyahe!",
+      "fr": "Tout à l'heure. Bon voyage !",
+      "next": null,
+      "pron": "ma·ma·YA PO I·ngat SA bi·YA·he"
+    }
+  ]
+}

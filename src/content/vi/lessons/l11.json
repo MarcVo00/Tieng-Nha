@@ -1,0 +1,217 @@
+{
+  "id": "l11",
+  "contentVersion": 1,
+  "title": "À la maison",
+  "description": "Les pièces, les meubles et ce qu'on dit quand on est invité·e chez quelqu'un.",
+  "tagline": "Chez les gens",
+  "emoji": "🏠",
+  "dialogueId": "d11",
+  "vocab": [
+    {
+      "id": "v_nha",
+      "vi": "nhà",
+      "fr": "maison",
+      "dialect": "south"
+    },
+    {
+      "id": "v_phong",
+      "vi": "phòng",
+      "fr": "pièce, chambre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_cua",
+      "vi": "cửa",
+      "fr": "porte",
+      "dialect": "south"
+    },
+    {
+      "id": "v_giuong",
+      "vi": "giường",
+      "fr": "lit",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ban_table",
+      "vi": "bàn",
+      "fr": "table",
+      "dialect": "south"
+    },
+    {
+      "id": "v_ghe",
+      "vi": "ghế",
+      "fr": "chaise",
+      "dialect": "south"
+    },
+    {
+      "id": "v_may_lanh",
+      "vi": "máy lạnh",
+      "fr": "climatisation",
+      "dialect": "south",
+      "note": "Mot du Sud. On dit « mở máy lạnh » pour l'allumer."
+    },
+    {
+      "id": "v_quat",
+      "vi": "quạt",
+      "fr": "ventilateur",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nha_ve_sinh",
+      "vi": "nhà vệ sinh",
+      "fr": "toilettes",
+      "dialect": "south"
+    },
+    {
+      "id": "v_sach",
+      "vi": "sạch",
+      "fr": "propre",
+      "dialect": "south"
+    },
+    {
+      "id": "v_do_ban",
+      "vi": "dơ",
+      "fr": "sale",
+      "dialect": "south",
+      "note": "Mot du Sud (le Nord dit « bẩn »)."
+    },
+    {
+      "id": "v_mo",
+      "vi": "mở",
+      "fr": "ouvrir, allumer",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nay",
+      "vi": "này",
+      "fr": "ce, cette",
+      "dialect": "south",
+      "note": "Se place après le nom : « phòng này », cette pièce."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l11_e01",
+      "type": "listen_choose",
+      "vocabId": "v_nha",
+      "choices": [
+        "v_nha",
+        "v_cua",
+        "v_ban_table",
+        "v_may_lanh"
+      ]
+    },
+    {
+      "id": "l11_e02",
+      "type": "listen_choose",
+      "vocabId": "v_giuong",
+      "choices": [
+        "v_giuong",
+        "v_ghe",
+        "v_quat",
+        "v_sach"
+      ]
+    },
+    {
+      "id": "l11_e03",
+      "type": "listen_choose",
+      "vocabId": "v_quat",
+      "choices": [
+        "v_quat",
+        "v_sach",
+        "v_mo",
+        "v_nha"
+      ]
+    },
+    {
+      "id": "l11_e04",
+      "type": "tone_pick",
+      "syllable": "cửa",
+      "answerTone": "hoi"
+    },
+    {
+      "id": "l11_e05",
+      "type": "tone_pick",
+      "syllable": "bàn",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l11_e06",
+      "type": "translate_choose",
+      "promptFr": "Où est ta maison ?",
+      "answerVi": "Nhà bạn ở đâu?",
+      "distractorsVi": [
+        "Nhà bạn có mấy người?",
+        "Phòng bạn ở đâu?",
+        "Chợ ở đâu?"
+      ]
+    },
+    {
+      "id": "l11_e07",
+      "type": "translate_choose",
+      "promptFr": "Allume la clim, d'accord ?",
+      "answerVi": "Mở máy lạnh nha.",
+      "distractorsVi": [
+        "Mở cửa nha.",
+        "Cho một ly nước.",
+        "Đi thẳng nha."
+      ]
+    },
+    {
+      "id": "l11_e08",
+      "type": "word_order",
+      "fr": "Cette pièce est très propre !",
+      "tokensVi": [
+        "Phòng",
+        "này",
+        "sạch",
+        "quá"
+      ],
+      "extraTokens": [
+        "dơ"
+      ]
+    },
+    {
+      "id": "l11_e09",
+      "type": "word_order",
+      "fr": "Où sont les toilettes ?",
+      "tokensVi": [
+        "Nhà vệ sinh",
+        "ở đâu"
+      ],
+      "extraTokens": [
+        "phòng"
+      ]
+    },
+    {
+      "id": "l11_e10",
+      "type": "speak",
+      "vi": "Nhà vệ sinh ở đâu?",
+      "fr": "Où sont les toilettes ?",
+      "vocabIds": [
+        "v_nha_ve_sinh"
+      ]
+    },
+    {
+      "id": "l11_e11",
+      "type": "speak",
+      "vi": "Mở máy lạnh nha.",
+      "fr": "Allume la clim, d'accord ?",
+      "vocabIds": [
+        "v_mo",
+        "v_may_lanh"
+      ]
+    },
+    {
+      "id": "l11_e12",
+      "type": "speak",
+      "vi": "Phòng này sạch quá!",
+      "fr": "Cette pièce est très propre !",
+      "vocabIds": [
+        "v_phong",
+        "v_nay",
+        "v_sach"
+      ]
+    }
+  ]
+}

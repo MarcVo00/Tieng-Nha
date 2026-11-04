@@ -9,6 +9,14 @@
     { "id": "tl_l06", "kind": "lesson", "requires": ["tl_l05"], "branch": "trunk" },
     { "id": "tl_l07", "kind": "lesson", "requires": ["tl_l06"], "branch": "trunk" },
     { "id": "tl_l08", "kind": "lesson", "requires": ["tl_l07"], "branch": "trunk" },
-    { "id": "tl_boss_bakunawa", "kind": "boss", "requires": ["tl_l08"], "branch": "trunk" }
-  ]
+    { "id": "tl_boss_bakunawa", "kind": "boss", "requires": ["tl_l08"], "branch": "trunk" },
+    { "id": "tl_l09", "kind": "lesson", "requires": ["tl_boss_bakunawa"], "branch": "trunk" },
+    { "id": "tl_l10", "kind": "lesson", "requires": ["tl_l09"], "branch": "trunk" },
+    { "id": "tl_l11", "kind": "lesson", "requires": ["tl_l10"], "branch": "trunk" },
+    { "id": "tl_l12", "kind": "lesson", "requires": ["tl_l11"], "branch": "trunk" },
+    { "id": "tl_l13", "kind": "lesson", "requires": ["tl_l12"], "branch": "trunk" },
+    { "id": "tl_l14", "kind": "lesson", "requires": ["tl_l13"], "branch": "trunk" },
+    { "id": "tl_boss_tikbalang", "kind": "boss", "requires": ["tl_l14"], "branch": "trunk" }
+  ],
+  "levels": [{ "level": 2, "title": "Voyager plus loin" }]
 }

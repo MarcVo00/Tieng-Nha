@@ -1405,6 +1405,1168 @@
         ],
         "pron": "o·KEY LANG SI·ge sa·LA·mat"
       }
+    },
+    {
+      "id": "tl_exam_q091",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e091",
+        "type": "listen_choose",
+        "vocabId": "tl_v_kuwarto",
+        "choices": [
+          "tl_v_kuwarto",
+          "tl_v_kama",
+          "tl_v_unan",
+          "tl_v_banyo"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q092",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e092",
+        "type": "listen_choose",
+        "vocabId": "tl_v_tuwalya",
+        "choices": [
+          "tl_v_tuwalya",
+          "tl_v_kumot",
+          "tl_v_sira",
+          "tl_v_mainit_na_tubig"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q093",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e093",
+        "type": "listen_choose",
+        "vocabId": "tl_v_susi",
+        "choices": [
+          "tl_v_susi",
+          "tl_v_tuwalya",
+          "tl_v_kumot",
+          "tl_v_sira"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q094",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e094",
+        "type": "translate_choose",
+        "promptFr": "Il y a une chambre ?",
+        "answerVi": "May kuwarto po ba?",
+        "distractorsVi": [
+          "May tubig po ba?",
+          "Nasaan po ang kuwarto?",
+          "Magkano po ang kuwarto?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q095",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e095",
+        "type": "translate_choose",
+        "promptFr": "La clé, s'il vous plaît.",
+        "answerVi": "Pahingi po ng susi.",
+        "distractorsVi": [
+          "Pahingi po ng tuwalya.",
+          "Pahingi po ng unan.",
+          "Nasaan po ang susi?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q096",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e096",
+        "type": "translate_choose",
+        "promptFr": "La salle de bain est cassée.",
+        "answerVi": "Sira po ang banyo.",
+        "distractorsVi": [
+          "Malapit po ang banyo.",
+          "Nasaan po ang banyo?",
+          "Sira po ang susi."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q097",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e097",
+        "type": "word_order",
+        "fr": "Une serviette, s'il vous plaît.",
+        "tokensVi": [
+          "Pahingi",
+          "po",
+          "ng",
+          "tuwalya"
+        ],
+        "extraTokens": [
+          "unan"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q098",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e098",
+        "type": "word_order",
+        "fr": "La chambre est froide.",
+        "tokensVi": [
+          "Malamig",
+          "po",
+          "ang",
+          "kuwarto"
+        ],
+        "extraTokens": [
+          "mainit"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q099",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e099",
+        "type": "speak",
+        "vi": "May kuwarto po ba?",
+        "fr": "Il y a une chambre ?",
+        "vocabIds": [
+          "tl_v_may_kuwarto"
+        ],
+        "pron": "MAY ku·WAR·to PO BA"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q100",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e100",
+        "type": "speak",
+        "vi": "Pahingi po ng tuwalya.",
+        "fr": "Une serviette, s'il vous plaît.",
+        "vocabIds": [
+          "tl_v_tuwalya"
+        ],
+        "pron": "pa·hi·NGI PO NANG tu·WAL·ya"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q101",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e101",
+        "type": "speak",
+        "vi": "Sira po ang susi.",
+        "fr": "La clé est cassée.",
+        "vocabIds": [
+          "tl_v_sira",
+          "tl_v_susi"
+        ],
+        "pron": "si·RA PO ANG SU·si"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q102",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e102",
+        "type": "speak",
+        "vi": "Walang mainit na tubig.",
+        "fr": "Il n'y a pas d'eau chaude.",
+        "vocabIds": [
+          "tl_v_mainit_na_tubig"
+        ],
+        "pron": "wa·LANG ma·I·nit NA TU·big"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q103",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e103",
+        "type": "listen_choose",
+        "vocabId": "tl_v_masakit",
+        "choices": [
+          "tl_v_masakit",
+          "tl_v_tiyan",
+          "tl_v_botika",
+          "tl_v_lagnat"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q104",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e104",
+        "type": "listen_choose",
+        "vocabId": "tl_v_gamot",
+        "choices": [
+          "tl_v_gamot",
+          "tl_v_doktor",
+          "tl_v_ubo",
+          "tl_v_tulong"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q105",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e105",
+        "type": "listen_choose",
+        "vocabId": "tl_v_botika",
+        "choices": [
+          "tl_v_botika",
+          "tl_v_lagnat",
+          "tl_v_pagod",
+          "tl_v_ospital"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q106",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e106",
+        "type": "translate_choose",
+        "promptFr": "J'ai mal à la tête.",
+        "answerVi": "Masakit po ang ulo ko.",
+        "distractorsVi": [
+          "Masakit po ang tiyan ko.",
+          "May lagnat po ako.",
+          "Pagod na ako."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q107",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e107",
+        "type": "translate_choose",
+        "promptFr": "J'ai de la fièvre.",
+        "answerVi": "May lagnat po ako.",
+        "distractorsVi": [
+          "May ubo po ako.",
+          "Masakit po ang ulo ko.",
+          "Gutom na ako."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q108",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e108",
+        "type": "translate_choose",
+        "promptFr": "Où est la pharmacie ?",
+        "answerVi": "Nasaan po ang botika?",
+        "distractorsVi": [
+          "Nasaan po ang ospital?",
+          "Malapit po ang botika.",
+          "Nasaan po ang doktor?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q109",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e109",
+        "type": "word_order",
+        "fr": "J'ai mal au ventre.",
+        "tokensVi": [
+          "Masakit",
+          "po",
+          "ang",
+          "tiyan",
+          "ko"
+        ],
+        "extraTokens": [
+          "ulo"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q110",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e110",
+        "type": "word_order",
+        "fr": "Il me faut un médecin.",
+        "tokensVi": [
+          "Kailangan",
+          "ko",
+          "po",
+          "ng",
+          "doktor"
+        ],
+        "extraTokens": [
+          "gamot"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q111",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e111",
+        "type": "speak",
+        "vi": "Masakit po ang ulo ko.",
+        "fr": "J'ai mal à la tête.",
+        "vocabIds": [
+          "tl_v_masakit",
+          "tl_v_ulo"
+        ],
+        "pron": "ma·sa·KIT PO ANG U·lo KO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q112",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e112",
+        "type": "speak",
+        "vi": "May gamot po ba?",
+        "fr": "Vous avez un médicament ?",
+        "vocabIds": [
+          "tl_v_gamot"
+        ],
+        "pron": "MAY ga·MOT PO BA"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q113",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e113",
+        "type": "speak",
+        "vi": "Tulong po!",
+        "fr": "À l'aide !",
+        "vocabIds": [
+          "tl_v_tulong"
+        ],
+        "pron": "TU·long PO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q114",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e114",
+        "type": "speak",
+        "vi": "Pagod na ako.",
+        "fr": "Je suis fatigué·e.",
+        "vocabIds": [
+          "tl_v_pagod"
+        ],
+        "pron": "pa·GOD NA a·KO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q115",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e115",
+        "type": "listen_choose",
+        "vocabId": "tl_v_ngayon",
+        "choices": [
+          "tl_v_ngayon",
+          "tl_v_kahapon",
+          "tl_v_sandali_lang_po",
+          "tl_v_anong_oras_na"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q116",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e116",
+        "type": "listen_choose",
+        "vocabId": "tl_v_kahapon",
+        "choices": [
+          "tl_v_kahapon",
+          "tl_v_sandali_lang_po",
+          "tl_v_anong_oras_na",
+          "tl_v_araw"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q117",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e117",
+        "type": "listen_choose",
+        "vocabId": "tl_v_mamaya",
+        "choices": [
+          "tl_v_mamaya",
+          "tl_v_oras",
+          "tl_v_tanghali",
+          "tl_v_linggo"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q118",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e118",
+        "type": "translate_choose",
+        "promptFr": "Quelle heure est-il ?",
+        "answerVi": "Anong oras na po?",
+        "distractorsVi": [
+          "Kailan po?",
+          "Magkano po?",
+          "Nasaan po?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q119",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e119",
+        "type": "translate_choose",
+        "promptFr": "Un instant, s'il vous plaît.",
+        "answerVi": "Sandali lang po.",
+        "distractorsVi": [
+          "Mamaya na lang po.",
+          "Bukas na lang po.",
+          "Ngayon na po."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q120",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e120",
+        "type": "translate_choose",
+        "promptFr": "Quand ?",
+        "answerVi": "Kailan po?",
+        "distractorsVi": [
+          "Saan po?",
+          "Ano po?",
+          "Magkano po?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q121",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e121",
+        "type": "word_order",
+        "fr": "Plus tard, alors.",
+        "tokensVi": [
+          "Mamaya",
+          "na",
+          "lang"
+        ],
+        "extraTokens": [
+          "kahapon"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q122",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e122",
+        "type": "word_order",
+        "fr": "C'est fermé aujourd'hui.",
+        "tokensVi": [
+          "Sarado",
+          "po",
+          "ngayon"
+        ],
+        "extraTokens": [
+          "kahapon"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q123",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e123",
+        "type": "speak",
+        "vi": "Anong oras na po?",
+        "fr": "Quelle heure est-il ?",
+        "vocabIds": [
+          "tl_v_anong_oras_na"
+        ],
+        "pron": "a·NONG O·ras NA PO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q124",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e124",
+        "type": "speak",
+        "vi": "Sandali lang po.",
+        "fr": "Un instant, s'il vous plaît.",
+        "vocabIds": [
+          "tl_v_sandali_lang_po"
+        ],
+        "pron": "san·da·LI LANG PO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q125",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e125",
+        "type": "speak",
+        "vi": "Bukas na lang po.",
+        "fr": "Demain, alors.",
+        "vocabIds": [
+          "tl_v_bukas_demain"
+        ],
+        "pron": "BU·kas NA LANG PO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q126",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e126",
+        "type": "speak",
+        "vi": "Kailan po?",
+        "fr": "Quand ?",
+        "vocabIds": [
+          "tl_v_kailan"
+        ],
+        "pron": "ka·i·LAN PO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q127",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e127",
+        "type": "listen_choose",
+        "vocabId": "tl_v_bus",
+        "choices": [
+          "tl_v_bus",
+          "tl_v_barko",
+          "tl_v_biyahe",
+          "tl_v_papunta"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q128",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e128",
+        "type": "listen_choose",
+        "vocabId": "tl_v_bangka",
+        "choices": [
+          "tl_v_bangka",
+          "tl_v_tiket",
+          "tl_v_istasyon",
+          "tl_v_sakay"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q129",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e129",
+        "type": "listen_choose",
+        "vocabId": "tl_v_tiket",
+        "choices": [
+          "tl_v_tiket",
+          "tl_v_istasyon",
+          "tl_v_sakay",
+          "tl_v_dalawang_tiket_po"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q130",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e130",
+        "type": "translate_choose",
+        "promptFr": "Un billet, s'il vous plaît.",
+        "answerVi": "Isang tiket po.",
+        "distractorsVi": [
+          "Dalawang tiket po.",
+          "Isang bus po.",
+          "Isang kape po."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q131",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e131",
+        "type": "translate_choose",
+        "promptFr": "À quelle heure est le bus ?",
+        "answerVi": "Anong oras po ang bus?",
+        "distractorsVi": [
+          "Anong oras po ang barko?",
+          "Nasaan po ang bus?",
+          "Magkano po ang bus?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q132",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e132",
+        "type": "translate_choose",
+        "promptFr": "Ça va à Manille ?",
+        "answerVi": "Papunta po ba ito sa Maynila?",
+        "distractorsVi": [
+          "Papunta po ba ito sa airport?",
+          "Nasaan po ang Maynila?",
+          "Malayo po ba ang Maynila?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q133",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e133",
+        "type": "word_order",
+        "fr": "Deux billets, s'il vous plaît.",
+        "tokensVi": [
+          "Dalawang",
+          "tiket",
+          "po"
+        ],
+        "extraTokens": [
+          "isang"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q134",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e134",
+        "type": "word_order",
+        "fr": "Où est la gare ?",
+        "tokensVi": [
+          "Nasaan",
+          "po",
+          "ang",
+          "istasyon"
+        ],
+        "extraTokens": [
+          "bangka"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q135",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e135",
+        "type": "speak",
+        "vi": "Isang tiket po.",
+        "fr": "Un billet, s'il vous plaît.",
+        "vocabIds": [
+          "tl_v_isang_tiket_po"
+        ],
+        "pron": "i·SANG TI·ket PO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q136",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e136",
+        "type": "speak",
+        "vi": "Anong oras po ang barko?",
+        "fr": "À quelle heure est le bateau ?",
+        "vocabIds": [
+          "tl_v_barko"
+        ],
+        "pron": "a·NONG O·ras PO ANG bar·KO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q137",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e137",
+        "type": "speak",
+        "vi": "Papunta po ba ito sa airport?",
+        "fr": "Ça va à l'aéroport ?",
+        "vocabIds": [
+          "tl_v_papunta"
+        ],
+        "pron": "pa·pun·TA PO BA i·TO SA ER·port"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q138",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e138",
+        "type": "speak",
+        "vi": "Ingat sa biyahe!",
+        "fr": "Bon voyage !",
+        "vocabIds": [
+          "tl_v_biyahe"
+        ],
+        "pron": "I·ngat SA bi·YA·he"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q139",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e139",
+        "type": "listen_choose",
+        "vocabId": "tl_v_pula",
+        "choices": [
+          "tl_v_pula",
+          "tl_v_itim",
+          "tl_v_malaki",
+          "tl_v_maganda"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q140",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e140",
+        "type": "listen_choose",
+        "vocabId": "tl_v_sapatos",
+        "choices": [
+          "tl_v_sapatos",
+          "tl_v_pula",
+          "tl_v_itim",
+          "tl_v_malaki"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q141",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e141",
+        "type": "listen_choose",
+        "vocabId": "tl_v_damit",
+        "choices": [
+          "tl_v_damit",
+          "tl_v_kulay",
+          "tl_v_puti",
+          "tl_v_maliit"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q142",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e142",
+        "type": "translate_choose",
+        "promptFr": "Que c'est beau !",
+        "answerVi": "Ang ganda!",
+        "distractorsVi": [
+          "Ang mahal!",
+          "Ang init!",
+          "Masarap!"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q143",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e143",
+        "type": "translate_choose",
+        "promptFr": "Il y en a un rouge ?",
+        "answerVi": "May pula po ba?",
+        "distractorsVi": [
+          "May puti po ba?",
+          "May itim po ba?",
+          "May malaki po ba?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q144",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e144",
+        "type": "translate_choose",
+        "promptFr": "Vous faites une réduction ?",
+        "answerVi": "May tawad po ba?",
+        "distractorsVi": [
+          "May sukli po ba?",
+          "Magkano po ba?",
+          "May pula po ba?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q145",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e145",
+        "type": "word_order",
+        "fr": "C'est petit.",
+        "tokensVi": [
+          "Maliit",
+          "po",
+          "ito"
+        ],
+        "extraTokens": [
+          "malaki"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q146",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e146",
+        "type": "word_order",
+        "fr": "Je voudrais des chaussures.",
+        "tokensVi": [
+          "Gusto",
+          "ko",
+          "po",
+          "ng",
+          "sapatos"
+        ],
+        "extraTokens": [
+          "damit"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q147",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e147",
+        "type": "speak",
+        "vi": "May malaki po ba?",
+        "fr": "Il y en a un grand ?",
+        "vocabIds": [
+          "tl_v_malaki"
+        ],
+        "pron": "MAY ma·la·KI PO BA"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q148",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e148",
+        "type": "speak",
+        "vi": "Gusto ko po ito.",
+        "fr": "Je voudrais ça.",
+        "vocabIds": [],
+        "pron": "gus·TO KO PO i·TO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q149",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e149",
+        "type": "speak",
+        "vi": "May tawad po ba?",
+        "fr": "Vous faites une réduction ?",
+        "vocabIds": [
+          "tl_v_may_tawad"
+        ],
+        "pron": "MAY TA·wad PO BA"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q150",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e150",
+        "type": "speak",
+        "vi": "Ang ganda!",
+        "fr": "Que c'est beau !",
+        "vocabIds": [
+          "tl_v_ang_ganda"
+        ],
+        "pron": "ANG gan·DA"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q151",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e151",
+        "type": "listen_choose",
+        "vocabId": "tl_v_kaibigan",
+        "choices": [
+          "tl_v_kaibigan",
+          "tl_v_nanay",
+          "tl_v_kapatid",
+          "tl_v_anak"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q152",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e152",
+        "type": "listen_choose",
+        "vocabId": "tl_v_nanay",
+        "choices": [
+          "tl_v_nanay",
+          "tl_v_kapatid",
+          "tl_v_anak",
+          "tl_v_bakasyon"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q153",
+      "section": "listening",
+      "exercise": {
+        "id": "tl_exam_e153",
+        "type": "listen_choose",
+        "vocabId": "tl_v_trabaho",
+        "choices": [
+          "tl_v_trabaho",
+          "tl_v_masaya",
+          "tl_v_bakasyon_lang_po",
+          "tl_v_pamilya"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q154",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e154",
+        "type": "translate_choose",
+        "promptFr": "C'est mon ami.",
+        "answerVi": "Kaibigan ko ito.",
+        "distractorsVi": [
+          "Kapatid ko ito.",
+          "Nanay ko ito.",
+          "Tatay ko ito."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q155",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e155",
+        "type": "translate_choose",
+        "promptFr": "Je suis content·e.",
+        "answerVi": "Masaya ako.",
+        "distractorsVi": [
+          "Pagod ako.",
+          "Gutom ako.",
+          "Busog ako."
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q156",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e156",
+        "type": "translate_choose",
+        "promptFr": "Quel est ton travail ?",
+        "answerVi": "Ano ang trabaho mo?",
+        "distractorsVi": [
+          "Ano ang pangalan mo?",
+          "Saan ang trabaho mo?",
+          "Kumusta ang trabaho?"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q157",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e157",
+        "type": "word_order",
+        "fr": "Je suis juste en vacances.",
+        "tokensVi": [
+          "Bakasyon",
+          "lang",
+          "po"
+        ],
+        "extraTokens": [
+          "trabaho"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q158",
+      "section": "translation",
+      "exercise": {
+        "id": "tl_exam_e158",
+        "type": "word_order",
+        "fr": "Tu as un frère ou une sœur ?",
+        "tokensVi": [
+          "May",
+          "kapatid",
+          "ka",
+          "ba"
+        ],
+        "extraTokens": [
+          "anak"
+        ]
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q159",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e159",
+        "type": "speak",
+        "vi": "Masaya ako dito.",
+        "fr": "Je suis content·e ici.",
+        "vocabIds": [
+          "tl_v_masaya"
+        ],
+        "pron": "ma·sa·YA a·KO DI·to"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q160",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e160",
+        "type": "speak",
+        "vi": "May kapatid ka ba?",
+        "fr": "Tu as un frère ou une sœur ?",
+        "vocabIds": [
+          "tl_v_kapatid"
+        ],
+        "pron": "MAY ka·pa·TID KA BA"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q161",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e161",
+        "type": "speak",
+        "vi": "Ano ang trabaho mo?",
+        "fr": "Quel est ton travail ?",
+        "vocabIds": [
+          "tl_v_ano_trabaho"
+        ],
+        "pron": "a·NO ANG tra·BA·ho MO"
+      },
+      "level": 2
+    },
+    {
+      "id": "tl_exam_q162",
+      "section": "speaking",
+      "exercise": {
+        "id": "tl_exam_e162",
+        "type": "speak",
+        "vi": "Bakasyon lang po.",
+        "fr": "Je suis juste en vacances.",
+        "vocabIds": [
+          "tl_v_bakasyon_lang_po"
+        ],
+        "pron": "ba·kas·YON LANG PO"
+      },
+      "level": 2
     }
   ]
 }

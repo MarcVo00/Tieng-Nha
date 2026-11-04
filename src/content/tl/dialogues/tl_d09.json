@@ -1,0 +1,100 @@
+{
+  "id": "tl_d09",
+  "contentVersion": 1,
+  "title": "À la réception",
+  "scene": "La réception d'un petit hôtel à Manille, le soir",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Magandang gabi po! Ano po ang kailangan ninyo?",
+      "fr": "Bonsoir ! De quoi avez-vous besoin ?",
+      "next": "t2",
+      "pron": "ma·gan·DANG ga·BI PO a·NO PO ANG ka·i·LA·ngan nin·YO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Magandang gabi po. May kuwarto po ba?",
+          "fr": "Bonsoir. Il y a une chambre ?",
+          "next": "t3",
+          "pron": "ma·gan·DANG ga·BI PO MAY ku·WAR·to PO BA"
+        },
+        {
+          "id": "o2",
+          "vi": "May kuwarto po ba? Pasensya na po.",
+          "fr": "Il y a une chambre ? Excusez-moi.",
+          "next": "t3",
+          "pron": "MAY ku·WAR·to PO BA pa·SEN·sya NA PO"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Opo. Ilang gabi po?",
+      "fr": "Oui. Combien de nuits ?",
+      "next": "t4",
+      "pron": "O·po i·LANG ga·BI PO"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dalawa po.",
+          "fr": "Deux.",
+          "next": "t5",
+          "pron": "da·la·WA PO"
+        },
+        {
+          "id": "o2",
+          "vi": "Isang gabi lang po.",
+          "fr": "Une nuit seulement.",
+          "next": "t5",
+          "pron": "i·SANG ga·BI LANG PO"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Sige po. Ito po ang susi.",
+      "fr": "Très bien. Voici la clé.",
+      "next": "t6",
+      "pron": "SI·ge PO i·TO PO ANG SU·si"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Nasaan po ang kuwarto?",
+          "fr": "Où est la chambre ?",
+          "next": "t7",
+          "pron": "na·sa·AN PO ANG ku·WAR·to"
+        },
+        {
+          "id": "o2",
+          "vi": "Salamat po. Nasaan po ang kuwarto?",
+          "fr": "Merci. Où est la chambre ?",
+          "next": "t7",
+          "pron": "sa·LA·mat PO na·sa·AN PO ANG ku·WAR·to"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Doon po sa kaliwa.",
+      "fr": "Là-bas, à gauche.",
+      "next": null,
+      "pron": "do·ON PO SA ka·li·WA"
+    }
+  ]
+}

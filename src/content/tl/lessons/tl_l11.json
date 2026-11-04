@@ -1,0 +1,230 @@
+{
+  "id": "tl_l11",
+  "contentVersion": 1,
+  "title": "Quand ?",
+  "description": "Aujourd'hui, demain, plus tard : demande l'heure et propose un moment.",
+  "tagline": "L'heure, les jours",
+  "emoji": "🕐",
+  "dialogueId": "tl_d11",
+  "vocab": [
+    {
+      "id": "tl_v_ngayon",
+      "vi": "ngayon",
+      "fr": "maintenant, aujourd'hui",
+      "dialect": "manila",
+      "pron": "nga·YON"
+    },
+    {
+      "id": "tl_v_bukas_demain",
+      "vi": "bukas",
+      "fr": "demain",
+      "dialect": "manila",
+      "pron": "BU·kas",
+      "note": "S'écrit comme « bukas » (ouvert), mais l'accent change tout : BU·kas, demain ; bu·KAS, ouvert."
+    },
+    {
+      "id": "tl_v_kahapon",
+      "vi": "kahapon",
+      "fr": "hier",
+      "dialect": "manila",
+      "pron": "ka·HA·pon"
+    },
+    {
+      "id": "tl_v_mamaya",
+      "vi": "mamaya",
+      "fr": "plus tard",
+      "dialect": "manila",
+      "pron": "ma·ma·YA"
+    },
+    {
+      "id": "tl_v_sandali_lang_po",
+      "vi": "sandali lang po",
+      "fr": "un instant, s'il vous plaît",
+      "dialect": "manila",
+      "pron": "san·da·LI LANG PO"
+    },
+    {
+      "id": "tl_v_oras",
+      "vi": "oras",
+      "fr": "heure",
+      "dialect": "manila",
+      "pron": "O·ras"
+    },
+    {
+      "id": "tl_v_anong_oras_na",
+      "vi": "anong oras na?",
+      "fr": "quelle heure est-il ?",
+      "dialect": "manila",
+      "pron": "a·NONG O·ras NA"
+    },
+    {
+      "id": "tl_v_tanghali",
+      "vi": "tanghali",
+      "fr": "midi",
+      "dialect": "manila",
+      "pron": "tang·HA·li"
+    },
+    {
+      "id": "tl_v_araw",
+      "vi": "araw",
+      "fr": "jour",
+      "dialect": "manila",
+      "pron": "A·raw"
+    },
+    {
+      "id": "tl_v_linggo",
+      "vi": "linggo",
+      "fr": "semaine",
+      "dialect": "manila",
+      "pron": "ling·GO"
+    },
+    {
+      "id": "tl_v_kailan",
+      "vi": "kailan",
+      "fr": "quand",
+      "dialect": "manila",
+      "pron": "ka·i·LAN"
+    },
+    {
+      "id": "tl_v_mamaya_na_lang",
+      "vi": "mamaya na lang",
+      "fr": "plus tard, alors",
+      "dialect": "manila",
+      "pron": "ma·ma·YA NA LANG"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l11_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_ngayon",
+      "choices": [
+        "tl_v_ngayon",
+        "tl_v_kahapon",
+        "tl_v_sandali_lang_po",
+        "tl_v_anong_oras_na"
+      ]
+    },
+    {
+      "id": "tl_l11_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_kahapon",
+      "choices": [
+        "tl_v_kahapon",
+        "tl_v_sandali_lang_po",
+        "tl_v_anong_oras_na",
+        "tl_v_araw"
+      ]
+    },
+    {
+      "id": "tl_l11_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_mamaya",
+      "choices": [
+        "tl_v_mamaya",
+        "tl_v_oras",
+        "tl_v_tanghali",
+        "tl_v_linggo"
+      ]
+    },
+    {
+      "id": "tl_l11_e04",
+      "type": "translate_choose",
+      "promptFr": "Quelle heure est-il ?",
+      "answerVi": "Anong oras na po?",
+      "distractorsVi": [
+        "Kailan po?",
+        "Magkano po?",
+        "Nasaan po?"
+      ]
+    },
+    {
+      "id": "tl_l11_e05",
+      "type": "translate_choose",
+      "promptFr": "Un instant, s'il vous plaît.",
+      "answerVi": "Sandali lang po.",
+      "distractorsVi": [
+        "Mamaya na lang po.",
+        "Bukas na lang po.",
+        "Ngayon na po."
+      ]
+    },
+    {
+      "id": "tl_l11_e06",
+      "type": "translate_choose",
+      "promptFr": "Quand ?",
+      "answerVi": "Kailan po?",
+      "distractorsVi": [
+        "Saan po?",
+        "Ano po?",
+        "Magkano po?"
+      ]
+    },
+    {
+      "id": "tl_l11_e07",
+      "type": "word_order",
+      "fr": "Plus tard, alors.",
+      "tokensVi": [
+        "Mamaya",
+        "na",
+        "lang"
+      ],
+      "extraTokens": [
+        "kahapon"
+      ]
+    },
+    {
+      "id": "tl_l11_e08",
+      "type": "word_order",
+      "fr": "C'est fermé aujourd'hui.",
+      "tokensVi": [
+        "Sarado",
+        "po",
+        "ngayon"
+      ],
+      "extraTokens": [
+        "kahapon"
+      ]
+    },
+    {
+      "id": "tl_l11_e09",
+      "type": "speak",
+      "vi": "Anong oras na po?",
+      "fr": "Quelle heure est-il ?",
+      "vocabIds": [
+        "tl_v_anong_oras_na"
+      ],
+      "pron": "a·NONG O·ras NA PO"
+    },
+    {
+      "id": "tl_l11_e10",
+      "type": "speak",
+      "vi": "Sandali lang po.",
+      "fr": "Un instant, s'il vous plaît.",
+      "vocabIds": [
+        "tl_v_sandali_lang_po"
+      ],
+      "pron": "san·da·LI LANG PO"
+    },
+    {
+      "id": "tl_l11_e11",
+      "type": "speak",
+      "vi": "Bukas na lang po.",
+      "fr": "Demain, alors.",
+      "vocabIds": [
+        "tl_v_bukas_demain"
+      ],
+      "pron": "BU·kas NA LANG PO"
+    },
+    {
+      "id": "tl_l11_e12",
+      "type": "speak",
+      "vi": "Kailan po?",
+      "fr": "Quand ?",
+      "vocabIds": [
+        "tl_v_kailan"
+      ],
+      "pron": "ka·i·LAN PO"
+    }
+  ]
+}

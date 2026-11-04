@@ -346,12 +346,17 @@ export const fr = {
       lockedToast: "Termine d'abord la leçon précédente",
     },
     dialogue: { kicker: "Dialogue", aria: (title: string) => `Dialogue\u202f: ${title}`, done: "Fait" },
+    level: {
+      label: (level: number) => `Niveau ${level}`,
+      locked: (boss: string) => `Bats ${boss} pour l'ouvrir`,
+      lockedToast: (boss: string) => `Bats d'abord ${boss} pour ouvrir ce niveau`,
+    },
     exam: {
-      kicker: "Boss final",
+      kicker: (level: number) => `Boss du niveau ${level}`,
       lockedToast: (name: string) => `Termine d'abord les leçons pour affronter ${name}`,
       lockedHint: (lessons: number) => `Après les ${lessons} leçons`,
       won: "Vaincu ✓",
-      aria: (name: string, locked: boolean) => `${name}, boss final${locked ? ", verrouillé" : ""}`,
+      aria: (name: string, level: number, locked: boolean) => `${name}, boss du niveau ${level}${locked ? ", verrouillé" : ""}`,
     },
   },
   // --- languages: the picker after onboarding and the switcher at the top of the home ---
@@ -677,7 +682,7 @@ export const fr = {
         `${name}, ${title.charAt(0).toLowerCase()}${title.slice(1)}${defeated ? " — vaincu" : ""}`,
     },
     intro: {
-      kicker: "Boss final",
+      kicker: (level: number) => `Boss du niveau ${level}`,
       loadError: { title: "Le test n'a pas pu se charger", body: "Vérifie ta connexion, puis réessaie." },
       legendLabel: "La légende",
       rulesLabel: "Comment ça se passe",
@@ -741,6 +746,11 @@ export const fr = {
       wrong: "Faux",
       skipped: "Passée",
       expected: "Réponse attendue",
+      levelOpen: {
+        title: (level: number) => `Niveau ${level} ouvert\u202f!`,
+        body: "De nouvelles leçons t'attendent sur le chemin.",
+        action: (level: number) => `Commencer le niveau ${level}`,
+      },
       certificate: "Ton certificat",
       download: "Télécharger",
       print: "Imprimer",
@@ -756,6 +766,11 @@ export const fr = {
       title: "Certificat de réussite",
       awardedTo: "décerné à",
       achievement: { vi: "a réussi le test final de vietnamien du Sud", tl: "a réussi le test final de tagalog" },
+      /** Above level 1. */
+      achievementAt: {
+        vi: (level: number) => `a réussi le niveau ${level} de vietnamien du Sud`,
+        tl: (level: number) => `a réussi le niveau ${level} de tagalog`,
+      },
       score: (n: number) => `${n} / 100`,
       noSpeaking: "Sans épreuve orale",
       seal: "Tiếng Nhà",
@@ -796,8 +811,8 @@ export const fr = {
     lessonsSummary: (n: number, total: number) => `${n} sur ${total}`,
     badgesTitle: "Badges",
     noBadges: "Pas encore de badge.",
-    examTitle: "Boss final",
-    examTitleIn: (language: string) => `Boss final · ${language}`,
+    examTitle: "Boss",
+    examTitleIn: (language: string) => `Boss · ${language}`,
     bossWon: (name: string, lives: number, max: number) => `${name} vaincu ✓ (${lives}/${max} ❤️)`,
     bossWonNoLives: "Boss final vaincu ✓",
     examNone: "Pas encore vaincu",

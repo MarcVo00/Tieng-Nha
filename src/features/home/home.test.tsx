@@ -164,7 +164,7 @@ describe("with Tagalog active", () => {
     const stop = await screen.findByRole("link", { name: /Salamat at kumusta.*disponible/ });
     expect(stop).toHaveAttribute("href", "/lesson/tl_l01");
     expect(screen.getByText("Kain tayo")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Bakunawa, boss final, verrouillé" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Bakunawa, boss du niveau 1, verrouillé" })).toBeInTheDocument();
     expect(screen.getByText(fr.home.exam.lockedHint(2))).toBeInTheDocument();
     expect(screen.getByText("Bakunawa")).toHaveAttribute("lang", "tl");
     expect(screen.queryByRole("button", { name: /Thủy Tinh/ })).not.toBeInTheDocument();
@@ -177,7 +177,7 @@ describe("with Tagalog active", () => {
     await services.activity.completeLesson({ lessonId: "tl_l01", mistakes: 0, durationMs: 1000, vocabIds: [] });
     await services.activity.completeLesson({ lessonId: "tl_l02", mistakes: 0, durationMs: 1000, vocabIds: [] });
     renderHome(services);
-    const boss = await screen.findByRole("link", { name: "Bakunawa, boss final" });
+    const boss = await screen.findByRole("link", { name: "Bakunawa, boss du niveau 1" });
     expect(boss).toHaveAttribute("href", "/exam");
     expect(screen.queryByText(fr.home.exam.won)).not.toBeInTheDocument();
   });

@@ -6,7 +6,7 @@ import { useRefreshProgress, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useLanguage } from "@/app/useLanguage";
 import type { Boss, Capabilities, ExamQuestion, Look, VocabId, VocabItem } from "@/domain/types";
-import type { Language } from "@/domain/languages";
+import { examPath, type Language } from "@/domain/languages";
 import { ExerciseHost } from "@/exercises/ExerciseHost";
 import type { GradeResult } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
@@ -156,6 +156,7 @@ function FightStage({ boss, language, defeated, look, heroFace, bossFace, bossPo
 function ExamRun({ run }: { run: RunState }) {
   const { content, exam, activity, clock, tts, stt, recorder, sound } = useServices();
   const { language } = useLanguage(); // `content` is the active language's source
+  const bossId = run.bossId ?? language.bossIds[0];
   const { settings } = useSettings();
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
@@ -308,8 +309,7 @@ function ExamRun({ run }: { run: RunState }) {
   useEffect(() => {
     let cancelled = false;
     setLoad({ status: "loading" });
-    const bossId = language.finalBossId;
-    if (bossId === null) {
+    if (bossId === undefined) {
       setLoad({ status: "error" }); // a language without a boss has no route here
       return;
     }
@@ -334,7 +334,7 @@ function ExamRun({ run }: { run: RunState }) {
     return () => {
       cancelled = true;
     };
-  }, [content, language.finalBossId, run.attemptId, loadAttempt]);
+  }, [content, bossId, run.attemptId, loadAttempt]);
 
   const finish = useCallback(
     async (f: Fight, boss: Boss, deck: readonly ExamQuestion[]) => {
@@ -422,7 +422,7 @@ function ExamRun({ run }: { run: RunState }) {
 
   const goBack = () => {
     clearAttemptMark();
-    navigate("/exam", { replace: true });
+    navigate(bossId === undefined ? "/exam" : examPath(bossId), { replace: true });
   };
 
   if (load.status === "error") {
@@ -567,7 +567,8 @@ export function ExamRunScreen() {
     if (attemptId && mark === "pending") markAttempt("running", attemptId);
   }, [attemptId, mark]);
   if (!isRunState(state)) return <Navigate to="/exam" replace />;
-  if (mark === "running") return <Navigate to="/exam" replace state={INTERRUPTED_STATE} />;
-  if (mark === "none") return <Navigate to="/exam" replace />;
+  const intro = state.bossId === undefined ? "/exam" : examPath(state.bossId);
+  if (mark === "running") return <Navigate to={intro} replace state={INTERRUPTED_STATE} />;
+  if (mark === "none") return <Navigate to={intro} replace />;
   return <ExamRun run={state} />;
 }

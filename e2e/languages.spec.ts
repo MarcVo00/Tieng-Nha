@@ -50,7 +50,7 @@ test("after the eight Tagalog lessons, Bakunawa ends the path and can be challen
   await onboard(page, { language: "tl" });
   await seedLessonsCompleted(page, Array.from({ length: 8 }, (_, i) => `tl_l0${i + 1}`));
   await page.goto("/");
-  await page.getByRole("link", { name: fr.home.exam.aria("Bakunawa", false) }).click();
+  await page.getByRole("link", { name: fr.home.exam.aria("Bakunawa", 1, false) }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Bakunawa" })).toBeVisible();
   await page.getByRole("button", { name: fr.exam.intro.start }).click();
   await expect(page.getByRole("progressbar", { name: fr.exam.run.bossHp("Bakunawa", 15, 15) })).toBeVisible();

@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useEntryState } from "@/app/useEntryState";
 import { useServices } from "@/app/ServicesProvider";
@@ -7,8 +7,9 @@ import { useLanguage } from "@/app/useLanguage";
 import type { Boss, Tree } from "@/domain/types";
 import { ENERGY } from "@/services/energy";
 import { livesFromScore } from "@/services/bossFight";
-import { EXAM_PASS, examBestIn } from "@/services/exam";
-import { nodeState, treeProgress } from "@/services/tree";
+import { EXAM_PASS, bossBestIn } from "@/services/exam";
+import { levelLessons, nodeState, treeProgress } from "@/services/tree";
+import { bossLevel } from "@/domain/languages";
 import { ExamLimitError, OfflineError } from "@/domain/errors";
 import { fr } from "@/i18n/fr";
 import { Button, Card, EmptyState, Hearts, Icon, Motif, ProgressBar, Skeleton, WaterDropHp } from "@/ui";
@@ -104,7 +105,8 @@ function Rules({ hp, lives }: { hp: number; lives: number }) {
 export function ExamIntroScreen() {
   const { exam, content, activity } = useServices();
   const { language } = useLanguage();
-  const bossId = language.finalBossId;
+  const { bossId: bossParam } = useParams();
+  const bossId = bossParam ?? language.bossIds[0] ?? null; // `/exam` is level 1
   const refreshProgress = useRefreshProgress();
   const navigate = useNavigate();
   const interrupted = isInterruptedState(useEntryState());
@@ -179,10 +181,11 @@ export function ExamIntroScreen() {
   }
   const progress = treeProgress(snapshot, language.id);
   const unlocked = nodeState(tree, boss.id, progress) !== "locked";
-  const trunkLessons = tree.nodes.filter((n) => n.kind === "lesson");
-  const done = trunkLessons.filter((n) => progress.lessonsDone.includes(n.id)).length;
-  const total = trunkLessons.length;
-  const best = examBestIn(snapshot, language.id);
+  const level = bossLevel(boss.id);
+  const levelIds = levelLessons(tree, level);
+  const done = levelIds.filter((id) => progress.lessonsDone.includes(id)).length;
+  const total = levelIds.length;
+  const best = bossBestIn(snapshot, boss.id);
   const bestLives = best !== null && best >= EXAM_PASS ? livesFromScore(best, boss.playerLives) : null;
 
   const canFight = !spendRefused && (energy === null || energy.current >= ENERGY.cost.boss);
@@ -192,7 +195,7 @@ export function ExamIntroScreen() {
     setStarting(true);
     setError(null);
     try {
-      const { attemptId, remainingToday } = await exam.startAttempt(language.id);
+      const { attemptId, remainingToday } = await (level > 1 ? exam.startAttempt(language.id, boss.id) : exam.startAttempt(language.id));
       const spent = await activity.startSession("boss", boss.id);
       // Accepted trade-off: if this spend fails (or throws) after startAttempt succeeded, the daily attempt is used.
       if (!spent.ok) {
@@ -203,7 +206,7 @@ export function ExamIntroScreen() {
         return;
       }
       void refreshProgress().catch(() => undefined);
-      const state: RunState = { attemptId, remainingToday };
+      const state: RunState = { attemptId, remainingToday, bossId: boss.id };
       markAttempt("pending", attemptId);
       navigate("/exam/run", { state });
     } catch (e) {
@@ -220,7 +223,7 @@ export function ExamIntroScreen() {
         <Motif kind="waves" />
       </div>
       <header className="relative flex flex-col items-center gap-2 text-center">
-        <p className="text-caption text-gold-ink">{fr.exam.intro.kicker}</p>
+        <p className="text-caption text-gold-ink">{fr.exam.intro.kicker(level)}</p>
         {unlocked ? (
           <>
             <BossPortrait boss={boss} size={176} />

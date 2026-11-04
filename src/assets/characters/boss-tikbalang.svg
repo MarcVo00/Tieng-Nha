@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
+  <title>Boss — Tikbalang, celui qui égare les voyageurs (Đông Hồ simplifié)</title>
+  <!-- Gabarit boss : signature đỏ son (vermillon), motif d'élément = le pagne hachuré, attribut lisible de loin = la
+       tête de cheval et les trois poils d'or de sa crinière (la légende : qui les arrache le dompte). Il regarde à droite. -->
+  <defs>
+    <pattern id="hatch-tikbalang" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="60" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#4E7A4A" stroke-width="3" stroke-linecap="round" opacity="0.55">
+    <!-- les chemins qui tournent en rond dans la forêt -->
+    <path d="M30 120 Q14 120 14 106 Q14 94 26 94 Q36 94 36 104 Q36 112 28 112"/>
+    <path d="M172 136 Q190 136 190 122 Q190 110 178 110 Q168 110 168 120 Q168 128 176 128"/>
+  </g>
+
+  <g id="layer-body" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- torse -->
+    <path d="M66 184 L70 118 Q100 102 130 118 L134 184 Z" fill="#B23A2A"/>
+    <!-- pagne : la seule zone à motif -->
+    <path d="M60 184 L66 150 Q100 162 134 150 L140 184 Z" fill="#F4E4C4"/>
+    <path d="M60 184 L66 150 Q100 162 134 150 L140 184 Z" fill="url(#hatch-tikbalang)" stroke="none"/>
+    <!-- longs bras, mains en sabots -->
+    <path d="M74 118 Q50 132 42 164 L58 168 Q66 144 88 132 Z" fill="#B23A2A"/>
+    <circle cx="50" cy="168" r="8" fill="#1F1A17"/>
+    <path d="M126 118 Q150 132 158 164 L142 168 Q134 144 112 132 Z" fill="#B23A2A"/>
+    <circle cx="150" cy="168" r="8" fill="#1F1A17"/>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- encolure -->
+    <path d="M84 114 Q82 86 94 64 L122 62 Q126 88 118 112 Z" fill="#B23A2A"/>
+    <!-- crinière noire -->
+    <path d="M98 34 Q74 46 80 68 Q66 84 76 100 Q74 110 86 114 L96 64 Z" fill="#1F1A17"/>
+    <!-- oreille -->
+    <path d="M102 40 L98 18 L116 34 Z" fill="#B23A2A"/>
+    <!-- tête de cheval -->
+    <path d="M92 66 Q90 38 112 34 Q128 32 136 46 L166 74 Q172 84 162 90 Q150 96 136 88 L112 80 Q98 80 92 66 Z" fill="#B23A2A"/>
+    <!-- naseaux crème -->
+    <path d="M148 60 L166 74 Q172 84 162 90 Q150 96 138 88 Z" fill="#F4E4C4"/>
+    <circle cx="158" cy="79" r="2" fill="#1F1A17" stroke="none"/>
+    <path d="M142 86 L158 90" fill="none" stroke-width="2"/>
+    <!-- sourcil froncé, œil rond -->
+    <path d="M110 46 L126 52" fill="none"/>
+    <circle cx="118" cy="56" r="3.4" fill="#1F1A17" stroke="none"/>
+  </g>
+
+  <g id="layer-weapon" fill="none" stroke="#D9A93A" stroke-width="3.5" stroke-linecap="round">
+    <!-- les trois poils d'or -->
+    <path d="M82 54 L66 46"/>
+    <path d="M76 74 L60 70"/>
+    <path d="M76 92 L60 94"/>
+  </g>
+</svg>

@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { fr } from "@/i18n/fr";
 import { LANGUAGES } from "@/domain/languages";
-import { CERTIFICATE_SIZE, formatCertificateDate, type CertificateData } from "@/ui/drawCertificate";
+import { CERTIFICATE_SIZE, certificateAchievement, formatCertificateDate, type CertificateData } from "@/ui/drawCertificate";
 import { Motif } from "@/ui/Motif";
 
 export type { CertificateMention } from "@/ui/drawCertificate";
@@ -19,7 +19,7 @@ const { w: W, h: H } = CERTIFICATE_SIZE;
 const CORNER_POS = ["left-[3.7%] top-[5.2%]", "right-[3.7%] top-[5.2%]", "bottom-[5.2%] left-[3.7%]", "bottom-[5.2%] right-[3.7%]"] as const;
 
 // Hero: the pseudo, large, on cream. Same composition as drawCertificate (shared 1754 x 1240 space).
-function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking, language = "vi" }: CertificateProps) {
+function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking, language = "vi", level = 1 }: CertificateProps) {
   const pseudoSize = Math.min(112, Math.floor(1300 / Math.max(1, pseudo.length * 0.62)));
   return (
     <div
@@ -50,7 +50,7 @@ function CertificateCard({ pseudo, score, mention, dateIso, noSpeaking, language
           {pseudo}
         </text>
         <text x={W / 2} y={660} textAnchor="middle" fontSize={40} className="fill-ink">
-          {fr.exam.certificate.achievement[language]}
+          {certificateAchievement({ language, level })}
         </text>
         <text x={W / 2} y={830} textAnchor="middle" fontSize={96} fontWeight={800} className="fill-gold-ink">
           {fr.exam.certificate.score(score)}

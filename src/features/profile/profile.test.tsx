@@ -396,9 +396,9 @@ describe("rewards section", () => {
     const all = ["frame_bronze", "frame_jade", "frame_son_mai", "fx_ink", "fx_lightning", "fx_embers"];
     const badgeOf: Record<string, [string, string]> = {
       frame_bronze: ["Une semaine", "7 jours d'affilée."],
-      frame_son_mai: ["Vainqueur de Thủy Tinh", "Bats le boss final."],
+      frame_son_mai: ["Vainqueur de Thủy Tinh", "Bats Thủy Tinh, le boss du niveau 1."],
       fx_ink: ["Main de maître", "Réussis 5 leçons différentes sans aucune erreur."],
-      fx_lightning: ["Excellence", "Bats le boss final en gardant au moins 4 vies."],
+      fx_lightning: ["Excellence", "Bats Thủy Tinh en gardant au moins 4 vies."],
       fx_embers: ["Inarrêtable", "30 jours d'affilée."],
     };
     for (const id of all) {

@@ -5,12 +5,13 @@ import { useEntryState } from "@/app/useEntryState";
 import { useAppState, useSettings, voiceRateOf } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
-import { LANGUAGES, languageOfId } from "@/domain/languages";
+import { bossLevel, examPath, LANGUAGES, languageOfId } from "@/domain/languages";
 import { useHeroLook } from "@/app/useHeroLook";
 import {
   BadgeMedal,
   rewardProp,
   Button,
+  Card,
   Certificate,
   Confetti,
   downloadCertificate,
@@ -171,7 +172,9 @@ function ResultContent({ state }: { state: ResultState }) {
   }, [won, reduced]);
   const pseudo = profile?.pseudo ?? "";
   const mention = state.mention === "presque" ? null : state.mention;
-  const certificate = won && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking, language: languageOfId(boss.id) } : null;
+  const certificate = won && mention !== null && pseudo !== "" ? { pseudo, score: state.score, mention, dateIso: state.dateIso, noSpeaking: state.noSpeaking, language: languageOfId(boss.id), level: bossLevel(boss.id) } : null;
+  // Beating the boss of a level opens the next one, when there is one.
+  const opened = won && bossLevel(boss.id) < LANGUAGES[languageOfId(boss.id)].bossIds.length ? bossLevel(boss.id) + 1 : null;
   // Only a victory is staged; a defeat shows everything at once (« Réessayer » must be there right away).
   const enter = (step: 1 | 2 | 3) =>
     !won
@@ -229,12 +232,21 @@ function ResultContent({ state }: { state: ResultState }) {
         </motion.div>
       </header>
 
-      <motion.div data-step="actions" {...enter(3)}>
+      <motion.div data-step="actions" className="flex flex-col gap-6" {...enter(3)}>
+        {opened !== null ? (
+          <Card className="flex flex-col gap-3 border-2 border-gold p-5 text-center">
+            <h2 className="text-heading text-gold-ink">{fr.exam.result.levelOpen.title(opened)}</h2>
+            <p className="text-body text-ink-muted">{fr.exam.result.levelOpen.body}</p>
+            <Button size="lg" fullWidth onClick={() => navigate("/", { replace: true })}>
+              {fr.exam.result.levelOpen.action(opened)}
+            </Button>
+          </Card>
+        ) : null}
         {certificate ? (
           <section aria-label={fr.exam.result.certificate} className="flex flex-col gap-4">
             <Certificate {...certificate} />
             <div className="flex flex-col gap-2">
-              <Button size="lg" fullWidth onClick={() => void download()}>
+              <Button size="lg" fullWidth variant={opened !== null ? "secondary" : "primary"} onClick={() => void download()}>
                 <Icon name="download" size={20} />
                 {fr.exam.result.download}
               </Button>
@@ -250,7 +262,7 @@ function ResultContent({ state }: { state: ResultState }) {
           </section>
         ) : (
           <div className="flex flex-col gap-2">
-            <Button size="lg" fullWidth disabled={state.remainingToday <= 0} onClick={() => navigate("/exam", { replace: true })}>
+            <Button size="lg" fullWidth disabled={state.remainingToday <= 0} onClick={() => navigate(examPath(boss.id), { replace: true })}>
               {state.remainingToday > 0 ? fr.exam.result.retry(state.remainingToday) : fr.exam.result.noMoreTries}
             </Button>
             <Button variant="secondary" fullWidth onClick={() => navigate("/review", { replace: true })}>

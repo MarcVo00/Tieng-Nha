@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
+  <title>Boss — Sơn Tinh, le génie des montagnes (Đông Hồ simplifié)</title>
+  <!-- Gabarit boss : signature lục (vert), motif d'élément = les montagnes en strates du bas de robe (seule zone hachurée),
+       attribut lisible de loin = la massue de pierre. Peau humaine : c'est un génie, pas un esprit des eaux. -->
+  <defs>
+    <pattern id="hatch-son-tinh" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="64" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#4E7A4A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.55">
+    <!-- les montagnes qui s'élèvent derrière lui -->
+    <path d="M8 150 L28 118 L42 138 L52 124"/>
+    <path d="M150 150 L168 122 L192 150"/>
+  </g>
+
+  <g id="layer-body" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- robe en cloche (vert) -->
+    <path d="M56 184 Q50 132 70 104 Q100 92 130 104 Q150 132 144 184 Z" fill="#4E7A4A"/>
+    <!-- bas de robe en montagnes : la seule zone à motif -->
+    <path d="M56 184 L56 170 L72 154 L88 170 L102 152 L118 170 L132 156 L144 170 L144 184 Z" fill="#F4E4C4"/>
+    <path d="M56 184 L56 170 L72 154 L88 170 L102 152 L118 170 L132 156 L144 170 L144 184 Z" fill="url(#hatch-son-tinh)" stroke="none"/>
+    <!-- ceinture or -->
+    <path d="M66 128 Q100 136 134 128 L136 140 Q100 148 64 140 Z" fill="#D9A93A"/>
+    <!-- bras et mains -->
+    <path d="M74 104 Q56 114 42 132 L54 144 Q68 130 82 120 Z" fill="#4E7A4A"/>
+    <circle cx="48" cy="138" r="7" fill="#F6DDBF"/>
+    <path d="M126 104 Q144 112 156 124 L146 138 Q134 128 118 120 Z" fill="#4E7A4A"/>
+    <circle cx="150" cy="130" r="7" fill="#F6DDBF"/>
+  </g>
+
+  <g id="layer-weapon" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- massue de pierre tenue à droite -->
+    <path d="M160 186 L160 84" fill="none" stroke-width="5"/>
+    <path d="M144 84 Q140 58 156 50 Q176 46 180 66 Q182 80 170 88 Q154 92 144 84 Z" fill="#9CC3BB"/>
+    <path d="M154 62 L164 68 M160 78 L170 74" fill="none" stroke-width="2"/>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="100" cy="76" r="28" fill="#F6DDBF"/>
+    <!-- cheveux noirs et chignon, bandeau or -->
+    <path d="M72 74 Q72 46 100 46 Q128 46 128 74 Q116 60 100 60 Q84 60 72 74 Z" fill="#1F1A17"/>
+    <circle cx="100" cy="38" r="10" fill="#1F1A17"/>
+    <path d="M74 62 Q100 48 126 62" fill="none" stroke="#D9A93A" stroke-width="4"/>
+    <!-- sourcils froncés, yeux ronds, joues vermillon -->
+    <path d="M84 70 L96 74 M116 70 L104 74" fill="none"/>
+    <circle cx="90" cy="80" r="3.2" fill="#1F1A17" stroke="none"/>
+    <circle cx="110" cy="80" r="3.2" fill="#1F1A17" stroke="none"/>
+    <circle cx="82" cy="90" r="3" fill="#B23A2A" stroke="none"/>
+    <circle cx="118" cy="90" r="3" fill="#B23A2A" stroke="none"/>
+    <path d="M94 92 L106 92" fill="none" stroke-width="2"/>
+  </g>
+</svg>

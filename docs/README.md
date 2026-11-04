@@ -19,6 +19,7 @@
 | [Plan Sons et révélation](superpowers/plans/2026-10-26-sound-and-reveal.md) | orchestrateur + sous-agents | sons synthétisés (leçons, combats, arène), présage crescendo, cartes, signature de la Gardienne |
 | [Plan Deux nouveaux tirages](superpowers/plans/2026-10-27-more-banners.md) | orchestrateur + sous-agents | « Seigneur des mers » et « Esprits de la nuit » : dessins, migration, sélecteur, signatures, sons |
 | [Spec Lì xì du jour](superpowers/specs/2026-10-29-daily-bonus-design.md) | tous | bonus de connexion quotidien : enveloppe rouge, suite de 7 jours, règle serveur |
+| [Spec Niveaux](superpowers/specs/2026-11-04-levels-design.md) | tous | niveaux par langue : le boss ouvre le niveau suivant, niveau 2 vietnamien et tagalog |
 | [Spec Énergie et succès](superpowers/specs/2026-10-29-energy-and-badge-rewards-design.md) | tous | énergie toutes les 10 min, xu par succès (20 à 200), 11 nouveaux succès |
 | [Spec Aide quand on bloque](superpowers/specs/2026-10-30-stuck-help-design.md) | tous | mots qui résistent, entraînement sur ses erreurs, talisman (+2 cœurs, essai offert) |
 | [Spec Tagalog et langues](superpowers/specs/2026-11-02-tagalog-and-languages-design.md) | tous | registre des langues, choix de langue, tagalog de voyage (oral), Bakunawa, duels par langue |

@@ -1,0 +1,90 @@
+{
+  "id": "d16",
+  "contentVersion": 1,
+  "title": "À table",
+  "scene": "Le repas chez l'oncle et la tante d'une amie",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Con ăn cơm với cô chú nha.",
+      "fr": "Mange avec nous.",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, con mời cô chú ăn cơm.",
+          "fr": "Je vous invite à manger.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, cảm ơn cô chú.",
+          "fr": "Merci.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Con ăn cá đi.",
+      "fr": "Prends du poisson.",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, ngon lắm!",
+          "fr": "C'est très bon !",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Cô nấu ngon lắm!",
+          "fr": "Vous cuisinez très bien !",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Ăn thêm đi con!",
+      "fr": "Reprends-en !",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, con no rồi.",
+          "fr": "Je n'ai plus faim.",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, cho con thêm cơm.",
+          "fr": "Encore un peu de riz, s'il vous plaît.",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Lần sau con tới nữa nha.",
+      "fr": "Reviens nous voir.",
+      "next": null
+    }
+  ]
+}

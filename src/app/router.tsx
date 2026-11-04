@@ -62,6 +62,7 @@ const focusRoutes: RouteObject[] = [
   { path: "review/run", element: screen(ReviewRunScreen) },
   { path: "dialogue/:id", element: screen(DialogueScreen) },
   { path: "exam/run", element: screen(ExamRunScreen) },
+  { path: "exam/:bossId", element: screen(ExamIntroScreen) },
   { path: "exam/result", element: screen(ExamResultScreen) },
   { path: "duel/:id", element: screen(DuelResultScreen) },
   { path: "duel/:id/run", element: screen(DuelRunScreen) },

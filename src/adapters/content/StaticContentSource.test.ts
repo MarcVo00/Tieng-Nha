@@ -56,8 +56,8 @@ describe("one content source per language", () => {
   const vi = createStaticContentSource("vi");
   const tl = createStaticContentSource("tl");
 
-  test("vi lists the ten Vietnamese lessons in order", async () => {
-    expect((await vi.listLessons()).map((l) => l.id)).toEqual(["l01", "l02", "l03", "l04", "l05", "l06", "l07", "l08", "l09", "l10"]);
+  test("vi lists the Vietnamese lessons in order", async () => {
+    expect((await vi.listLessons()).map((l) => l.id)).toEqual(Array.from({ length: 16 }, (_, i) => `l${String(i + 1).padStart(2, "0")}`));
   });
   test("tl lists only tl_ lessons and dialogues", async () => {
     const ids = (await tl.listLessons()).map((l) => l.id);
@@ -75,7 +75,10 @@ describe("one content source per language", () => {
     expect(tlKeys.every((k) => k.startsWith("tl_"))).toBe(true);
   });
   test("tree, exam and bosses are per language", async () => {
-    expect((await tl.getTree()).nodes.map((n) => n.id)).toEqual(["tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05", "tl_l06", "tl_l07", "tl_l08", "tl_boss_bakunawa"]);
+    expect((await tl.getTree()).nodes.map((n) => n.id)).toEqual([
+      "tl_l01", "tl_l02", "tl_l03", "tl_l04", "tl_l05", "tl_l06", "tl_l07", "tl_l08", "tl_boss_bakunawa",
+      "tl_l09", "tl_l10", "tl_l11", "tl_l12", "tl_l13", "tl_l14", "tl_boss_tikbalang",
+    ]);
     const pool = await tl.getExamPool();
     expect(pool.length).toBeGreaterThanOrEqual(19); // 15 hp + 5 lives - 1
     expect(pool.every((q) => q.id.startsWith("tl_exam_q") && q.exercise.id.startsWith("tl_exam_e"))).toBe(true);

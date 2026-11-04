@@ -10,6 +10,17 @@
       "hp": 15,
       "playerLives": 5,
       "pool": "exam"
+    },
+    {
+      "id": "tl_boss_tikbalang",
+      "name": "Tikbalang",
+      "title": "Celui qui égare les voyageurs",
+      "legend": "Mi-homme, mi-cheval, le Tikbalang fait tourner les voyageurs en rond dans la forêt. Pour retrouver ton chemin, il faut lui montrer que tu sais te débrouiller en tagalog !",
+      "illustration": "tl_boss_tikbalang",
+      "hp": 15,
+      "playerLives": 5,
+      "pool": "exam",
+      "level": 2
     }
   ]
 }

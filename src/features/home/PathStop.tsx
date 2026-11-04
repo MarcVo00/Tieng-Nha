@@ -2,11 +2,11 @@ import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
-import { LANGUAGES, languageOfId } from "@/domain/languages";
+import { examPath, LANGUAGES, languageOfId } from "@/domain/languages";
 import { EXAM_PASS } from "@/services/exam";
 import { Icon, tap, useToast, duration, spring } from "@/ui";
 import { bossArtUrl } from "@/features/home/bossArt";
-import { PATH_WIDTH, type PathNode } from "@/features/home/pathLayout";
+import { PATH_WIDTH, type PathNode, type StopNode } from "@/features/home/pathLayout";
 
 const SHAKE = [0, -6, 6, -4, 4, 0];
 
@@ -35,11 +35,11 @@ function Lantern({ dim, style }: { dim: boolean; style: { left: number } }) {
   );
 }
 
-type StopProps = { node: PathNode; nextRef: (el: HTMLElement | null) => void };
+type StopProps = { node: StopNode; nextRef: (el: HTMLElement | null) => void };
 
 type Visual = { circle: string; icon: ReactNode; title: ReactNode; sub: ReactNode; chip: boolean; badge?: ReactNode; to: string | null; lockedToast: string; label: string };
 
-function visualOf(node: PathNode): Visual {
+function visualOf(node: StopNode): Visual {
   if (node.kind === "lesson") {
     const { lesson, state } = node;
     const lessonCircle =
@@ -61,7 +61,7 @@ function visualOf(node: PathNode): Visual {
       sub: <span className="block max-w-full truncate text-caption text-ink-muted">{lesson.tagline ?? lesson.description}</span>,
       chip: node.next,
       to: state === "locked" ? null : `/lesson/${lesson.id}`,
-      lockedToast: fr.home.lesson.lockedToast,
+      lockedToast: node.waitsFor !== null ? fr.home.level.lockedToast(node.waitsFor) : fr.home.lesson.lockedToast,
       label: fr.home.lesson.aria(node.order, lesson.title, state, node.perfect),
     };
   }
@@ -88,11 +88,11 @@ function visualOf(node: PathNode): Visual {
         {node.boss.name}
       </span>
     ),
-    sub: <span className="text-caption text-ink-muted">{node.locked ? fr.home.exam.lockedHint(node.lessons) : node.best !== null && node.best >= EXAM_PASS ? fr.home.exam.won : fr.home.exam.kicker}</span>,
+    sub: <span className="text-caption text-ink-muted">{node.locked ? fr.home.exam.lockedHint(node.lessons) : node.best !== null && node.best >= EXAM_PASS ? fr.home.exam.won : fr.home.exam.kicker(node.level)}</span>,
     chip: node.next,
-    to: node.locked ? null : "/exam",
+    to: node.locked ? null : examPath(node.boss.id),
     lockedToast: fr.home.exam.lockedToast(node.boss.name),
-    label: fr.home.exam.aria(node.boss.name, node.locked),
+    label: fr.home.exam.aria(node.boss.name, node.level, node.locked),
   };
 }
 
@@ -165,5 +165,23 @@ export function PathStop({ node, nextRef }: StopProps) {
         </button>
       )}
     </motion.li>
+  );
+}
+
+/** The start of a level: a plaque laid across the path, gold once its boss has opened it. */
+export function LevelBanner({ node }: { node: Extract<PathNode, { kind: "level" }> }) {
+  return (
+    <li className="absolute inset-x-0 flex items-center justify-center" style={{ top: node.cy - node.height / 2, height: node.height }}>
+      <div className={`flex w-64 flex-col items-center gap-0.5 rounded-lg border-2 bg-surface px-4 py-3 text-center shadow-card ${node.locked ? "border-line" : "border-gold"}`}>
+        <p className={`text-caption ${node.locked ? "text-ink-muted" : "text-gold-ink"}`}>{fr.home.level.label(node.level)}</p>
+        {node.title !== null ? <h2 className="text-body-strong text-ink">{node.title}</h2> : null}
+        {node.locked ? (
+          <p className="flex items-center gap-1 text-caption text-ink-muted">
+            <Icon name="lock" size={14} />
+            {fr.home.level.locked(node.boss)}
+          </p>
+        ) : null}
+      </div>
+    </li>
   );
 }

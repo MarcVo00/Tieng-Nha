@@ -1,0 +1,90 @@
+{
+  "id": "d11",
+  "contentVersion": 1,
+  "title": "Chez une amie",
+  "scene": "Nhà bạn — tu arrives chez une amie à Sài Gòn",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào bạn! Vô nhà đi!",
+      "fr": "Salut ! Entre !",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Chào bạn! Nhà đẹp quá!",
+          "fr": "Salut ! Ta maison est très belle !",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Cảm ơn bạn!",
+          "fr": "Merci !",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Bạn uống nước không?",
+      "fr": "Tu bois quelque chose ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Cho mình ly nước.",
+          "fr": "Un verre d'eau, s'il te plaît.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Cho mình ly trà đá.",
+          "fr": "Un thé glacé, s'il te plaît.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Nóng quá! Mở máy lạnh nha?",
+      "fr": "Il fait très chaud ! J'allume la clim ?",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Mở đi!",
+          "fr": "Vas-y !",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Cảm ơn bạn nha!",
+          "fr": "Merci !",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Bạn ngồi đi!",
+      "fr": "Assieds-toi !",
+      "next": null
+    }
+  ]
+}

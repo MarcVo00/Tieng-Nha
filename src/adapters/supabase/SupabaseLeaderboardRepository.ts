@@ -32,6 +32,12 @@ function examBestsFrom(examBest: number | null, examBests: unknown): Partial<Rec
   return out;
 }
 
+/** Best score per boss above level 1: the `exam_bests` keys that are boss ids. */
+function bossBestsFrom(examBests: unknown): Record<string, number> {
+  if (typeof examBests !== "object" || examBests === null || Array.isArray(examBests)) return {};
+  return Object.fromEntries(Object.entries(examBests).filter((e): e is [string, number] => e[0].includes("boss_") && typeof e[1] === "number"));
+}
+
 export class SupabaseLeaderboardRepository implements LeaderboardRepository {
   constructor(private readonly db: Db) {}
 
@@ -80,6 +86,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
       badges: data.badges ?? [],
       examBest: data.exam_best,
       examBests: examBestsFrom(data.exam_best, data.exam_bests),
+      bossBests: bossBestsFrom(data.exam_bests),
       frame: data.equipped_frame ?? null,
       fx: profileFx(data.equipped),
       look: lookFrom(data.equipped),

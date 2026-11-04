@@ -10,7 +10,13 @@ export type CertificateData = {
   noSpeaking: boolean;
   /** The language of the boss beaten; Vietnamese when omitted. */
   language?: LanguageId;
+  /** The level that boss closes; 1 when omitted. */
+  level?: number;
 };
+
+/** The line under the name: the final test of level 1 (as before 2.3), or the level passed. */
+export const certificateAchievement = ({ language = "vi", level = 1 }: Pick<CertificateData, "language" | "level">): string =>
+  level > 1 ? fr.exam.certificate.achievementAt[language](level) : fr.exam.certificate.achievement[language];
 
 /** A4 landscape at 150 dpi; the SVG certificate uses the same coordinate space. */
 export const CERTIFICATE_SIZE = { w: 1754, h: 1240 } as const;
@@ -118,7 +124,7 @@ export async function drawCertificate(
   text(ctx, fr.exam.certificate.title, cx, at(325), `600 ${at(40)}px ${FONT}`, PAPER.muted);
   text(ctx, fr.exam.certificate.awardedTo, cx, at(440), `400 ${at(32)}px ${FONT}`, PAPER.muted);
   text(ctx, data.pseudo, cx, at(570), `800 ${at(112)}px ${FONT}`, PAPER.ink, "center", maxW);
-  text(ctx, fr.exam.certificate.achievement[data.language ?? "vi"], cx, at(660), `400 ${at(40)}px ${FONT}`, PAPER.ink, "center", maxW);
+  text(ctx, certificateAchievement(data), cx, at(660), `400 ${at(40)}px ${FONT}`, PAPER.ink, "center", maxW);
   text(ctx, fr.exam.certificate.score(data.score), cx, at(830), `800 ${at(96)}px ${FONT}`, PAPER.goldInk);
   text(ctx, fr.exam.certificate.mention[data.mention], cx, at(900), `700 ${at(44)}px ${FONT}`, PAPER.goldInk);
   if (data.noSpeaking) text(ctx, fr.exam.certificate.noSpeaking, cx, at(960), `400 ${at(30)}px ${FONT}`, PAPER.muted);

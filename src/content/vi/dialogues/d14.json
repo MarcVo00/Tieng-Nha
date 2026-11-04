@@ -1,0 +1,90 @@
+{
+  "id": "d14",
+  "contentVersion": 1,
+  "title": "Au marché Bến Thành",
+  "scene": "Chợ Bến Thành — une vendeuse un peu plus âgée que toi",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào em! Em mua gì?",
+      "fr": "Bonjour ! Tu veux acheter quoi ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, em mua áo.",
+          "fr": "Je cherche un haut.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, em coi thôi.",
+          "fr": "Je regarde seulement.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Áo này đẹp lắm nha.",
+      "fr": "Ce haut est très beau.",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, có màu đỏ không chị?",
+          "fr": "Il y en a en rouge ?",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, cho em thử nha chị.",
+          "fr": "Je peux l'essayer ?",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Có chứ! Đây nè.",
+      "fr": "Bien sûr ! Tiens.",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, bao nhiêu tiền chị?",
+          "fr": "Ça fait combien ?",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, em lấy cái này.",
+          "fr": "Je prends celui-ci.",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Hai trăm ngàn nha em.",
+      "fr": "Deux cent mille.",
+      "next": null
+    }
+  ]
+}

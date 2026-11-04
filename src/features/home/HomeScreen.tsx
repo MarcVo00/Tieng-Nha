@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { fr } from "@/i18n/fr";
+import { treeBosses } from "@/services/tree";
 import { useAppState, useRefreshProgress } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useDuelSummary } from "@/app/usePendingDuels";
@@ -13,7 +14,7 @@ import { nextDailyBonus } from "@/services/wallet";
 import { parisDay } from "@/services/time";
 import { BONUS_SHOWN_KEY } from "@/domain/storageKeys";
 import { Button, Card, EmptyState, Icon, LanguageEmblem, LanguageList, Motif, Sheet, Skeleton, ease, tap, useToast } from "@/ui";
-import { PathStop } from "@/features/home/PathStop";
+import { LevelBanner, PathStop } from "@/features/home/PathStop";
 import { HeroToken } from "@/features/home/HeroToken";
 import { DailyBonusCard, DailyBonusSheet, type DailyBonusOffer } from "@/features/home/DailyBonus";
 import { buildPathLayout, PATH_MARGIN, PATH_WIDTH, type PathLayout } from "@/features/home/pathLayout";
@@ -134,7 +135,6 @@ function SkeletonStops() {
 export function HomeScreen() {
   const { content, activity, clock, sound } = useServices();
   const { language, setLanguage } = useLanguage();
-  const bossId = language.finalBossId;
   const refresh = useRefreshProgress();
   const snapshot = useAppState((s) => s.snapshot);
   const dueCount = useAppState((s) => s.dueCount);
@@ -146,8 +146,7 @@ export function HomeScreen() {
   const maskId = useId();
   const [lessons, setLessons] = useState<LessonSummary[] | null>(null);
   const [tree, setTree] = useState<Tree | null>(null);
-  // undefined while loading; null for a language whose path has no boss.
-  const [boss, setBoss] = useState<Boss | null | undefined>(undefined);
+  const [bosses, setBosses] = useState<Boss[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const nextEl = useRef<HTMLElement | null>(null);
@@ -156,12 +155,16 @@ export function HomeScreen() {
   useEffect(() => {
     let cancelled = false;
     setFailed(false);
-    Promise.all([content.listLessons(), content.getTree(), bossId === null ? null : content.getBoss(bossId), refresh()]).then(
-      ([list, loadedTree, loadedBoss]) => {
+    const loadTree = async () => {
+      const loaded = await content.getTree();
+      return [loaded, await Promise.all(treeBosses(loaded).map((id) => content.getBoss(id)))] as const;
+    };
+    Promise.all([content.listLessons(), loadTree(), refresh()]).then(
+      ([list, [loadedTree, loadedBosses]]) => {
         if (cancelled) return;
         setLessons(list);
         setTree(loadedTree);
-        setBoss(loadedBoss);
+        setBosses(loadedBosses);
       },
       () => {
         if (!cancelled) setFailed(true);
@@ -170,9 +173,9 @@ export function HomeScreen() {
     return () => {
       cancelled = true;
     };
-  }, [content, refresh, attempt, bossId]);
+  }, [content, refresh, attempt]);
 
-  const ready = lessons !== null && tree !== null && boss !== undefined && snapshot !== null;
+  const ready = lessons !== null && tree !== null && bosses !== null && snapshot !== null;
   useEffect(() => {
     if (!ready || scrolled.current) return;
     scrolled.current = true;
@@ -214,7 +217,7 @@ export function HomeScreen() {
     );
   }
 
-  const layout = ready ? buildPathLayout(lessons, snapshot, tree, boss) : null;
+  const layout = ready ? buildPathLayout(lessons, snapshot, tree, bosses) : null;
 
   return (
     <div className="relative px-5 pb-8 pt-4">
@@ -258,9 +261,9 @@ export function HomeScreen() {
               </g>
             </svg>
             <ol className="absolute inset-0 list-none">
-              {layout.nodes.map((node) => (
-                <PathStop key={node.key} node={node} nextRef={nextRef} />
-              ))}
+              {layout.nodes.map((node) =>
+                node.kind === "level" ? <LevelBanner key={node.key} node={node} /> : <PathStop key={node.key} node={node} nextRef={nextRef} />,
+              )}
             </ol>
             <HeroToken hero={layout.hero} label={heroLabel(layout)} look={look} />
           </div>

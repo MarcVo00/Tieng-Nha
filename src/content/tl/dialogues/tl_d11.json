@@ -1,0 +1,92 @@
+{
+  "id": "tl_d11",
+  "contentVersion": 1,
+  "title": "On se voit quand ?",
+  "scene": "Une amie te propose de manger ensemble",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Kumusta! Kain tayo mamaya?",
+      "fr": "Salut ! On mange ensemble plus tard ?",
+      "next": "t2",
+      "pron": "ku·mus·TA KA·in TA·yo ma·ma·YA"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Sige! Anong oras?",
+          "fr": "D'accord ! À quelle heure ?",
+          "next": "t3",
+          "pron": "SI·ge a·NONG O·ras"
+        },
+        {
+          "id": "o2",
+          "vi": "Bukas na lang?",
+          "fr": "Demain, plutôt ?",
+          "next": "t3",
+          "pron": "BU·kas NA LANG"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Tanghali. Okay lang?",
+      "fr": "À midi. Ça te va ?",
+      "next": "t4",
+      "pron": "tang·HA·li o·KEY LANG"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Okay lang!",
+          "fr": "Ça me va !",
+          "next": "t5",
+          "pron": "o·KEY LANG"
+        },
+        {
+          "id": "o2",
+          "vi": "Sige, salamat!",
+          "fr": "D'accord, merci !",
+          "next": "t5",
+          "pron": "SI·ge sa·LA·mat"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Sige! Ingat ka!",
+      "fr": "Parfait ! Fais attention à toi !",
+      "next": "t6",
+      "pron": "SI·ge I·ngat KA"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Ingat!",
+          "fr": "Fais attention à toi !",
+          "next": null,
+          "pron": "I·ngat"
+        },
+        {
+          "id": "o2",
+          "vi": "Paalam!",
+          "fr": "Au revoir !",
+          "next": null,
+          "pron": "pa·A·lam"
+        }
+      ]
+    }
+  ]
+}

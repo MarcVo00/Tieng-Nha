@@ -484,7 +484,7 @@ describe("result", () => {
   });
 
   test("coins and badges are grouped in one « Butin » line that unfolds to the badge rewards", async () => {
-    const badge = { id: "exam_passed", title: "Vainqueur de Thủy Tinh", description: "Bats le boss final.", icon: "📜", rule: { kind: "exam_score", gte: 70 }, reward: "frame_son_mai" } as const;
+    const badge = { id: "exam_passed", title: "Vainqueur de Thủy Tinh", description: "Bats Thủy Tinh, le boss du niveau 1.", icon: "📜", rule: { kind: "exam_score", gte: 70 }, reward: "frame_son_mai" } as const;
     renderExam({ entry: { pathname: "/exam/result", state: { ...failedState(2), coinsGained: 50, newBadges: [badge] } } });
     const loot = await screen.findByRole("region", { name: fr.exam.result.loot });
     expect(within(loot).getByText(fr.shop.gained(50))).toBeInTheDocument();
@@ -773,5 +773,30 @@ describe("Tagalog boss", () => {
     const certificate = screen.getAllByRole("img", { name: fr.exam.certificate.aria("Linh", 92) })[0] as HTMLElement;
     expect(within(certificate).getByText(fr.exam.certificate.heading.tl)).toHaveAttribute("lang", "tl");
     expect(within(certificate).getByText(fr.exam.certificate.achievement.tl)).toBeInTheDocument();
+  });
+});
+
+describe("levels", () => {
+  test("winning against the level 1 boss announces level 2", async () => {
+    const state: ResultState = {
+      score: 92, mention: bossMention(92), results: [], questions: [], noSpeaking: false, xpGained: 92, coinsGained: 50, newBadges: [], remainingToday: 2, dateIso: "2026-11-04T10:00:00.000Z",
+      boss: { id: "boss_thuy_tinh", name: "Thủy Tinh", title: "Le dieu des eaux", illustration: "boss_thuy_tinh", hp: 15, playerLives: 5, won: true, livesLeft: 4, bossHpLeft: 0 },
+    };
+    renderExam({ entry: { pathname: "/exam/result", state } });
+    expect(await screen.findByRole("heading", { name: fr.exam.result.levelOpen.title(2) })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: fr.exam.result.levelOpen.action(2) }));
+    expect(await screen.findByText("page d'accueil")).toBeInTheDocument();
+  });
+
+  test("a defeat opens nothing, and the last boss has no next level", async () => {
+    const base = { score: 36, mention: bossMention(36), results: [], questions: [], noSpeaking: false, xpGained: 0, coinsGained: 0, newBadges: [], remainingToday: 2, dateIso: "2026-11-04T10:00:00.000Z" };
+    const lost = renderExam({ entry: { pathname: "/exam/result", state: { ...base, boss: { id: "boss_thuy_tinh", name: "Thủy Tinh", title: "t", illustration: "boss_thuy_tinh", hp: 15, playerLives: 5, won: false, livesLeft: 0, bossHpLeft: 6 } } } });
+    await screen.findByRole("heading", { name: fr.exam.result.lost("Thủy Tinh") });
+    expect(screen.queryByRole("heading", { name: fr.exam.result.levelOpen.title(2) })).not.toBeInTheDocument();
+    lost.unmount();
+    renderExam({ entry: { pathname: "/exam/result", state: { ...base, score: 92, mention: bossMention(92), boss: { id: "boss_son_tinh", name: "Sơn Tinh", title: "t", illustration: "boss_son_tinh", hp: 15, playerLives: 5, won: true, livesLeft: 4, bossHpLeft: 0 } } } });
+    await screen.findByRole("heading", { name: fr.exam.result.won("Sơn Tinh") });
+    expect(screen.queryByRole("heading", { name: /ouvert/ })).not.toBeInTheDocument();
+    expect(screen.getAllByText(fr.exam.certificate.achievementAt.vi(2)).length).toBeGreaterThan(0);
   });
 });

@@ -1,0 +1,90 @@
+{
+  "id": "d15",
+  "contentVersion": 1,
+  "title": "Un rendez-vous",
+  "scene": "Une amie t'appelle : tu es en route",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "A lô! Bạn ở đâu rồi?",
+      "fr": "Allô ! Tu es où ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Mình ở chợ.",
+          "fr": "Je suis au marché.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Xin lỗi, mình trễ.",
+          "fr": "Désolé·e, je suis en retard.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Không sao. Mấy giờ bạn tới?",
+      "fr": "Pas grave. Tu arrives à quelle heure ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Lát nữa mình tới nha.",
+          "fr": "J'arrive tout à l'heure.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Chờ mình chút nha.",
+          "fr": "Attends-moi un peu.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Được, mình chờ bạn.",
+      "fr": "D'accord, je t'attends.",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Cảm ơn bạn nha!",
+          "fr": "Merci !",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Lát nữa gặp nha!",
+          "fr": "À tout à l'heure !",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Chào bạn!",
+      "fr": "Salut !",
+      "next": null
+    }
+  ]
+}

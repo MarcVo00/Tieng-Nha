@@ -90,7 +90,8 @@ Gabarit : `viewBox="0 0 200 200"`, calques `layer-shadow`, `layer-aura` (l'élé
 |---|---|---|---|---|
 | **Thủy Tinh** (novembre) | dieu des eaux, rival de Sơn Tinh | xanh chàm | vagues | trident, couronne |
 | **Bakunawa** (tagalog, 2.1) | serpent de mer qui avale la lune (mythologie philippine) | lục (vert) | vagues (bande devant lui) | la lune or entre ses mâchoires ; vaincu, il la recrache |
-| Sơn Tinh | génie des montagnes | lục (vert) | montagnes en strates | massue de pierre |
+| **Sơn Tinh** (niveau 2) | génie des montagnes | lục (vert) | montagnes en strates | massue de pierre |
+| **Tikbalang** (tagalog, niveau 2) | mi-homme, mi-cheval, égare les voyageurs (folklore philippin) | đỏ son | pagne hachuré | tête de cheval, trois poils d'or |
 | Thánh Gióng | l'enfant devenu géant, cheval de fer | vàng hoè + noir | flammes | bambou arraché, cheval |
 | Kim Quy | la tortue d'or du lac de l'Épée | vàng hoè | écailles hexagonales | l'épée sacrée |
 | Hai Bà Trưng | les sœurs Trưng sur leurs éléphants | đỏ son | nuages | éléphant, étendard |

@@ -1,0 +1,90 @@
+{
+  "id": "d12",
+  "contentVersion": 1,
+  "title": "À la pharmacie",
+  "scene": "Nhà thuốc — une pharmacienne plus âgée t'accueille",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Chào con! Con bị sao vậy?",
+      "fr": "Bonjour ! Qu'est-ce qui ne va pas ?",
+      "next": "t2"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, con đau đầu quá.",
+          "fr": "J'ai très mal à la tête.",
+          "next": "t3"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, con đau bụng.",
+          "fr": "J'ai mal au ventre.",
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Con có sốt không?",
+      "fr": "Tu as de la fièvre ?",
+      "next": "t4"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ không.",
+          "fr": "Non.",
+          "next": "t5"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ có, con bị sốt.",
+          "fr": "Oui, j'ai de la fièvre.",
+          "next": "t5"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Đây là thuốc của con nha.",
+      "fr": "Voici tes médicaments.",
+      "next": "t6"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Dạ, cảm ơn cô.",
+          "fr": "Merci, madame.",
+          "next": "t7"
+        },
+        {
+          "id": "o2",
+          "vi": "Dạ, bao nhiêu tiền cô?",
+          "fr": "Ça fait combien, madame ?",
+          "next": "t7"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Năm mươi ngàn nha con. Chào con!",
+      "fr": "Cinquante mille. Au revoir !",
+      "next": null
+    }
+  ]
+}

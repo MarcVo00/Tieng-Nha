@@ -1,0 +1,100 @@
+{
+  "id": "tl_d10",
+  "contentVersion": 1,
+  "title": "À la botika",
+  "scene": "Une pharmacie de quartier : tu ne te sens pas bien",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Magandang umaga po! Ano po ang kailangan ninyo?",
+      "fr": "Bonjour ! De quoi avez-vous besoin ?",
+      "next": "t2",
+      "pron": "ma·gan·DANG u·MA·ga PO a·NO PO ANG ka·i·LA·ngan nin·YO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Masakit po ang ulo ko.",
+          "fr": "J'ai mal à la tête.",
+          "next": "t3",
+          "pron": "ma·sa·KIT PO ANG U·lo KO"
+        },
+        {
+          "id": "o2",
+          "vi": "Masakit po ang tiyan ko.",
+          "fr": "J'ai mal au ventre.",
+          "next": "t3",
+          "pron": "ma·sa·KIT PO ANG ti·YAN KO"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "May lagnat po ba kayo?",
+      "fr": "Vous avez de la fièvre ?",
+      "next": "t4",
+      "pron": "MAY lag·NAT PO BA ka·YO"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Opo, may lagnat po ako.",
+          "fr": "Oui, j'ai de la fièvre.",
+          "next": "t5",
+          "pron": "O·po MAY lag·NAT PO a·KO"
+        },
+        {
+          "id": "o2",
+          "vi": "Wala po.",
+          "fr": "Non.",
+          "next": "t5",
+          "pron": "wa·LA PO"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Ito po ang gamot.",
+      "fr": "Voici le médicament.",
+      "next": "t6",
+      "pron": "i·TO PO ANG ga·MOT"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Magkano po ito?",
+          "fr": "C'est combien ?",
+          "next": "t7",
+          "pron": "mag·KA·no PO i·TO"
+        },
+        {
+          "id": "o2",
+          "vi": "Salamat po. Magkano po ito?",
+          "fr": "Merci. C'est combien ?",
+          "next": "t7",
+          "pron": "sa·LA·mat PO mag·KA·no PO i·TO"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Singkuwenta pesos po. Ingat po!",
+      "fr": "Cinquante pesos. Prenez soin de vous !",
+      "next": null,
+      "pron": "sing·ku·WEN·ta PE·sos PO I·ngat PO"
+    }
+  ]
+}

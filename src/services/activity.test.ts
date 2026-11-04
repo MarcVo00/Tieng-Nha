@@ -300,3 +300,13 @@ test("a lesson failure and a training stay in the local journal, and the talisma
   expect((await svc.getStruggle("l05")).talisman).toBe(false);
   expect(await outbox.size()).toBe(0);
 });
+
+test("finishExam against a level 2 boss writes its id and scores against that boss only", async () => {
+  const { svc, progress } = setup();
+  await svc.finishExam({ attemptId: "a", score: 90, noSpeaking: false });
+  const r = await svc.finishExam({ attemptId: "b", score: 80, noSpeaking: false, boss: { bossId: "boss_son_tinh", won: true, livesLeft: 3, bossHpLeft: 0 } });
+  expect(r.xpGained).toBe(80);
+  expect(r.snapshot.bossBests).toEqual({ boss_son_tinh: 80 });
+  expect(r.snapshot.examBest).toBe(90);
+  expect((await progress.listEvents()).filter((e) => e.type === "exam_finished").map((e) => e.refId)).toEqual(["exam", "boss_son_tinh"]);
+});

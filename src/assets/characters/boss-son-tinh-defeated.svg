@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>Boss — Sơn Tinh salue après le combat (Đông Hồ simplifié)</title>
+  <!-- Version « vaincu » : un salut de maître, pas une humiliation. Il incline la tête, joint le poing et la paume,
+       sa massue posée à côté de lui. -->
+  <defs>
+    <pattern id="hatch-son-tinh-defeated" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="64" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#4E7A4A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.4">
+    <path d="M8 156 L28 130 L46 156"/>
+  </g>
+
+  <g id="layer-weapon" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- la massue, posée au sol -->
+    <path d="M164 186 L164 132" fill="none" stroke-width="5"/>
+    <path d="M148 186 Q144 164 160 156 Q178 152 182 170 Q184 182 176 186 Z" fill="#9CC3BB"/>
+  </g>
+
+  <g id="layer-body" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M56 184 Q50 134 70 108 Q100 98 130 108 Q150 134 144 184 Z" fill="#4E7A4A"/>
+    <path d="M56 184 L56 170 L72 154 L88 170 L102 152 L118 170 L132 156 L144 170 L144 184 Z" fill="#F4E4C4"/>
+    <path d="M56 184 L56 170 L72 154 L88 170 L102 152 L118 170 L132 156 L144 170 L144 184 Z" fill="url(#hatch-son-tinh-defeated)" stroke="none"/>
+    <path d="M66 128 Q100 136 134 128 L136 140 Q100 148 64 140 Z" fill="#D9A93A"/>
+    <path d="M72 108 Q58 122 70 134 L94 136 L94 124 L80 122 Q84 114 84 110 Z" fill="#4E7A4A"/>
+    <path d="M128 108 Q142 122 130 134 L106 136 L106 124 L120 122 Q116 114 116 110 Z" fill="#4E7A4A"/>
+    <ellipse cx="106" cy="130" rx="8" ry="9" fill="#F6DDBF"/>
+    <circle cx="95" cy="130" r="7" fill="#F6DDBF"/>
+    <path d="M91 127 L97 127 M91 132 L97 132" fill="none" stroke-width="1.5"/>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" transform="translate(0 14) rotate(-5 100 76)">
+    <circle cx="100" cy="76" r="28" fill="#F6DDBF"/>
+    <path d="M72 74 Q72 46 100 46 Q128 46 128 74 Q116 60 100 60 Q84 60 72 74 Z" fill="#1F1A17"/>
+    <circle cx="100" cy="38" r="10" fill="#1F1A17"/>
+    <path d="M74 62 Q100 48 126 62" fill="none" stroke="#D9A93A" stroke-width="4"/>
+    <path d="M84 80 Q90 85 96 80 M104 80 Q110 85 116 80" fill="none" stroke-width="2.5"/>
+    <circle cx="82" cy="90" r="3" fill="#B23A2A" stroke="none"/>
+    <circle cx="118" cy="90" r="3" fill="#B23A2A" stroke="none"/>
+    <path d="M95 92 Q100 94.5 105 92" fill="none" stroke-width="2"/>
+  </g>
+</svg>

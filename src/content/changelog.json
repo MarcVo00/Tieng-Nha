@@ -2,6 +2,17 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "2.3.0",
+      "date": "2026-11-04",
+      "title": "Deux nouveaux niveaux",
+      "items": [
+        "Un niveau 2 en vietnamien : la maison, la santé, tes goûts, les vêtements, le téléphone, les repas de famille.",
+        "Un niveau 2 en tagalog : l'hôtel, la pharmacie, l'heure, le bus et le bateau, les achats, les amis.",
+        "Bats le boss de ton niveau pour ouvrir le suivant.",
+        "Deux nouveaux boss t'attendent : Sơn Tinh et le Tikbalang."
+      ]
+    },
+    {
       "version": "2.2.0",
       "date": "2026-11-03",
       "title": "Succès et duels en tagalog",

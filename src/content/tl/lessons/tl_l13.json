@@ -1,0 +1,230 @@
+{
+  "id": "tl_l13",
+  "contentVersion": 1,
+  "title": "Les achats",
+  "description": "Vêtements, couleurs, tailles : dis ce que tu cherches et tente une réduction.",
+  "tagline": "Couleurs, tailles",
+  "emoji": "👕",
+  "dialogueId": "tl_d13",
+  "vocab": [
+    {
+      "id": "tl_v_damit",
+      "vi": "damit",
+      "fr": "vêtement",
+      "dialect": "manila",
+      "pron": "da·MIT"
+    },
+    {
+      "id": "tl_v_sapatos",
+      "vi": "sapatos",
+      "fr": "chaussures",
+      "dialect": "manila",
+      "pron": "sa·PA·tos"
+    },
+    {
+      "id": "tl_v_kulay",
+      "vi": "kulay",
+      "fr": "couleur",
+      "dialect": "manila",
+      "pron": "KU·lay"
+    },
+    {
+      "id": "tl_v_pula",
+      "vi": "pula",
+      "fr": "rouge",
+      "dialect": "manila",
+      "pron": "pu·LA"
+    },
+    {
+      "id": "tl_v_puti",
+      "vi": "puti",
+      "fr": "blanc",
+      "dialect": "manila",
+      "pron": "pu·TI"
+    },
+    {
+      "id": "tl_v_itim",
+      "vi": "itim",
+      "fr": "noir",
+      "dialect": "manila",
+      "pron": "i·TIM"
+    },
+    {
+      "id": "tl_v_maliit",
+      "vi": "maliit",
+      "fr": "petit",
+      "dialect": "manila",
+      "pron": "ma·li·IT"
+    },
+    {
+      "id": "tl_v_malaki",
+      "vi": "malaki",
+      "fr": "grand",
+      "dialect": "manila",
+      "pron": "ma·la·KI"
+    },
+    {
+      "id": "tl_v_tawad",
+      "vi": "tawad",
+      "fr": "réduction",
+      "dialect": "manila",
+      "pron": "TA·wad",
+      "note": "Au marché, on demande : « May tawad po ba? ». Dans un magasin, on dit plutôt « discount »."
+    },
+    {
+      "id": "tl_v_maganda",
+      "vi": "maganda",
+      "fr": "beau, belle",
+      "dialect": "manila",
+      "pron": "ma·gan·DA"
+    },
+    {
+      "id": "tl_v_ang_ganda",
+      "vi": "ang ganda!",
+      "fr": "que c'est beau !",
+      "dialect": "manila",
+      "pron": "ANG gan·DA"
+    },
+    {
+      "id": "tl_v_may_tawad",
+      "vi": "may tawad po ba?",
+      "fr": "vous faites une réduction ?",
+      "dialect": "manila",
+      "pron": "MAY TA·wad PO BA"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l13_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_pula",
+      "choices": [
+        "tl_v_pula",
+        "tl_v_itim",
+        "tl_v_malaki",
+        "tl_v_maganda"
+      ]
+    },
+    {
+      "id": "tl_l13_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_sapatos",
+      "choices": [
+        "tl_v_sapatos",
+        "tl_v_pula",
+        "tl_v_itim",
+        "tl_v_malaki"
+      ]
+    },
+    {
+      "id": "tl_l13_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_damit",
+      "choices": [
+        "tl_v_damit",
+        "tl_v_kulay",
+        "tl_v_puti",
+        "tl_v_maliit"
+      ]
+    },
+    {
+      "id": "tl_l13_e04",
+      "type": "translate_choose",
+      "promptFr": "Que c'est beau !",
+      "answerVi": "Ang ganda!",
+      "distractorsVi": [
+        "Ang mahal!",
+        "Ang init!",
+        "Masarap!"
+      ]
+    },
+    {
+      "id": "tl_l13_e05",
+      "type": "translate_choose",
+      "promptFr": "Il y en a un rouge ?",
+      "answerVi": "May pula po ba?",
+      "distractorsVi": [
+        "May puti po ba?",
+        "May itim po ba?",
+        "May malaki po ba?"
+      ]
+    },
+    {
+      "id": "tl_l13_e06",
+      "type": "translate_choose",
+      "promptFr": "Vous faites une réduction ?",
+      "answerVi": "May tawad po ba?",
+      "distractorsVi": [
+        "May sukli po ba?",
+        "Magkano po ba?",
+        "May pula po ba?"
+      ]
+    },
+    {
+      "id": "tl_l13_e07",
+      "type": "word_order",
+      "fr": "C'est petit.",
+      "tokensVi": [
+        "Maliit",
+        "po",
+        "ito"
+      ],
+      "extraTokens": [
+        "malaki"
+      ]
+    },
+    {
+      "id": "tl_l13_e08",
+      "type": "word_order",
+      "fr": "Je voudrais des chaussures.",
+      "tokensVi": [
+        "Gusto",
+        "ko",
+        "po",
+        "ng",
+        "sapatos"
+      ],
+      "extraTokens": [
+        "damit"
+      ]
+    },
+    {
+      "id": "tl_l13_e09",
+      "type": "speak",
+      "vi": "May malaki po ba?",
+      "fr": "Il y en a un grand ?",
+      "vocabIds": [
+        "tl_v_malaki"
+      ],
+      "pron": "MAY ma·la·KI PO BA"
+    },
+    {
+      "id": "tl_l13_e10",
+      "type": "speak",
+      "vi": "Gusto ko po ito.",
+      "fr": "Je voudrais ça.",
+      "vocabIds": [],
+      "pron": "gus·TO KO PO i·TO"
+    },
+    {
+      "id": "tl_l13_e11",
+      "type": "speak",
+      "vi": "May tawad po ba?",
+      "fr": "Vous faites une réduction ?",
+      "vocabIds": [
+        "tl_v_may_tawad"
+      ],
+      "pron": "MAY TA·wad PO BA"
+    },
+    {
+      "id": "tl_l13_e12",
+      "type": "speak",
+      "vi": "Ang ganda!",
+      "fr": "Que c'est beau !",
+      "vocabIds": [
+        "tl_v_ang_ganda"
+      ],
+      "pron": "ANG gan·DA"
+    }
+  ]
+}

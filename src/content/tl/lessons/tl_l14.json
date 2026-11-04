@@ -1,0 +1,231 @@
+{
+  "id": "tl_l14",
+  "contentVersion": 1,
+  "title": "Se faire des amis",
+  "description": "Parle de ta famille, de ton travail et de tes vacances avec les gens que tu rencontres.",
+  "tagline": "Famille, vacances",
+  "emoji": "🤝",
+  "dialogueId": "tl_d14",
+  "vocab": [
+    {
+      "id": "tl_v_kaibigan",
+      "vi": "kaibigan",
+      "fr": "ami·e",
+      "dialect": "manila",
+      "pron": "ka·i·BI·gan"
+    },
+    {
+      "id": "tl_v_pamilya",
+      "vi": "pamilya",
+      "fr": "famille",
+      "dialect": "manila",
+      "pron": "pa·MIL·ya"
+    },
+    {
+      "id": "tl_v_nanay",
+      "vi": "nanay",
+      "fr": "mère",
+      "dialect": "manila",
+      "pron": "NA·nay"
+    },
+    {
+      "id": "tl_v_tatay",
+      "vi": "tatay",
+      "fr": "père",
+      "dialect": "manila",
+      "pron": "TA·tay"
+    },
+    {
+      "id": "tl_v_kapatid",
+      "vi": "kapatid",
+      "fr": "frère ou sœur",
+      "dialect": "manila",
+      "pron": "ka·pa·TID",
+      "note": "Un seul mot pour les deux : le tagalog ne précise pas."
+    },
+    {
+      "id": "tl_v_asawa",
+      "vi": "asawa",
+      "fr": "époux, épouse",
+      "dialect": "manila",
+      "pron": "a·SA·wa"
+    },
+    {
+      "id": "tl_v_anak",
+      "vi": "anak",
+      "fr": "enfant (fils, fille)",
+      "dialect": "manila",
+      "pron": "a·NAK"
+    },
+    {
+      "id": "tl_v_trabaho",
+      "vi": "trabaho",
+      "fr": "travail",
+      "dialect": "manila",
+      "pron": "tra·BA·ho"
+    },
+    {
+      "id": "tl_v_bakasyon",
+      "vi": "bakasyon",
+      "fr": "vacances",
+      "dialect": "manila",
+      "pron": "ba·kas·YON"
+    },
+    {
+      "id": "tl_v_masaya",
+      "vi": "masaya",
+      "fr": "content·e, heureux·se",
+      "dialect": "manila",
+      "pron": "ma·sa·YA"
+    },
+    {
+      "id": "tl_v_ano_trabaho",
+      "vi": "ano ang trabaho mo?",
+      "fr": "quel est ton travail ?",
+      "dialect": "manila",
+      "pron": "a·NO ANG tra·BA·ho MO"
+    },
+    {
+      "id": "tl_v_bakasyon_lang_po",
+      "vi": "bakasyon lang po",
+      "fr": "je suis juste en vacances",
+      "dialect": "manila",
+      "pron": "ba·kas·YON LANG PO"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l14_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_kaibigan",
+      "choices": [
+        "tl_v_kaibigan",
+        "tl_v_nanay",
+        "tl_v_kapatid",
+        "tl_v_anak"
+      ]
+    },
+    {
+      "id": "tl_l14_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_nanay",
+      "choices": [
+        "tl_v_nanay",
+        "tl_v_kapatid",
+        "tl_v_anak",
+        "tl_v_bakasyon"
+      ]
+    },
+    {
+      "id": "tl_l14_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_trabaho",
+      "choices": [
+        "tl_v_trabaho",
+        "tl_v_masaya",
+        "tl_v_bakasyon_lang_po",
+        "tl_v_pamilya"
+      ]
+    },
+    {
+      "id": "tl_l14_e04",
+      "type": "translate_choose",
+      "promptFr": "C'est mon ami.",
+      "answerVi": "Kaibigan ko ito.",
+      "distractorsVi": [
+        "Kapatid ko ito.",
+        "Nanay ko ito.",
+        "Tatay ko ito."
+      ]
+    },
+    {
+      "id": "tl_l14_e05",
+      "type": "translate_choose",
+      "promptFr": "Je suis content·e.",
+      "answerVi": "Masaya ako.",
+      "distractorsVi": [
+        "Pagod ako.",
+        "Gutom ako.",
+        "Busog ako."
+      ]
+    },
+    {
+      "id": "tl_l14_e06",
+      "type": "translate_choose",
+      "promptFr": "Quel est ton travail ?",
+      "answerVi": "Ano ang trabaho mo?",
+      "distractorsVi": [
+        "Ano ang pangalan mo?",
+        "Saan ang trabaho mo?",
+        "Kumusta ang trabaho?"
+      ]
+    },
+    {
+      "id": "tl_l14_e07",
+      "type": "word_order",
+      "fr": "Je suis juste en vacances.",
+      "tokensVi": [
+        "Bakasyon",
+        "lang",
+        "po"
+      ],
+      "extraTokens": [
+        "trabaho"
+      ]
+    },
+    {
+      "id": "tl_l14_e08",
+      "type": "word_order",
+      "fr": "Tu as un frère ou une sœur ?",
+      "tokensVi": [
+        "May",
+        "kapatid",
+        "ka",
+        "ba"
+      ],
+      "extraTokens": [
+        "anak"
+      ]
+    },
+    {
+      "id": "tl_l14_e09",
+      "type": "speak",
+      "vi": "Masaya ako dito.",
+      "fr": "Je suis content·e ici.",
+      "vocabIds": [
+        "tl_v_masaya"
+      ],
+      "pron": "ma·sa·YA a·KO DI·to"
+    },
+    {
+      "id": "tl_l14_e10",
+      "type": "speak",
+      "vi": "May kapatid ka ba?",
+      "fr": "Tu as un frère ou une sœur ?",
+      "vocabIds": [
+        "tl_v_kapatid"
+      ],
+      "pron": "MAY ka·pa·TID KA BA"
+    },
+    {
+      "id": "tl_l14_e11",
+      "type": "speak",
+      "vi": "Ano ang trabaho mo?",
+      "fr": "Quel est ton travail ?",
+      "vocabIds": [
+        "tl_v_ano_trabaho"
+      ],
+      "pron": "a·NO ANG tra·BA·ho MO"
+    },
+    {
+      "id": "tl_l14_e12",
+      "type": "speak",
+      "vi": "Bakasyon lang po.",
+      "fr": "Je suis juste en vacances.",
+      "vocabIds": [
+        "tl_v_bakasyon_lang_po"
+      ],
+      "pron": "ba·kas·YON LANG PO"
+    }
+  ]
+}

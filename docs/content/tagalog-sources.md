@@ -304,3 +304,177 @@ Chaque transcription ci-dessous est la concaténation des transcriptions des mot
 | tl_l08 | Busog na ako. Salamat po! | bu·SOG NA a·KO sa·LA·mat PO |
 | tl_l08 | Teka lang po. Pakiulit po. | TE·ka LANG PO pa·ki·u·LIT PO |
 | tl_l08 | Okay lang. Sige, salamat! | o·KEY LANG SI·ge sa·LA·mat |
+
+## Niveau 2
+
+Consulté le 2026-11-04, même méthode. `bukas` « demain » est /ˈbukas/ (`BU·kas`), à ne pas confondre avec « ouvert » /buˈkas/ ; la leçon tl_l11 utilise le premier.
+
+### Mots
+
+| Mot | Transcription | Prononciation de la source | Source |
+|---|---|---|---|
+| kuwarto | ku·WAR·to | /kuˈwaɾto/ | https://en.wiktionary.org/wiki/kuwarto#Tagalog |
+| susi | SU·si | /ˈsusiʔ/ | https://en.wiktionary.org/wiki/susi#Tagalog |
+| kama | KA·ma | /ˈkama/ | https://en.wiktionary.org/wiki/kama#Tagalog |
+| tuwalya | tu·WAL·ya | /tuˈwalja/ | https://en.wiktionary.org/wiki/tuwalya#Tagalog |
+| unan | U·nan | /ˈʔunan/ | https://en.wiktionary.org/wiki/unan#Tagalog |
+| kumot | KU·mot | /ˈkumot/ | https://en.wiktionary.org/wiki/kumot#Tagalog |
+| banyo | BAN·yo | /ˈbanjo/ | https://en.wiktionary.org/wiki/banyo#Tagalog |
+| sira | si·RA | /siˈɾaʔ/ (« broken ») | https://en.wiktionary.org/wiki/sira#Tagalog |
+| malamig | ma·la·MIG | /malaˈmiɡ/ | https://en.wiktionary.org/wiki/malamig#Tagalog |
+| masakit | ma·sa·KIT | /masaˈkit/ | https://en.wiktionary.org/wiki/masakit#Tagalog |
+| ulo | U·lo | /ˈʔulo/ (« head ») | https://en.wiktionary.org/wiki/ulo#Tagalog |
+| tiyan | ti·YAN | /tiˈjan/ | https://en.wiktionary.org/wiki/tiyan#Tagalog |
+| gamot | ga·MOT | /ɡaˈmot/ | https://en.wiktionary.org/wiki/gamot#Tagalog |
+| botika | bo·TI·ka | /boˈtika/ | https://en.wiktionary.org/wiki/botika#Tagalog |
+| doktor | dok·TOR | /dokˈtoɾ/ | https://en.wiktionary.org/wiki/doktor#Tagalog |
+| lagnat | lag·NAT | /laɡˈnat/ | https://en.wiktionary.org/wiki/lagnat#Tagalog |
+| ubo | u·BO | /ʔuˈbo/ (« cough ») | https://en.wiktionary.org/wiki/ubo#Tagalog |
+| pagod | pa·GOD | /paˈɡod/ (« tired ») | https://en.wiktionary.org/wiki/pagod#Tagalog |
+| tulong | TU·long | /ˈtuloŋ/ | https://en.wiktionary.org/wiki/tulong#Tagalog |
+| ospital | os·pi·TAL | /ʔospiˈtal/ | https://en.wiktionary.org/wiki/ospital#Tagalog |
+| kailangan | ka·i·LA·ngan | /kaʔiˈlaŋan/ | https://en.wiktionary.org/wiki/kailangan#Tagalog |
+| ngayon | nga·YON | /ŋaˈjon/ | https://en.wiktionary.org/wiki/ngayon#Tagalog |
+| kahapon | ka·HA·pon | /kaˈhapon/ | https://en.wiktionary.org/wiki/kahapon#Tagalog |
+| oras | O·ras | /ˈʔoɾas/ | https://en.wiktionary.org/wiki/oras#Tagalog |
+| mamaya | ma·ma·YA | /mamaˈjaʔ/ | https://en.wiktionary.org/wiki/mamaya#Tagalog |
+| sandali | san·da·LI | /sandaˈliʔ/ | https://en.wiktionary.org/wiki/sandali#Tagalog |
+| tanghali | tang·HA·li | /taŋˈhaliʔ/ | https://en.wiktionary.org/wiki/tanghali#Tagalog |
+| araw | A·raw | /ˈʔaɾaw/ (« day ») | https://en.wiktionary.org/wiki/araw#Tagalog |
+| linggo | ling·GO | /liŋˈɡo/ (« week ») | https://en.wiktionary.org/wiki/linggo#Tagalog |
+| kailan | ka·i·LAN | /kaʔiˈlan/ | https://en.wiktionary.org/wiki/kailan#Tagalog |
+| bangka | bang·KA | /baŋˈkaʔ/ | https://en.wiktionary.org/wiki/bangka#Tagalog |
+| barko | bar·KO | /baɾˈko/ | https://en.wiktionary.org/wiki/barko#Tagalog |
+| tiket | TI·ket | /ˈtiket/ | https://en.wiktionary.org/wiki/tiket#Tagalog |
+| bus | BAS | /ˈbas/ | https://en.wiktionary.org/wiki/bus#Tagalog |
+| biyahe | bi·YA·he | /biˈjahe/ | https://en.wiktionary.org/wiki/biyahe#Tagalog |
+| istasyon | is·tas·YON | /ʔistasˈjon/ | https://en.wiktionary.org/wiki/istasyon#Tagalog |
+| papunta | pa·pun·TA | /papunˈta/ | https://en.wiktionary.org/wiki/papunta#Tagalog |
+| sakay | sa·KAY | /saˈkaj/ | https://en.wiktionary.org/wiki/sakay#Tagalog |
+| damit | da·MIT | /daˈmit/ | https://en.wiktionary.org/wiki/damit#Tagalog |
+| sapatos | sa·PA·tos | /saˈpatos/ | https://en.wiktionary.org/wiki/sapatos#Tagalog |
+| kulay | KU·lay | /ˈkulaj/ | https://en.wiktionary.org/wiki/kulay#Tagalog |
+| pula | pu·LA | /puˈla/ | https://en.wiktionary.org/wiki/pula#Tagalog |
+| puti | pu·TI | /puˈtiʔ/ | https://en.wiktionary.org/wiki/puti#Tagalog |
+| itim | i·TIM | /ʔiˈtim/ | https://en.wiktionary.org/wiki/itim#Tagalog |
+| maliit | ma·li·IT | /maliˈʔit/ | https://en.wiktionary.org/wiki/maliit#Tagalog |
+| malaki | ma·la·KI | /malaˈki/ | https://en.wiktionary.org/wiki/malaki#Tagalog |
+| tawad | TA·wad | /ˈtawad/ | https://en.wiktionary.org/wiki/tawad#Tagalog |
+| maganda | ma·gan·DA | /maɡanˈda/ | https://en.wiktionary.org/wiki/maganda#Tagalog |
+| ganda | gan·DA | /ɡanˈda/ | https://en.wiktionary.org/wiki/ganda#Tagalog |
+| kaibigan | ka·i·BI·gan | /kaʔiˈbiɡan/ | https://en.wiktionary.org/wiki/kaibigan#Tagalog |
+| pamilya | pa·MIL·ya | /paˈmilja/ | https://en.wiktionary.org/wiki/pamilya#Tagalog |
+| nanay | NA·nay | /ˈnanaj/ | https://en.wiktionary.org/wiki/nanay#Tagalog |
+| tatay | TA·tay | /ˈtataj/ | https://en.wiktionary.org/wiki/tatay#Tagalog |
+| kapatid | ka·pa·TID | /kapaˈtid/ | https://en.wiktionary.org/wiki/kapatid#Tagalog |
+| asawa | a·SA·wa | /ʔaˈsawa/ | https://en.wiktionary.org/wiki/asawa#Tagalog |
+| anak | a·NAK | /ʔaˈnak/ (« child ») | https://en.wiktionary.org/wiki/anak#Tagalog |
+| trabaho | tra·BA·ho | /tɾaˈbaho/ | https://en.wiktionary.org/wiki/trabaho#Tagalog |
+| bakasyon | ba·kas·YON | /bakasˈjon/ | https://en.wiktionary.org/wiki/bakasyon#Tagalog |
+| masaya | ma·sa·YA | /masaˈja/ | https://en.wiktionary.org/wiki/masaya#Tagalog |
+| ilan | i·LAN | C:/Program Files/Git/ʔiˈlan/ | https://en.wiktionary.org/wiki/ilan#Tagalog |
+| isang | i·SANG | forme de « isa » avec le lien -ng, l'accent ne bouge pas | https://en.wiktionary.org/wiki/isa#Tagalog |
+| dalawang | da·la·WANG | forme de « dalawa » avec le lien -ng, l'accent ne bouge pas | https://en.wiktionary.org/wiki/dalawa#Tagalog |
+| anong | a·NONG | forme de « ano » avec le lien -ng, l'accent ne bouge pas | https://en.wiktionary.org/wiki/ano#Tagalog |
+| ilang | i·LANG | forme de « ilan » avec le lien -ng, l'accent ne bouge pas | https://en.wiktionary.org/wiki/ilan#Tagalog |
+
+### Mots et phrases enseignés
+
+| Leçon | Tagalog | Transcription |
+|---|---|---|
+| tl_l09 | kuwarto | ku·WAR·to |
+| tl_l09 | susi | SU·si |
+| tl_l09 | kama | KA·ma |
+| tl_l09 | tuwalya | tu·WAL·ya |
+| tl_l09 | unan | U·nan |
+| tl_l09 | kumot | KU·mot |
+| tl_l09 | banyo | BAN·yo |
+| tl_l09 | sira | si·RA |
+| tl_l09 | malamig | ma·la·MIG |
+| tl_l09 | mainit na tubig | ma·I·nit NA TU·big |
+| tl_l09 | may kuwarto po ba? | MAY ku·WAR·to PO BA |
+| tl_l09 | nasaan po ang susi? | na·sa·AN PO ANG SU·si |
+| tl_l09 | May kuwarto po ba? | MAY ku·WAR·to PO BA |
+| tl_l09 | Pahingi po ng tuwalya. | pa·hi·NGI PO NANG tu·WAL·ya |
+| tl_l09 | Sira po ang susi. | si·RA PO ANG SU·si |
+| tl_l09 | Walang mainit na tubig. | wa·LANG ma·I·nit NA TU·big |
+| tl_l10 | masakit | ma·sa·KIT |
+| tl_l10 | ulo | U·lo |
+| tl_l10 | tiyan | ti·YAN |
+| tl_l10 | gamot | ga·MOT |
+| tl_l10 | botika | bo·TI·ka |
+| tl_l10 | doktor | dok·TOR |
+| tl_l10 | lagnat | lag·NAT |
+| tl_l10 | ubo | u·BO |
+| tl_l10 | pagod | pa·GOD |
+| tl_l10 | tulong | TU·long |
+| tl_l10 | ospital | os·pi·TAL |
+| tl_l10 | kailangan ko po | ka·i·LA·ngan KO PO |
+| tl_l10 | Masakit po ang ulo ko. | ma·sa·KIT PO ANG U·lo KO |
+| tl_l10 | May gamot po ba? | MAY ga·MOT PO BA |
+| tl_l10 | Tulong po! | TU·long PO |
+| tl_l10 | Pagod na ako. | pa·GOD NA a·KO |
+| tl_l11 | ngayon | nga·YON |
+| tl_l11 | bukas | BU·kas |
+| tl_l11 | kahapon | ka·HA·pon |
+| tl_l11 | mamaya | ma·ma·YA |
+| tl_l11 | sandali lang po | san·da·LI LANG PO |
+| tl_l11 | oras | O·ras |
+| tl_l11 | anong oras na? | a·NONG O·ras NA |
+| tl_l11 | tanghali | tang·HA·li |
+| tl_l11 | araw | A·raw |
+| tl_l11 | linggo | ling·GO |
+| tl_l11 | kailan | ka·i·LAN |
+| tl_l11 | mamaya na lang | ma·ma·YA NA LANG |
+| tl_l11 | Anong oras na po? | a·NONG O·ras NA PO |
+| tl_l11 | Sandali lang po. | san·da·LI LANG PO |
+| tl_l11 | Bukas na lang po. | BU·kas NA LANG PO |
+| tl_l11 | Kailan po? | ka·i·LAN PO |
+| tl_l12 | bus | BAS |
+| tl_l12 | bangka | bang·KA |
+| tl_l12 | barko | bar·KO |
+| tl_l12 | tiket | TI·ket |
+| tl_l12 | biyahe | bi·YA·he |
+| tl_l12 | istasyon | is·tas·YON |
+| tl_l12 | papunta | pa·pun·TA |
+| tl_l12 | sakay | sa·KAY |
+| tl_l12 | isang tiket po | i·SANG TI·ket PO |
+| tl_l12 | dalawang tiket po | da·la·WANG TI·ket PO |
+| tl_l12 | anong oras po ang bus? | a·NONG O·ras PO ANG BAS |
+| tl_l12 | sakay na! | sa·KAY NA |
+| tl_l12 | Isang tiket po. | i·SANG TI·ket PO |
+| tl_l12 | Anong oras po ang barko? | a·NONG O·ras PO ANG bar·KO |
+| tl_l12 | Papunta po ba ito sa airport? | pa·pun·TA PO BA i·TO SA ER·port |
+| tl_l12 | Ingat sa biyahe! | I·ngat SA bi·YA·he |
+| tl_l13 | damit | da·MIT |
+| tl_l13 | sapatos | sa·PA·tos |
+| tl_l13 | kulay | KU·lay |
+| tl_l13 | pula | pu·LA |
+| tl_l13 | puti | pu·TI |
+| tl_l13 | itim | i·TIM |
+| tl_l13 | maliit | ma·li·IT |
+| tl_l13 | malaki | ma·la·KI |
+| tl_l13 | tawad | TA·wad |
+| tl_l13 | maganda | ma·gan·DA |
+| tl_l13 | ang ganda! | ANG gan·DA |
+| tl_l13 | may tawad po ba? | MAY TA·wad PO BA |
+| tl_l13 | May malaki po ba? | MAY ma·la·KI PO BA |
+| tl_l13 | Gusto ko po ito. | gus·TO KO PO i·TO |
+| tl_l13 | May tawad po ba? | MAY TA·wad PO BA |
+| tl_l13 | Ang ganda! | ANG gan·DA |
+| tl_l14 | kaibigan | ka·i·BI·gan |
+| tl_l14 | pamilya | pa·MIL·ya |
+| tl_l14 | nanay | NA·nay |
+| tl_l14 | tatay | TA·tay |
+| tl_l14 | kapatid | ka·pa·TID |
+| tl_l14 | asawa | a·SA·wa |
+| tl_l14 | anak | a·NAK |
+| tl_l14 | trabaho | tra·BA·ho |
+| tl_l14 | bakasyon | ba·kas·YON |
+| tl_l14 | masaya | ma·sa·YA |
+| tl_l14 | ano ang trabaho mo? | a·NO ANG tra·BA·ho MO |
+| tl_l14 | bakasyon lang po | ba·kas·YON LANG PO |
+| tl_l14 | Masaya ako dito. | ma·sa·YA a·KO DI·to |
+| tl_l14 | May kapatid ka ba? | MAY ka·pa·TID KA BA |
+| tl_l14 | Ano ang trabaho mo? | a·NO ANG tra·BA·ho MO |
+| tl_l14 | Bakasyon lang po. | ba·kas·YON LANG PO |

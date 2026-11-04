@@ -1,0 +1,232 @@
+{
+  "id": "l14",
+  "contentVersion": 1,
+  "title": "Les vêtements",
+  "description": "Essaie, demande une autre couleur ou une autre taille, et achète au marché.",
+  "tagline": "Essayer, acheter",
+  "emoji": "👕",
+  "dialogueId": "d14",
+  "vocab": [
+    {
+      "id": "v_ao",
+      "vi": "áo",
+      "fr": "haut, chemise",
+      "dialect": "south"
+    },
+    {
+      "id": "v_quan",
+      "vi": "quần",
+      "fr": "pantalon",
+      "dialect": "south"
+    },
+    {
+      "id": "v_giay",
+      "vi": "giày",
+      "fr": "chaussures",
+      "dialect": "south"
+    },
+    {
+      "id": "v_non",
+      "vi": "nón",
+      "fr": "chapeau",
+      "dialect": "south",
+      "note": "Mot du Sud (le Nord dit « mũ »). Le « nón lá » est le chapeau conique."
+    },
+    {
+      "id": "v_dep",
+      "vi": "đẹp",
+      "fr": "beau, belle",
+      "dialect": "south"
+    },
+    {
+      "id": "v_rong",
+      "vi": "rộng",
+      "fr": "large",
+      "dialect": "south"
+    },
+    {
+      "id": "v_chat",
+      "vi": "chật",
+      "fr": "serré, étroit",
+      "dialect": "south"
+    },
+    {
+      "id": "v_mau",
+      "vi": "màu",
+      "fr": "couleur",
+      "dialect": "south"
+    },
+    {
+      "id": "v_do_mau",
+      "vi": "đỏ",
+      "fr": "rouge",
+      "dialect": "south"
+    },
+    {
+      "id": "v_trang",
+      "vi": "trắng",
+      "fr": "blanc",
+      "dialect": "south"
+    },
+    {
+      "id": "v_thu",
+      "vi": "thử",
+      "fr": "essayer",
+      "dialect": "south"
+    },
+    {
+      "id": "v_lon",
+      "vi": "lớn",
+      "fr": "grand",
+      "dialect": "south"
+    },
+    {
+      "id": "v_nho",
+      "vi": "nhỏ",
+      "fr": "petit",
+      "dialect": "south"
+    },
+    {
+      "id": "v_cai",
+      "vi": "cái",
+      "fr": "celui-ci (pour un objet)",
+      "dialect": "south",
+      "note": "Mot qui accompagne les objets : « cái này », celui-ci."
+    },
+    {
+      "id": "v_hon",
+      "vi": "hơn",
+      "fr": "plus",
+      "dialect": "south",
+      "note": "Se place après le mot : « lớn hơn », plus grand."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "l14_e01",
+      "type": "listen_choose",
+      "vocabId": "v_ao",
+      "choices": [
+        "v_ao",
+        "v_giay",
+        "v_dep",
+        "v_chat"
+      ]
+    },
+    {
+      "id": "l14_e02",
+      "type": "listen_choose",
+      "vocabId": "v_giay",
+      "choices": [
+        "v_giay",
+        "v_dep",
+        "v_chat",
+        "v_do_mau"
+      ]
+    },
+    {
+      "id": "l14_e03",
+      "type": "listen_choose",
+      "vocabId": "v_trang",
+      "choices": [
+        "v_trang",
+        "v_lon",
+        "v_cai",
+        "v_ao"
+      ]
+    },
+    {
+      "id": "l14_e04",
+      "type": "tone_pick",
+      "syllable": "đỏ",
+      "answerTone": "hoi"
+    },
+    {
+      "id": "l14_e05",
+      "type": "tone_pick",
+      "syllable": "quần",
+      "answerTone": "huyen"
+    },
+    {
+      "id": "l14_e06",
+      "type": "translate_choose",
+      "promptFr": "Ce haut est très beau !",
+      "answerVi": "Áo này đẹp quá!",
+      "distractorsVi": [
+        "Áo này chật quá!",
+        "Áo này rộng quá!",
+        "Áo này mắc quá!"
+      ]
+    },
+    {
+      "id": "l14_e07",
+      "type": "translate_choose",
+      "promptFr": "Il y en a en rouge ?",
+      "answerVi": "Có màu đỏ không?",
+      "distractorsVi": [
+        "Có màu trắng không?",
+        "Có áo không?",
+        "Có giày không?"
+      ]
+    },
+    {
+      "id": "l14_e08",
+      "type": "word_order",
+      "fr": "Ce haut est trop serré.",
+      "tokensVi": [
+        "Áo",
+        "này",
+        "chật",
+        "quá"
+      ],
+      "extraTokens": [
+        "rộng"
+      ]
+    },
+    {
+      "id": "l14_e09",
+      "type": "word_order",
+      "fr": "Il y en a un plus grand ?",
+      "tokensVi": [
+        "Có",
+        "cái",
+        "lớn",
+        "hơn",
+        "không"
+      ],
+      "extraTokens": [
+        "nhỏ"
+      ]
+    },
+    {
+      "id": "l14_e10",
+      "type": "speak",
+      "vi": "Cho em thử áo này.",
+      "fr": "Je peux essayer ce haut ?",
+      "vocabIds": [
+        "v_thu",
+        "v_ao",
+        "v_nay"
+      ]
+    },
+    {
+      "id": "l14_e11",
+      "type": "speak",
+      "vi": "Có màu đỏ không?",
+      "fr": "Il y en a en rouge ?",
+      "vocabIds": [
+        "v_mau",
+        "v_do_mau"
+      ]
+    },
+    {
+      "id": "l14_e12",
+      "type": "speak",
+      "vi": "Áo này đẹp quá!",
+      "fr": "Ce haut est très beau !",
+      "vocabIds": [
+        "v_dep"
+      ]
+    }
+  ]
+}

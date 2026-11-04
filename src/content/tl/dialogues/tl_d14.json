@@ -1,0 +1,120 @@
+{
+  "id": "tl_d14",
+  "contentVersion": 1,
+  "title": "Une rencontre",
+  "scene": "Sur la plage, quelqu'un de ton âge vient te parler",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Kumusta! Ano ang pangalan mo?",
+      "fr": "Salut ! Comment tu t'appelles ?",
+      "next": "t2",
+      "pron": "ku·mus·TA a·NO ANG pa·NGA·lan MO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Ako si Marc.",
+          "fr": "Je m'appelle Marc.",
+          "next": "t3",
+          "pron": "a·KO SI MARK"
+        },
+        {
+          "id": "o2",
+          "vi": "Marc ang pangalan ko.",
+          "fr": "Mon nom est Marc.",
+          "next": "t3",
+          "pron": "MARK ANG pa·NGA·lan KO"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Bakasyon ka ba dito?",
+      "fr": "Tu es en vacances ici ?",
+      "next": "t4",
+      "pron": "ba·kas·YON KA BA DI·to"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Oo, bakasyon lang.",
+          "fr": "Oui, juste en vacances.",
+          "next": "t5",
+          "pron": "O·o ba·kas·YON LANG"
+        },
+        {
+          "id": "o2",
+          "vi": "Oo, masaya ako dito.",
+          "fr": "Oui, je suis content·e ici.",
+          "next": "t5",
+          "pron": "O·o ma·sa·YA a·KO DI·to"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "May pamilya ka ba dito?",
+      "fr": "Tu as de la famille ici ?",
+      "next": "t6",
+      "pron": "MAY pa·MIL·ya KA BA DI·to"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Wala, kaibigan lang.",
+          "fr": "Non, seulement des amis.",
+          "next": "t7",
+          "pron": "wa·LA ka·i·BI·gan LANG"
+        },
+        {
+          "id": "o2",
+          "vi": "Oo, may kapatid ako.",
+          "fr": "Oui, j'ai un frère ou une sœur.",
+          "next": "t7",
+          "pron": "O·o MAY ka·pa·TID a·KO"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Kain tayo! Tara!",
+      "fr": "On mange ensemble ! Allez !",
+      "next": "t8",
+      "pron": "KA·in TA·yo ta·RA"
+    },
+    {
+      "id": "t8",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Sige, tara!",
+          "fr": "D'accord, allons-y !",
+          "next": null,
+          "pron": "SI·ge ta·RA"
+        },
+        {
+          "id": "o2",
+          "vi": "Salamat, kaibigan!",
+          "fr": "Merci, mon ami !",
+          "next": null,
+          "pron": "sa·LA·mat ka·i·BI·gan"
+        }
+      ]
+    }
+  ]
+}

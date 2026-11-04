@@ -1,0 +1,236 @@
+{
+  "id": "tl_l10",
+  "contentVersion": 1,
+  "title": "À la pharmacie",
+  "description": "Dis où tu as mal, demande un médicament, et appelle à l'aide si besoin.",
+  "tagline": "Se soigner",
+  "emoji": "🩹",
+  "dialogueId": "tl_d10",
+  "vocab": [
+    {
+      "id": "tl_v_masakit",
+      "vi": "masakit",
+      "fr": "qui fait mal",
+      "dialect": "manila",
+      "pron": "ma·sa·KIT",
+      "note": "« Masakit po ang ulo ko. » Mot à mot : « douloureuse, ma tête »."
+    },
+    {
+      "id": "tl_v_ulo",
+      "vi": "ulo",
+      "fr": "tête",
+      "dialect": "manila",
+      "pron": "U·lo"
+    },
+    {
+      "id": "tl_v_tiyan",
+      "vi": "tiyan",
+      "fr": "ventre",
+      "dialect": "manila",
+      "pron": "ti·YAN"
+    },
+    {
+      "id": "tl_v_gamot",
+      "vi": "gamot",
+      "fr": "médicament",
+      "dialect": "manila",
+      "pron": "ga·MOT"
+    },
+    {
+      "id": "tl_v_botika",
+      "vi": "botika",
+      "fr": "pharmacie",
+      "dialect": "manila",
+      "pron": "bo·TI·ka"
+    },
+    {
+      "id": "tl_v_doktor",
+      "vi": "doktor",
+      "fr": "médecin",
+      "dialect": "manila",
+      "pron": "dok·TOR"
+    },
+    {
+      "id": "tl_v_lagnat",
+      "vi": "lagnat",
+      "fr": "fièvre",
+      "dialect": "manila",
+      "pron": "lag·NAT"
+    },
+    {
+      "id": "tl_v_ubo",
+      "vi": "ubo",
+      "fr": "toux",
+      "dialect": "manila",
+      "pron": "u·BO"
+    },
+    {
+      "id": "tl_v_pagod",
+      "vi": "pagod",
+      "fr": "fatigué·e",
+      "dialect": "manila",
+      "pron": "pa·GOD"
+    },
+    {
+      "id": "tl_v_tulong",
+      "vi": "tulong",
+      "fr": "à l'aide, aide",
+      "dialect": "manila",
+      "pron": "TU·long"
+    },
+    {
+      "id": "tl_v_ospital",
+      "vi": "ospital",
+      "fr": "hôpital",
+      "dialect": "manila",
+      "pron": "os·pi·TAL"
+    },
+    {
+      "id": "tl_v_kailangan_ko_po",
+      "vi": "kailangan ko po",
+      "fr": "il me faut",
+      "dialect": "manila",
+      "pron": "ka·i·LA·ngan KO PO",
+      "note": "« Kailangan ko po ng doktor. » Pour dire ce dont tu as besoin."
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l10_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_masakit",
+      "choices": [
+        "tl_v_masakit",
+        "tl_v_tiyan",
+        "tl_v_botika",
+        "tl_v_lagnat"
+      ]
+    },
+    {
+      "id": "tl_l10_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_gamot",
+      "choices": [
+        "tl_v_gamot",
+        "tl_v_doktor",
+        "tl_v_ubo",
+        "tl_v_tulong"
+      ]
+    },
+    {
+      "id": "tl_l10_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_botika",
+      "choices": [
+        "tl_v_botika",
+        "tl_v_lagnat",
+        "tl_v_pagod",
+        "tl_v_ospital"
+      ]
+    },
+    {
+      "id": "tl_l10_e04",
+      "type": "translate_choose",
+      "promptFr": "J'ai mal à la tête.",
+      "answerVi": "Masakit po ang ulo ko.",
+      "distractorsVi": [
+        "Masakit po ang tiyan ko.",
+        "May lagnat po ako.",
+        "Pagod na ako."
+      ]
+    },
+    {
+      "id": "tl_l10_e05",
+      "type": "translate_choose",
+      "promptFr": "J'ai de la fièvre.",
+      "answerVi": "May lagnat po ako.",
+      "distractorsVi": [
+        "May ubo po ako.",
+        "Masakit po ang ulo ko.",
+        "Gutom na ako."
+      ]
+    },
+    {
+      "id": "tl_l10_e06",
+      "type": "translate_choose",
+      "promptFr": "Où est la pharmacie ?",
+      "answerVi": "Nasaan po ang botika?",
+      "distractorsVi": [
+        "Nasaan po ang ospital?",
+        "Malapit po ang botika.",
+        "Nasaan po ang doktor?"
+      ]
+    },
+    {
+      "id": "tl_l10_e07",
+      "type": "word_order",
+      "fr": "J'ai mal au ventre.",
+      "tokensVi": [
+        "Masakit",
+        "po",
+        "ang",
+        "tiyan",
+        "ko"
+      ],
+      "extraTokens": [
+        "ulo"
+      ]
+    },
+    {
+      "id": "tl_l10_e08",
+      "type": "word_order",
+      "fr": "Il me faut un médecin.",
+      "tokensVi": [
+        "Kailangan",
+        "ko",
+        "po",
+        "ng",
+        "doktor"
+      ],
+      "extraTokens": [
+        "gamot"
+      ]
+    },
+    {
+      "id": "tl_l10_e09",
+      "type": "speak",
+      "vi": "Masakit po ang ulo ko.",
+      "fr": "J'ai mal à la tête.",
+      "vocabIds": [
+        "tl_v_masakit",
+        "tl_v_ulo"
+      ],
+      "pron": "ma·sa·KIT PO ANG U·lo KO"
+    },
+    {
+      "id": "tl_l10_e10",
+      "type": "speak",
+      "vi": "May gamot po ba?",
+      "fr": "Vous avez un médicament ?",
+      "vocabIds": [
+        "tl_v_gamot"
+      ],
+      "pron": "MAY ga·MOT PO BA"
+    },
+    {
+      "id": "tl_l10_e11",
+      "type": "speak",
+      "vi": "Tulong po!",
+      "fr": "À l'aide !",
+      "vocabIds": [
+        "tl_v_tulong"
+      ],
+      "pron": "TU·long PO"
+    },
+    {
+      "id": "tl_l10_e12",
+      "type": "speak",
+      "vi": "Pagod na ako.",
+      "fr": "Je suis fatigué·e.",
+      "vocabIds": [
+        "tl_v_pagod"
+      ],
+      "pron": "pa·GOD NA a·KO"
+    }
+  ]
+}

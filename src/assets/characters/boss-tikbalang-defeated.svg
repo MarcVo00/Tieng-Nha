@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>Boss — Le Tikbalang salue après le combat (Đông Hồ simplifié)</title>
+  <!-- Version « vaincu » : un salut, pas une humiliation. Il baisse la tête, les yeux fermés, et te laisse passer. -->
+  <defs>
+    <pattern id="hatch-tikbalang-defeated" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#1F1A17" stroke-width="0.9" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <g id="layer-shadow">
+    <ellipse cx="100" cy="186" rx="60" ry="8" fill="#1F1A17" opacity="0.12"/>
+  </g>
+
+  <g id="layer-aura" fill="none" stroke="#4E7A4A" stroke-width="3" stroke-linecap="round" opacity="0.4">
+    <path d="M14 130 Q30 122 46 130"/>
+    <path d="M156 130 Q172 122 188 130"/>
+  </g>
+
+  <g id="layer-body" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M66 184 L70 122 Q100 108 130 122 L134 184 Z" fill="#B23A2A"/>
+    <path d="M60 184 L66 150 Q100 162 134 150 L140 184 Z" fill="#F4E4C4"/>
+    <path d="M60 184 L66 150 Q100 162 134 150 L140 184 Z" fill="url(#hatch-tikbalang-defeated)" stroke="none"/>
+    <!-- les bras ramenés devant lui -->
+    <path d="M74 122 Q58 134 70 146 L96 148 L96 136 L82 134 Q86 128 86 124 Z" fill="#B23A2A"/>
+    <path d="M126 122 Q142 134 130 146 L104 148 L104 136 L118 134 Q114 128 114 124 Z" fill="#B23A2A"/>
+    <circle cx="100" cy="142" r="9" fill="#1F1A17"/>
+  </g>
+
+  <g id="layer-head" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" transform="translate(0 10) rotate(26 100 110)">
+    <path d="M84 114 Q82 86 94 64 L122 62 Q126 88 118 112 Z" fill="#B23A2A"/>
+    <path d="M98 34 Q74 46 80 68 Q66 84 76 100 Q74 110 86 114 L96 64 Z" fill="#1F1A17"/>
+    <path d="M102 40 L98 18 L116 34 Z" fill="#B23A2A"/>
+    <path d="M92 66 Q90 38 112 34 Q128 32 136 46 L166 74 Q172 84 162 90 Q150 96 136 88 L112 80 Q98 80 92 66 Z" fill="#B23A2A"/>
+    <path d="M148 60 L166 74 Q172 84 162 90 Q150 96 138 88 Z" fill="#F4E4C4"/>
+    <circle cx="158" cy="79" r="2" fill="#1F1A17" stroke="none"/>
+    <path d="M112 56 Q118 61 124 56" fill="none" stroke-width="2.5"/>
+    <g fill="none" stroke="#D9A93A" stroke-width="3.5">
+      <path d="M82 54 L66 46"/>
+      <path d="M76 74 L60 70"/>
+      <path d="M76 92 L60 94"/>
+    </g>
+  </g>
+</svg>

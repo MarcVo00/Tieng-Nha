@@ -8,7 +8,7 @@ import { ContentNotFoundError, OfflineError } from "@/domain/errors";
 import type { BadgeDef, Boss, PublicProfile } from "@/domain/types";
 import { LANGUAGE_IDS, LANGUAGES, languageOfId, type LanguageId } from "@/domain/languages";
 import { livesFromScore } from "@/services/bossFight";
-import { EXAM_PASS, examBestIn } from "@/services/exam";
+import { EXAM_PASS, bossBestIn, examBestIn, topBossId } from "@/services/exam";
 import { shownBadges } from "@/services/badges";
 import { fr } from "@/i18n/fr";
 import { Avatar, fxSpill, BadgeShelf, SectionTitle, Button, Card, EmptyState, Icon, Skeleton, StreakFlame, duration, ease, tap } from "@/ui";
@@ -45,12 +45,13 @@ function bossStat(examBest: number | null, boss: Boss | null, bossFailed: boolea
 function startedLanguages(profile: PublicProfile): LanguageId[] {
   return LANGUAGE_IDS.filter(
     (id) =>
-      LANGUAGES[id].finalBossId !== null &&
+      LANGUAGES[id].bossIds.length > 0 &&
       (id === "vi" || examBestIn(profile, id) !== null || profile.lessonsDone.some((l) => languageOfId(l) === id)),
   );
 }
 
-type BossLoad = Partial<Record<LanguageId, Boss | "failed">>;
+/** Boss sheets by boss id. */
+type BossLoad = Record<string, Boss | "failed">;
 
 export function PublicProfileScreen() {
   const { userId = "" } = useParams();
@@ -62,16 +63,16 @@ export function PublicProfileScreen() {
   const [bosses, setBosses] = useState<BossLoad>({});
   const challenge = useChallenge();
 
-  // Every language's boss sheet, from that language's own content; a failure falls back to a plain label.
+  // Every boss sheet, from its language's own content; a failure falls back to a plain label.
   useEffect(() => {
     let cancelled = false;
     for (const id of LANGUAGE_IDS) {
-      const bossId = LANGUAGES[id].finalBossId;
-      if (bossId === null) continue;
-      services.contents[id].getBoss(bossId).then(
-        (b) => !cancelled && setBosses((m) => ({ ...m, [id]: b })),
-        () => !cancelled && setBosses((m) => ({ ...m, [id]: "failed" })),
-      );
+      for (const bossId of LANGUAGES[id].bossIds) {
+        services.contents[id].getBoss(bossId).then(
+          (b) => !cancelled && setBosses((m) => ({ ...m, [bossId]: b })),
+          () => !cancelled && setBosses((m) => ({ ...m, [bossId]: "failed" })),
+        );
+      }
     }
     return () => {
       cancelled = true;
@@ -203,14 +204,16 @@ export function PublicProfileScreen() {
       </section>
 
       {startedLanguages(profile).map((id, _, shown) => {
-        const loaded = bosses[id];
+        // The highest boss beaten in that language.
+        const top = topBossId(profile, id) ?? "";
+        const loaded = bosses[top];
         return (
           <Card key={id} className="mt-8 p-4">
             <p className="text-caption text-ink-muted">
               {shown.length > 1 ? fr.publicProfile.examTitleIn(LANGUAGES[id].nameFr) : fr.publicProfile.examTitle}
             </p>
             <p className="tabular text-heading text-ink">
-              {bossStat(examBestIn(profile, id), loaded === undefined || loaded === "failed" ? null : loaded, loaded === "failed")}
+              {bossStat(bossBestIn(profile, top), loaded === undefined || loaded === "failed" ? null : loaded, loaded === "failed")}
             </p>
           </Card>
         );

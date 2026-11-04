@@ -112,14 +112,24 @@ export const DialogueSchema = z
 
 export const ExamSectionSchema = z.enum(["listening", "translation", "tones", "speaking"]);
 export const ExamQuestionSchema = z
-  .object({ id: z.string().regex(/^(tl_)?exam_q\d{3}$/), section: ExamSectionSchema, exercise: ExerciseSchema })
+  .object({
+    id: z.string().regex(/^(tl_)?exam_q\d{3}$/),
+    section: ExamSectionSchema,
+    exercise: ExerciseSchema,
+    /** The level whose boss asks this question; 1 when omitted. */
+    level: z.number().int().min(2).optional(),
+  })
   .strict();
 export const ExamPoolSchema = z.object({ contentVersion: z.number().int().min(1), questions: z.array(ExamQuestionSchema) }).strict();
 
 export const TreeNodeSchema = z
   .object({ id: z.string().min(1), kind: z.enum(["lesson", "boss"]), requires: z.array(z.string().min(1)), branch: z.string().min(1) })
   .strict();
-export const TreeFileSchema = z.object({ contentVersion: z.number().int().min(1), nodes: z.array(TreeNodeSchema).min(1) }).strict();
+/** The heading of a level on the path (level 1 has none). */
+export const TreeLevelSchema = z.object({ level: z.number().int().min(2), title: z.string().min(1) }).strict();
+export const TreeFileSchema = z
+  .object({ contentVersion: z.number().int().min(1), nodes: z.array(TreeNodeSchema).min(1), levels: z.array(TreeLevelSchema).optional() })
+  .strict();
 
 export const BossSchema = z
   .object({
@@ -131,6 +141,8 @@ export const BossSchema = z
     hp: z.number().int().min(1).max(50),
     playerLives: z.number().int().min(1).max(10),
     pool: z.literal("exam"),
+    /** The level this boss closes: it asks that level's questions; 1 when omitted. */
+    level: z.number().int().min(2).optional(),
   })
   .strict();
 export const BossesFileSchema = z.object({ contentVersion: z.number().int().min(1), bosses: z.array(BossSchema).min(0) }).strict();

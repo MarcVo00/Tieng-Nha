@@ -75,3 +75,17 @@ test("each language keeps its own boss score: a Tagalog fight (tl_exam) never mo
   expect(both.examBest).toBe(72);
   expect(both.examBests).toEqual({ vi: 72 });
 });
+
+test("a boss above level 1 keeps its own best score: its ref_id is its id", () => {
+  const s = computeProgress(
+    [
+      ev({ type: "exam_finished", refId: "exam", xp: 72, createdAt: "2026-10-10T08:00:00.000Z", payload: { score: 72 } }),
+      ev({ type: "exam_finished", refId: "boss_son_tinh", xp: 85, createdAt: "2026-10-10T08:30:00.000Z", payload: { score: 85 } }),
+      ev({ type: "exam_finished", refId: "tl_boss_tikbalang", xp: 78, createdAt: "2026-10-10T09:00:00.000Z", payload: { score: 78 } }),
+    ],
+    NOW,
+  );
+  expect(s.examBest).toBe(72);
+  expect(s.examBests).toEqual({ vi: 72 });
+  expect(s.bossBests).toEqual({ boss_son_tinh: 85, tl_boss_tikbalang: 78 });
+});

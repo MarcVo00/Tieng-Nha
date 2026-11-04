@@ -1,0 +1,233 @@
+{
+  "id": "tl_l09",
+  "contentVersion": 1,
+  "title": "À l'hôtel",
+  "description": "Demande une chambre, la clé, une serviette, et dis ce qui ne marche pas.",
+  "tagline": "Ta chambre",
+  "emoji": "🛏️",
+  "dialogueId": "tl_d09",
+  "vocab": [
+    {
+      "id": "tl_v_kuwarto",
+      "vi": "kuwarto",
+      "fr": "chambre",
+      "dialect": "manila",
+      "pron": "ku·WAR·to"
+    },
+    {
+      "id": "tl_v_susi",
+      "vi": "susi",
+      "fr": "clé",
+      "dialect": "manila",
+      "pron": "SU·si"
+    },
+    {
+      "id": "tl_v_kama",
+      "vi": "kama",
+      "fr": "lit",
+      "dialect": "manila",
+      "pron": "KA·ma"
+    },
+    {
+      "id": "tl_v_tuwalya",
+      "vi": "tuwalya",
+      "fr": "serviette de bain",
+      "dialect": "manila",
+      "pron": "tu·WAL·ya"
+    },
+    {
+      "id": "tl_v_unan",
+      "vi": "unan",
+      "fr": "oreiller",
+      "dialect": "manila",
+      "pron": "U·nan"
+    },
+    {
+      "id": "tl_v_kumot",
+      "vi": "kumot",
+      "fr": "couverture",
+      "dialect": "manila",
+      "pron": "KU·mot"
+    },
+    {
+      "id": "tl_v_banyo",
+      "vi": "banyo",
+      "fr": "salle de bain",
+      "dialect": "manila",
+      "pron": "BAN·yo"
+    },
+    {
+      "id": "tl_v_sira",
+      "vi": "sira",
+      "fr": "cassé",
+      "dialect": "manila",
+      "pron": "si·RA",
+      "note": "« Sira po ang susi. » Pour tout ce qui ne marche pas."
+    },
+    {
+      "id": "tl_v_malamig",
+      "vi": "malamig",
+      "fr": "froid",
+      "dialect": "manila",
+      "pron": "ma·la·MIG"
+    },
+    {
+      "id": "tl_v_mainit_na_tubig",
+      "vi": "mainit na tubig",
+      "fr": "eau chaude",
+      "dialect": "manila",
+      "pron": "ma·I·nit NA TU·big"
+    },
+    {
+      "id": "tl_v_may_kuwarto",
+      "vi": "may kuwarto po ba?",
+      "fr": "il y a une chambre ?",
+      "dialect": "manila",
+      "pron": "MAY ku·WAR·to PO BA"
+    },
+    {
+      "id": "tl_v_nasaan_susi",
+      "vi": "nasaan po ang susi?",
+      "fr": "où est la clé ?",
+      "dialect": "manila",
+      "pron": "na·sa·AN PO ANG SU·si"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "tl_l09_e01",
+      "type": "listen_choose",
+      "vocabId": "tl_v_kuwarto",
+      "choices": [
+        "tl_v_kuwarto",
+        "tl_v_kama",
+        "tl_v_unan",
+        "tl_v_banyo"
+      ]
+    },
+    {
+      "id": "tl_l09_e02",
+      "type": "listen_choose",
+      "vocabId": "tl_v_tuwalya",
+      "choices": [
+        "tl_v_tuwalya",
+        "tl_v_kumot",
+        "tl_v_sira",
+        "tl_v_mainit_na_tubig"
+      ]
+    },
+    {
+      "id": "tl_l09_e03",
+      "type": "listen_choose",
+      "vocabId": "tl_v_susi",
+      "choices": [
+        "tl_v_susi",
+        "tl_v_tuwalya",
+        "tl_v_kumot",
+        "tl_v_sira"
+      ]
+    },
+    {
+      "id": "tl_l09_e04",
+      "type": "translate_choose",
+      "promptFr": "Il y a une chambre ?",
+      "answerVi": "May kuwarto po ba?",
+      "distractorsVi": [
+        "May tubig po ba?",
+        "Nasaan po ang kuwarto?",
+        "Magkano po ang kuwarto?"
+      ]
+    },
+    {
+      "id": "tl_l09_e05",
+      "type": "translate_choose",
+      "promptFr": "La clé, s'il vous plaît.",
+      "answerVi": "Pahingi po ng susi.",
+      "distractorsVi": [
+        "Pahingi po ng tuwalya.",
+        "Pahingi po ng unan.",
+        "Nasaan po ang susi?"
+      ]
+    },
+    {
+      "id": "tl_l09_e06",
+      "type": "translate_choose",
+      "promptFr": "La salle de bain est cassée.",
+      "answerVi": "Sira po ang banyo.",
+      "distractorsVi": [
+        "Malapit po ang banyo.",
+        "Nasaan po ang banyo?",
+        "Sira po ang susi."
+      ]
+    },
+    {
+      "id": "tl_l09_e07",
+      "type": "word_order",
+      "fr": "Une serviette, s'il vous plaît.",
+      "tokensVi": [
+        "Pahingi",
+        "po",
+        "ng",
+        "tuwalya"
+      ],
+      "extraTokens": [
+        "unan"
+      ]
+    },
+    {
+      "id": "tl_l09_e08",
+      "type": "word_order",
+      "fr": "La chambre est froide.",
+      "tokensVi": [
+        "Malamig",
+        "po",
+        "ang",
+        "kuwarto"
+      ],
+      "extraTokens": [
+        "mainit"
+      ]
+    },
+    {
+      "id": "tl_l09_e09",
+      "type": "speak",
+      "vi": "May kuwarto po ba?",
+      "fr": "Il y a une chambre ?",
+      "vocabIds": [
+        "tl_v_may_kuwarto"
+      ],
+      "pron": "MAY ku·WAR·to PO BA"
+    },
+    {
+      "id": "tl_l09_e10",
+      "type": "speak",
+      "vi": "Pahingi po ng tuwalya.",
+      "fr": "Une serviette, s'il vous plaît.",
+      "vocabIds": [
+        "tl_v_tuwalya"
+      ],
+      "pron": "pa·hi·NGI PO NANG tu·WAL·ya"
+    },
+    {
+      "id": "tl_l09_e11",
+      "type": "speak",
+      "vi": "Sira po ang susi.",
+      "fr": "La clé est cassée.",
+      "vocabIds": [
+        "tl_v_sira",
+        "tl_v_susi"
+      ],
+      "pron": "si·RA PO ANG SU·si"
+    },
+    {
+      "id": "tl_l09_e12",
+      "type": "speak",
+      "vi": "Walang mainit na tubig.",
+      "fr": "Il n'y a pas d'eau chaude.",
+      "vocabIds": [
+        "tl_v_mainit_na_tubig"
+      ],
+      "pron": "wa·LANG ma·I·nit NA TU·big"
+    }
+  ]
+}

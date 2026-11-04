@@ -3,7 +3,12 @@ import { fr } from "@/i18n/fr";
 import type { ExamMention } from "@/services/exam";
 
 /** Router state handed from the intro to the run screen. */
-export type RunState = { attemptId: string; remainingToday: number };
+export type RunState = {
+  attemptId: string;
+  remainingToday: number;
+  /** The boss fought; missing in a state saved before 2.3: the language's level 1 boss. */
+  bossId?: string;
+};
 
 /** What the result screen needs per question (plain data: it must survive the history state clone). */
 export type QuestionOutcome = { score: number; correct: boolean; skipped: boolean; expected: string };

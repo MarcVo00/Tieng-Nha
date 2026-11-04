@@ -1,0 +1,100 @@
+{
+  "id": "tl_d13",
+  "contentVersion": 1,
+  "title": "Au marché",
+  "scene": "Un étal de vêtements dans un marché de Manille",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "npc",
+      "vi": "Ano po ang gusto ninyo?",
+      "fr": "Qu'est-ce que vous voulez ?",
+      "next": "t2",
+      "pron": "a·NO PO ANG gus·TO nin·YO"
+    },
+    {
+      "id": "t2",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Magkano po ang sapatos?",
+          "fr": "Combien coûtent les chaussures ?",
+          "next": "t3",
+          "pron": "mag·KA·no PO ANG sa·PA·tos"
+        },
+        {
+          "id": "o2",
+          "vi": "Magkano po ang damit?",
+          "fr": "Combien coûte le vêtement ?",
+          "next": "t3",
+          "pron": "mag·KA·no PO ANG da·MIT"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "speaker": "npc",
+      "vi": "Dosyentos pesos po.",
+      "fr": "Deux cents pesos.",
+      "next": "t4",
+      "pron": "dos·YEN·tos PE·sos PO"
+    },
+    {
+      "id": "t4",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Ang mahal! May tawad po ba?",
+          "fr": "C'est cher ! Vous faites une réduction ?",
+          "next": "t5",
+          "pron": "ANG ma·HAL MAY TA·wad PO BA"
+        },
+        {
+          "id": "o2",
+          "vi": "May pula po ba?",
+          "fr": "Il y en a un rouge ?",
+          "next": "t5",
+          "pron": "MAY pu·LA PO BA"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "speaker": "npc",
+      "vi": "Opo. Ito po, maganda!",
+      "fr": "Oui. Celui-ci, il est beau !",
+      "next": "t6",
+      "pron": "O·po i·TO PO ma·gan·DA"
+    },
+    {
+      "id": "t6",
+      "speaker": "user",
+      "options": [
+        {
+          "id": "o1",
+          "vi": "Sige po. Gusto ko po ito.",
+          "fr": "D'accord. Je voudrais ça.",
+          "next": "t7",
+          "pron": "SI·ge PO gus·TO KO PO i·TO"
+        },
+        {
+          "id": "o2",
+          "vi": "Ang ganda! Bayad po.",
+          "fr": "Que c'est beau ! Voilà.",
+          "next": "t7",
+          "pron": "ANG gan·DA BA·yad PO"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "speaker": "npc",
+      "vi": "Salamat po!",
+      "fr": "Merci !",
+      "next": null,
+      "pron": "sa·LA·mat PO"
+    }
+  ]
+}

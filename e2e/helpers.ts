@@ -342,3 +342,28 @@ export async function playRun(page: Page): Promise<void> {
   }
   throw new Error("The duel run never reached the result screen");
 }
+
+/** Writes a won `exam_finished` event straight into the local event log (`refId`: `exam`, `tl_exam` or a boss id above level 1). Call after onboarding, then reload. */
+export async function seedBossWon(page: Page, refId: string, score = 92): Promise<void> {
+  await page.evaluate(
+    async ({ refId, score }) => {
+      const db: IDBDatabase = await new Promise((res, rej) => {
+        const r = indexedDB.open("tieng-nha");
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      const tx = db.transaction("events", "readwrite");
+      tx.objectStore("events").put({
+        clientId: crypto.randomUUID(),
+        schemaVersion: 1,
+        type: "exam_finished",
+        refId,
+        xp: score,
+        payload: { score, attemptId: crypto.randomUUID(), noSpeaking: false },
+        createdAt: new Date().toISOString(),
+      });
+      await new Promise((res) => { tx.oncomplete = res; });
+    },
+    { refId, score },
+  );
+}

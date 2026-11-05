@@ -1,5 +1,5 @@
 import { InMemoryProgressRepository, InMemoryOutbox, FakeEventSink, FakeAuthService, FakeExamGateway } from "@/adapters/fakes";
-import { ExamLimitError, InvalidInviteError } from "@/domain/errors";
+import { ExamLimitError, InvalidInviteError, TooManyInviteAttemptsError } from "@/domain/errors";
 
 const now = "2026-10-10T08:00:00.000Z";
 
@@ -105,4 +105,12 @@ test("due vocab can be limited to one language", async () => {
   expect(await repo.countDueVocab(now)).toBe(2);
   expect((await repo.listDueVocab(now, 10, "tl")).map((p) => p.vocabId)).toEqual(["tl_v_salamat"]);
   expect((await repo.listDueVocab(now, 10, "vi")).map((p) => p.vocabId)).toEqual(["v_chao"]);
+});
+
+test("the fake stops an account after five wrong invite codes, like join_group", async () => {
+  const auth = new FakeAuthService();
+  await auth.requestOtp("a@b.c");
+  await auth.verifyOtp("a@b.c", "123456");
+  for (let i = 0; i < 5; i += 1) await expect(auth.joinGroup("WRONG", "Marc", "🐉")).rejects.toBeInstanceOf(InvalidInviteError);
+  await expect(auth.joinGroup("TEST-CODE", "Marc", "🐉")).rejects.toBeInstanceOf(TooManyInviteAttemptsError);
 });

@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { ServicesProvider } from "@/app/ServicesProvider";
 import { createFakeServices, FakeAuthService } from "@/adapters/fakes";
-import { InvalidCredentialsError, OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
+import { InvalidCredentialsError, OfflineError, SamePasswordError, TooManyInviteAttemptsError, WeakPasswordError } from "@/domain/errors";
 import { useAppState } from "@/app/appState";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { AuthCallbackScreen, WelcomeScreen } from "@/features/onboarding";
@@ -124,6 +124,18 @@ test("a pseudo that is too short is refused before calling the server", async ()
   await user.type(screen.getByLabelText("Pseudo"), "M");
   await user.click(screen.getByRole("button", { name: "Rejoindre le groupe" }));
   expect(await screen.findByText("Ton pseudo doit faire entre 2 et 20 caractères")).toBeInTheDocument();
+});
+
+test("too many wrong invite codes says to wait", async () => {
+  const auth = new FakeAuthService();
+  auth.joinGroup = async () => {
+    throw new TooManyInviteAttemptsError();
+  };
+  const { user } = setup({ auth });
+  await signIn(user, "NOPE");
+  await user.type(screen.getByLabelText("Pseudo"), "Marc");
+  await user.click(screen.getByRole("button", { name: "Rejoindre le groupe" }));
+  expect(await screen.findByText("Trop d'essais. Réessaie dans une heure.")).toBeInTheDocument();
 });
 
 test("an invalid invite sends the user back to step 2 with the message", async () => {

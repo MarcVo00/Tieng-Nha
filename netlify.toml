@@ -10,6 +10,14 @@
   VITE_DEMO = "true"
   VITE_FAKE_SPEECH = "false"
 [[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://vofuvzixswyprqzbjnru.supabase.co wss://vofuvzixswyprqzbjnru.supabase.co; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "microphone=(self), camera=(), geolocation=()"
+[[headers]]
   for = "/sw.js"
   [headers.values]
     Cache-Control = "no-cache"

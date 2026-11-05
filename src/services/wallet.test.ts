@@ -417,3 +417,21 @@ test("each boss pays its own first win (mirrors supabase/tests/12_levels_test.sq
   expect(coinsOf([exam(85, 8), boss("boss_son_tinh", 85, 9)])).toBe(2 * COINS.firstBossWin);
   expect(coinsOf([exam(85, 8), boss("boss_son_tinh", 85, 9), boss("boss_son_tinh", 92, 10)])).toBe(2 * COINS.firstBossWin + COINS.bossWin);
 });
+
+describe("daily xu cap (mirrors supabase/tests/13_security_hardening_test.sql)", () => {
+  const lessons = (n: number, day: number) => Array.from({ length: n }, (_, i) => ev("lesson_completed", { perfect: true }, "l01", day, 8 + (i % 12)));
+
+  test("lessons stop paying at the cap, and the last one pays what is left", () => {
+    expect(coinsOf(lessons(13, 10))).toBe(195);
+    expect(coinsOf(lessons(14, 10))).toBe(COINS.dailyActivityCap);
+    expect(coinsOf(lessons(15, 10))).toBe(COINS.dailyActivityCap);
+  });
+
+  test("a new day opens a new allowance", () => {
+    expect(coinsOf([...lessons(15, 10), ...lessons(1, 11)])).toBe(COINS.dailyActivityCap + 15);
+  });
+
+  test("a boss win and the daily bonus stay outside the cap", () => {
+    expect(coinsOf([...lessons(15, 10), exam(85, 21)])).toBe(COINS.dailyActivityCap + COINS.firstBossWin);
+  });
+});

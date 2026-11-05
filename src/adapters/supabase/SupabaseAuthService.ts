@@ -1,7 +1,7 @@
 import type { Session as SbSession } from "@supabase/supabase-js";
 import type { Db } from "@/adapters/supabase/client";
 import { mapError } from "@/adapters/supabase/errors";
-import { InvalidCredentialsError, NotAuthenticatedError, OfflineError } from "@/domain/errors";
+import { InvalidCredentialsError, InvalidInviteError, NotAuthenticatedError, OfflineError, TooManyInviteAttemptsError } from "@/domain/errors";
 import type { Session } from "@/domain/types";
 import type { AuthEvent, AuthService } from "@/ports";
 import { clearCachedSession, readCachedSession, writeCachedSession } from "@/domain/sessionCache";
@@ -103,8 +103,10 @@ export class SupabaseAuthService implements AuthService {
   }
 
   async joinGroup(inviteCode: string, pseudo: string, avatarEmoji: string): Promise<void> {
-    const { error } = await this.db.rpc("join_group", { p_invite_code: inviteCode, p_pseudo: pseudo, p_avatar: avatarEmoji });
+    const { data, error } = await this.db.rpc("join_group", { p_invite_code: inviteCode, p_pseudo: pseudo, p_avatar: avatarEmoji });
     if (error) throw mapError(error);
+    if (data === "invalid_invite") throw new InvalidInviteError();
+    if (data === "too_many_attempts") throw new TooManyInviteAttemptsError();
   }
 
   async getMyProfile(): Promise<{ pseudo: string; avatarEmoji: string } | null> {

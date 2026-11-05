@@ -3,7 +3,7 @@ import { gachaRefund, isGachaItem } from "@/services/gacha";
 import { STREAK_EVENT_TYPES } from "@/services/progress";
 import { daysBetween, parisDay } from "@/services/time";
 
-export const COINS = { lesson: 10, perfectBonus: 5, dialogue: 5, review: 3, badge: 10, firstBossWin: 50, bossWin: 20, bossPass: 70 } as const;
+export const COINS = { lesson: 10, perfectBonus: 5, dialogue: 5, review: 3, badge: 10, firstBossWin: 50, bossWin: 20, bossPass: 70, dailyActivityCap: 200 } as const;
 
 const DEFAULT_MAX_FREEZES = 2;
 
@@ -111,6 +111,9 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
   const pulls = new Set<string>();
   // best score per boss, like the server (exam_best, exam_bests): the ref_id names the boss (`exam`, `tl_exam`, a boss id)
   const best: Record<string, number> = {};
+  // xu from lessons, dialogues and reviews on the Paris day being counted, like the server (coins_day, coins_today)
+  let activityDay = "";
+  let activityCoins = 0;
 
   for (const e of sorted) {
     if (e.type === "item_purchased") {
@@ -170,8 +173,17 @@ export function walletAt(events: readonly AppEvent[], shop: readonly ShopItem[],
         if (reward !== null && !w.inventory.includes(reward)) w.inventory.push(reward);
       }
       unlocked.add(e.refId);
+    } else if (e.type === "exam_finished") {
+      w.coins += coinsForEvent(e, best[e.refId] ?? null);
     } else {
-      w.coins += coinsForEvent(e, e.type === "exam_finished" ? (best[e.refId] ?? null) : null);
+      const day = parisDay(e.createdAt);
+      if (day > activityDay) {
+        activityDay = day;
+        activityCoins = 0;
+      }
+      const paid = Math.min(coinsForEvent(e, null), Math.max(0, COINS.dailyActivityCap - activityCoins));
+      w.coins += paid;
+      activityCoins += paid;
     }
     if (e.type === "exam_finished") best[e.refId] = Math.max(best[e.refId] ?? 0, normalisedScore(e.payload["score"]));
     if (STREAK_EVENT_TYPES.includes(e.type)) {

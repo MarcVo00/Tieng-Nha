@@ -372,6 +372,8 @@ export type Database = {
         Row: {
           badges: string[]
           coins: number
+          coins_day: string
+          coins_today: number
           dialogues_done: string[]
           equipped: Json
           exam_best: number | null
@@ -395,6 +397,8 @@ export type Database = {
         Insert: {
           badges?: string[]
           coins?: number
+          coins_day?: string
+          coins_today?: number
           dialogues_done?: string[]
           equipped?: Json
           exam_best?: number | null
@@ -418,6 +422,8 @@ export type Database = {
         Update: {
           badges?: string[]
           coins?: number
+          coins_day?: string
+          coins_today?: number
           dialogues_done?: string[]
           equipped?: Json
           exam_best?: number | null
@@ -522,7 +528,7 @@ export type Database = {
           p_pseudo: string
           p_avatar: string
         }
-        Returns: undefined
+        Returns: string
       }
       list_duels: {
         Args: Record<PropertyKey, never>

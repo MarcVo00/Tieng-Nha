@@ -30,7 +30,7 @@ end $$;
 -- join_group
 select pg_temp.login('11111111-1111-1111-1111-111111111111');
 select lives_ok($$ select public.join_group('FAM', 'Alice', '🐉') $$, 'alice joins FAM');
-select throws_ok($$ select public.join_group('NOPE', 'Alice', '🐉') $$, 'P0001', 'invalid_invite', 'bad invite rejected');
+select is(public.join_group('NOPE', 'Alice', '🐉'), 'invalid_invite', 'bad invite rejected');
 select lives_ok($$ select public.join_group('  fam ', 'Alice', '🐉') $$, 'lowercase code with spaces still joins');
 
 -- events → stats, idempotence

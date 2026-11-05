@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { AVATARS } from "@/domain/avatars";
-import { InvalidInviteError, InvalidProfileError, OfflineError, PseudoTakenError } from "@/domain/errors";
+import { InvalidInviteError, InvalidProfileError, OfflineError, PseudoTakenError, TooManyInviteAttemptsError } from "@/domain/errors";
 import { useServices } from "@/app/ServicesProvider";
 import { fr } from "@/i18n/fr";
 import { Avatar, Button, tap } from "@/ui";
@@ -47,6 +47,7 @@ export function ProfileStep({ inviteCode, askInvite = false, onInviteChange, onI
         if (askInvite) setInviteError(fr.onboarding.invite.inviteInvalid);
         else onInvalidInvite();
       }
+      else if (e instanceof TooManyInviteAttemptsError) setError(fr.onboarding.invite.inviteTooMany);
       else if (e instanceof PseudoTakenError) setError(t.pseudoTaken);
       else if (e instanceof InvalidProfileError) setError(t.pseudoInvalid);
       else if (e instanceof OfflineError) setError(fr.onboarding.invite.offline);

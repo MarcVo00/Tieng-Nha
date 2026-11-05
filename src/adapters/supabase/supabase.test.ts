@@ -3,7 +3,7 @@ import { SupabaseAuthService } from "@/adapters/supabase/SupabaseAuthService";
 import { mapError } from "@/adapters/supabase/errors";
 import { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
 import { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
-import { ExamLimitError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
+import { ExamLimitError, TooManyInviteAttemptsError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
 import type { AppEvent } from "@/domain/types";
 import type { ExamGateway } from "@/ports";
 
@@ -261,5 +261,15 @@ describe("getPublicProfile look mapping", () => {
 
   test("malformed equipped reads as the default hero", async () => {
     for (const bad of [null, [], "hat_thuy_tinh", 7]) expect(await lookFor(bad)).toEqual({});
+  });
+});
+
+describe("SupabaseAuthService.joinGroup", () => {
+  const svc = (data: unknown) => new SupabaseAuthService({ auth: { onAuthStateChange: vi.fn() }, rpc: vi.fn().mockResolvedValue({ data, error: null }) } as never);
+
+  test("reads the status join_group returns", async () => {
+    await expect(svc("joined").joinGroup("C", "Marc", "🐉")).resolves.toBeUndefined();
+    await expect(svc("invalid_invite").joinGroup("C", "Marc", "🐉")).rejects.toBeInstanceOf(InvalidInviteError);
+    await expect(svc("too_many_attempts").joinGroup("C", "Marc", "🐉")).rejects.toBeInstanceOf(TooManyInviteAttemptsError);
   });
 });

@@ -2,6 +2,16 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "2.3.1",
+      "date": "2026-11-05",
+      "title": "Plus de sécurité",
+      "items": [
+        "Le site est mieux protégé dans ton navigateur.",
+        "Les leçons, dialogues et révisions rapportent au plus 200 xu par jour.",
+        "Après 5 codes d'invitation faux, attends une heure avant de réessayer."
+      ]
+    },
+    {
       "version": "2.3.0",
       "date": "2026-11-04",
       "title": "Deux nouveaux niveaux",

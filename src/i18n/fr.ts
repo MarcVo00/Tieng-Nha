@@ -228,6 +228,7 @@ export const fr = {
       emailInvalid: "Cette adresse e-mail n'a pas l'air complète",
       inviteEmpty: "Il manque ton code d'invitation",
       inviteInvalid: "Code d'invitation incorrect",
+      inviteTooMany: "Trop d'essais. Réessaie dans une heure.",
       codeTitle: "Regarde ta boîte mail",
       codeLead: (email: string) => `Un code à 6 chiffres vient d'être envoyé à ${email}.`,
       codeLabel: "Code à 6 chiffres",

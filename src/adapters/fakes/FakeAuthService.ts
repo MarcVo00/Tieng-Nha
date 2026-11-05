@@ -1,4 +1,4 @@
-import { InvalidCredentialsError, InvalidInviteError, SamePasswordError, WeakPasswordError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
+import { InvalidCredentialsError, InvalidInviteError, TooManyInviteAttemptsError, SamePasswordError, WeakPasswordError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
 import type { Session } from "@/domain/types";
 import type { AuthEvent, AuthService } from "@/ports";
 
@@ -29,6 +29,7 @@ export class FakeAuthService implements AuthService {
   private profile: Profile | null = null;
   private passwords: Record<string, string> = {};
   private knownEmails = new Set<string>();
+  private wrongInvites = 0;
   private listeners = new Set<(s: Session | null, event?: AuthEvent) => void>();
 
   private readonly persist: boolean;
@@ -126,7 +127,11 @@ export class FakeAuthService implements AuthService {
 
   async joinGroup(inviteCode: string, pseudo: string, avatarEmoji: string): Promise<void> {
     this.requireSession();
-    if (this.anyInvite ? !inviteCode.trim() : inviteCode !== "TEST-CODE") throw new InvalidInviteError();
+    if (this.wrongInvites >= 5) throw new TooManyInviteAttemptsError();
+    if (this.anyInvite ? !inviteCode.trim() : inviteCode !== "TEST-CODE") {
+      this.wrongInvites += 1;
+      throw new InvalidInviteError();
+    }
     if (pseudo === "Taken") throw new PseudoTakenError();
     this.profile = { pseudo, avatarEmoji };
     this.save();

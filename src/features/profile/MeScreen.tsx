@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { DEFAULT_SETTINGS } from "@/ports/ProgressRepository";
 import { THEME_KEY } from "@/domain/storageKeys";
-import { OfflineError } from "@/domain/errors";
+import { OfflineError, WrongPasswordError } from "@/domain/errors";
 import { clearCachedProfile, useAppState } from "@/app/appState";
 import { useServices } from "@/app/ServicesProvider";
 import { useLanguage } from "@/app/useLanguage";
@@ -16,7 +16,7 @@ import { EXAM_PASS, bossBestIn, topBossId } from "@/services/exam";
 import { shownBadges } from "@/services/badges";
 import { fr } from "@/i18n/fr";
 import {
-  Avatar, fxSpill, BadgeMedal, BadgeShelf, Button, Card, Certificate, ConfirmDialog, DropNumber, Icon, SectionTitle, Sheet, StreakFlame, downloadCertificate, tap, useToast,
+  Avatar, downloadBlob, fxSpill, BadgeMedal, BadgeShelf, Button, Card, Certificate, ConfirmDialog, DropNumber, Icon, SectionTitle, Sheet, StreakFlame, downloadCertificate, tap, useToast,
   type CertificateProps,
 } from "@/ui";
 import { EditProfileSheet } from "@/features/profile/EditProfileSheet";
@@ -127,6 +127,7 @@ export function MeScreen() {
   const [certOpen, setCertOpen] = useState(false);
   const [badge, setBadge] = useState<BadgeDef | null>(null);
   const [confirm, setConfirm] = useState<"signout" | "unsynced" | "delete" | null>(null);
+  const [exporting, setExporting] = useState(false);
   const [pending, setPending] = useState(false);
   const leaving = useRef(false);
 
@@ -201,7 +202,19 @@ export function MeScreen() {
   const unlockedIds = new Set(snapshot?.badges ?? []);
   const sortedBadges = badges ? shownBadges(badges, { lessonsDone: snapshot?.lessonsDone ?? [], badges: snapshot?.badges ?? [] }, language.id).sort((a, b) => Number(unlockedIds.has(b.id)) - Number(unlockedIds.has(a.id))) : [];
 
-  async function leave(kind: "signout" | "delete", skipUnsyncedCheck = false): Promise<void> {
+  async function exportData(): Promise<void> {
+    setExporting(true);
+    try {
+      const data = await auth.exportMyData();
+      downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), "tieng-nha-mes-donnees.json");
+    } catch (e) {
+      toast.show({ title: e instanceof OfflineError ? a.offline : a.error });
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function leave(kind: "signout" | "delete", skipUnsyncedCheck = false, password = ""): Promise<void> {
     if (leaving.current) return;
     leaving.current = true;
     setPending(true);
@@ -219,12 +232,12 @@ export function MeScreen() {
         }
       }
       if (kind === "signout") await auth.signOut();
-      else await auth.deleteAccount();
+      else await auth.deleteAccount(password);
     } catch (e) {
       leaving.current = false;
       setPending(false);
       setConfirm(null);
-      toast.show({ title: e instanceof OfflineError ? fr.profile.account.offline : fr.profile.account.error });
+      toast.show({ title: e instanceof WrongPasswordError ? a.delete.wrongPassword : e instanceof OfflineError ? a.offline : a.error });
       return;
     }
     try {
@@ -340,6 +353,12 @@ export function MeScreen() {
         <Button variant="secondary" fullWidth onClick={() => setConfirm("signout")}>
           {a.signOut.open}
         </Button>
+        <Button variant="secondary" fullWidth loading={exporting} disabled={exporting} onClick={() => void exportData()}>
+          {a.export.open}
+        </Button>
+        <Link to="/privacy" className="inline-flex min-h-11 items-center justify-center text-caption text-ink-muted underline underline-offset-2">
+          {fr.privacy.title}
+        </Link>
         <div className="pt-6">
           <Button variant="danger" fullWidth onClick={() => setConfirm("delete")}>
             {a.delete.open}
@@ -381,7 +400,8 @@ export function MeScreen() {
         danger
         busy={pending}
         requireText={a.delete.word}
-        onConfirm={() => void leave("delete")}
+        requirePassword
+        onConfirm={(password) => void leave("delete", false, password)}
         onCancel={() => setConfirm(null)}
       />
     </div>

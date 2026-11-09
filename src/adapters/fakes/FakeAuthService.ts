@@ -1,4 +1,4 @@
-import { InvalidCredentialsError, InvalidInviteError, TooManyInviteAttemptsError, SamePasswordError, WeakPasswordError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
+import { InvalidCredentialsError, InvalidInviteError, TooManyInviteAttemptsError, WrongPasswordError, SamePasswordError, WeakPasswordError, NotAuthenticatedError, PseudoTakenError } from "@/domain/errors";
 import type { Session } from "@/domain/types";
 import type { AuthEvent, AuthService } from "@/ports";
 
@@ -152,7 +152,18 @@ export class FakeAuthService implements AuthService {
     this.setSession(null);
   }
 
-  async deleteAccount(): Promise<void> {
+  async exportMyData(): Promise<unknown> {
+    const session = this.requireSession();
+    return { account: { email: session.email }, profile: this.profile };
+  }
+
+  async getPrivacyContact(): Promise<string | null> {
+    return null;
+  }
+
+  async deleteAccount(password: string): Promise<void> {
+    const known = this.passwords[this.requireSession().email];
+    if (known !== undefined && known !== password) throw new WrongPasswordError();
     this.profile = null;
     this.setSession(null);
   }

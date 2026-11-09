@@ -2,7 +2,7 @@ import { useState } from "react";
 import { detectPlatform } from "@/domain/platform";
 import { useDeviceTest } from "@/app/appState";
 import { fr } from "@/i18n/fr";
-import { Button, DeviceCheck } from "@/ui";
+import { Button, DeviceCheck, VoiceNotice } from "@/ui";
 
 export function DeviceStep({ onNext }: { onNext(): void }) {
   const { result, busy, listening, testVoice, testMic, refresh } = useDeviceTest();
@@ -28,6 +28,7 @@ export function DeviceStep({ onNext }: { onNext(): void }) {
         busy={busy}
         listening={listening}
       />
+      <VoiceNotice />
       <Button size="lg" fullWidth loading={continuing} disabled={busy} onClick={() => void next()}>
         {t.next}
       </Button>

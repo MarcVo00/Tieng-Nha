@@ -13,16 +13,19 @@ type ConfirmDialogProps = {
   cancelLabel: string;
   danger?: boolean;
   requireText?: string;
+  /** Also asks for the account password, handed to `onConfirm`. */
+  requirePassword?: boolean;
   /** True while the confirmed action is running: the confirm button shows its loading state. */
   busy?: boolean;
-  onConfirm: () => void;
+  onConfirm: (password: string) => void;
   onCancel: () => void;
 };
 
-function Panel({ title, body, confirmLabel, cancelLabel, danger, requireText, busy = false, onConfirm, onCancel }: Omit<ConfirmDialogProps, "open">) {
+function Panel({ title, body, confirmLabel, cancelLabel, danger, requireText, requirePassword = false, busy = false, onConfirm, onCancel }: Omit<ConfirmDialogProps, "open">) {
   const [typed, setTyped] = useState("");
+  const [password, setPassword] = useState("");
   const titleId = useId();
-  const canConfirm = requireText === undefined || typed === requireText;
+  const canConfirm = (requireText === undefined || typed === requireText) && (!requirePassword || password !== "");
 
   const ref = useRef<HTMLDivElement>(null);
   useFocusTrap(ref, onCancel);
@@ -60,11 +63,23 @@ function Panel({ title, body, confirmLabel, cancelLabel, danger, requireText, bu
           />
         </label>
       ) : null}
+      {requirePassword ? (
+        <label className="mt-4 block">
+          <span className="block text-caption text-ink-muted">{fr.ui.confirm.passwordLabel}</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            className="mt-1 min-h-11 w-full rounded-sm border-2 border-line bg-bg px-3 text-body text-ink"
+          />
+        </label>
+      ) : null}
       <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="secondary" onClick={onCancel} autoFocus={requireText === undefined}>
           {cancelLabel}
         </Button>
-        <Button variant={danger ? "danger" : "primary"} loading={busy} disabled={!canConfirm || busy} onClick={onConfirm}>
+        <Button variant={danger ? "danger" : "primary"} loading={busy} disabled={!canConfirm || busy} onClick={() => onConfirm(password)}>
           {confirmLabel}
         </Button>
       </div>

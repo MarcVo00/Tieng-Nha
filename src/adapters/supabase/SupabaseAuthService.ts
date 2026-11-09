@@ -128,8 +128,20 @@ export class SupabaseAuthService implements AuthService {
     clearCachedSession();
   }
 
-  async deleteAccount(): Promise<void> {
-    const { error } = await this.db.rpc("delete_my_account");
+  async exportMyData(): Promise<unknown> {
+    const { data, error } = await this.db.rpc("export_my_data");
+    if (error) throw mapError(error);
+    return data;
+  }
+
+  async getPrivacyContact(): Promise<string | null> {
+    const { data, error } = await this.db.from("groups").select("privacy_contact").maybeSingle();
+    if (error) throw mapError(error);
+    return data?.privacy_contact ?? null;
+  }
+
+  async deleteAccount(password: string): Promise<void> {
+    const { error } = await this.db.rpc("delete_my_account", { p_password: password });
     if (error) throw mapError(error);
     await this.db.auth.signOut();
     clearCachedSession();

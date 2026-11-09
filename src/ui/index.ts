@@ -46,4 +46,5 @@ export { useChoiceKeys } from "@/ui/useChoiceKeys";
 export { DeviceCheck, type DeviceCheckProps } from "@/ui/DeviceCheck";
 export { ReportSheet } from "@/ui/ReportSheet";
 export { Certificate, type CertificateProps, type CertificateMention } from "@/ui/Certificate";
-export { drawCertificate, downloadCertificate, certificateToBlob, type CertificateData } from "@/ui/drawCertificate";
+export { VoiceNotice } from "@/ui/VoiceNotice";
+export { drawCertificate, downloadBlob, downloadCertificate, certificateToBlob, type CertificateData } from "@/ui/drawCertificate";

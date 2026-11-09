@@ -20,6 +20,7 @@ const LeaderboardScreen = lazy(() => import("@/features/leaderboard").then((m) =
 const PublicProfileScreen = lazy(() => import("@/features/leaderboard").then((m) => ({ default: m.PublicProfileScreen })));
 const ShopScreen = lazy(() => import("@/features/shop").then((m) => ({ default: m.ShopScreen })));
 const NewsScreen = lazy(() => import("@/features/profile").then((m) => ({ default: m.NewsScreen })));
+const PrivacyScreen = lazy(() => import("@/features/profile").then((m) => ({ default: m.PrivacyScreen })));
 const MeScreen = lazy(() => import("@/features/profile").then((m) => ({ default: m.MeScreen })));
 const LessonScreen = lazy(() => import("@/features/lessons").then((m) => ({ default: m.LessonScreen })));
 const LessonDoneScreen = lazy(() => import("@/features/lessons").then((m) => ({ default: m.LessonDoneScreen })));
@@ -48,6 +49,7 @@ const tabRoutes: RouteObject[] = [
   { path: "leaderboard", element: screen(LeaderboardScreen) },
   { path: "me", element: screen(MeScreen) },
   { path: "news", element: screen(NewsScreen) },
+  { path: "privacy", element: screen(PrivacyScreen) },
   { path: "shop", element: screen(ShopScreen) },
   { path: "u/:userId", element: screen(PublicProfileScreen) },
   { path: "exam", element: screen(ExamIntroScreen) },

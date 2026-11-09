@@ -10,7 +10,7 @@ import { useServices } from "@/app/ServicesProvider";
 import { useResumeAtZero } from "@/app/useCountdown";
 import { useLanguage } from "@/app/useLanguage";
 import { useDialogue, type DialogueNotice } from "@/features/conversation/useDialogue";
-import { BadgeMedal, rewardProp, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, Pron, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
+import { BadgeMedal, VoiceNotice, rewardProp, Button, Card, ConfirmDialog, Confetti, duration, EmptyState, FocusHeader, Icon, MicButton, Motif, NoEnergy, Pron, ReportSheet, Skeleton, spring, tap, XpCounter } from "@/ui";
 import type { ActivityResult } from "@/services/activity";
 
 const BADGE_STAGGER_MS = 280;
@@ -232,6 +232,7 @@ export function DialogueScreen() {
                   onPress={() => void d.listen()}
                   label={d.mic === "listening" ? fr.exercises.speak.micStop : fr.conversation.speakHint}
                 />
+                <VoiceNotice />
                 <p className="text-caption text-ink-muted">{fr.conversation.orChoose}</p>
               </div>
             ) : (

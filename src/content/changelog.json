@@ -2,6 +2,17 @@
   "contentVersion": 1,
   "entries": [
     {
+      "version": "2.4.0",
+      "date": "2026-11-05",
+      "title": "Tes données, ton choix",
+      "items": [
+        "Une page Confidentialité explique ce qui est gardé et qui le voit.",
+        "Tu peux télécharger toutes tes données depuis ton profil.",
+        "Supprimer ton compte demande maintenant ton mot de passe.",
+        "L'app te prévient quand ta voix peut passer par Google ou Apple."
+      ]
+    },
+    {
       "version": "2.3.1",
       "date": "2026-11-05",
       "title": "Plus de sécurité",

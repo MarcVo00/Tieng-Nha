@@ -1,4 +1,4 @@
-import { ExamLimitError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, SamePasswordError, WeakPasswordError, NotAuthenticatedError, OfflineError, PseudoTakenError } from "@/domain/errors";
+import { ExamLimitError, WrongPasswordError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, SamePasswordError, WeakPasswordError, NotAuthenticatedError, OfflineError, PseudoTakenError } from "@/domain/errors";
 
 /** Maps Supabase/PostgREST/network errors to domain errors. */
 export function mapError(
@@ -17,6 +17,7 @@ export function mapError(
   if (/Invalid login credentials/i.test(msg)) return new InvalidCredentialsError();
   if (/Password should be at least|should contain/i.test(msg)) return new WeakPasswordError();
   if (/should be different from the old password/i.test(msg)) return new SamePasswordError();
+  if (msg.includes("wrong_password")) return new WrongPasswordError();
   if (msg.includes("invalid_profile")) return new InvalidProfileError();
   if (msg.includes("invalid_invite")) return new InvalidInviteError();
   if (msg.includes("pseudo_taken") || err?.code === "23505") return new PseudoTakenError();

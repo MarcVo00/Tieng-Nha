@@ -3,7 +3,7 @@ import { SupabaseAuthService } from "@/adapters/supabase/SupabaseAuthService";
 import { mapError } from "@/adapters/supabase/errors";
 import { SupabaseEventSink } from "@/adapters/supabase/SupabaseEventSink";
 import { SupabaseExamGateway } from "@/adapters/supabase/SupabaseExamGateway";
-import { ExamLimitError, TooManyInviteAttemptsError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
+import { ExamLimitError, WrongPasswordError, TooManyInviteAttemptsError, InvalidCredentialsError, InvalidInviteError, InvalidProfileError, NotAuthenticatedError, OfflineError, SamePasswordError, WeakPasswordError } from "@/domain/errors";
 import type { AppEvent } from "@/domain/types";
 import type { ExamGateway } from "@/ports";
 
@@ -271,5 +271,20 @@ describe("SupabaseAuthService.joinGroup", () => {
     await expect(svc("joined").joinGroup("C", "Marc", "🐉")).resolves.toBeUndefined();
     await expect(svc("invalid_invite").joinGroup("C", "Marc", "🐉")).rejects.toBeInstanceOf(InvalidInviteError);
     await expect(svc("too_many_attempts").joinGroup("C", "Marc", "🐉")).rejects.toBeInstanceOf(TooManyInviteAttemptsError);
+  });
+});
+
+describe("SupabaseAuthService privacy", () => {
+  test("deletion sends the password, and a refusal maps to WrongPasswordError", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: null, error: { message: "wrong_password" } });
+    await expect(new SupabaseAuthService({ auth: { onAuthStateChange: vi.fn() }, rpc } as never).deleteAccount("x")).rejects.toBeInstanceOf(WrongPasswordError);
+    expect(rpc).toHaveBeenCalledWith("delete_my_account", { p_password: "x" });
+  });
+
+  test("the contact comes from the member's group row", async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { privacy_contact: "Marc" }, error: null });
+    const from = vi.fn(() => ({ select: () => ({ maybeSingle }) }));
+    await expect(new SupabaseAuthService({ auth: { onAuthStateChange: vi.fn() }, from } as never).getPrivacyContact()).resolves.toBe("Marc");
+    expect(from).toHaveBeenCalledWith("groups");
   });
 });

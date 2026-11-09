@@ -5,7 +5,7 @@ import { SLOW_VOICE_RATE, type ExerciseProps } from "@/exercises/types";
 import { fr } from "@/i18n/fr";
 import { RecognitionError } from "@/ports";
 import { saidExactly } from "@/services/pronunciation";
-import { Button, MicButton, Pron, SpeakerButton } from "@/ui";
+import { Button, MicButton, Pron, SpeakerButton, VoiceNotice } from "@/ui";
 
 type Speak = Extract<Exercise, { type: "speak" }>;
 type Mode = "stt" | "recorder" | "none";
@@ -143,6 +143,7 @@ export const Component: FC<ExerciseProps<Speak>> = ({ exercise, disabled, onAnsw
           disabled={disabled}
           onPress={() => void listen()}
         />
+        <VoiceNotice />
         {offerSelf ? (
           capabilities.recorder ? (
             <Button variant="secondary" size="lg" fullWidth disabled={disabled} onClick={switchToRecorder}>

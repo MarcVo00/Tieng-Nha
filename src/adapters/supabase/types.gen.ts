@@ -320,18 +320,21 @@ export type Database = {
           created_at: string
           id: string
           invite_code: string
+          privacy_contact: string | null
           name: string
         }
         Insert: {
           created_at?: string
           id?: string
           invite_code: string
+          privacy_contact?: string | null
           name: string
         }
         Update: {
           created_at?: string
           id?: string
           invite_code?: string
+          privacy_contact?: string | null
           name?: string
         }
         Relationships: []
@@ -511,8 +514,12 @@ export type Database = {
         Returns: Json
       }
       delete_my_account: {
-        Args: Record<PropertyKey, never>
+        Args: { p_password?: string }
         Returns: undefined
+      }
+      export_my_data: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       gacha_pull: {
         Args: {

@@ -15,5 +15,7 @@ export interface AuthService {
   getMyProfile(): Promise<{ pseudo: string; avatarEmoji: string } | null>;
   updateProfile(p: { pseudo: string; avatarEmoji: string }): Promise<void>; // PseudoTakenError
   signOut(): Promise<void>;
-  deleteAccount(): Promise<void>;
+  deleteAccount(password: string): Promise<void>; // WrongPasswordError
+  exportMyData(): Promise<unknown>; // everything stored about the signed-in user
+  getPrivacyContact(): Promise<string | null>; // null when the group has none
 }

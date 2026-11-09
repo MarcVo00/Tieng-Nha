@@ -159,13 +159,18 @@ export async function certificateToBlob(data: CertificateData, size = CERTIFICAT
 export async function downloadCertificate(data: CertificateData): Promise<boolean> {
   const blob = await certificateToBlob(data);
   if (!blob) return false;
+  downloadBlob(blob, "tieng-nha-certificat.png");
+  return true;
+}
+
+/** Hands a file to the browser's download. */
+export function downloadBlob(blob: Blob, name: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "tieng-nha-certificat.png";
+  link.download = name;
   document.body.appendChild(link);
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  return true;
 }

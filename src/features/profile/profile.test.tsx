@@ -5,7 +5,7 @@ import { ServicesProvider } from "@/app/ServicesProvider";
 import { useAppState } from "@/app/appState";
 import type { Services } from "@/app/services";
 import { createFakeServices, FakeAuthService } from "@/adapters/fakes";
-import { OfflineError, WeakPasswordError } from "@/domain/errors";
+import { OfflineError, WeakPasswordError, WrongPasswordError } from "@/domain/errors";
 import type { ProgressSnapshot } from "@/domain/types";
 import { MeScreen } from "@/features/profile";
 import { fr } from "@/i18n/fr";
@@ -227,14 +227,44 @@ test("account deletion requires typing SUPPRIMER, then clears everything", async
   const confirm = within(dialog).getByRole("button", { name: fr.profile.account.delete.confirm });
   expect(confirm).toBeDisabled();
   await user.type(within(dialog).getByLabelText(fr.ui.confirm.inputLabel), "SUPPRIMER");
+  await user.type(within(dialog).getByLabelText(fr.ui.confirm.passwordLabel), "secret123");
   await user.click(confirm);
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
-  expect(del).toHaveBeenCalledTimes(1);
+  expect(del).toHaveBeenCalledWith("secret123");
   expect(await services.progress.listEvents()).toEqual([]);
   expect((await services.progress.getSettings()).onboardingDone).toBe(false);
   expect(localStorage.getItem("tn-profile")).toBeNull();
   expect(localStorage.getItem("tn-theme")).toBeNull();
   expect(useAppState.getState().settings.onboardingDone).toBe(false);
+});
+
+test("a wrong password keeps the account and the data", async () => {
+  class Guarded extends FakeAuthService {
+    override async deleteAccount(): Promise<void> {
+      throw new WrongPasswordError();
+    }
+  }
+  const { services, router, user } = await setup({ auth: new Guarded() });
+  await services.progress.appendEvent({ type: "lesson_completed", refId: "l01", xp: 10, payload: {} }, NOW);
+  await user.click(screen.getByRole("button", { name: fr.profile.account.delete.open }));
+  const dialog = await screen.findByRole("alertdialog");
+  await user.type(within(dialog).getByLabelText(fr.ui.confirm.inputLabel), "SUPPRIMER");
+  await user.type(within(dialog).getByLabelText(fr.ui.confirm.passwordLabel), "nope");
+  await user.click(within(dialog).getByRole("button", { name: fr.profile.account.delete.confirm }));
+  expect(await screen.findByText(fr.profile.account.delete.wrongPassword)).toBeInTheDocument();
+  expect(router.state.location.pathname).toBe("/me");
+  expect(await services.progress.listEvents()).toHaveLength(1);
+});
+
+test("the account section downloads the user's data", async () => {
+  const { services, user } = await setup();
+  const exportData = vi.spyOn(services.auth, "exportMyData").mockResolvedValue({ account: { email: "m@x.fr" } });
+  const create = vi.fn(() => "blob:x");
+  URL.createObjectURL = create;
+  URL.revokeObjectURL = vi.fn();
+  await user.click(screen.getByRole("button", { name: fr.profile.account.export.open }));
+  await waitFor(() => expect(create).toHaveBeenCalledTimes(1));
+  expect(exportData).toHaveBeenCalledTimes(1);
 });
 
 test("offline deletion shows an error toast and keeps the data", async () => {
@@ -248,6 +278,7 @@ test("offline deletion shows an error toast and keeps the data", async () => {
   await user.click(screen.getByRole("button", { name: fr.profile.account.delete.open }));
   const dialog = await screen.findByRole("alertdialog");
   await user.type(within(dialog).getByLabelText(fr.ui.confirm.inputLabel), "SUPPRIMER");
+  await user.type(within(dialog).getByLabelText(fr.ui.confirm.passwordLabel), "secret123");
   await user.click(within(dialog).getByRole("button", { name: fr.profile.account.delete.confirm }));
   expect(await screen.findByText(fr.profile.account.offline)).toBeInTheDocument();
   expect(router.state.location.pathname).toBe("/me");
@@ -262,6 +293,7 @@ test("a failing clearAll after a successful delete still resets state and lands 
   await user.click(screen.getByRole("button", { name: fr.profile.account.delete.open }));
   const dialog = await screen.findByRole("alertdialog");
   await user.type(within(dialog).getByLabelText(fr.ui.confirm.inputLabel), "SUPPRIMER");
+  await user.type(within(dialog).getByLabelText(fr.ui.confirm.passwordLabel), "secret123");
   await user.click(within(dialog).getByRole("button", { name: fr.profile.account.delete.confirm }));
   await waitFor(() => expect(router.state.location.pathname).toBe("/welcome"));
   expect(warn).toHaveBeenCalled();

@@ -85,7 +85,7 @@ export const fr = {
     speaker: { play: "Écouter", slow: "Écouter lentement" },
     mic: { idle: "Appuie pour parler", listening: "Je t'écoute…", processing: "Un instant…" },
     report: { label: "Signaler", aria: "Signaler un problème avec cette réponse" },
-    confirm: { typeToConfirm: (text: string) => `Tape «\u202f${text}\u202f» pour confirmer`, inputLabel: "Confirmation" },
+    confirm: { typeToConfirm: (text: string) => `Tape «\u202f${text}\u202f» pour confirmer`, passwordLabel: "Ton mot de passe", inputLabel: "Confirmation" },
     tones: { ngang: "ngang", huyen: "huyền", sac: "sắc", hoi: "hỏi", nga: "ngã", nang: "nặng" },
     nav: { label: "Navigation principale", due: (n: number) => `${n} à réviser`, dueMany: "plus de 99 à réviser" },
     gallery: {
@@ -1073,12 +1073,50 @@ export const fr = {
         title: "Supprimer mon compte\u202f?",
         body: "Toutes tes données seront supprimées pour de bon, y compris ta place au classement du groupe. Cette action est irréversible.",
         word: "SUPPRIMER",
+        wrongPassword: "Ce n'est pas le bon mot de passe. Ton compte n'a pas été supprimé.",
         confirm: "Supprimer définitivement",
         cancel: "Annuler",
       },
+      export: { open: "Télécharger mes données" },
       offline: "Pas de connexion\u202f: réessaie quand tu es en ligne.",
       error: "Quelque chose a coincé. Réessaie dans un instant.",
     },
+  },
+  privacy: {
+    title: "Confidentialité",
+    back: "Retour à ton profil",
+    voiceNotice: "Pour reconnaître ce que tu dis, ton navigateur peut envoyer ta voix à Google ou Apple.",
+    who: {
+      title: "Qui s'en occupe\u202f?",
+      body: (contact: string) => `Tiếng Nhà est une app familiale, sans but commercial. Pour toute question sur tes données\u202f: ${contact}.`,
+      fallback: "Tiếng Nhà est une app familiale, sans but commercial. Pour toute question sur tes données, écris à la personne qui t'a invité·e.",
+    },
+    sections: [
+      {
+        title: "Ce qui est gardé",
+        body: "Ton e-mail, ton mot de passe (chiffré, personne ne peut le lire), ton pseudo, ton avatar, ta progression, tes xu, tes duels et tes signalements. Rien d'autre\u202f: ni nom, ni téléphone, ni adresse.",
+      },
+      {
+        title: "Pourquoi",
+        body: "Uniquement pour faire marcher l'app\u202f: te connecter, garder ta progression, le classement et les duels. Pas de publicité, pas de revente, aucun outil de suivi.",
+      },
+      {
+        title: "Qui voit quoi",
+        body: "Les membres de ton groupe voient ton pseudo, ton avatar, ta tenue et tes résultats (XP, série, leçons, succès, xu, scores de boss). Ton e-mail n'est visible par aucun membre.",
+      },
+      {
+        title: "Ta voix",
+        body: "Tes enregistrements restent sur ton téléphone. La reconnaissance vocale, elle, passe par ton navigateur, qui peut envoyer ta voix à Google ou Apple selon ton appareil. Tiếng Nhà ne la garde pas. Tu peux refuser le micro\u202f: l'app marche aussi sans.",
+      },
+      {
+        title: "Où et combien de temps",
+        body: "Tes données sont sur Supabase, en Irlande. Le site est servi par Netlify, et les codes de connexion passent par un service d'envoi d'e-mails. Tes données restent tant que ton compte existe.",
+      },
+      {
+        title: "Tes droits",
+        body: "Tu peux corriger ton profil, télécharger tes données et supprimer ton compte depuis ton profil. La suppression efface tes données du serveur et de cet appareil. Pour tout le reste, écris au contact ci-dessus. Tu peux aussi saisir la CNIL.",
+      },
+    ],
   },
 } as const;
 
